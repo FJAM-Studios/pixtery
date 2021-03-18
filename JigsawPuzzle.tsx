@@ -8,9 +8,9 @@ import {
 } from "react-native";
 import Draggable from "react-native-draggable";
 import * as _Svg from "react-native-svg";
-const { Svg, Image, Defs, ClipPath, Path } = _Svg;
-// import { shuffle } from "./util";
-const shuffle = (arr: any) => arr;
+const { Svg, Image, Defs, ClipPath, Path, Rect } = _Svg;
+import { shuffle } from "./util";
+// const shuffle = (arr: any) => arr;
 const image = require("./assets/earth.jpg");
 
 class Piece {
@@ -269,41 +269,35 @@ export default ({ boardSize }: { boardSize: number }) => {
         const startX =
           squareX === 0
             ? squareX * squareSize
-            : squareX * squareSize - squareSize * 0.2;
+            : squareX * squareSize - squareSize * 0.25;
         const startY =
           squareY === 0
             ? squareY * squareSize
-            : squareX * squareSize - squareSize * 0.2;
-        const widthX =
-          squareY === 0 || squareY === gridSize - 1
-            ? squareSize * 1.2
-            : squareSize * 1.4;
+            : squareY * squareSize - squareSize * 0.25;
         const widthY =
+          squareY === 0 || squareY === gridSize - 1
+            ? squareSize * 1.25
+            : squareSize * 1.5;
+        const widthX =
           squareX === 0 || squareX === gridSize - 1
-            ? squareSize * 1.2
-            : squareSize * 1.4;
-        console.log(startX, startY, widthX, widthY);
+            ? squareSize * 1.25
+            : squareSize * 1.5;
         return (
           <Draggable
             // this is cheating to force these to rerender and should be figured out properly later
             key={Math.random() * (1 + ix)}
-            x={initX * squareSize}
-            y={initY * squareSize}
+            x={Math.max(0, initX * squareSize - squareSize * 0.25)}
+            y={Math.max(0, initY * squareSize - squareSize * 0.25)}
           >
             <Svg
               height={widthY}
               width={widthX}
-              //viewBox = startX startY widthX widthY
               viewBox={`
-              ${squareX * squareSize}
-              ${squareY * squareSize}
-              ${widthX}
-              ${widthY}
-            `}
-              // ${Math.max(0, squareX * squareSize - squareSize * 0)}
-              // ${Math.max(0, squareY * squareSize - squareSize * 0)}
-              // ${squareSize * 1}
-              // ${squareSize * 1}
+                ${Math.max(0, squareX * squareSize - squareSize * 0.25)}
+                ${Math.max(0, squareY * squareSize - squareSize * 0.25)}
+                ${widthX}
+                ${widthY}
+              `}
             >
               <Defs>
                 <ClipPath id="clip">
@@ -320,7 +314,6 @@ export default ({ boardSize }: { boardSize: number }) => {
           </Draggable>
         );
       })}
-      {/* generate jigsaws*/}
       <View
         style={{
           flex: 1,
