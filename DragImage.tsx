@@ -2,11 +2,12 @@ import Draggable from "react-native-draggable";
 import React, { useState, useEffect } from "react";
 import * as ImageManipulator from "expo-image-manipulator";
 import { Asset } from "expo-asset";
-import { SquareProps } from "./Puzzle";
-import Svg, { Image, Defs, ClipPath, Path } from "react-native-svg";
+import { SquareProps } from "./SquaresPuzzle";
+import { Image } from "react-native";
 
+/** This is an individual tile piece */
 export default (props: SquareProps) => {
-  const { squareSize, initX, initY, squareX, squareY } = props;
+  const { squareSize, initX, initY, squareX, squareY, gridSize } = props;
   const [ready, setReady] = useState(false);
   const [image, setImage] = useState<ImageManipulator.ImageResult | null>(null);
 
@@ -19,8 +20,8 @@ export default (props: SquareProps) => {
         [
           {
             resize: {
-              width: squareSize * 3,
-              height: squareSize * 3,
+              width: squareSize * gridSize,
+              height: squareSize * gridSize,
             },
           },
           {
@@ -44,37 +45,18 @@ export default (props: SquareProps) => {
   const _renderImage = () => {
     if (image)
       return (
-        // <Image
-        //   source={{ uri: image.uri }}
-        //   style={{
-        //     width: squareSize,
-        //     height: squareSize,
-        //     resizeMode: "contain",
-        //   }}
-        // />
-        <Svg height={squareSize} width={squareSize}>
-          {/* 
-          TODO implement jigsaw path
-          <Defs>
-            <ClipPath id="clip">
-              <Path />
-            </ClipPath>
-          </Defs> */}
-          <Image
-            x={0}
-            y={0}
-            width="100%"
-            height="100%"
-            preserveAspectRatio="xMidYMid slice"
-            href={image}
-            clipPath="url(#clip)"
-          />
-        </Svg>
+        <Image
+          source={{ uri: image.uri }}
+          style={{
+            width: squareSize,
+            height: squareSize,
+            resizeMode: "contain",
+          }}
+        />
       );
   };
 
   if (!ready) return null;
-
   return (
     <Draggable x={initX * squareSize} y={initY * squareSize}>
       {ready && _renderImage()}
