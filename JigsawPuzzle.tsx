@@ -7,10 +7,8 @@ import {
   NativeTouchEvent,
 } from "react-native";
 import Draggable from "react-native-draggable";
-import * as _Svg from "react-native-svg";
-const { Svg, Image, Defs, ClipPath, Path, Rect } = _Svg;
+import { Svg, Image, Defs, ClipPath, Path } from "react-native-svg";
 import { shuffle } from "./util";
-// const shuffle = (arr: any) => arr;
 const image = require("./assets/earth.jpg");
 
 class Piece {
@@ -28,6 +26,8 @@ interface Point {
 export default ({ boardSize }: { boardSize: number }) => {
   const [gridSize, setGridSize] = useState(3);
   const squareSize = boardSize / gridSize;
+
+  //this function can be moved to its own module or utility file
 
   const generatePiecePaths = (gridSize: number, squareSize: number) => {
     //create empty array for storing Pieces in order
@@ -192,7 +192,7 @@ export default ({ boardSize }: { boardSize: number }) => {
       let str = `M ${(i % gridSize) * squareSize} ${
         Math.floor(i / gridSize) * squareSize
       } `;
-
+      //idk if this is good typescript
       const sides = ["top", "right", "bottom", "left"] as const;
       for (let side of sides) {
         //if only two points, denote line
@@ -266,14 +266,6 @@ export default ({ boardSize }: { boardSize: number }) => {
         const initY = Math.floor(ix / gridSize);
         const squareX = num % gridSize;
         const squareY = Math.floor(num / gridSize);
-        const startX =
-          squareX === 0
-            ? squareX * squareSize
-            : squareX * squareSize - squareSize * 0.25;
-        const startY =
-          squareY === 0
-            ? squareY * squareSize
-            : squareY * squareSize - squareSize * 0.25;
         const widthY =
           squareY === 0 || squareY === gridSize - 1
             ? squareSize * 1.25
@@ -286,12 +278,15 @@ export default ({ boardSize }: { boardSize: number }) => {
           <Draggable
             // this is cheating to force these to rerender and should be figured out properly later
             key={Math.random() * (1 + ix)}
+            //draggable SVG needs to be placed where cropped image starts. jigsaw shape extends beyond square
             x={Math.max(0, initX * squareSize - squareSize * 0.25)}
             y={Math.max(0, initY * squareSize - squareSize * 0.25)}
           >
             <Svg
+              //height and width are size of jigsaw piece
               height={widthY}
               width={widthX}
+              //view box is 'panned' to the right section of the image for the puzzle piece
               viewBox={`
                 ${Math.max(0, squareX * squareSize - squareSize * 0.25)}
                 ${Math.max(0, squareY * squareSize - squareSize * 0.25)}
@@ -306,6 +301,7 @@ export default ({ boardSize }: { boardSize: number }) => {
               </Defs>
               <Image
                 href={image}
+                //image needs to be as big as the board so that the clipping happens properly
                 width={boardSize}
                 height={boardSize}
                 clipPath="url(#clip)"
