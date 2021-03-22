@@ -9,7 +9,6 @@ import {
 import Draggable from "react-native-draggable";
 import { Svg, Image, Defs, ClipPath, Path } from "react-native-svg";
 import { shuffle } from "./util";
-const image = require("./assets/earth.jpg");
 
 class Piece {
   top: Point[] = [];
@@ -23,9 +22,19 @@ interface Point {
   y: number;
 }
 
-export default ({ boardSize }: { boardSize: number }) => {
+export default ({
+  boardSize,
+  imageURI,
+}: {
+  boardSize: number;
+  imageURI: string;
+}) => {
   const [gridSize, setGridSize] = useState(3);
   const squareSize = boardSize / gridSize;
+  let image: { uri: string };
+  if (imageURI && imageURI.length > 0) {
+    image = { uri: imageURI };
+  } else image = require("./assets/earth.jpg");
 
   //this function can be moved to its own module or utility file
 

@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "ts-camystery",
-    "slug": "ts-camystery",
+    "name": "svg-demo",
+    "slug": "svg-demo",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

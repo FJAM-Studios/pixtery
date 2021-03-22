@@ -7,14 +7,26 @@ import { Image } from "react-native";
 
 /** This is an individual tile piece */
 export default (props: SquareProps) => {
-  const { squareSize, initX, initY, squareX, squareY, gridSize } = props;
+  const {
+    squareSize,
+    initX,
+    initY,
+    squareX,
+    squareY,
+    gridSize,
+    imageURI,
+  } = props;
   const [ready, setReady] = useState(false);
   const [image, setImage] = useState<ImageManipulator.ImageResult | null>(null);
 
   useEffect(() => {
     const manipulateImage = async () => {
       setReady(false);
-      const image = Asset.fromModule(require("./assets/earth.jpg"));
+      // const image = Asset.fromModule(require("./assets/earth.jpg"));
+      let image;
+      if (imageURI && imageURI.length > 0) {
+        image = { uri: imageURI };
+      } else image = Asset.fromModule(require("./assets/earth.jpg"));
       const croppedImage = await ImageManipulator.manipulateAsync(
         image.localUri || image.uri,
         [

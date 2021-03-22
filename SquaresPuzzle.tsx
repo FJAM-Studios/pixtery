@@ -16,9 +16,16 @@ export interface SquareProps {
   squareX: number;
   squareY: number;
   gridSize: number;
+  imageURI: string;
 }
 
-export default ({ boardSize }: { boardSize: number }) => {
+export default ({
+  boardSize,
+  imageURI,
+}: {
+  boardSize: number;
+  imageURI: string;
+}) => {
   const [gridSize, setGridSize] = useState(3);
   const squareSize = boardSize / gridSize;
 
@@ -70,6 +77,7 @@ export default ({ boardSize }: { boardSize: number }) => {
             squareX={num % gridSize}
             squareY={Math.floor(num / gridSize)}
             gridSize={gridSize}
+            imageURI={imageURI}
           />
         );
       })}
