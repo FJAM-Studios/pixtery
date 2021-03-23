@@ -1,5 +1,5 @@
-import * as React from "react";
-import { View, Text, Button, ImageBackground } from "react-native";
+import React, { useEffect } from "react";
+import { View, Text, Button, ImageBackground, Platform } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 const image = require("./assets/bg.jpg");
 
@@ -12,20 +12,41 @@ export default function HomeScreen({
   imageURI: string;
   setImageURI: (uri: string) => void;
 }) {
+
+  // request gallery and camera permissions for iPhone. \
+  // Expo gives you a weird notification if you've already given permissions to another expo project, but that won't matter in       production.
+  useEffect(() => {
+    (async () => {
+      if (Platform.OS !== 'web') {
+        let response = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        const libraryPermission = response.status
+        if (libraryPermission !== 'granted') {
+          alert('Sorry, we need camera roll permissions to make this work!');
+        } else {
+          response = await ImagePicker.requestCameraPermissionsAsync();
+          const cameraPermission = response.status
+          if (cameraPermission !== 'granted') {
+            alert('Sorry, we need camera permissions to make this work!');
+          }
+        }
+      }
+    })()
+  }, []);
+
   const selectImage = async (camera: boolean) => {
     let result = camera
       ? await ImagePicker.launchCameraAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.All,
-          allowsEditing: true,
-          aspect: [4, 4],
-          quality: 1,
-        })
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 4],
+        quality: 1,
+      })
       : await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.All,
-          allowsEditing: true,
-          aspect: [4, 4],
-          quality: 1,
-        });
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 4],
+        quality: 1,
+      });
 
     console.log(result);
 
