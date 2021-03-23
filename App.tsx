@@ -20,6 +20,7 @@ const App = () => {
           {(props) => (
             <HomeScreen
               {...props}
+              boardSize={boardSize}
               setImageURI={setImageURI}
               imageURI={imageURI}
             />
