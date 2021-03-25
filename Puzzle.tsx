@@ -1,33 +1,34 @@
 import React, { useState } from "react";
 import {
+  Text,
   View,
   Button,
-  Text,
   NativeSyntheticEvent,
   NativeTouchEvent,
 } from "react-native";
-import DragImage from "./DragImage";
-import { shuffle } from "./util";
 
-export interface SquareProps {
-  squareSize: number;
-  initX: number;
-  initY: number;
-  squareX: number;
-  squareY: number;
-  gridSize: number;
-  imageURI: string;
-}
+import PuzzlePiece from "./PuzzlePiece";
+import { shuffle, generateJigsawPiecePaths } from "./util";
 
 export default ({
   boardSize,
   imageURI,
+  puzzleType,
 }: {
   boardSize: number;
   imageURI: string;
+  puzzleType: string;
 }) => {
   const [gridSize, setGridSize] = useState(3);
   const squareSize = boardSize / gridSize;
+  let image: { uri: string };
+  if (imageURI && imageURI.length > 0) {
+    image = { uri: imageURI };
+  } else image = require("./assets/earth.jpg");
+
+  const [piecePaths, setPiecePaths] = useState(
+    generateJigsawPiecePaths(gridSize, squareSize)
+  );
 
   const shufflePics = (ev?: NativeSyntheticEvent<NativeTouchEvent>) => {
     if (ev) ev.preventDefault();
@@ -39,10 +40,16 @@ export default ({
   const changeGrid = (up: boolean): void => {
     if (up && gridSize < 5) {
       setGridSize(gridSize + 1);
+      setPiecePaths(
+        generateJigsawPiecePaths(gridSize + 1, boardSize / (gridSize + 1))
+      );
       setRand(shuffle(fillArray(gridSize + 1)));
     }
     if (!up && gridSize > 2) {
       setGridSize(gridSize - 1);
+      setPiecePaths(
+        generateJigsawPiecePaths(gridSize - 1, boardSize / (gridSize - 1))
+      );
       setRand(shuffle(fillArray(gridSize - 1)));
     }
   };
@@ -67,20 +74,22 @@ export default ({
         width: "95%",
       }}
     >
-      {rand.map((num: number, ix: number) => {
-        return (
-          <DragImage
-            key={ix}
-            initX={ix % gridSize}
-            initY={Math.floor(ix / gridSize)}
-            squareSize={squareSize}
-            squareX={num % gridSize}
-            squareY={Math.floor(num / gridSize)}
-            gridSize={gridSize}
-            imageURI={imageURI}
-          />
-        );
-      })}
+      {/* could probably cut down on some of these props*/}
+      {rand.map((num: number, ix: number) => (
+        <PuzzlePiece
+          // this random key forces Draggable/React to rerender these pieces when changing board
+          // seems like cheating, but maybe not?
+          key={Math.random() * (1 + ix)}
+          num={num}
+          ix={ix}
+          gridSize={gridSize}
+          squareSize={squareSize}
+          puzzleType={puzzleType}
+          image={image}
+          piecePath={piecePaths[num]}
+          boardSize={boardSize}
+        />
+      ))}
       <View
         style={{
           flex: 1,

@@ -27,8 +27,6 @@ export default function HomeScreen({
           quality: 1,
         });
 
-    console.log(result);
-
     if (!result.cancelled) {
       setImageURI(result.uri);
     }
