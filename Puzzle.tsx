@@ -6,9 +6,13 @@ import {
   NativeSyntheticEvent,
   NativeTouchEvent,
 } from "react-native";
-
+import { Asset } from "expo-asset";
 import PuzzlePiece from "./PuzzlePiece";
 import { shuffle, generateJigsawPiecePaths } from "./util";
+import { testingMode } from "./constants";
+
+//disable shuffling for testing
+const disableShuffle = testingMode;
 
 export default ({
   boardSize,
@@ -24,7 +28,7 @@ export default ({
   let image: { uri: string };
   if (imageURI && imageURI.length > 0) {
     image = { uri: imageURI };
-  } else image = require("./assets/earth.jpg");
+  } else image = Asset.fromModule(require("./assets/earth.jpg"));
 
   const [piecePaths, setPiecePaths] = useState(
     generateJigsawPiecePaths(gridSize, squareSize)
@@ -33,7 +37,7 @@ export default ({
   const shufflePics = (ev?: NativeSyntheticEvent<NativeTouchEvent>) => {
     if (ev) ev.preventDefault();
     const _rand = [...rand];
-    shuffle(_rand);
+    shuffle(_rand, disableShuffle);
     setRand(_rand);
   };
 
@@ -43,14 +47,14 @@ export default ({
       setPiecePaths(
         generateJigsawPiecePaths(gridSize + 1, boardSize / (gridSize + 1))
       );
-      setRand(shuffle(fillArray(gridSize + 1)));
+      setRand(shuffle(fillArray(gridSize + 1), disableShuffle));
     }
     if (!up && gridSize > 2) {
       setGridSize(gridSize - 1);
       setPiecePaths(
         generateJigsawPiecePaths(gridSize - 1, boardSize / (gridSize - 1))
       );
-      setRand(shuffle(fillArray(gridSize - 1)));
+      setRand(shuffle(fillArray(gridSize - 1), disableShuffle));
     }
   };
 
@@ -62,7 +66,9 @@ export default ({
     return numberArray;
   };
 
-  const [rand, setRand] = useState(shuffle(fillArray(gridSize)));
+  const [rand, setRand] = useState(
+    shuffle(fillArray(gridSize), disableShuffle)
+  );
 
   return (
     <View

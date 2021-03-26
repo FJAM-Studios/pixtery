@@ -1,6 +1,10 @@
 import { Piece } from "./types";
 
-export const shuffle = (array: number[]): number[] => {
+export const shuffle = (
+  array: number[],
+  dontShuffle: boolean = false
+): number[] => {
+  if (dontShuffle) return array;
   let currentIndex = array.length,
     temporaryValue: number,
     randomIndex: number;
@@ -183,10 +187,16 @@ export const generateJigsawPiecePaths = (
   //construct SVG path data
   const piecePaths: string[] = [];
   for (let i = 0; i < pieces.length; i++) {
+    //to deal with iphone SVG difference, these offsets change SVG path to be relative to the piece rather than the overall image
+    const oX = Math.max(0, (i % gridSize) * squareSize - squareSize * 0.25);
+    const oY = Math.max(
+      0,
+      Math.floor(i / gridSize) * squareSize - squareSize * 0.25
+    );
     const piece = pieces[i];
     //move to top right point
-    let str = `M ${(i % gridSize) * squareSize} ${
-      Math.floor(i / gridSize) * squareSize
+    let str = `M ${(i % gridSize) * squareSize - oX} ${
+      Math.floor(i / gridSize) * squareSize - oY
     } `;
     //idk if this is good typescript
     const sides = ["top", "right", "bottom", "left"] as const;
@@ -198,8 +208,8 @@ export const generateJigsawPiecePaths = (
           (coord, ix) =>
             //3 points denotes curve
             `${ix % 3 === 0 && piece[side].length > 2 ? "C " : ""}${
-              Math.round(coord.x * 100) / 100
-            } ${Math.round(coord.y * 100) / 100} `
+              Math.round(coord.x * 100) / 100 - oX
+            } ${Math.round(coord.y * 100) / 100 - oY} `
         )
         .join("");
     }

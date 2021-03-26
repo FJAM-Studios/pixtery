@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Draggable from "react-native-draggable";
 import { Svg, Image, Defs, ClipPath, Path, Rect } from "react-native-svg";
+import * as ImageManipulator from "expo-image-manipulator";
 
 export default ({
   num,
@@ -29,7 +30,12 @@ export default ({
   //initX and initY are starting position for pieces (not aligned w grid for jigsaw)
   //viewBoxX and viewBoxY are 'panned' for selecting correct portion of image for piece
 
-  let widthY, widthX, initX, initY, viewBoxX, viewBoxY;
+  let widthY: number,
+    widthX: number,
+    initX,
+    initY,
+    viewBoxX: number,
+    viewBoxY: number;
 
   if (puzzleType === "squares") {
     //for square puzzles, everything is aligned to grid
@@ -56,6 +62,42 @@ export default ({
     viewBoxX = Math.max(0, squareX * squareSize - squareSize * 0.25);
     viewBoxY = Math.max(0, squareY * squareSize - squareSize * 0.25);
   }
+
+  const [ready, setReady] = useState(false);
+  const [croppedImage, setCroppedImage] = useState(image);
+
+  useEffect(() => {
+    const manipulateImage = async () => {
+      setReady(false);
+      const croppedImage = await ImageManipulator.manipulateAsync(
+        image.uri,
+        [
+          {
+            resize: {
+              width: boardSize,
+              height: boardSize,
+            },
+          },
+          {
+            crop: {
+              originX: viewBoxX,
+              originY: viewBoxY,
+              width: widthX,
+              height: widthY,
+            },
+          },
+        ],
+        { compress: 1, format: ImageManipulator.SaveFormat.JPEG }
+      );
+      setCroppedImage(croppedImage);
+      setReady(true);
+    };
+
+    manipulateImage();
+  }, []);
+
+  if (!ready) return null;
+
   return (
     <Draggable
       //draggable SVG needs to be placed where cropped image starts. jigsaw shape extends beyond square
@@ -66,13 +108,6 @@ export default ({
         //height and width are size of jigsaw piece
         height={widthY}
         width={widthX}
-        //view box is 'panned' to the right section of the image for the puzzle piece
-        viewBox={`
-        ${viewBoxX}
-        ${viewBoxY}
-        ${widthX}
-        ${widthY}
-      `}
       >
         <Defs>
           {/* for jigsaws, clip using piecePaths */}
@@ -86,16 +121,17 @@ export default ({
               stroke="white"
               x={0}
               y={0}
-              width={boardSize}
-              height={boardSize}
+              width={widthX}
+              height={widthY}
             />
           </ClipPath>
         </Defs>
+        {/* <Path d={piecePath} stroke="white" /> */}
+
         <Image
-          href={image}
-          //image needs to be as big as the board so that the clipping happens properly
-          width={boardSize}
-          height={boardSize}
+          href={croppedImage}
+          width={widthX}
+          height={widthY}
           clipPath={`url(#${puzzleType})`}
         />
       </Svg>
