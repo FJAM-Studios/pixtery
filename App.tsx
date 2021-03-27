@@ -11,7 +11,7 @@ import HomeScreen from "./Home";
 const theme = {
   ...DefaultTheme,
   roundness: 10,
-  color: {
+  colors: {
     ...DefaultTheme.colors,
     primary: "#7D8CC4",
     accent: "#B8336A",
@@ -42,6 +42,7 @@ const App = () => {
                   {...props}
                   setImageURI={setImageURI}
                   imageURI={imageURI}
+                  boardSize={boardSize}
                 />
               )}
             </Stack.Screen>
