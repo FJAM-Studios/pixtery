@@ -40,7 +40,20 @@ export default ({
     shuffle(_rand, disableShuffle);
     setRand(_rand);
   };
+//TO DO gridsections TS and interface
+  const getGridSections = () => {
+    let gridSections = {}
+    for(let i = 0; i < gridSize * gridSize; i++) {
+        const x = (i % gridSize) * squareSize;
+        const y = Math.floor(i / gridSize) * squareSize;
+        gridSections[i] = [x, y]
+    }
+    return gridSections
+}
 
+const [gridSections, setGridSections] = useState(getGridSections());
+
+// TO DO need to include grid sections in this function
   const changeGrid = (up: boolean): void => {
     if (up && gridSize < 5) {
       setGridSize(gridSize + 1);
@@ -69,6 +82,13 @@ export default ({
   const [rand, setRand] = useState(
     shuffle(fillArray(gridSize), disableShuffle)
   );
+console.log('rand', rand)
+// rand needs to match up with ix?
+// after generating rand, calculate answer set
+// answer set initialized as [false, false,...] taking into account pieces that coincidentally start at correct place
+// pass down to PuzzlePiece as a prop a function that will update tihs answer array 
+// i.e. whether each puzzle piece matches up to where on the grid it should be
+// if all are true then it's a win
 
   return (
     <View
@@ -94,6 +114,7 @@ export default ({
           image={image}
           piecePath={piecePaths[num]}
           boardSize={boardSize}
+          gridSections={gridSections}
         />
       ))}
       <View
@@ -122,3 +143,6 @@ export default ({
     </View>
   );
 };
+
+// is there a way we know when user has released a piece
+// figure out where to get locations of dragged pieces

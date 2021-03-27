@@ -12,6 +12,7 @@ export default ({
   boardSize,
   piecePath,
   image,
+  gridSections
 }: {
   num: number;
   ix: number;
@@ -21,6 +22,7 @@ export default ({
   boardSize: number;
   piecePath: string;
   image: { uri: string };
+  // TO DO include type for gridsections
 }) => {
   //squareX and squareY represent the row and col of the square in the solved puzzle
   const squareX = num % gridSize;
@@ -96,6 +98,21 @@ export default ({
     manipulateImage();
   }, []);
 
+  const snap = (pageX, pageY) => {
+    console.log(pageX, pageY)
+    console.log('gridsections', gridSections)
+  }
+//   console.log(
+//       'num',num,
+//       'ix',ix,
+//       'squareX',squareX,
+//       'squareY',squareY,
+//     'initx',initX,
+//     'inity',initY,
+//     'viewboxX',viewBoxX,
+//     'viewboxY',viewBoxY,
+//     'squaresize', squareSize
+//   )
   if (!ready) return null;
 
   return (
@@ -103,6 +120,7 @@ export default ({
       //draggable SVG needs to be placed where cropped image starts. jigsaw shape extends beyond square
       x={initX}
       y={initY}
+      onDragRelease={(ev) => snap(ev.nativeEvent.pageX, ev.nativeEvent.pageY)}
     >
       <Svg
         //height and width are size of jigsaw piece
@@ -138,3 +156,6 @@ export default ({
     </Draggable>
   );
 };
+//square X and Y, viewboxX/Y
+// what needs to align on this piece so that we know its in teh correct spot? 
+// how do we get the position of where this has been dragged?
