@@ -1,6 +1,9 @@
 import * as React from "react";
-import { View, Text, Button, ImageBackground } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Text, Button, ImageBackground } from "react-native";
 import * as ImagePicker from "expo-image-picker";
+import Hamburger from "./Hamburger";
+
 const image = require("./assets/bg.jpg");
 
 export default function HomeScreen({
@@ -33,7 +36,7 @@ export default function HomeScreen({
   };
 
   return (
-    <View
+    <SafeAreaView
       style={{
         flex: 1,
         flexDirection: "column",
@@ -67,6 +70,6 @@ export default function HomeScreen({
           disabled={imageURI.length === 0}
         />
       </ImageBackground>
-    </View>
+    </SafeAreaView>
   );
 }

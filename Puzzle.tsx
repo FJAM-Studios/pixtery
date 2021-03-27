@@ -6,6 +6,7 @@ import {
   NativeSyntheticEvent,
   NativeTouchEvent,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import PuzzlePiece from "./PuzzlePiece";
 import { shuffle, generateJigsawPiecePaths } from "./util";
@@ -65,7 +66,7 @@ export default ({
   const [rand, setRand] = useState(shuffle(fillArray(gridSize)));
 
   return (
-    <View
+    <SafeAreaView
       style={{
         flex: 1,
         justifyContent: "flex-end",
@@ -113,6 +114,6 @@ export default ({
         />
       </View>
       <Button title="Reset" onPress={shufflePics} />
-    </View>
+    </SafeAreaView>
   );
 };
