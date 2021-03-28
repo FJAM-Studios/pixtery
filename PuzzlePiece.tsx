@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import Draggable from "react-native-draggable";
 import { Svg, Image, Defs, ClipPath, Path, Rect } from "react-native-svg";
 import * as ImageManipulator from "expo-image-manipulator";
+// to do
+// redo convertix rules of touch from just larger or smaller than grid divider
 
 export default ({
   num,
@@ -102,61 +104,33 @@ export default ({
     manipulateImage();
   }, []);
 
-
-  const getTouchXY = (ev) => {
-    // ev.preventDefault();
-    const x = ev.nativeEvent.pageX;
-    const y = ev.nativeEvent.pageY;
-    console.log('touch', x, y)
-    setTouchX(x)
-    setTouchY(y)
+  const convertToIx = (ev) => {
+    ev.preventDefault();
+    const touchCol = ev.nativeEvent.pageX;
+    const touchRow = ev.nativeEvent.pageY;
+    let snappedRow;
+    let snappedCol;
+    const rowDividers = gridSections.rowDividers
+    for(let i = 0; i <= rowDividers.length - 1; i++) {
+        const rowDivider = rowDividers[i]
+        const nextRowDivider = (rowDividers[i+1] || rowDivider + squareSize)
+        if(touchRow > rowDivider && touchRow <= nextRowDivider) {
+            snappedRow = i;
+            break;
+        }
+    }
+    const colDividers = gridSections.colDividers
+    for(let i = 0; i <= colDividers.length - 1; i++) {
+        const colDivider = colDividers[i]
+        const nextColDivider = (colDividers[i+1] || colDivider + squareSize)
+        if(touchCol > colDivider && touchCol <= nextColDivider) {
+            snappedCol = i;
+            break;
+        }
+    }
+    let newIx = snappedRow * gridSize + snappedCol
+    console.log('touchCol', touchCol, 'touchRow', touchRow, 'row', snappedRow, 'col', snappedCol, 'newix', newIx, gridSections)
   }
-
-  useEffect(() => {
-    const snap = () => {
-        const x = touchX;
-        const y = touchY;
-        // console.log(x, y)
-        let snappedX;
-        let snappedY;
-        const rowDividers = gridSections.rowDividers
-        for(let i = 0; i <= rowDividers.length - 1; i++) {
-            const rowDivider = rowDividers[i]
-            const nextRowDivider = (rowDividers[i+1] || rowDivider + squareSize)
-            if(x > rowDivider && x <= nextRowDivider) {
-                snappedX = rowDivider;
-                break;
-            }
-        }
-        const colDividers = gridSections.colDividers
-        for(let i = 0; i <= colDividers.length - 1; i++) {
-            const colDivider = colDividers[i]
-            const nextColDivider = (colDividers[i+1] || colDivider + squareSize)
-            if(y > colDivider && y <= nextColDivider) {
-                snappedY = colDivider;
-                break;
-            }
-        }
-        // console.log('x', x, 'y', y,'snapx', snappedX, 'snapy', snappedY)
-    
-        // if either of them are undefined, it means piece was moved to outside the grid, so use the raw location that piece was dragged to
-        if(!snappedX || !snappedY) {
-            snappedX = 0
-            snappedY = 0
-        }
-        console.log('after','x', x, 'y', y,'snapx', snappedX, 'snapy', snappedY)
-    
-        // start here - it is not snappeing to where it needs to. i think it is because i need to return a new draggable - the xy coordinate updates are not working
-        // might be an xy update on svg?
-        // try updating state for pageX pageY values, and then running onEffect
-        setCurrentX(snappedX)
-        setCurrentY(snappedY)
-        // console.log('pagex',pageX, 'pagey',pageY)
-        // console.log('then gridsections', gridSections)
-      };
-      snap()
-  }, [touchX])
-
   
   console.log(
       'num',num,
@@ -169,15 +143,14 @@ export default ({
     'viewboxY',viewBoxY,
     'squaresize', squareSize
   )
-// console.log('idx', ix, 'initx', initX, 'inity', initY)
   if (!ready) return null;
 
   return (
     <Draggable
       //draggable SVG needs to be placed where cropped image starts. jigsaw shape extends beyond square
-      x={currentX}
-      y={currentY}
-      onDragRelease={(ev) => getTouchXY(ev)}
+      x={initX}
+      y={initY}
+      onRelease={convertToIx}
     >
       <Svg
         //height and width are size of jigsaw piece

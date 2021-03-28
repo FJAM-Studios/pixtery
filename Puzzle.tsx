@@ -40,15 +40,21 @@ export default ({
     shuffle(_rand, disableShuffle);
     setRand(_rand);
   };
-//TO DO gridsections TS and interface. need to add case for square and jigsaw
+//TO DO gridsections TS and interface. need to add case for jigsaw
   const getGridSections = () => {
-    let gridSections = {rowDividers: [], colDividers: []}
-    for(let i = 0; i < gridSize; i++) {
+    let gridSections = {rowDividers: [], colDividers: []} // separated row and col in case needed for future flexibility
+    for(let i = 0; i <= gridSize; i++) {
         let x: number;
         let y: number;
         if(puzzleType === 'squares') {
-            x = (i % gridSize) * squareSize;
-            y = (i % gridSize) * squareSize;
+            if(i === gridSize) {
+                x = gridSize * squareSize
+                y = gridSize * squareSize
+            }
+            else {
+                x = i % gridSize * squareSize;
+                y = i % gridSize * squareSize;    
+            }
         }
         else {
             // insert jigsaw logic
