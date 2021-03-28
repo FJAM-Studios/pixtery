@@ -67,6 +67,10 @@ export default ({
 
   const [ready, setReady] = useState(false);
   const [croppedImage, setCroppedImage] = useState(image);
+  const [currentX, setCurrentX] = useState(initX)
+  const [currentY, setCurrentY] = useState(initY)
+  const [touchX, setTouchX] = useState(initX)
+  const [touchY, setTouchY] = useState(initY)
 
   useEffect(() => {
     const manipulateImage = async () => {
@@ -98,29 +102,82 @@ export default ({
     manipulateImage();
   }, []);
 
-  const snap = (pageX, pageY) => {
-    console.log(pageX, pageY)
-    console.log('gridsections', gridSections)
+
+  const getTouchXY = (ev) => {
+    // ev.preventDefault();
+    const x = ev.nativeEvent.pageX;
+    const y = ev.nativeEvent.pageY;
+    console.log('touch', x, y)
+    setTouchX(x)
+    setTouchY(y)
   }
-//   console.log(
-//       'num',num,
-//       'ix',ix,
-//       'squareX',squareX,
-//       'squareY',squareY,
-//     'initx',initX,
-//     'inity',initY,
-//     'viewboxX',viewBoxX,
-//     'viewboxY',viewBoxY,
-//     'squaresize', squareSize
-//   )
+
+  useEffect(() => {
+    const snap = () => {
+        const x = touchX;
+        const y = touchY;
+        // console.log(x, y)
+        let snappedX;
+        let snappedY;
+        const rowDividers = gridSections.rowDividers
+        for(let i = 0; i <= rowDividers.length - 1; i++) {
+            const rowDivider = rowDividers[i]
+            const nextRowDivider = (rowDividers[i+1] || rowDivider + squareSize)
+            if(x > rowDivider && x <= nextRowDivider) {
+                snappedX = rowDivider;
+                break;
+            }
+        }
+        const colDividers = gridSections.colDividers
+        for(let i = 0; i <= colDividers.length - 1; i++) {
+            const colDivider = colDividers[i]
+            const nextColDivider = (colDividers[i+1] || colDivider + squareSize)
+            if(y > colDivider && y <= nextColDivider) {
+                snappedY = colDivider;
+                break;
+            }
+        }
+        // console.log('x', x, 'y', y,'snapx', snappedX, 'snapy', snappedY)
+    
+        // if either of them are undefined, it means piece was moved to outside the grid, so use the raw location that piece was dragged to
+        if(!snappedX || !snappedY) {
+            snappedX = 0
+            snappedY = 0
+        }
+        console.log('after','x', x, 'y', y,'snapx', snappedX, 'snapy', snappedY)
+    
+        // start here - it is not snappeing to where it needs to. i think it is because i need to return a new draggable - the xy coordinate updates are not working
+        // might be an xy update on svg?
+        // try updating state for pageX pageY values, and then running onEffect
+        setCurrentX(snappedX)
+        setCurrentY(snappedY)
+        // console.log('pagex',pageX, 'pagey',pageY)
+        // console.log('then gridsections', gridSections)
+      };
+      snap()
+  }, [touchX])
+
+  
+  console.log(
+      'num',num,
+      'ix',ix,
+      'squareX',squareX,
+      'squareY',squareY,
+    'initx',initX,
+    'inity',initY,
+    'viewboxX',viewBoxX,
+    'viewboxY',viewBoxY,
+    'squaresize', squareSize
+  )
+// console.log('idx', ix, 'initx', initX, 'inity', initY)
   if (!ready) return null;
 
   return (
     <Draggable
       //draggable SVG needs to be placed where cropped image starts. jigsaw shape extends beyond square
-      x={initX}
-      y={initY}
-      onDragRelease={(ev) => snap(ev.nativeEvent.pageX, ev.nativeEvent.pageY)}
+      x={currentX}
+      y={currentY}
+      onDragRelease={(ev) => getTouchXY(ev)}
     >
       <Svg
         //height and width are size of jigsaw piece

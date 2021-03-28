@@ -10,7 +10,8 @@ const Stack = createStackNavigator();
 const App = () => {
   const [imageURI, setImageURI] = useState("");
   const { width, height } = useWindowDimensions();
-  const boardSize = 0.95 * Math.min(height, width);
+  console.log('windowwidth', width, 'winheight', height)
+  const boardSize = Math.min(height, width);
 
   return (
     <NavigationContainer>

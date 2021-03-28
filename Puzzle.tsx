@@ -40,14 +40,24 @@ export default ({
     shuffle(_rand, disableShuffle);
     setRand(_rand);
   };
-//TO DO gridsections TS and interface
+//TO DO gridsections TS and interface. need to add case for square and jigsaw
   const getGridSections = () => {
-    let gridSections = {}
-    for(let i = 0; i < gridSize * gridSize; i++) {
-        const x = (i % gridSize) * squareSize;
-        const y = Math.floor(i / gridSize) * squareSize;
-        gridSections[i] = [x, y]
+    let gridSections = {rowDividers: [], colDividers: []}
+    for(let i = 0; i < gridSize; i++) {
+        let x: number;
+        let y: number;
+        if(puzzleType === 'squares') {
+            x = (i % gridSize) * squareSize;
+            y = (i % gridSize) * squareSize;
+        }
+        else {
+            // insert jigsaw logic
+        }
+        console.log(i, 'x',x, 'y',y, squareSize)
+        gridSections.rowDividers.push(x)
+        gridSections.colDividers.push(y)
     }
+    console.log(gridSections)
     return gridSections
 }
 
@@ -82,7 +92,6 @@ const [gridSections, setGridSections] = useState(getGridSections());
   const [rand, setRand] = useState(
     shuffle(fillArray(gridSize), disableShuffle)
   );
-console.log('rand', rand)
 // rand needs to match up with ix?
 // after generating rand, calculate answer set
 // answer set initialized as [false, false,...] taking into account pieces that coincidentally start at correct place
