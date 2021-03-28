@@ -8,10 +8,13 @@ import {
   Surface,
   Headline,
   TextInput,
+  ActivityIndicator,
 } from "react-native-paper";
 import * as ImagePicker from "expo-image-picker";
 import Header from "./Header";
 const emptyImage = require("./assets/blank.jpg");
+import Logo from "./Logo";
+import Title from "./Title";
 
 export default ({
   navigation,
@@ -54,6 +57,32 @@ export default ({
     }
   };
   const [message, setMessage] = React.useState("");
+  const [isLoading, setLoading] = React.useState(true);
+  setTimeout(() => setLoading(false), 1500);
+  if (isLoading) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          flexDirection: "column",
+          padding: 10,
+          backgroundColor: theme.colors.background,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Logo width="100" height="100" />
+        <Title width="100" height="35" />
+        <Headline>Pretending To Load</Headline>
+        <ActivityIndicator
+          animating={true}
+          color={theme.colors.text}
+          size="large"
+        />
+      </View>
+    );
+  }
+
   return (
     <SafeAreaView
       style={{
@@ -71,16 +100,27 @@ export default ({
           alignItems: "center",
         }}
       >
-        <Image
-          source={imageURI.length ? { uri: imageURI } : emptyImage}
+        <Surface
           style={{
-            width: boardSize / 1.6,
-            height: boardSize / 1.6,
+            padding: 8,
+            alignItems: "center",
+            justifyContent: "center",
+            elevation: 4,
             borderRadius: theme.roundness,
-            alignSelf: "center",
+            backgroundColor: theme.colors.accent,
           }}
-        />
-        {imageURI.length ? null : <Headline>Choose an Image</Headline>}
+        >
+          <Image
+            source={imageURI.length ? { uri: imageURI } : emptyImage}
+            style={{
+              width: boardSize / 1.6,
+              height: boardSize / 1.6,
+              borderRadius: theme.roundness,
+              alignSelf: "center",
+            }}
+          />
+          {imageURI.length ? null : <Headline>Choose an Image</Headline>}
+        </Surface>
       </View>
       <Button
         icon="camera"
@@ -238,7 +278,7 @@ export default ({
         onPress={() => {}}
         style={{ margin: 10 }}
       >
-        Send!
+        Send
       </Button>
     </SafeAreaView>
   );

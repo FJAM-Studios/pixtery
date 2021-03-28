@@ -1,6 +1,8 @@
 import React from "react";
 import { View, TouchableWithoutFeedback } from "react-native";
-import { IconButton, Text, Badge, Menu, Divider } from "react-native-paper";
+import { IconButton, Badge, Menu, Divider } from "react-native-paper";
+import Logo from "./Logo";
+import Title from "./Title";
 
 export default ({
   notifications,
@@ -22,15 +24,15 @@ export default ({
           flexDirection: "row",
         }}
       >
-        <Text
+        <View
           style={{
-            fontSize: 35,
-            color: theme.colors.surface,
-            fontWeight: "bold",
+            alignItems: "center",
+            flexDirection: "row",
           }}
         >
-          Pixtery
-        </Text>
+          <Title width="100" height="25" style={{ marginRight: 10 }} />
+          <Logo width="25" height="25" />
+        </View>
         <Menu
           visible={visible}
           onDismiss={closeMenu}
