@@ -59,7 +59,6 @@ export default ({
         else {
             // insert jigsaw logic
         }
-        console.log(i, 'x',x, 'y',y, squareSize)
         gridSections.rowDividers.push(x)
         gridSections.colDividers.push(y)
     }
@@ -130,6 +129,8 @@ const [gridSections, setGridSections] = useState(getGridSections());
           piecePath={piecePaths[num]}
           boardSize={boardSize}
           gridSections={gridSections}
+          rand={rand}
+          setRand={setRand}
         />
       ))}
       <View

@@ -2,8 +2,10 @@ import React, { useState, useEffect } from "react";
 import Draggable from "react-native-draggable";
 import { Svg, Image, Defs, ClipPath, Path, Rect } from "react-native-svg";
 import * as ImageManipulator from "expo-image-manipulator";
+import { TextComponent } from "react-native";
 // to do
 // redo convertix rules of touch from just larger or smaller than grid divider
+  // TO DO update type for gridsections, rand, setRand
 
 export default ({
   num,
@@ -14,7 +16,9 @@ export default ({
   boardSize,
   piecePath,
   image,
-  gridSections
+  gridSections,
+  rand,
+  setRand
 }: {
   num: number;
   ix: number;
@@ -24,7 +28,9 @@ export default ({
   boardSize: number;
   piecePath: string;
   image: { uri: string };
-  // TO DO include type for gridsections
+  gridSections: any;
+  rand: any;
+  setRand: any;
 }) => {
   //squareX and squareY represent the row and col of the square in the solved puzzle
   const squareX = num % gridSize;
@@ -104,45 +110,61 @@ export default ({
     manipulateImage();
   }, []);
 
-  const convertToIx = (ev) => {
+  const convertNewPosToIx = (ev) => {
     ev.preventDefault();
     const touchCol = ev.nativeEvent.pageX;
     const touchRow = ev.nativeEvent.pageY;
     let snappedRow;
     let snappedCol;
     const rowDividers = gridSections.rowDividers
-    for(let i = 0; i <= rowDividers.length - 1; i++) {
+    // start here - need to make sure rows / cols dont go beyond 2
+    for(let i = 0; i <= rowDividers.length - 2; i++) {
         const rowDivider = rowDividers[i]
-        const nextRowDivider = (rowDividers[i+1] || rowDivider + squareSize)
+        const nextRowDivider = i < rowDividers.length-2 ? rowDividers[i+1] : rowDivider + squareSize
         if(touchRow > rowDivider && touchRow <= nextRowDivider) {
             snappedRow = i;
             break;
         }
     }
     const colDividers = gridSections.colDividers
-    for(let i = 0; i <= colDividers.length - 1; i++) {
+    for(let i = 0; i <= colDividers.length - 2; i++) {
         const colDivider = colDividers[i]
-        const nextColDivider = (colDividers[i+1] || colDivider + squareSize)
+        const nextColDivider = i < colDividers.length-2 ? colDividers[i+1] : colDivider + squareSize
         if(touchCol > colDivider && touchCol <= nextColDivider) {
             snappedCol = i;
             break;
         }
     }
+    if(snappedRow === undefined || snappedCol === undefined) {
+        console.log('undefined', 'touchCol', touchCol, 'touchRow', touchRow, 'row', snappedRow, 'col', snappedCol)
+        return;
+    }
     let newIx = snappedRow * gridSize + snappedCol
-    console.log('touchCol', touchCol, 'touchRow', touchRow, 'row', snappedRow, 'col', snappedCol, 'newix', newIx, gridSections)
+    console.log('touchCol', touchCol, 'touchRow', touchRow, 'row', snappedRow, 'col', snappedCol, 'newix', newIx)
+    sendUpdatedOrderToPuzzle(newIx)
+
   }
   
-  console.log(
-      'num',num,
-      'ix',ix,
-      'squareX',squareX,
-      'squareY',squareY,
-    'initx',initX,
-    'inity',initY,
-    'viewboxX',viewBoxX,
-    'viewboxY',viewBoxY,
-    'squaresize', squareSize
-  )
+  const sendUpdatedOrderToPuzzle = (newIx) => {
+    // swap
+    let newRand = [...rand]
+    const temp = newRand[newIx]
+    newRand[newIx] = num
+    newRand[ix] = temp
+    console.log('newIx', newIx, 'oldrand', rand, 'newrand', newRand)
+    setRand(newRand)
+  }
+
+//   console.log(
+//       'num',num,
+//       'ix',ix,
+//       'squareX',squareX,
+//       'squareY',squareY,
+//     'initx',initX,
+//     'inity',initY,
+//     'viewboxX',viewBoxX,
+//     'viewboxY',viewBoxY,
+//   )
   if (!ready) return null;
 
   return (
@@ -150,7 +172,7 @@ export default ({
       //draggable SVG needs to be placed where cropped image starts. jigsaw shape extends beyond square
       x={initX}
       y={initY}
-      onRelease={convertToIx}
+      onRelease={convertNewPosToIx}
     >
       <Svg
         //height and width are size of jigsaw piece
