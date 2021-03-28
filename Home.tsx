@@ -1,21 +1,38 @@
 import * as React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Image, View } from "react-native";
-import { Button } from "react-native-paper";
+import {
+  Button,
+  IconButton,
+  Text,
+  Surface,
+  Headline,
+  TextInput,
+} from "react-native-paper";
 import * as ImagePicker from "expo-image-picker";
-import Hamburger from "./Hamburger";
-const emptyImage = require("./assets/earth.jpg");
+import Header from "./Header";
+const emptyImage = require("./assets/blank.jpg");
 
 export default ({
   navigation,
   imageURI,
   setImageURI,
   boardSize,
+  theme,
+  puzzleType,
+  setPuzzleType,
+  gridSize,
+  setGridSize,
 }: {
   navigation: any;
   imageURI: string;
   setImageURI: (uri: string) => void;
   boardSize: number;
+  theme: any;
+  puzzleType: string;
+  setPuzzleType: (puzzleType: string) => void;
+  gridSize: number;
+  setGridSize: (gridSize: number) => void;
 }) => {
   const selectImage = async (camera: boolean) => {
     let result = camera
@@ -36,31 +53,34 @@ export default ({
       setImageURI(result.uri);
     }
   };
-
+  const [message, setMessage] = React.useState("");
   return (
     <SafeAreaView
       style={{
         flex: 1,
         flexDirection: "column",
         padding: 10,
+        backgroundColor: theme.colors.background,
+        justifyContent: "space-between",
       }}
     >
-      <Hamburger notifications={0} />
+      <Header theme={theme} notifications={2} />
       <View
         style={{
-          width: boardSize,
-          height: boardSize,
-          marginBottom: 10,
+          alignSelf: "center",
+          alignItems: "center",
         }}
       >
         <Image
           source={imageURI.length ? { uri: imageURI } : emptyImage}
           style={{
-            width: boardSize,
-            height: boardSize,
-            borderRadius: 10,
+            width: boardSize / 1.6,
+            height: boardSize / 1.6,
+            borderRadius: theme.roundness,
+            alignSelf: "center",
           }}
         />
+        {imageURI.length ? null : <Headline>Choose an Image</Headline>}
       </View>
       <Button
         icon="camera"
@@ -78,16 +98,148 @@ export default ({
       >
         Gallery
       </Button>
-      {/* <Button
-        title="Squares"
-        onPress={() => navigation.navigate("Squares")}
-        disabled={imageURI.length === 0}
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-evenly",
+        }}
+      >
+        <Text>Type:</Text>
+        <Surface
+          style={{
+            padding: 8,
+            height: 40,
+            width: 40,
+            alignItems: "center",
+            justifyContent: "center",
+            elevation: 4,
+            borderRadius: theme.roundness,
+            backgroundColor:
+              puzzleType === "jigsaw"
+                ? theme.colors.surface
+                : theme.colors.background,
+          }}
+        >
+          <IconButton
+            icon="puzzle"
+            onPress={() => {
+              setPuzzleType("jigsaw");
+            }}
+            disabled={!imageURI.length}
+            animated={false}
+          />
+        </Surface>
+        <Surface
+          style={{
+            padding: 8,
+            height: 40,
+            width: 40,
+            alignItems: "center",
+            justifyContent: "center",
+            elevation: 4,
+            borderRadius: theme.roundness,
+            backgroundColor:
+              puzzleType === "squares"
+                ? theme.colors.surface
+                : theme.colors.background,
+          }}
+        >
+          <IconButton
+            icon="view-grid"
+            onPress={() => {
+              setPuzzleType("squares");
+            }}
+            disabled={!imageURI.length}
+            animated={false}
+          />
+        </Surface>
+        <Text>Size:</Text>
+        <Surface
+          style={{
+            // padding: 8,
+            // height: 40,
+            // width: 40,
+            alignItems: "center",
+            justifyContent: "center",
+            elevation: 4,
+            borderRadius: theme.roundness,
+            backgroundColor:
+              gridSize === 2 ? theme.colors.surface : theme.colors.background,
+          }}
+        >
+          <Button
+            mode="text"
+            disabled={!imageURI.length}
+            onPress={() => setGridSize(2)}
+            color="white"
+            compact={true}
+          >
+            2
+          </Button>
+        </Surface>
+        <Surface
+          style={{
+            // padding: 8,
+            // height: 40,
+            // width: 40,
+            alignItems: "center",
+            justifyContent: "center",
+            elevation: 4,
+            borderRadius: theme.roundness,
+            backgroundColor:
+              gridSize === 3 ? theme.colors.surface : theme.colors.background,
+          }}
+        >
+          <Button
+            mode="text"
+            disabled={!imageURI.length}
+            onPress={() => setGridSize(3)}
+            color="white"
+            compact={true}
+          >
+            3
+          </Button>
+        </Surface>
+        <Surface
+          style={{
+            // padding: 8,
+            // height: 40,
+            // width: 40,
+            alignItems: "center",
+            justifyContent: "center",
+            elevation: 4,
+            borderRadius: theme.roundness,
+            backgroundColor:
+              gridSize === 4 ? theme.colors.surface : theme.colors.background,
+          }}
+        >
+          <Button
+            mode="text"
+            disabled={!imageURI.length}
+            onPress={() => setGridSize(4)}
+            color="white"
+            compact={true}
+          >
+            4
+          </Button>
+        </Surface>
+      </View>
+      <TextInput
+        placeholder="Message (optional)"
+        disabled={!imageURI.length}
+        mode="outlined"
+        value={message}
+        onChangeText={(message) => setMessage(message)}
       />
       <Button
-        title="Jigsaw"
-        onPress={() => navigation.navigate("Jigsaw")}
-        disabled={imageURI.length === 0}
-      /> */}
+        icon="send"
+        mode="contained"
+        onPress={() => {}}
+        style={{ margin: 10 }}
+      >
+        Send!
+      </Button>
     </SafeAreaView>
   );
 };

@@ -8,7 +8,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import Puzzle from "./Puzzle";
 import HomeScreen from "./Home";
 
-const theme = {
+export const theme = {
   ...DefaultTheme,
   roundness: 10,
   colors: {
@@ -28,6 +28,8 @@ const Stack = createStackNavigator();
 
 const App = () => {
   const [imageURI, setImageURI] = useState("");
+  const [puzzleType, setPuzzleType] = useState("jigsaw");
+  const [gridSize, setGridSize] = useState(3);
   const { width, height } = useWindowDimensions();
   const boardSize = 0.95 * Math.min(height, width);
 
@@ -43,6 +45,11 @@ const App = () => {
                   setImageURI={setImageURI}
                   imageURI={imageURI}
                   boardSize={boardSize}
+                  theme={theme}
+                  puzzleType={puzzleType}
+                  setPuzzleType={setPuzzleType}
+                  gridSize={gridSize}
+                  setGridSize={setGridSize}
                 />
               )}
             </Stack.Screen>
