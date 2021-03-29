@@ -5,9 +5,11 @@ import Logo from "./Logo";
 import Title from "./Title";
 
 export default ({
+  navigation,
   notifications,
   theme,
 }: {
+  navigation: any;
   notifications: number;
   theme: any;
 }) => {
@@ -54,11 +56,32 @@ export default ({
           </TouchableWithoutFeedback>
         }
       >
-        <Menu.Item onPress={() => {}} title="Make" icon="send" />
+        <Menu.Item
+          onPress={() => {
+            closeMenu();
+            navigation.navigate("Home");
+          }}
+          title="Make"
+          icon="send"
+        />
         <Divider />
-        <Menu.Item onPress={() => {}} title="Solve" icon="puzzle" />
+        <Menu.Item
+          onPress={() => {
+            closeMenu();
+            navigation.navigate("PuzzleList");
+          }}
+          title="Solve"
+          icon="puzzle"
+        />
         <Divider />
-        <Menu.Item onPress={() => {}} title="Friends" icon="account-multiple" />
+        <Menu.Item
+          onPress={() => {
+            closeMenu();
+            // navigation.navigate("Squares");
+          }}
+          title="Friends"
+          icon="account-multiple"
+        />
         <Divider />
         <Menu.Item onPress={() => {}} title="Profile" icon="cog" />
       </Menu>

@@ -1,12 +1,14 @@
 import React, { useState } from "react";
-import { useWindowDimensions } from "react-native";
+import { View, useWindowDimensions } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { Provider as PaperProvider, DefaultTheme } from "react-native-paper";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { dummyPuzzles } from "./dummyData";
 
 import Puzzle from "./Puzzle";
 import HomeScreen from "./Home";
+import PuzzleList from "./PuzzleList";
 
 export const theme = {
   ...DefaultTheme,
@@ -27,9 +29,8 @@ export const theme = {
 const Stack = createStackNavigator();
 
 const App = () => {
-  const [imageURI, setImageURI] = useState("");
-  const [puzzleType, setPuzzleType] = useState("jigsaw");
-  const [gridSize, setGridSize] = useState(3);
+  const [receivedPuzzles, setReceivedPuzzles] = useState(dummyPuzzles);
+
   const { width, height } = useWindowDimensions();
   const boardSize = 0.95 * Math.min(height, width);
 
@@ -37,35 +38,42 @@ const App = () => {
     <PaperProvider theme={theme}>
       <SafeAreaProvider>
         <NavigationContainer>
-          <Stack.Navigator headerMode="none">
-            <Stack.Screen name="Home">
-              {(props) => (
-                <HomeScreen
-                  {...props}
-                  setImageURI={setImageURI}
-                  imageURI={imageURI}
-                  boardSize={boardSize}
-                  theme={theme}
-                  puzzleType={puzzleType}
-                  setPuzzleType={setPuzzleType}
-                  gridSize={gridSize}
-                  setGridSize={setGridSize}
-                />
-              )}
-            </Stack.Screen>
-            <Stack.Screen
-              name="Squares"
-              options={{ title: "Drag The Pictures!" }}
-            >
-              {(props) => (
-                <Puzzle
-                  {...props}
-                  boardSize={boardSize}
-                  imageURI={imageURI}
-                  puzzleType={"squares"}
-                />
-              )}
-            </Stack.Screen>
+          <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
+            <Stack.Navigator headerMode="none">
+              <Stack.Screen name="Home">
+                {(props) => (
+                  <HomeScreen
+                    {...props}
+                    boardSize={boardSize}
+                    theme={theme}
+                    receivedPuzzles={receivedPuzzles}
+                  />
+                )}
+              </Stack.Screen>
+              <Stack.Screen name="PuzzleList">
+                {(props) => (
+                  <PuzzleList
+                    {...props}
+                    theme={theme}
+                    receivedPuzzles={receivedPuzzles}
+                  />
+                )}
+              </Stack.Screen>
+              {/*
+              <Stack.Screen
+                name="Squares"
+                options={{ title: "Drag The Pictures!" }}
+              >
+                {(props) => (
+                  <Puzzle
+                    {...props}
+                    imageURI={null}
+                    boardSize={boardSize}
+                    puzzleType={"squares"}
+                  />
+                )}
+              </Stack.Screen>
+
             <Stack.Screen
               name="Jigsaw"
               options={{ title: "Solve The Puzzle!" }}
@@ -78,8 +86,10 @@ const App = () => {
                   puzzleType={"jigsaw"}
                 />
               )}
-            </Stack.Screen>
-          </Stack.Navigator>
+            </Stack.Screen> 
+            */}
+            </Stack.Navigator>
+          </View>
         </NavigationContainer>
       </SafeAreaProvider>
     </PaperProvider>

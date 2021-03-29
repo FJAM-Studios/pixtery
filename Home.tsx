@@ -15,30 +15,24 @@ import Header from "./Header";
 const emptyImage = require("./assets/blank.jpg");
 import Logo from "./Logo";
 import Title from "./Title";
-import Svg, { Path, Rect } from "react-native-svg";
+import Svg, { Path } from "react-native-svg";
 import { generateJigsawPiecePaths, generateSquarePiecePaths } from "./util";
+import { Puzzle } from "./types";
 
 export default ({
   navigation,
-  imageURI,
-  setImageURI,
   boardSize,
   theme,
-  puzzleType,
-  setPuzzleType,
-  gridSize,
-  setGridSize,
+  receivedPuzzles,
 }: {
   navigation: any;
-  imageURI: string;
-  setImageURI: (uri: string) => void;
   boardSize: number;
   theme: any;
-  puzzleType: string;
-  setPuzzleType: (puzzleType: string) => void;
-  gridSize: number;
-  setGridSize: (gridSize: number) => void;
+  receivedPuzzles: Puzzle[];
 }) => {
+  const [imageURI, setImageURI] = React.useState("");
+  const [puzzleType, setPuzzleType] = React.useState("jigsaw");
+  const [gridSize, setGridSize] = React.useState(3);
   const selectImage = async (camera: boolean) => {
     let result = camera
       ? await ImagePicker.launchCameraAsync({
@@ -58,6 +52,7 @@ export default ({
       setImageURI(result.uri);
     }
   };
+
   const [message, setMessage] = React.useState("");
   const [isLoading, setLoading] = React.useState(true);
   const [paths, setPaths] = React.useState(
@@ -110,7 +105,13 @@ export default ({
         justifyContent: "space-between",
       }}
     >
-      <Header theme={theme} notifications={2} />
+      <Header
+        theme={theme}
+        notifications={
+          receivedPuzzles.filter((puzzle) => !puzzle.completed).length
+        }
+        navigation={navigation}
+      />
       <View
         style={{
           alignSelf: "center",
@@ -224,9 +225,6 @@ export default ({
         <Text>Size:</Text>
         <Surface
           style={{
-            // padding: 8,
-            // height: 40,
-            // width: 40,
             alignItems: "center",
             justifyContent: "center",
             elevation: 4,
@@ -247,9 +245,6 @@ export default ({
         </Surface>
         <Surface
           style={{
-            // padding: 8,
-            // height: 40,
-            // width: 40,
             alignItems: "center",
             justifyContent: "center",
             elevation: 4,
@@ -270,9 +265,6 @@ export default ({
         </Surface>
         <Surface
           style={{
-            // padding: 8,
-            // height: 40,
-            // width: 40,
             alignItems: "center",
             justifyContent: "center",
             elevation: 4,
