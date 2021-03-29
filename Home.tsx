@@ -1,7 +1,7 @@
 import * as React from "react";
 import { View, Text, Button, ImageBackground } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import { testingMode } from "./constants";
+import { TESTING_MODE } from "./constants";
 const image = require("./assets/bg.jpg");
 
 export default function HomeScreen({
@@ -60,12 +60,12 @@ export default function HomeScreen({
         <Button
           title="Squares"
           onPress={() => navigation.navigate("Squares")}
-          disabled={testingMode ? false : imageURI.length === 0}
+          disabled={TESTING_MODE ? false : imageURI.length === 0}
         />
         <Button
           title="Jigsaw"
           onPress={() => navigation.navigate("Jigsaw")}
-          disabled={testingMode ? false : imageURI.length === 0}
+          disabled={TESTING_MODE ? false : imageURI.length === 0}
         />
       </ImageBackground>
     </View>

@@ -9,10 +9,10 @@ import {
 import { Asset } from "expo-asset";
 import PuzzlePiece from "./PuzzlePiece";
 import { shuffle, generateJigsawPiecePaths } from "./util";
-import { testingMode } from "./constants";
+import { TESTING_MODE } from "./constants"
 
 //disable shuffling for testing
-const disableShuffle = testingMode;
+const disableShuffle = TESTING_MODE;
 
 export default ({
   boardSize,
@@ -97,6 +97,11 @@ const [gridSections, setGridSections] = useState(getGridSections());
   const [rand, setRand] = useState(
     shuffle(fillArray(gridSize), disableShuffle)
   );
+
+  const [currentBoard, setCurrentBoard] = useState(
+      [...rand]
+  )
+  console.log('currentboard', currentBoard)
 // rand needs to match up with ix?
 // after generating rand, calculate answer set
 // answer set initialized as [false, false,...] taking into account pieces that coincidentally start at correct place
@@ -129,8 +134,8 @@ const [gridSections, setGridSections] = useState(getGridSections());
           piecePath={piecePaths[num]}
           boardSize={boardSize}
           gridSections={gridSections}
-          rand={rand}
-          setRand={setRand}
+          currentBoard={currentBoard}
+          setCurrentBoard={setCurrentBoard}
         />
       ))}
       <View

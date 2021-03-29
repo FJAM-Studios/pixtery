@@ -3,9 +3,11 @@ import Draggable from "react-native-draggable";
 import { Svg, Image, Defs, ClipPath, Path, Rect } from "react-native-svg";
 import * as ImageManipulator from "expo-image-manipulator";
 import { TextComponent } from "react-native";
+import { SNAP_MARGIN, TESTING_MODE } from './constants'
 // to do
 // redo convertix rules of touch from just larger or smaller than grid divider
   // TO DO update type for gridsections, rand, setRand
+  // to do set error emssage when piece cant move
 
 export default ({
   num,
@@ -17,8 +19,8 @@ export default ({
   piecePath,
   image,
   gridSections,
-  rand,
-  setRand
+  currentBoard,
+  setCurrentBoard,
 }: {
   num: number;
   ix: number;
@@ -29,8 +31,8 @@ export default ({
   piecePath: string;
   image: { uri: string };
   gridSections: any;
-  rand: any;
-  setRand: any;
+  currentBoard: any;
+  setCurrentBoard: any;
 }) => {
   //squareX and squareY represent the row and col of the square in the solved puzzle
   const squareX = num % gridSize;
@@ -39,19 +41,24 @@ export default ({
   //widthX and widthY are the size of the pieces (larger for jigsaw);
   //initX and initY are starting position for pieces (not aligned w grid for jigsaw)
   //viewBoxX and viewBoxY are 'panned' for selecting correct portion of image for piece
+  //solutionX and solutionY are the top left coords for where the piece belongs in solution
 
   let widthY: number,
     widthX: number,
-    initX,
-    initY,
+    initX: number,
+    initY: number,
     viewBoxX: number,
-    viewBoxY: number;
+    viewBoxY: number,
+    solutionX: number,
+    solutionY: number;
 
   if (puzzleType === "squares") {
     //for square puzzles, everything is aligned to grid
     widthY = widthX = squareSize;
     initX = (ix % gridSize) * squareSize;
     initY = Math.floor(ix / gridSize) * squareSize;
+    solutionX = (num % gridSize) * squareSize;
+    solutionY = Math.floor(num / gridSize) * squareSize;
     viewBoxX = squareX * squareSize;
     viewBoxY = squareY * squareSize;
   } else {
@@ -69,16 +76,29 @@ export default ({
       0,
       Math.floor(ix / gridSize) * squareSize - squareSize * 0.25
     );
+    solutionX = Math.max(0, (num % gridSize) * squareSize - squareSize * 0.25);
+    solutionY = Math.max(
+      0,
+      Math.floor(num / gridSize) * squareSize - squareSize * 0.25
+    );
     viewBoxX = Math.max(0, squareX * squareSize - squareSize * 0.25);
     viewBoxY = Math.max(0, squareY * squareSize - squareSize * 0.25);
   }
 
   const [ready, setReady] = useState(false);
   const [croppedImage, setCroppedImage] = useState(image);
-  const [currentX, setCurrentX] = useState(initX)
-  const [currentY, setCurrentY] = useState(initY)
-  const [touchX, setTouchX] = useState(initX)
-  const [touchY, setTouchY] = useState(initY)
+//   const [currentX, setCurrentX] = useState(initX)
+//   const [currentY, setCurrentY] = useState(initY)
+//   const [touchX, setTouchX] = useState(initX)
+//   const [touchY, setTouchY] = useState(initY)
+
+  //_x and _y are used to keep track of where image is relative to its start positon
+  const [currentXY, setXY] = useState({
+    x: initX,
+    y: initY,
+    _x: initX,
+    _y: initY,
+  });
 
   useEffect(() => {
     const manipulateImage = async () => {
@@ -110,69 +130,75 @@ export default ({
     manipulateImage();
   }, []);
 
-  const convertNewPosToIx = (ev) => {
-    ev.preventDefault();
-    const touchCol = ev.nativeEvent.pageX;
-    const touchRow = ev.nativeEvent.pageY;
+  const changePosition = (gestureState: { dx: number; dy: number }) => {
+    //update the relative _x and _y but leave x and y the same unless snapping
+    const newXY = {
+      x: currentXY.x,
+      y: currentXY.y,
+      _x: currentXY._x + gestureState.dx,
+      _y: currentXY._y + gestureState.dy,
+    };
+    //if _x and _y are within some number of a point on the grid, then snap!
+    let snappedX;
+    let snappedY;
     let snappedRow;
     let snappedCol;
     const rowDividers = gridSections.rowDividers
-    // start here - need to make sure rows / cols dont go beyond 2
-    for(let i = 0; i <= rowDividers.length - 2; i++) {
+    for(let i = 0; i <= rowDividers.length - 1; i++) {
         const rowDivider = rowDividers[i]
-        const nextRowDivider = i < rowDividers.length-2 ? rowDividers[i+1] : rowDivider + squareSize
-        if(touchRow > rowDivider && touchRow <= nextRowDivider) {
-            snappedRow = i;
+        if(Math.abs(newXY._y - rowDivider) < squareSize * SNAP_MARGIN) {
+            snappedY = initY - newXY._y + rowDivider;
+            snappedRow = i
             break;
         }
     }
     const colDividers = gridSections.colDividers
-    for(let i = 0; i <= colDividers.length - 2; i++) {
+    for(let i = 0; i <= colDividers.length - 1; i++) {
         const colDivider = colDividers[i]
-        const nextColDivider = i < colDividers.length-2 ? colDividers[i+1] : colDivider + squareSize
-        if(touchCol > colDivider && touchCol <= nextColDivider) {
+        if(Math.abs(newXY._x - colDivider) < squareSize * SNAP_MARGIN) {
+            snappedX = initX - newXY._x + colDivider;
             snappedCol = i;
             break;
         }
     }
-    if(snappedRow === undefined || snappedCol === undefined) {
-        console.log('undefined', 'touchCol', touchCol, 'touchRow', touchRow, 'row', snappedRow, 'col', snappedCol)
-        return;
+// start here - send up updated index to array
+    let newIx;
+    // if there was a snap i.e. the piece came within the grid snap margin
+    console.log('snapx',snappedX, 'snapy', snappedY)
+    if(snappedX >= 0 && snappedY >= 0) {
+        console.log(snappedX, snappedY)
+        newIx = snappedRow * gridSize + snappedCol
+        // if the current board already has another piece in the new index, return back to original place
+        if(currentBoard[newIx]) {
+            console.log('cannot move to ', newIx)
+            newXY._x = currentXY._x;
+            newXY._y = currentXY._y;
+            setXY(newXY);
+            return;
+        } 
+        newXY.x = snappedX;
+        newXY.y = snappedY;
     }
-    let newIx = snappedRow * gridSize + snappedCol
-    console.log('touchCol', touchCol, 'touchRow', touchRow, 'row', snappedRow, 'col', snappedCol, 'newix', newIx)
-    sendUpdatedOrderToPuzzle(newIx)
+    updateCurrentBoard(newIx)
+    setXY(newXY);
+  };
 
-  }
-  
-  const sendUpdatedOrderToPuzzle = (newIx) => {
-    // swap
-    let newRand = [...rand]
-    const temp = newRand[newIx]
-    newRand[newIx] = num
-    newRand[ix] = temp
-    console.log('newIx', newIx, 'oldrand', rand, 'newrand', newRand)
-    setRand(newRand)
+  const updateCurrentBoard = (newIx) => {
+    let newBoard = [...currentBoard]
+    if (newIx >= 0) newBoard[newIx] = num
+    newBoard[ix] = null
+    setCurrentBoard(newBoard)
   }
 
-//   console.log(
-//       'num',num,
-//       'ix',ix,
-//       'squareX',squareX,
-//       'squareY',squareY,
-//     'initx',initX,
-//     'inity',initY,
-//     'viewboxX',viewBoxX,
-//     'viewboxY',viewBoxY,
-//   )
   if (!ready) return null;
 
   return (
     <Draggable
       //draggable SVG needs to be placed where cropped image starts. jigsaw shape extends beyond square
-      x={initX}
-      y={initY}
-      onRelease={convertNewPosToIx}
+      x={currentXY.x}
+      y={currentXY.y}
+      //on release of a piece, update the state and check for snapping
+      onDragRelease={(ev, gestureState) => changePosition(gestureState)}
     >
       <Svg
         //height and width are size of jigsaw piece
