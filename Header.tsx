@@ -16,27 +16,27 @@ export default ({
 
   const closeMenu = () => setVisible(false);
   return (
-    <TouchableWithoutFeedback onPress={openMenu}>
+    <View
+      style={{
+        justifyContent: "space-between",
+        alignItems: "center",
+        flexDirection: "row",
+      }}
+    >
       <View
         style={{
-          justifyContent: "space-between",
           alignItems: "center",
           flexDirection: "row",
         }}
       >
-        <View
-          style={{
-            alignItems: "center",
-            flexDirection: "row",
-          }}
-        >
-          <Title width="100" height="25" style={{ marginRight: 10 }} />
-          <Logo width="25" height="25" />
-        </View>
-        <Menu
-          visible={visible}
-          onDismiss={closeMenu}
-          anchor={
+        <Title width="100" height="25" style={{ marginRight: 10 }} />
+        <Logo width="25" height="25" />
+      </View>
+      <Menu
+        visible={visible}
+        onDismiss={closeMenu}
+        anchor={
+          <TouchableWithoutFeedback onPress={openMenu}>
             <View>
               <IconButton icon="menu" />
               <Badge
@@ -51,21 +51,17 @@ export default ({
                 {notifications}
               </Badge>
             </View>
-          }
-        >
-          <Menu.Item onPress={() => {}} title="Make" icon="send" />
-          <Divider />
-          <Menu.Item onPress={() => {}} title="Solve" icon="puzzle" />
-          <Divider />
-          <Menu.Item
-            onPress={() => {}}
-            title="Friends"
-            icon="account-multiple"
-          />
-          <Divider />
-          <Menu.Item onPress={() => {}} title="Profile" icon="cog" />
-        </Menu>
-      </View>
-    </TouchableWithoutFeedback>
+          </TouchableWithoutFeedback>
+        }
+      >
+        <Menu.Item onPress={() => {}} title="Make" icon="send" />
+        <Divider />
+        <Menu.Item onPress={() => {}} title="Solve" icon="puzzle" />
+        <Divider />
+        <Menu.Item onPress={() => {}} title="Friends" icon="account-multiple" />
+        <Divider />
+        <Menu.Item onPress={() => {}} title="Profile" icon="cog" />
+      </Menu>
+    </View>
   );
 };
