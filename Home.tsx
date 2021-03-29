@@ -15,6 +15,8 @@ import Header from "./Header";
 const emptyImage = require("./assets/blank.jpg");
 import Logo from "./Logo";
 import Title from "./Title";
+import Svg, { Path, Rect } from "react-native-svg";
+import { generateJigsawPiecePaths, generateSquarePiecePaths } from "./util";
 
 export default ({
   navigation,
@@ -58,6 +60,21 @@ export default ({
   };
   const [message, setMessage] = React.useState("");
   const [isLoading, setLoading] = React.useState(true);
+  const [paths, setPaths] = React.useState(
+    generateJigsawPiecePaths(gridSize, boardSize / (1.6 * gridSize))
+  );
+
+  React.useEffect(() => {
+    if (puzzleType === "squares")
+      setPaths(
+        generateSquarePiecePaths(gridSize, boardSize / (1.6 * gridSize))
+      );
+    else
+      setPaths(
+        generateJigsawPiecePaths(gridSize, boardSize / (1.6 * gridSize))
+      );
+  }, [gridSize, puzzleType]);
+
   setTimeout(() => setLoading(false), 1500);
   if (isLoading) {
     return (
@@ -102,7 +119,7 @@ export default ({
       >
         <Surface
           style={{
-            padding: 8,
+            padding: 4,
             alignItems: "center",
             justifyContent: "center",
             elevation: 4,
@@ -115,10 +132,20 @@ export default ({
             style={{
               width: boardSize / 1.6,
               height: boardSize / 1.6,
-              borderRadius: theme.roundness,
               alignSelf: "center",
             }}
           />
+          {imageURI.length ? (
+            <Svg
+              width={boardSize / 1.6}
+              height={boardSize / 1.6}
+              style={{ position: "absolute", top: 4, left: 4 }}
+            >
+              {paths.map((path, ix) => (
+                <Path key={ix} d={path} stroke="white" strokeWidth="1" />
+              ))}
+            </Svg>
+          ) : null}
           {imageURI.length ? null : <Headline>Choose an Image</Headline>}
         </Surface>
       </View>
