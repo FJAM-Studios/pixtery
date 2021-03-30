@@ -52,6 +52,8 @@ export default ({
     solutionX: number,
     solutionY: number;
 
+    // if (newSnappedIx !== -1) ix = newSnappedIx
+
   if (puzzleType === "squares") {
     //for square puzzles, everything is aligned to grid
     widthY = widthX = squareSize;
@@ -88,6 +90,7 @@ export default ({
   const [ready, setReady] = useState(false);
   const [croppedImage, setCroppedImage] = useState(image);
   const [newSnappedIx, setNewSnappedIx] = useState(-1)
+  const [prevIx, setPrevIx] = useState(ix)
   const [mounted, setMounted] = useState(false)
 
   //_x and _y are used to keep track of where image is relative to its start positon
@@ -141,29 +144,32 @@ export default ({
       _x: currentXY._x + gestureState.dx,
       _y: currentXY._y + gestureState.dy,
     };
+    console.log('newxy', newXY)
+    // start here, the snappedY is coming up as undefined when it should notbe
     //if _x and _y are within a margin of a point on the grid, then snap!
     let snappedX;
     let snappedY;
     let snappedRow;
     let snappedCol;
     const rowDividers = gridSections.rowDividers
-    for(let i = 0; i <= rowDividers.length - 1; i++) {
+    for(let i = 0; i < rowDividers.length - 1; i++) {
         const rowDivider = rowDividers[i]
         if(Math.abs(newXY._y - rowDivider) < squareSize * SNAP_MARGIN) {
             // start here - initX. initY may not be usable here because the ix will be diferent on move. maybe i can use newXY.x?
-            // snappedY = initY - newXY._y + rowDivider;
-            snappedY = newXY.y - newXY._y + rowDivider;
+            snappedY = initY - newXY._y + rowDivider;
+            // snappedY = newXY.y - newXY._y + rowDivider;
 
             snappedRow = i
             break;
         }
     }
     const colDividers = gridSections.colDividers
-    for(let i = 0; i <= colDividers.length - 1; i++) {
+    for(let i = 0; i < colDividers.length - 1; i++) {
         const colDivider = colDividers[i]
         if(Math.abs(newXY._x - colDivider) < squareSize * SNAP_MARGIN) {
             // snappedX = initX - newXY._x + colDivider;
-            snappedX = newXY.x - newXY._x + colDivider;
+            snappedX = initX - newXY._x + colDivider;
+            // snappedX = newXY.x - newXY._x + colDivider;
 
             snappedCol = i;
             break;
@@ -173,45 +179,48 @@ export default ({
     let newIx;
     // if there was a snap i.e. the piece came within the grid snap margin
     console.log('snapx',snappedX, 'snapy', snappedY)
-    if(snappedX >= 0 && snappedY >= 0) {
-        console.log(snappedX, snappedY)
+    if(snappedX !== undefined && snappedY !== undefined) {
+        // console.log(snappedX, snappedY)
         newIx = snappedRow * gridSize + snappedCol
-        // if the current board already has another piece in the new index, return back to original place
         console.log('board',currentBoard, newIx)
         if(currentBoard[newIx] === null) {
             console.log('snapping to', newIx)
             newXY.x = snappedX;
             newXY.y = snappedY;
         }
+        // if the current board already has another piece in the new index, return back to original place
         else {
             console.log('cannot move to ', newIx)
+            newIx = undefined
             // need to check this - how to get it back to original location
-            // newXY.x = currentXY._x;
-            // newXY.y = currentXY._y;
+            // newXY.x = currentXY.x + currentXY._x - gestureState.dx;
+            // newXY.y = currentXY.y + currentXY._y - gestureState.dy;
         }
     }
-    setNewSnappedIx(newIx)
+    // setNewSnappedIx(newIx)
+    updateIx(newIx)
     setXY(newXY)
   };
 
+  // preserve previous Ix and set the new Ix that it will snap to
+  const updateIx = (newIx) => {
+      if (newSnappedIx !== -1) setPrevIx(newSnappedIx)
+      setNewSnappedIx(newIx)
+  }
+
   const updateCurrentBoard = () => {
-      console.log('newsnappedix when board update', newSnappedIx, 'num', num, 'ix', ix)
-  let newBoard = [...currentBoard]
-  if (newSnappedIx >= 0) newBoard[newSnappedIx] = num
-  // start here - need to figure out how to update existing ix, when to make it null etc
-  if(newSnappedIx !== ix) newBoard[ix] = null
-  setCurrentBoard(newBoard)
-}
+    console.log('newsnappedix when board update:', newSnappedIx, 'prevIx', prevIx, 'num', num, 'ix', ix)
+    let newBoard = [...currentBoard]
+    if (newSnappedIx >= 0) newBoard[newSnappedIx] = num
+    if(prevIx >= 0) newBoard[prevIx] = null
+    setCurrentBoard(newBoard)
+    }
 
   useEffect(() => {
-    //   console.log('newix',newSnappedIx)
     if(newSnappedIx !== -1) {
         console.log('new snapped ix', newSnappedIx)
         updateCurrentBoard()    
     }
-    // return () => {
-    //     updateCurrentBoard()
-    // }
   }, [currentXY])
 
 

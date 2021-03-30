@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Text,
   View,
@@ -101,13 +101,21 @@ const [gridSections, setGridSections] = useState(getGridSections());
   const [currentBoard, setCurrentBoard] = useState(
       [...rand]
   )
+
+  const [winMessage, setWinMessage] = useState('')
+// start here! also need to trouble shoot piece returning to same place
+  const checkWin = () => {
+      if(currentBoard[0] !== 0) return;
+      for(let i = 0; i < currentBoard.length; i++){
+          if(currentBoard[i] !== i) return;
+      }
+      setWinMessage('Congrats! You solved the puzzle!')
+  }
+
+  useEffect(() => {
+        checkWin()
+  }, [currentBoard])
   console.log('currentboard', currentBoard)
-// rand needs to match up with ix?
-// after generating rand, calculate answer set
-// answer set initialized as [false, false,...] taking into account pieces that coincidentally start at correct place
-// pass down to PuzzlePiece as a prop a function that will update tihs answer array 
-// i.e. whether each puzzle piece matches up to where on the grid it should be
-// if all are true then it's a win
 
   return (
     <View
@@ -138,6 +146,7 @@ const [gridSections, setGridSections] = useState(getGridSections());
           setCurrentBoard={setCurrentBoard}
         />
       ))}
+      <Text>{winMessage}</Text>
       <View
         style={{
           flex: 1,
@@ -164,6 +173,3 @@ const [gridSections, setGridSections] = useState(getGridSections());
     </View>
   );
 };
-
-// is there a way we know when user has released a piece
-// figure out where to get locations of dragged pieces
