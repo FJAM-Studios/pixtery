@@ -87,10 +87,8 @@ export default ({
 
   const [ready, setReady] = useState(false);
   const [croppedImage, setCroppedImage] = useState(image);
-//   const [currentX, setCurrentX] = useState(initX)
-//   const [currentY, setCurrentY] = useState(initY)
-//   const [touchX, setTouchX] = useState(initX)
-//   const [touchY, setTouchY] = useState(initY)
+  const [newSnappedIx, setNewSnappedIx] = useState(-1)
+  const [mounted, setMounted] = useState(false)
 
   //_x and _y are used to keep track of where image is relative to its start positon
   const [currentXY, setXY] = useState({
@@ -99,6 +97,10 @@ export default ({
     _x: initX,
     _y: initY,
   });
+
+//   useEffect(() => {
+//     setMounted(true)
+//   }, []);
 
   useEffect(() => {
     const manipulateImage = async () => {
@@ -131,6 +133,7 @@ export default ({
   }, []);
 
   const changePosition = (gestureState: { dx: number; dy: number }) => {
+      console.log(mounted)
     //update the relative _x and _y but leave x and y the same unless snapping
     const newXY = {
       x: currentXY.x,
@@ -138,7 +141,7 @@ export default ({
       _x: currentXY._x + gestureState.dx,
       _y: currentXY._y + gestureState.dy,
     };
-    //if _x and _y are within some number of a point on the grid, then snap!
+    //if _x and _y are within a margin of a point on the grid, then snap!
     let snappedX;
     let snappedY;
     let snappedRow;
@@ -147,7 +150,10 @@ export default ({
     for(let i = 0; i <= rowDividers.length - 1; i++) {
         const rowDivider = rowDividers[i]
         if(Math.abs(newXY._y - rowDivider) < squareSize * SNAP_MARGIN) {
-            snappedY = initY - newXY._y + rowDivider;
+            // start here - initX. initY may not be usable here because the ix will be diferent on move. maybe i can use newXY.x?
+            // snappedY = initY - newXY._y + rowDivider;
+            snappedY = newXY.y - newXY._y + rowDivider;
+
             snappedRow = i
             break;
         }
@@ -156,7 +162,9 @@ export default ({
     for(let i = 0; i <= colDividers.length - 1; i++) {
         const colDivider = colDividers[i]
         if(Math.abs(newXY._x - colDivider) < squareSize * SNAP_MARGIN) {
-            snappedX = initX - newXY._x + colDivider;
+            // snappedX = initX - newXY._x + colDivider;
+            snappedX = newXY.x - newXY._x + colDivider;
+
             snappedCol = i;
             break;
         }
@@ -169,26 +177,43 @@ export default ({
         console.log(snappedX, snappedY)
         newIx = snappedRow * gridSize + snappedCol
         // if the current board already has another piece in the new index, return back to original place
-        if(currentBoard[newIx]) {
+        console.log('board',currentBoard, newIx)
+        if(currentBoard[newIx] === null) {
+            console.log('snapping to', newIx)
+            newXY.x = snappedX;
+            newXY.y = snappedY;
+        }
+        else {
             console.log('cannot move to ', newIx)
-            newXY._x = currentXY._x;
-            newXY._y = currentXY._y;
-            setXY(newXY);
-            return;
-        } 
-        newXY.x = snappedX;
-        newXY.y = snappedY;
+            // need to check this - how to get it back to original location
+            // newXY.x = currentXY._x;
+            // newXY.y = currentXY._y;
+        }
     }
-    updateCurrentBoard(newIx)
-    setXY(newXY);
+    setNewSnappedIx(newIx)
+    setXY(newXY)
   };
 
-  const updateCurrentBoard = (newIx) => {
-    let newBoard = [...currentBoard]
-    if (newIx >= 0) newBoard[newIx] = num
-    newBoard[ix] = null
-    setCurrentBoard(newBoard)
-  }
+  const updateCurrentBoard = () => {
+      console.log('newsnappedix when board update', newSnappedIx, 'num', num, 'ix', ix)
+  let newBoard = [...currentBoard]
+  if (newSnappedIx >= 0) newBoard[newSnappedIx] = num
+  // start here - need to figure out how to update existing ix, when to make it null etc
+  if(newSnappedIx !== ix) newBoard[ix] = null
+  setCurrentBoard(newBoard)
+}
+
+  useEffect(() => {
+    //   console.log('newix',newSnappedIx)
+    if(newSnappedIx !== -1) {
+        console.log('new snapped ix', newSnappedIx)
+        updateCurrentBoard()    
+    }
+    // return () => {
+    //     updateCurrentBoard()
+    // }
+  }, [currentXY])
+
 
   if (!ready) return null;
 

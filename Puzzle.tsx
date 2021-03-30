@@ -124,7 +124,7 @@ const [gridSections, setGridSections] = useState(getGridSections());
         <PuzzlePiece
           // this random key forces Draggable/React to rerender these pieces when changing board
           // seems like cheating, but maybe not?
-          key={Math.random() * (1 + ix)}
+          key={num}
           num={num}
           ix={ix}
           gridSize={gridSize}
