@@ -91,7 +91,6 @@ export default ({
   const [croppedImage, setCroppedImage] = useState(image);
   const [newSnappedIx, setNewSnappedIx] = useState(-1)
   const [prevIx, setPrevIx] = useState(ix)
-  const [mounted, setMounted] = useState(false)
 
   //_x and _y are used to keep track of where image is relative to its start positon
   const [currentXY, setXY] = useState({
@@ -100,10 +99,6 @@ export default ({
     _x: initX,
     _y: initY,
   });
-
-//   useEffect(() => {
-//     setMounted(true)
-//   }, []);
 
   useEffect(() => {
     const manipulateImage = async () => {
@@ -136,7 +131,6 @@ export default ({
   }, []);
 
   const changePosition = (gestureState: { dx: number; dy: number }) => {
-      console.log(mounted)
     //update the relative _x and _y but leave x and y the same unless snapping
     const newXY = {
       x: currentXY.x,
@@ -175,12 +169,10 @@ export default ({
             break;
         }
     }
-// start here - send up updated index to array
     let newIx;
     // if there was a snap i.e. the piece came within the grid snap margin
     console.log('snapx',snappedX, 'snapy', snappedY)
     if(snappedX !== undefined && snappedY !== undefined) {
-        // console.log(snappedX, snappedY)
         newIx = snappedRow * gridSize + snappedCol
         console.log('board',currentBoard, newIx)
         if(currentBoard[newIx] === null) {
@@ -188,21 +180,20 @@ export default ({
             newXY.x = snappedX;
             newXY.y = snappedY;
         }
-        // if the current board already has another piece in the new index, return back to original place
+        // if the current board already has another piece in the new index...
         else {
             console.log('cannot move to ', newIx)
             newIx = undefined
-            // need to check this - how to get it back to original location
+            // need to check this - ideally would want to get it back to original location
             // newXY.x = currentXY.x + currentXY._x - gestureState.dx;
             // newXY.y = currentXY.y + currentXY._y - gestureState.dy;
         }
     }
-    // setNewSnappedIx(newIx)
     updateIx(newIx)
     setXY(newXY)
   };
 
-  // preserve previous Ix and set the new Ix that it will snap to
+  // preserve previous Ix, and set the new Ix that it will snap to
   const updateIx = (newIx) => {
       if (newSnappedIx !== -1) setPrevIx(newSnappedIx)
       setNewSnappedIx(newIx)
@@ -268,6 +259,3 @@ export default ({
     </Draggable>
   );
 };
-//square X and Y, viewboxX/Y
-// what needs to align on this piece so that we know its in teh correct spot? 
-// how do we get the position of where this has been dragged?
