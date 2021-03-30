@@ -183,10 +183,16 @@ export const generateJigsawPiecePaths = (
   //construct SVG path data
   const piecePaths: string[] = [];
   for (let i = 0; i < pieces.length; i++) {
+    //to deal with iphone SVG difference, these offsets change SVG path to be relative to the piece rather than the overall image
+    const oX = Math.max(0, (i % gridSize) * squareSize - squareSize * 0.25);
+    const oY = Math.max(
+      0,
+      Math.floor(i / gridSize) * squareSize - squareSize * 0.25
+    );
     const piece = pieces[i];
     //move to top right point
-    let str = `M ${(i % gridSize) * squareSize} ${
-      Math.floor(i / gridSize) * squareSize
+    let str = `M ${(i % gridSize) * squareSize - oX} ${
+      Math.floor(i / gridSize) * squareSize - oY
     } `;
     //idk if this is good typescript
     const sides = ["top", "right", "bottom", "left"] as const;
@@ -198,71 +204,8 @@ export const generateJigsawPiecePaths = (
           (coord, ix) =>
             //3 points denotes curve
             `${ix % 3 === 0 && piece[side].length > 2 ? "C " : ""}${
-              Math.round(coord.x * 100) / 100
-            } ${Math.round(coord.y * 100) / 100} `
-        )
-        .join("");
-    }
-    piecePaths[i] = str;
-  }
-  return piecePaths;
-};
-
-export const generateSquarePiecePaths = (
-  gridSize: number,
-  squareSize: number
-): string[] => {
-  const pieces: Piece[] = new Array(gridSize * gridSize);
-  //fill array with empty pieces
-  for (let z = 0; z < pieces.length; z++) pieces[z] = new Piece();
-  //loop through the pieces
-  for (let y = 0; y < gridSize; y++) {
-    for (let x = 0; x < gridSize; x++) {
-      const ix = x + y * gridSize;
-      const thisPiece = pieces[ix];
-      //set flat top
-      thisPiece.top = [
-        //goes from left to right
-        { x: x * squareSize, y: y * squareSize },
-        { x: (x + 1) * squareSize, y: y * squareSize },
-      ];
-      thisPiece.bottom = [
-        //goes from right to left
-        { x: (x + 1) * squareSize, y: (y + 1) * squareSize },
-        { x: x * squareSize, y: (y + 1) * squareSize },
-      ];
-      thisPiece.left = [
-        //goes from bottom to top
-        { x: x * squareSize, y: (y + 1) * squareSize },
-        { x: x * squareSize, y: y * squareSize },
-      ];
-      thisPiece.right = [
-        //goes from top to bottom
-        { x: (x + 1) * squareSize, y: y * squareSize },
-        { x: (x + 1) * squareSize, y: (y + 1) * squareSize },
-      ];
-    }
-  }
-  //construct SVG path data
-  const piecePaths: string[] = [];
-  for (let i = 0; i < pieces.length; i++) {
-    const piece = pieces[i];
-    //move to top right point
-    let str = `M ${(i % gridSize) * squareSize} ${
-      Math.floor(i / gridSize) * squareSize
-    } `;
-    //idk if this is good typescript
-    const sides = ["top", "right", "bottom", "left"] as const;
-    for (let side of sides) {
-      //if only two points, denote line
-      str += piece[side].length === 2 ? "L " : "";
-      str += piece[side]
-        .map(
-          (coord, ix) =>
-            //3 points denotes curve
-            `${ix % 3 === 0 && piece[side].length > 2 ? "C " : ""}${
-              Math.round(coord.x * 100) / 100
-            } ${Math.round(coord.y * 100) / 100} `
+              Math.round(coord.x * 100) / 100 - oX
+            } ${Math.round(coord.y * 100) / 100 - oY} `
         )
         .join("");
     }

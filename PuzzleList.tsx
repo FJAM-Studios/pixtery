@@ -5,6 +5,7 @@ import { Text, Card, IconButton } from "react-native-paper";
 import moment from "moment";
 import Header from "./Header";
 import { Puzzle } from "./types";
+import { TouchableOpacity } from "react-native-gesture-handler";
 
 export default ({
   navigation,
@@ -34,32 +35,40 @@ export default ({
       />
       <View>
         {receivedPuzzles.map((receivedPuzzle, ix) => (
-          <Card
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate("Puzzle", {
+                ...receivedPuzzle,
+              })
+            }
             key={ix}
-            style={{
-              margin: 1,
-              backgroundColor: receivedPuzzle.completed
-                ? theme.colors.disabled
-                : theme.colors.surface,
-            }}
           >
-            <Card.Title
-              title={receivedPuzzle.senderName}
-              subtitle={moment(receivedPuzzle.dateReceived).calendar()}
-              right={() => (
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <Text>{receivedPuzzle.gridSize}</Text>
-                  <IconButton
-                    icon={
-                      receivedPuzzle.puzzleType === "jigsaw"
-                        ? "puzzle"
-                        : "view-grid"
-                    }
-                  />
-                </View>
-              )}
-            />
-          </Card>
+            <Card
+              style={{
+                margin: 1,
+                backgroundColor: receivedPuzzle.completed
+                  ? theme.colors.disabled
+                  : theme.colors.surface,
+              }}
+            >
+              <Card.Title
+                title={receivedPuzzle.senderName}
+                subtitle={moment(receivedPuzzle.dateReceived).calendar()}
+                right={() => (
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <Text>{receivedPuzzle.gridSize}</Text>
+                    <IconButton
+                      icon={
+                        receivedPuzzle.puzzleType === "jigsaw"
+                          ? "puzzle"
+                          : "view-grid"
+                      }
+                    />
+                  </View>
+                )}
+              />
+            </Card>
+          </TouchableOpacity>
         ))}
       </View>
     </SafeAreaView>

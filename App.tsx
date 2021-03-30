@@ -10,6 +10,8 @@ import Puzzle from "./Puzzle";
 import HomeScreen from "./Home";
 import PuzzleList from "./PuzzleList";
 
+const image = require("./assets/earth.jpg");
+
 export const theme = {
   ...DefaultTheme,
   roundness: 10,
@@ -59,35 +61,27 @@ const App = () => {
                   />
                 )}
               </Stack.Screen>
-              {/*
               <Stack.Screen
-                name="Squares"
-                options={{ title: "Drag The Pictures!" }}
+                name="Puzzle"
+                initialParams={{
+                  imageURI: image.uri,
+                  puzzleType: "jigsaw",
+                  gridSize: 3,
+                }}
               >
                 {(props) => (
                   <Puzzle
                     {...props}
-                    imageURI={null}
                     boardSize={boardSize}
-                    puzzleType={"squares"}
+                    theme={theme}
+                    receivedPuzzles={receivedPuzzles}
+
+                    // imageURI={image.uri}
+                    // puzzleType={"jigsaw"}
+                    // gridSize={3}
                   />
                 )}
               </Stack.Screen>
-
-            <Stack.Screen
-              name="Jigsaw"
-              options={{ title: "Solve The Puzzle!" }}
-            >
-              {(props) => (
-                <Puzzle
-                  {...props}
-                  boardSize={boardSize}
-                  imageURI={imageURI}
-                  puzzleType={"jigsaw"}
-                />
-              )}
-            </Stack.Screen> 
-            */}
             </Stack.Navigator>
           </View>
         </NavigationContainer>
