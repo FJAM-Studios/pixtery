@@ -1,6 +1,6 @@
 import * as React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Image, View } from "react-native";
+import { Image, View, Platform } from "react-native";
 import {
   Button,
   IconButton,
@@ -56,7 +56,7 @@ export default ({
   const [message, setMessage] = React.useState("");
   const [isLoading, setLoading] = React.useState(true);
   const [paths, setPaths] = React.useState(
-    generateJigsawPiecePaths(gridSize, boardSize / (1.6 * gridSize))
+    generateJigsawPiecePaths(gridSize, boardSize / (1.6 * gridSize), true)
   );
 
   React.useEffect(() => {
@@ -66,9 +66,27 @@ export default ({
       );
     else
       setPaths(
-        generateJigsawPiecePaths(gridSize, boardSize / (1.6 * gridSize))
+        generateJigsawPiecePaths(gridSize, boardSize / (1.6 * gridSize), true)
       );
   }, [gridSize, puzzleType]);
+
+  React.useEffect(() => {
+    (async () => {
+      if (Platform.OS !== "web") {
+        let response = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        const libraryPermission = response.status;
+        if (libraryPermission !== "granted") {
+          alert("Sorry, we need camera roll permissions to make this work!");
+        } else {
+          response = await ImagePicker.requestCameraPermissionsAsync();
+          const cameraPermission = response.status;
+          if (cameraPermission !== "granted") {
+            alert("Sorry, we need camera permissions to make this work!");
+          }
+        }
+      }
+    })();
+  }, []);
 
   setTimeout(() => setLoading(false), 1500);
   if (isLoading) {
