@@ -9,7 +9,8 @@ import {
 import { Asset } from "expo-asset";
 import PuzzlePiece from "./PuzzlePiece";
 import { shuffle, generateJigsawPiecePaths } from "./util";
-import { TESTING_MODE } from "./constants"
+import { TESTING_MODE } from "./constants";
+import { GridSections } from './types';
 
 //disable shuffling for testing
 const disableShuffle = TESTING_MODE;
@@ -24,7 +25,7 @@ export default ({
   puzzleType: string;
 }) => {
   const [gridSize, setGridSize] = useState(3);
-  const squareSize = boardSize / gridSize;
+  const squareSize: number = boardSize / gridSize;
   let image: { uri: string };
   if (imageURI && imageURI.length > 0) {
     image = { uri: imageURI };
@@ -48,8 +49,8 @@ export default ({
         let y: number;
         if(puzzleType === 'squares') {
             if(i === gridSize) {
-                x = gridSize * squareSize
-                y = gridSize * squareSize
+                x = gridSize * squareSize;
+                y = gridSize * squareSize;
             }
             else {
                 x = i % gridSize * squareSize;
@@ -57,12 +58,23 @@ export default ({
             }
         }
         else {
-            // insert jigsaw logic
+            if(i === 0) {
+                x = 0;
+                y = 0;
+            }
+            else if(i === gridSize) {
+                x = gridSize * squareSize;
+                y = gridSize * squareSize;
+            }
+            else {
+                x = squareSize * 0.75 + (i-1) * squareSize;
+                y = squareSize * 0.75 + (i-1) * squareSize;
+            }
         }
         gridSections.rowDividers.push(x)
         gridSections.colDividers.push(y)
     }
-    console.log(gridSections)
+    console.log(gridSections, squareSize)
     return gridSections
 }
 
@@ -103,7 +115,7 @@ const [gridSections, setGridSections] = useState(getGridSections());
   )
 
   const [winMessage, setWinMessage] = useState('')
-// start here! also need to trouble shoot piece returning to same place
+
   const checkWin = () => {
       if(currentBoard[0] !== 0) return;
       for(let i = 0; i < currentBoard.length; i++){
@@ -146,7 +158,12 @@ const [gridSections, setGridSections] = useState(getGridSections());
           setCurrentBoard={setCurrentBoard}
         />
       ))}
-      <Text>{winMessage}</Text>
+      <Text style={{ 
+          fontSize: 20,
+          justifyContent: "space-around",
+          marginBottom: 10,
+          width: "100%"
+          }}>{winMessage}</Text>
       <View
         style={{
           flex: 1,

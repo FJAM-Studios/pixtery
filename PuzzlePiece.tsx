@@ -52,8 +52,6 @@ export default ({
     solutionX: number,
     solutionY: number;
 
-    // if (newSnappedIx !== -1) ix = newSnappedIx
-
   if (puzzleType === "squares") {
     //for square puzzles, everything is aligned to grid
     widthY = widthX = squareSize;
@@ -86,6 +84,7 @@ export default ({
     viewBoxX = Math.max(0, squareX * squareSize - squareSize * 0.25);
     viewBoxY = Math.max(0, squareY * squareSize - squareSize * 0.25);
   }
+console.log('num', num, 'ix', ix, 'soliotnnx', solutionX, 'solY', solutionY)
 
   const [ready, setReady] = useState(false);
   const [croppedImage, setCroppedImage] = useState(image);
@@ -149,11 +148,9 @@ export default ({
     for(let i = 0; i < rowDividers.length - 1; i++) {
         const rowDivider = rowDividers[i]
         if(Math.abs(newXY._y - rowDivider) < squareSize * SNAP_MARGIN) {
-            // start here - initX. initY may not be usable here because the ix will be diferent on move. maybe i can use newXY.x?
             snappedY = initY - newXY._y + rowDivider;
             // snappedY = newXY.y - newXY._y + rowDivider;
-
-            snappedRow = i
+            snappedRow = i;
             break;
         }
     }
@@ -184,7 +181,7 @@ export default ({
         else {
             console.log('cannot move to ', newIx)
             newIx = undefined
-            // need to check this - ideally would want to get it back to original location
+            // need to check this - ideally would want to send piece back to original location
             // newXY.x = currentXY.x + currentXY._x - gestureState.dx;
             // newXY.y = currentXY.y + currentXY._y - gestureState.dy;
         }
