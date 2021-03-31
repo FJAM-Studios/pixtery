@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import * as React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Image, View, Platform } from "react-native";
 import {
@@ -33,26 +33,6 @@ export default ({
   const [imageURI, setImageURI] = React.useState("");
   const [puzzleType, setPuzzleType] = React.useState("jigsaw");
   const [gridSize, setGridSize] = React.useState(3);
-
-    // request gallery and camera permissions for iPhone. \
-  // Expo gives you a weird notification if you've already given permissions to another expo project, but that won't matter in       production.
-  useEffect(() => {
-    (async () => {
-      if (Platform.OS !== 'web') {
-        let response = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        const libraryPermission = response.status
-        if (libraryPermission !== 'granted') {
-          alert('Sorry, we need camera roll permissions to make this work!');
-        } else {
-          response = await ImagePicker.requestCameraPermissionsAsync();
-          const cameraPermission = response.status
-          if (cameraPermission !== 'granted') {
-            alert('Sorry, we need camera permissions to make this work!');
-          }
-        }
-      }
-    })()
-  }, []);
 
   const selectImage = async (camera: boolean) => {
     let result = camera
