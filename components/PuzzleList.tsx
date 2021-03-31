@@ -4,7 +4,7 @@ import { View } from "react-native";
 import { Text, Card, IconButton } from "react-native-paper";
 import moment from "moment";
 import Header from "./Header";
-import { Puzzle } from "./types";
+import { Puzzle } from "../types";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
 export default ({

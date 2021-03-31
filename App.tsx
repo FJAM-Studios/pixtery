@@ -6,9 +6,9 @@ import { Provider as PaperProvider, DefaultTheme } from "react-native-paper";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { dummyPuzzles } from "./dummyData";
 
-import Puzzle from "./Puzzle";
-import HomeScreen from "./Home";
-import PuzzleList from "./PuzzleList";
+import Puzzle from "./components/Puzzle";
+import HomeScreen from "./components/Home";
+import PuzzleList from "./components/PuzzleList";
 
 const image = require("./assets/earth.jpg");
 
