@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import Draggable from "react-native-draggable";
-import { Svg, Image, Defs, ClipPath, Path, Rect } from "react-native-svg";
+import { Svg, Image, Defs, ClipPath, Path, Rect, NumberProp } from "react-native-svg";
 import * as ImageManipulator from "expo-image-manipulator";
 import { TextComponent } from "react-native";
-import { SNAP_MARGIN, TESTING_MODE } from './constants'
-// to do
-// redo convertix rules of touch from just larger or smaller than grid divider
+import { SNAP_MARGIN, TESTING_MODE } from './constants';
+import { GridSections } from './types';
   // TO DO update type for gridsections, rand, setRand
   // to do set error emssage when piece cant move
+  // figure out if i need to retype props if type is aleady set on parent
 
 export default ({
   num,
@@ -30,8 +30,8 @@ export default ({
   boardSize: number;
   piecePath: string;
   image: { uri: string };
-  gridSections: any;
-  currentBoard: any;
+  gridSections: GridSections;
+  currentBoard: (number | null) [];
   setCurrentBoard: any;
 }) => {
   //squareX and squareY represent the row and col of the square in the solved puzzle
@@ -84,12 +84,11 @@ export default ({
     viewBoxX = Math.max(0, squareX * squareSize - squareSize * 0.25);
     viewBoxY = Math.max(0, squareY * squareSize - squareSize * 0.25);
   }
-console.log('num', num, 'ix', ix, 'soliotnnx', solutionX, 'solY', solutionY)
 
-  const [ready, setReady] = useState(false);
+  const [ready, setReady] = useState<boolean>(false);
   const [croppedImage, setCroppedImage] = useState(image);
-  const [newSnappedIx, setNewSnappedIx] = useState(-1)
-  const [prevIx, setPrevIx] = useState(ix)
+  const [newSnappedIx, setNewSnappedIx] = useState<number | undefined | null>(-1)
+  const [prevIx, setPrevIx] = useState<number | undefined | null>(ix)
 
   //_x and _y are used to keep track of where image is relative to its start positon
   const [currentXY, setXY] = useState({
@@ -129,7 +128,7 @@ console.log('num', num, 'ix', ix, 'soliotnnx', solutionX, 'solY', solutionY)
     manipulateImage();
   }, []);
 
-  const changePosition = (gestureState: { dx: number; dy: number }) => {
+  const changePosition = (gestureState: { dx: number; dy: number }): void => {
     //update the relative _x and _y but leave x and y the same unless snapping
     const newXY = {
       x: currentXY.x,
@@ -137,15 +136,14 @@ console.log('num', num, 'ix', ix, 'soliotnnx', solutionX, 'solY', solutionY)
       _x: currentXY._x + gestureState.dx,
       _y: currentXY._y + gestureState.dy,
     };
-    console.log('newxy', newXY)
     // start here, the snappedY is coming up as undefined when it should notbe
     //if _x and _y are within a margin of a point on the grid, then snap!
-    let snappedX;
-    let snappedY;
-    let snappedRow;
-    let snappedCol;
-    const rowDividers = gridSections.rowDividers
-    for(let i = 0; i < rowDividers.length - 1; i++) {
+    let snappedX: number | undefined;
+    let snappedY: number | undefined;
+    let snappedRow: number | undefined;
+    let snappedCol: number | undefined;
+    const rowDividers: number[] = gridSections.rowDividers
+    for(let i = 0; i < rowDividers.length; i++) {
         const rowDivider = rowDividers[i]
         if(Math.abs(newXY._y - rowDivider) < squareSize * SNAP_MARGIN) {
             snappedY = initY - newXY._y + rowDivider;
@@ -154,19 +152,17 @@ console.log('num', num, 'ix', ix, 'soliotnnx', solutionX, 'solY', solutionY)
             break;
         }
     }
-    const colDividers = gridSections.colDividers
-    for(let i = 0; i < colDividers.length - 1; i++) {
+    const colDividers: number[] = gridSections.colDividers
+    for(let i = 0; i < colDividers.length; i++) {
         const colDivider = colDividers[i]
         if(Math.abs(newXY._x - colDivider) < squareSize * SNAP_MARGIN) {
-            // snappedX = initX - newXY._x + colDivider;
             snappedX = initX - newXY._x + colDivider;
             // snappedX = newXY.x - newXY._x + colDivider;
-
             snappedCol = i;
             break;
         }
     }
-    let newIx;
+    let newIx: number | undefined;
     // if there was a snap i.e. the piece came within the grid snap margin
     console.log('snapx',snappedX, 'snapy', snappedY)
     if(snappedX !== undefined && snappedY !== undefined) {
@@ -191,20 +187,22 @@ console.log('num', num, 'ix', ix, 'soliotnnx', solutionX, 'solY', solutionY)
   };
 
   // preserve previous Ix, and set the new Ix that it will snap to
-  const updateIx = (newIx) => {
+  const updateIx = (newIx: number | undefined): void => {
       if (newSnappedIx !== -1) setPrevIx(newSnappedIx)
       setNewSnappedIx(newIx)
   }
 
-  const updateCurrentBoard = () => {
+  const updateCurrentBoard = (): void => {
     console.log('newsnappedix when board update:', newSnappedIx, 'prevIx', prevIx, 'num', num, 'ix', ix)
     let newBoard = [...currentBoard]
-    if (newSnappedIx >= 0) newBoard[newSnappedIx] = num
-    if(prevIx >= 0) newBoard[prevIx] = null
+    // putting ! after a variable is to tell TS that in this case, the variable will not be null or undefined
+    if (newSnappedIx! >= 0) newBoard[newSnappedIx!] = num
+    if(prevIx! >= 0) newBoard[prevIx!] = null
     setCurrentBoard(newBoard)
     }
 
   useEffect(() => {
+    // if the piece has been mounted already (i.e. newSnappedIx is not -1), update board after currentXY changes
     if(newSnappedIx !== -1) {
         console.log('new snapped ix', newSnappedIx)
         updateCurrentBoard()    

@@ -24,7 +24,7 @@ export default ({
   imageURI: string;
   puzzleType: string;
 }) => {
-  const [gridSize, setGridSize] = useState(3);
+  const [gridSize, setGridSize] = useState<number>(3);
   const squareSize: number = boardSize / gridSize;
   let image: { uri: string };
   if (imageURI && imageURI.length > 0) {
@@ -41,35 +41,25 @@ export default ({
     shuffle(_rand, disableShuffle);
     setRand(_rand);
   };
-//TO DO gridsections TS and interface. need to add case for jigsaw
-  const getGridSections = () => {
-    let gridSections = {rowDividers: [], colDividers: []} // separated row and col in case needed for future flexibility
-    for(let i = 0; i <= gridSize; i++) {
+
+// populates X Y coordinates for upper left corner of each grid section
+  const getGridSections = (): GridSections => {
+    // separated row and col in case needed for future flexibility
+    let gridSections: GridSections = {
+        rowDividers: [0],
+        colDividers: [0]
+    };
+    for(let i = 1; i < gridSize; i++) {
         let x: number;
         let y: number;
         if(puzzleType === 'squares') {
-            if(i === gridSize) {
-                x = gridSize * squareSize;
-                y = gridSize * squareSize;
-            }
-            else {
-                x = i % gridSize * squareSize;
-                y = i % gridSize * squareSize;    
-            }
+            x = i * squareSize;
+            y = i * squareSize;
         }
+        //if jigsaw
         else {
-            if(i === 0) {
-                x = 0;
-                y = 0;
-            }
-            else if(i === gridSize) {
-                x = gridSize * squareSize;
-                y = gridSize * squareSize;
-            }
-            else {
-                x = squareSize * 0.75 + (i-1) * squareSize;
-                y = squareSize * 0.75 + (i-1) * squareSize;
-            }
+            x = squareSize * 0.75 + (i-1) * squareSize;
+            y = squareSize * 0.75 + (i-1) * squareSize;
         }
         gridSections.rowDividers.push(x)
         gridSections.colDividers.push(y)
@@ -78,7 +68,7 @@ export default ({
     return gridSections
 }
 
-const [gridSections, setGridSections] = useState(getGridSections());
+const [gridSections, setGridSections] = useState<GridSections>(getGridSections());
 
 // TO DO need to include grid sections in this function
   const changeGrid = (up: boolean): void => {
@@ -96,6 +86,7 @@ const [gridSections, setGridSections] = useState(getGridSections());
       );
       setRand(shuffle(fillArray(gridSize - 1), disableShuffle));
     }
+    setGridSections(getGridSections())
   };
 
   const fillArray = (gridSize: number): number[] => {
@@ -105,18 +96,18 @@ const [gridSections, setGridSections] = useState(getGridSections());
     }
     return numberArray;
   };
-
-  const [rand, setRand] = useState(
+// start here, array generics
+  const [rand, setRand] = useState<number[]>(
     shuffle(fillArray(gridSize), disableShuffle)
   );
-
-  const [currentBoard, setCurrentBoard] = useState(
+// start here - need to type for number and null
+  const [currentBoard, setCurrentBoard] = useState<(number | null) []>(
       [...rand]
   )
 
-  const [winMessage, setWinMessage] = useState('')
+  const [winMessage, setWinMessage] = useState<string>('')
 
-  const checkWin = () => {
+  const checkWin = (): void => {
       if(currentBoard[0] !== 0) return;
       for(let i = 0; i < currentBoard.length; i++){
           if(currentBoard[i] !== i) return;
@@ -125,7 +116,7 @@ const [gridSections, setGridSections] = useState(getGridSections());
   }
 
   useEffect(() => {
-        checkWin()
+      checkWin()
   }, [currentBoard])
   console.log('currentboard', currentBoard)
 
