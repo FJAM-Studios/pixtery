@@ -8,13 +8,11 @@ import {
   Surface,
   Headline,
   TextInput,
-  ActivityIndicator,
 } from "react-native-paper";
 import * as ImagePicker from "expo-image-picker";
 import Header from "./Header";
 const emptyImage = require("./assets/blank.jpg");
-import Logo from "./Logo";
-import Title from "./Title";
+
 import Svg, { Path } from "react-native-svg";
 import { generateJigsawPiecePaths, generateSquarePiecePaths } from "./util";
 import { Puzzle } from "./types";
@@ -37,17 +35,17 @@ export default ({
   const selectImage = async (camera: boolean) => {
     let result = camera
       ? await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 4],
-        quality: 1,
-      })
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          allowsEditing: true,
+          aspect: [4, 4],
+          quality: 1,
+        })
       : await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 4],
-        quality: 1,
-      });
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          allowsEditing: true,
+          aspect: [4, 4],
+          quality: 1,
+        });
 
     if (!result.cancelled) {
       setImageURI(result.uri);
@@ -55,7 +53,6 @@ export default ({
   };
 
   const [message, setMessage] = React.useState("");
-  const [isLoading, setLoading] = React.useState(true);
   const [paths, setPaths] = React.useState(
     generateJigsawPiecePaths(gridSize, boardSize / (1.6 * gridSize), true)
   );
@@ -88,31 +85,6 @@ export default ({
       }
     })();
   }, []);
-
-  setTimeout(() => setLoading(false), 1500);
-  if (isLoading) {
-    return (
-      <View
-        style={{
-          flex: 1,
-          flexDirection: "column",
-          padding: 10,
-          backgroundColor: theme.colors.background,
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <Logo width="100" height="100" />
-        <Title width="100" height="35" />
-        <Headline>Pretending To Load</Headline>
-        <ActivityIndicator
-          animating={true}
-          color={theme.colors.text}
-          size="large"
-        />
-      </View>
-    );
-  }
 
   return (
     <SafeAreaView
