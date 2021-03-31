@@ -10,8 +10,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Header from "./Header";
 
 import PuzzlePiece from "./PuzzlePiece";
-import { shuffle, generateJigsawPiecePaths } from "./util";
-import { Puzzle } from "./types";
+import { shuffle, generateJigsawPiecePaths } from "../util";
+import { Puzzle } from "../types";
 
 export default ({
   boardSize,

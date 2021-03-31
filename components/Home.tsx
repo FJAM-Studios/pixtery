@@ -16,8 +16,8 @@ const emptyImage = require("./assets/blank.jpg");
 import Logo from "./Logo";
 import Title from "./Title";
 import Svg, { Path } from "react-native-svg";
-import { generateJigsawPiecePaths, generateSquarePiecePaths } from "./util";
-import { Puzzle } from "./types";
+import { generateJigsawPiecePaths, generateSquarePiecePaths } from "../util";
+import { Puzzle } from "../types";
 
 export default ({
   navigation,
