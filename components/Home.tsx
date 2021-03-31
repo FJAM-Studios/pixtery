@@ -1,5 +1,5 @@
 import {app, db, storage} from '../FirebaseApp'
-import React, {useEffect} from "react";
+import * as React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Image, View, Platform } from "react-native";
 import {
@@ -17,8 +17,9 @@ const emptyImage = require("./assets/blank.jpg");
 import Logo from "./Logo";
 import Title from "./Title";
 import Svg, { Path } from "react-native-svg";
-import { generateJigsawPiecePaths, generateSquarePiecePaths } from "../util";
+import { generateJigsawPiecePaths, generateSquarePiecePaths, createBlob } from "../util";
 import { Puzzle } from "../types";
+import uuid from 'uuid';
 
 export default ({
   navigation,
@@ -34,26 +35,6 @@ export default ({
   const [imageURI, setImageURI] = React.useState("");
   const [puzzleType, setPuzzleType] = React.useState("jigsaw");
   const [gridSize, setGridSize] = React.useState(3);
-
-    // request gallery and camera permissions for iPhone. \
-  // Expo gives you a weird notification if you've already given permissions to another expo project, but that won't matter in       production.
-  useEffect(() => {
-    (async () => {
-      if (Platform.OS !== 'web') {
-        let response = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        const libraryPermission = response.status
-        if (libraryPermission !== 'granted') {
-          alert('Sorry, we need camera roll permissions to make this work!');
-        } else {
-          response = await ImagePicker.requestCameraPermissionsAsync();
-          const cameraPermission = response.status
-          if (cameraPermission !== 'granted') {
-            alert('Sorry, we need camera permissions to make this work!');
-          }
-        }
-      }
-    })()
-  }, []);
 
   const selectImage = async (camera: boolean) => {
     let result = camera
@@ -136,58 +117,35 @@ export default ({
   }
 
 
-  const submitToServer = async (): uuid => {
+  const submitToServer = async (): Promise<string> => {
 
-    const fileName: uuid = uuid.v4();
-
+    const fileName: string = uuid.v4();
     const cloudURL: string = await uploadImage(fileName);
-    const publicKey: uuid = uploadPuzzleSettings(cloudURL, fileName);
+    const publicKey: Promise<string> = uploadPuzzleSettings(cloudURL, fileName);
 
     //for now this function just returns a uuid
     //@todo use that key to build a public SMS
     return publicKey
   }
 
-  const uploadImage = async (fileName: uuid) : Promise<string> => {
-    const blob = await createBlob(localImage.uri);
-
+  const uploadImage = async (fileName: string) : Promise<string> => {
+    const blob: Blob = await createBlob(imageURI);
     const ref = storage.ref().child(fileName);
-
     const snapshot = await ref.put(blob);
-
-    // We're done with the blob, close and release it
-    blob.close();
-
     return snapshot.ref.getDownloadURL();
   }
 
-  const createBlob = (localUri) => {
-    //converts the image URI into a blob. there are references to using fetch online,
-    // but it looks like that was broken in the latest version of expo
 
-   return new Promise((resolve, reject) => {
-      const xhr = new XMLHttpRequest();
-      xhr.onload = function () {
-        resolve(xhr.response);
-      };
-      xhr.onerror = function (e) {
-        console.log(e);
-        reject(new TypeError('Network request failed'));
-      };
-      xhr.responseType = 'blob';
-      xhr.open('GET', localUri, true);
-      xhr.send(null);
-    });
 
-  }
-
-  const uploadPuzzleSettings = async (cloudURL: string, fileName: uuid): uuid => {
+  const uploadPuzzleSettings = async (cloudURL: string, fileName: string): Promise<string> => {
     //  @todo connect to realtime database, store the filename with the puzzle settings and user info. create and store a path for the text message or can that just be the uuid??
     console.log("public URL is", cloudURL);
-    const publicKey: uuid = uuid.v4()
+    const publicKey: string = uuid.v4()
     await db.collection("puzzles").doc(fileName).set({
       imageRef: fileName,
-      publicKey: publicKey
+      publicKey: publicKey,
+      type: puzzleType,
+      gridSize: gridSize,
     })
 
     return publicKey
@@ -392,7 +350,7 @@ export default ({
       <Button
         icon="send"
         mode="contained"
-        onPress={() => {}}
+        onPress={submitToServer}
         style={{ margin: 10 }}
       >
         Send
