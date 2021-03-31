@@ -6,53 +6,32 @@ import {
   NativeSyntheticEvent,
   NativeTouchEvent,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Header from "./Header";
 
 import PuzzlePiece from "./PuzzlePiece";
 import { shuffle, generateJigsawPiecePaths } from "./util";
+import { Puzzle } from "./types";
 
 export default ({
   boardSize,
-  imageURI,
-  puzzleType,
+  theme,
+  navigation,
+  receivedPuzzles,
+  route,
 }: {
   boardSize: number;
-  imageURI: string;
-  puzzleType: string;
+  theme: any;
+  navigation: any;
+  receivedPuzzles: Puzzle[];
+  route: any;
 }) => {
-  const [gridSize, setGridSize] = useState(3);
+  const { imageURI, puzzleType, gridSize } = route.params;
   const squareSize = boardSize / gridSize;
-  let image: { uri: string };
-  if (imageURI && imageURI.length > 0) {
-    image = { uri: imageURI };
-  } else image = require("./assets/earth.jpg");
-
+  const image = { uri: imageURI };
   const [piecePaths, setPiecePaths] = useState(
     generateJigsawPiecePaths(gridSize, squareSize)
   );
-
-  const shufflePics = (ev?: NativeSyntheticEvent<NativeTouchEvent>) => {
-    if (ev) ev.preventDefault();
-    const _rand = [...rand];
-    shuffle(_rand);
-    setRand(_rand);
-  };
-
-  const changeGrid = (up: boolean): void => {
-    if (up && gridSize < 5) {
-      setGridSize(gridSize + 1);
-      setPiecePaths(
-        generateJigsawPiecePaths(gridSize + 1, boardSize / (gridSize + 1))
-      );
-      setRand(shuffle(fillArray(gridSize + 1)));
-    }
-    if (!up && gridSize > 2) {
-      setGridSize(gridSize - 1);
-      setPiecePaths(
-        generateJigsawPiecePaths(gridSize - 1, boardSize / (gridSize - 1))
-      );
-      setRand(shuffle(fillArray(gridSize - 1)));
-    }
-  };
 
   const fillArray = (gridSize: number): number[] => {
     const numberArray = [];
@@ -62,57 +41,40 @@ export default ({
     return numberArray;
   };
 
-  const [rand, setRand] = useState(shuffle(fillArray(gridSize)));
+  const [shuffledPieces, setRand] = useState(shuffle(fillArray(gridSize)));
 
   return (
-    <View
+    <SafeAreaView
       style={{
         flex: 1,
-        justifyContent: "flex-end",
-        alignSelf: "center",
-        backgroundColor: "slateblue",
-        width: "95%",
+        flexDirection: "column",
+        padding: 10,
+        backgroundColor: theme.colors.background,
+        justifyContent: "flex-start",
       }}
     >
-      {/* could probably cut down on some of these props*/}
-      {rand.map((num: number, ix: number) => (
-        <PuzzlePiece
-          // this random key forces Draggable/React to rerender these pieces when changing board
-          // seems like cheating, but maybe not?
-          key={Math.random() * (1 + ix)}
-          num={num}
-          ix={ix}
-          gridSize={gridSize}
-          squareSize={squareSize}
-          puzzleType={puzzleType}
-          image={image}
-          piecePath={piecePaths[num]}
-          boardSize={boardSize}
-        />
-      ))}
-      <View
-        style={{
-          flex: 1,
-          width: "100%",
-          maxHeight: "5%",
-          flexDirection: "row",
-          justifyContent: "space-around",
-          marginBottom: 10,
-        }}
-      >
-        <Button
-          title="-"
-          onPress={() => changeGrid(false)}
-          disabled={gridSize === 2}
-        />
-        <Text style={{ fontSize: 20 }}>Grid Size: {gridSize}</Text>
-        <Button
-          title="+"
-          onPress={() => changeGrid(true)}
-          disabled={gridSize === 5}
-        />
+      <Header
+        theme={theme}
+        notifications={
+          receivedPuzzles.filter((puzzle) => !puzzle.completed).length
+        }
+        navigation={navigation}
+      />
+      <View>
+        {shuffledPieces.map((num: number, ix: number) => (
+          <PuzzlePiece
+            key={num}
+            num={num}
+            ix={ix}
+            gridSize={gridSize}
+            squareSize={squareSize}
+            puzzleType={puzzleType}
+            image={image}
+            piecePath={piecePaths[num]}
+            boardSize={boardSize}
+          />
+        ))}
       </View>
-      <Button title="Reset" onPress={shufflePics} />
-    </View>
+    </SafeAreaView>
   );
 };

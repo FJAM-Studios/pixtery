@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Draggable from "react-native-draggable";
 import { Svg, Image, Defs, ClipPath, Path, Rect } from "react-native-svg";
+import * as ImageManipulator from "expo-image-manipulator";
 
 export default ({
   num,
@@ -28,14 +29,24 @@ export default ({
   //widthX and widthY are the size of the pieces (larger for jigsaw);
   //initX and initY are starting position for pieces (not aligned w grid for jigsaw)
   //viewBoxX and viewBoxY are 'panned' for selecting correct portion of image for piece
+  //solutionX and solutionY are the top left coords for where the piece belongs in solution
 
-  let widthY, widthX, initX, initY, viewBoxX, viewBoxY;
+  let widthY: number,
+    widthX: number,
+    initX: number,
+    initY: number,
+    viewBoxX: number,
+    viewBoxY: number,
+    solutionX: number,
+    solutionY: number;
 
   if (puzzleType === "squares") {
     //for square puzzles, everything is aligned to grid
     widthY = widthX = squareSize;
     initX = (ix % gridSize) * squareSize;
     initY = Math.floor(ix / gridSize) * squareSize;
+    solutionX = (num % gridSize) * squareSize;
+    solutionY = Math.floor(num / gridSize) * squareSize;
     viewBoxX = squareX * squareSize;
     viewBoxY = squareY * squareSize;
   } else {
@@ -53,26 +64,93 @@ export default ({
       0,
       Math.floor(ix / gridSize) * squareSize - squareSize * 0.25
     );
+    solutionX = Math.max(0, (num % gridSize) * squareSize - squareSize * 0.25);
+    solutionY = Math.max(
+      0,
+      Math.floor(num / gridSize) * squareSize - squareSize * 0.25
+    );
     viewBoxX = Math.max(0, squareX * squareSize - squareSize * 0.25);
     viewBoxY = Math.max(0, squareY * squareSize - squareSize * 0.25);
   }
+
+  const [ready, setReady] = useState(false);
+  const [croppedImage, setCroppedImage] = useState(image);
+
+  //_x and _y are used to keep track of where image is relative to its start positon
+  const [currentXY, setXY] = useState({
+    x: initX,
+    y: initY,
+    _x: initX,
+    _y: initY,
+  });
+
+  useEffect(() => {
+    const manipulateImage = async () => {
+      setReady(false);
+      const croppedImage = await ImageManipulator.manipulateAsync(
+        image.uri,
+        [
+          {
+            resize: {
+              width: boardSize,
+              height: boardSize,
+            },
+          },
+          {
+            crop: {
+              originX: viewBoxX,
+              originY: viewBoxY,
+              width: widthX,
+              height: widthY,
+            },
+          },
+        ],
+        { compress: 1, format: ImageManipulator.SaveFormat.JPEG }
+      );
+      setCroppedImage(croppedImage);
+      setReady(true);
+    };
+
+    manipulateImage();
+  }, []);
+
+  const changePosition = (gestureState: { dx: number; dy: number }) => {
+    //update the relative _x and _y but leave x and y the same unless snapping
+    const newXY = {
+      x: currentXY.x,
+      y: currentXY.y,
+      _x: currentXY._x + gestureState.dx,
+      _y: currentXY._y + gestureState.dy,
+    };
+    //if _x and _y are within some number of the solutionX and Y, then snap!
+    //this only snaps to the 'solved' positions, but could do the same for all positions
+    if (
+      Math.abs(solutionX - newXY._x) < squareSize / 4 &&
+      Math.abs(solutionY - newXY._y) < squareSize / 4
+    ) {
+      //new x and new y (not underscode) are moved to the solutionX and Y,
+      //factoring in initial position and _x/_y offset
+      newXY.x = initX - newXY._x + solutionX;
+      newXY.y = initY - newXY._y + solutionY;
+      //here is where you could update the puzzle state to say what has been solved
+    }
+    setXY(newXY);
+  };
+
+  if (!ready) return null;
+
   return (
     <Draggable
       //draggable SVG needs to be placed where cropped image starts. jigsaw shape extends beyond square
-      x={initX}
-      y={initY}
+      x={currentXY.x}
+      y={currentXY.y}
+      //on release of a piece, update the state and check for snapping
+      onDragRelease={(ev, gestureState) => changePosition(gestureState)}
     >
       <Svg
         //height and width are size of jigsaw piece
         height={widthY}
         width={widthX}
-        //view box is 'panned' to the right section of the image for the puzzle piece
-        viewBox={`
-        ${viewBoxX}
-        ${viewBoxY}
-        ${widthX}
-        ${widthY}
-      `}
       >
         <Defs>
           {/* for jigsaws, clip using piecePaths */}
@@ -86,16 +164,17 @@ export default ({
               stroke="white"
               x={0}
               y={0}
-              width={boardSize}
-              height={boardSize}
+              width={widthX}
+              height={widthY}
             />
           </ClipPath>
         </Defs>
+        {/* <Path d={piecePath} stroke="white" /> */}
+
         <Image
-          href={image}
-          //image needs to be as big as the board so that the clipping happens properly
-          width={boardSize}
-          height={boardSize}
+          href={croppedImage}
+          width={widthX}
+          height={widthY}
           clipPath={`url(#${puzzleType})`}
         />
       </Svg>
