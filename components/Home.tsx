@@ -120,24 +120,22 @@ export default ({
   const submitToServer = async (): uuid => {
 
     const fileName: uuid = uuid.v4();
-    const cloudURL: string = await uploadImage(fileName);
-    const publicKey: uuid = uploadPuzzleSettings(cloudURL, fileName);
+    await uploadImage(fileName);
+    const publicKey: uuid = uploadPuzzleSettings(fileName);
 
     //for now this function just returns a uuid
     //@todo use that key to build a public SMS
     return publicKey
   }
 
-  const uploadImage = async (fileName: string) : Promise<string> => {
+  const uploadImage = async (fileName: string) : Promise<void> => {
     const blob: Blob = await createBlob(imageURI);
     const ref = storage.ref().child(fileName);
-    const snapshot = await ref.put(blob);
-    return snapshot.ref.getDownloadURL();
+    await ref.put(blob);
+    return ;
   }
 
-  const uploadPuzzleSettings = async (cloudURL: string, fileName: uuid): uuid => {
-    //  @todo connect to realtime database, store the filename with the puzzle settings and user info. create and store a path for the text message or can that just be the uuid??
-    console.log("public URL is", cloudURL);
+  const uploadPuzzleSettings = async (fileName: uuid): uuid => {
     const publicKey: uuid = uuid.v4()
     await db.collection("puzzles").doc(fileName).set({
       imageRef: fileName,
