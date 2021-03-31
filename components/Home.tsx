@@ -13,7 +13,7 @@ import {
 } from "react-native-paper";
 import * as ImagePicker from "expo-image-picker";
 import Header from "./Header";
-const emptyImage = require("./assets/blank.jpg");
+const emptyImage = require("../assets/blank.jpg");
 import Logo from "./Logo";
 import Title from "./Title";
 import Svg, { Path } from "react-native-svg";
@@ -117,11 +117,11 @@ export default ({
   }
 
 
-  const submitToServer = async (): Promise<string> => {
+  const submitToServer = async (): uuid => {
 
-    const fileName: string = uuid.v4();
+    const fileName: uuid = uuid.v4();
     const cloudURL: string = await uploadImage(fileName);
-    const publicKey: Promise<string> = uploadPuzzleSettings(cloudURL, fileName);
+    const publicKey: uuid = uploadPuzzleSettings(cloudURL, fileName);
 
     //for now this function just returns a uuid
     //@todo use that key to build a public SMS
@@ -135,12 +135,10 @@ export default ({
     return snapshot.ref.getDownloadURL();
   }
 
-
-
-  const uploadPuzzleSettings = async (cloudURL: string, fileName: string): Promise<string> => {
+  const uploadPuzzleSettings = async (cloudURL: string, fileName: uuid): uuid => {
     //  @todo connect to realtime database, store the filename with the puzzle settings and user info. create and store a path for the text message or can that just be the uuid??
     console.log("public URL is", cloudURL);
-    const publicKey: string = uuid.v4()
+    const publicKey: uuid = uuid.v4()
     await db.collection("puzzles").doc(fileName).set({
       imageRef: fileName,
       publicKey: publicKey,
