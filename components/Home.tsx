@@ -1,3 +1,4 @@
+import {app, db, storage} from '../FirebaseApp'
 import React, {useEffect} from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Image, View, Platform } from "react-native";
@@ -132,6 +133,64 @@ export default ({
         />
       </View>
     );
+  }
+
+
+  const submitToServer = async (): uuid => {
+
+    const fileName: uuid = uuid.v4();
+
+    const cloudURL: string = await uploadImage(fileName);
+    const publicKey: uuid = uploadPuzzleSettings(cloudURL, fileName);
+
+    //for now this function just returns a uuid
+    //@todo use that key to build a public SMS
+    return publicKey
+  }
+
+  const uploadImage = async (fileName: uuid) : Promise<string> => {
+    const blob = await createBlob(localImage.uri);
+
+    const ref = storage.ref().child(fileName);
+
+    const snapshot = await ref.put(blob);
+
+    // We're done with the blob, close and release it
+    blob.close();
+
+    return snapshot.ref.getDownloadURL();
+  }
+
+  const createBlob = (localUri) => {
+    //converts the image URI into a blob. there are references to using fetch online,
+    // but it looks like that was broken in the latest version of expo
+
+   return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onload = function () {
+        resolve(xhr.response);
+      };
+      xhr.onerror = function (e) {
+        console.log(e);
+        reject(new TypeError('Network request failed'));
+      };
+      xhr.responseType = 'blob';
+      xhr.open('GET', localUri, true);
+      xhr.send(null);
+    });
+
+  }
+
+  const uploadPuzzleSettings = async (cloudURL: string, fileName: uuid): uuid => {
+    //  @todo connect to realtime database, store the filename with the puzzle settings and user info. create and store a path for the text message or can that just be the uuid??
+    console.log("public URL is", cloudURL);
+    const publicKey: uuid = uuid.v4()
+    await db.collection("puzzles").doc(fileName).set({
+      imageRef: fileName,
+      publicKey: publicKey
+    })
+
+    return publicKey
   }
 
   return (
