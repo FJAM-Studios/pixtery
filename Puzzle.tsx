@@ -5,12 +5,14 @@ import {
   Button,
   NativeSyntheticEvent,
   NativeTouchEvent,
+  StyleSheet
 } from "react-native";
 import { Asset } from "expo-asset";
 import PuzzlePiece from "./PuzzlePiece";
 import { shuffle, generateJigsawPiecePaths } from "./util";
 import { TESTING_MODE } from "./constants";
 import { GridSections } from './types';
+import { greaterThan } from "react-native-reanimated";
 
 //disable shuffling for testing
 const disableShuffle = TESTING_MODE;
@@ -96,16 +98,17 @@ const [gridSections, setGridSections] = useState<GridSections>(getGridSections()
     }
     return numberArray;
   };
-// start here, array generics
+
   const [rand, setRand] = useState<number[]>(
     shuffle(fillArray(gridSize), disableShuffle)
   );
-// start here - need to type for number and null
+
   const [currentBoard, setCurrentBoard] = useState<(number | null) []>(
       [...rand]
   )
 
   const [winMessage, setWinMessage] = useState<string>('')
+  const [errorMessage, setErrorMessage] = useState<string>('')
 
   const checkWin = (): void => {
       if(currentBoard[0] !== 0) return;
@@ -147,24 +150,18 @@ const [gridSections, setGridSections] = useState<GridSections>(getGridSections()
           gridSections={gridSections}
           currentBoard={currentBoard}
           setCurrentBoard={setCurrentBoard}
+          setErrorMessage={setErrorMessage}
         />
       ))}
-      <Text style={{ 
-          fontSize: 20,
-          justifyContent: "space-around",
-          marginBottom: 10,
-          width: "100%"
-          }}>{winMessage}</Text>
-      <View
-        style={{
-          flex: 1,
-          width: "100%",
-          maxHeight: "5%",
-          flexDirection: "row",
-          justifyContent: "space-around",
-          marginBottom: 10,
-        }}
-      >
+      <View style={{marginBottom: 40}}>
+        <View style={styles.messageContainer}>
+            <Text style={styles.winText}>{winMessage}</Text>
+        </View>
+        <View style={styles.messageContainer}>
+            <Text style={styles.errorText}>{errorMessage}</Text>
+        </View>
+      </View>
+      <View style={styles.gridOptionsContainer}>
         <Button
           title="-"
           onPress={() => changeGrid(false)}
@@ -181,3 +178,33 @@ const [gridSections, setGridSections] = useState<GridSections>(getGridSections()
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+    gridOptionsContainer: {
+        flex: 1,
+        width: "100%",
+        maxHeight: "5%",
+        flexDirection: "row",
+        justifyContent: "space-around",
+        marginBottom: 10,
+        zIndex: -1,
+    },
+    errorText: {
+        fontSize: 20,
+        flexWrap: "wrap",
+        textAlign:"center",
+        flex: 1,
+        color: "orange"
+    },
+    messageContainer: {
+        flexDirection: "row",
+        zIndex: -1,
+    },
+    winText: {
+        fontSize: 20,
+        flexWrap: "wrap",
+        textAlign:"center",
+        flex: 1,
+        color: "white"
+    }
+})

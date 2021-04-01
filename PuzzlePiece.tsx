@@ -5,7 +5,6 @@ import * as ImageManipulator from "expo-image-manipulator";
 import { TextComponent } from "react-native";
 import { SNAP_MARGIN, TESTING_MODE } from './constants';
 import { GridSections } from './types';
-  // TO DO update type for gridsections, rand, setRand
   // to do set error emssage when piece cant move
   // figure out if i need to retype props if type is aleady set on parent
 
@@ -21,6 +20,7 @@ export default ({
   gridSections,
   currentBoard,
   setCurrentBoard,
+  setErrorMessage,
 }: {
   num: number;
   ix: number;
@@ -32,7 +32,8 @@ export default ({
   image: { uri: string };
   gridSections: GridSections;
   currentBoard: (number | null) [];
-  setCurrentBoard: any;
+  setCurrentBoard: Function;
+  setErrorMessage: Function;
 }) => {
   //squareX and squareY represent the row and col of the square in the solved puzzle
   const squareX = num % gridSize;
@@ -129,6 +130,7 @@ export default ({
   }, []);
 
   const changePosition = (gestureState: { dx: number; dy: number }): void => {
+    setErrorMessage('');
     //update the relative _x and _y but leave x and y the same unless snapping
     const newXY = {
       x: currentXY.x,
@@ -166,7 +168,8 @@ export default ({
     // if there was a snap i.e. the piece came within the grid snap margin
     console.log('snapx',snappedX, 'snapy', snappedY)
     if(snappedX !== undefined && snappedY !== undefined) {
-        newIx = snappedRow * gridSize + snappedCol
+        // putting ! after a variable is to tell TS that in this case, the variable will not be null or undefined
+        newIx = snappedRow! * gridSize + snappedCol!
         console.log('board',currentBoard, newIx)
         if(currentBoard[newIx] === null) {
             console.log('snapping to', newIx)
@@ -176,6 +179,7 @@ export default ({
         // if the current board already has another piece in the new index...
         else {
             console.log('cannot move to ', newIx)
+            setErrorMessage('There is a piece already in that spot. Please move that piece first!')
             newIx = undefined
             // need to check this - ideally would want to send piece back to original location
             // newXY.x = currentXY.x + currentXY._x - gestureState.dx;
