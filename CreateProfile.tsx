@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Headline, Text, TextInput, Button } from "react-native-paper";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { CommonActions } from "@react-navigation/native";
 
 import Logo from "./Logo";
 import Title from "./Title";
@@ -70,7 +71,12 @@ export default ({
             //update app state
             setProfile({ name, phone });
             //send ya on your way
-            navigation.navigate("Home");
+            navigation.dispatch(
+              CommonActions.reset({
+                index: 0,
+                routes: [{ name: "Home" }],
+              })
+            );
           } else {
             setErrors("Must enter name and number!");
           }

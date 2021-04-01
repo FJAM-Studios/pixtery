@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { View } from "react-native";
 import { ActivityIndicator } from "react-native-paper";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { CommonActions } from "@react-navigation/native";
 
 import Logo from "./Logo";
 import Title from "./Title";
@@ -49,16 +50,33 @@ export default ({
       await loadPuzzles();
       //if you have a profile, navigate home
       if (profile) {
-        navigation.navigate("Home");
+        // navigation.navigate("Home");
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: "Home" }],
+          })
+        );
       } else {
         //otherwise, load profile from local storage if it exists
         const loadedProfile = await loadProfile();
         if (loadedProfile) {
           setProfile(loadedProfile);
-          navigation.navigate("Home");
+          // navigation.navigate("Home");
+          navigation.dispatch(
+            CommonActions.reset({
+              index: 0,
+              routes: [{ name: "Home" }],
+            })
+          );
         } else {
           //or navigate to createprofile if it doesn't exist
-          navigation.navigate("CreateProfile");
+          navigation.dispatch(
+            CommonActions.reset({
+              index: 0,
+              routes: [{ name: "CreateProfile" }],
+            })
+          );
         }
       }
     };
