@@ -20,3 +20,8 @@ export interface Puzzle {
   dateReceived: string;
   completed: boolean;
 }
+
+export interface Profile {
+  name: string;
+  phone: string;
+}
