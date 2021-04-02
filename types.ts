@@ -10,6 +10,10 @@ export interface Point {
   y: number;
 }
 
+export interface GridSections {
+    rowDividers: number[];
+    colDividers: number[];
+}
 export interface Puzzle {
   puzzleType: string;
   gridSize: number;
