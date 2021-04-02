@@ -12,11 +12,10 @@ import PuzzlePiece from "./PuzzlePiece";
 import { shuffle, generateJigsawPiecePaths } from "./util";
 import { TESTING_MODE } from "./constants";
 import { GridSections } from './types';
-import { greaterThan } from "react-native-reanimated";
 
 //disable shuffling for testing
 const disableShuffle = TESTING_MODE;
-
+// note: not working yet when grid changes; to confirm whether that is needed given that is info that is received
 export default ({
   boardSize,
   imageURI,
@@ -66,13 +65,11 @@ export default ({
         gridSections.rowDividers.push(x)
         gridSections.colDividers.push(y)
     }
-    console.log(gridSections, squareSize)
     return gridSections
 }
 
 const [gridSections, setGridSections] = useState<GridSections>(getGridSections());
 
-// TO DO need to include grid sections in this function
   const changeGrid = (up: boolean): void => {
     if (up && gridSize < 5) {
       setGridSize(gridSize + 1);
@@ -88,8 +85,13 @@ const [gridSections, setGridSections] = useState<GridSections>(getGridSections()
       );
       setRand(shuffle(fillArray(gridSize - 1), disableShuffle));
     }
-    setGridSections(getGridSections())
   };
+
+  // when grid size changes, generate new grid sections and rand arrays
+//   useEffect(() => {
+//     setGridSections(getGridSections())
+//     setCurrentBoard([...rand])
+//   }, [gridSize])
 
   const fillArray = (gridSize: number): number[] => {
     const numberArray = [];
@@ -104,7 +106,7 @@ const [gridSections, setGridSections] = useState<GridSections>(getGridSections()
   );
 
   const [currentBoard, setCurrentBoard] = useState<(number | null) []>(
-      [...rand]
+    [...rand]
   )
 
   const [winMessage, setWinMessage] = useState<string>('')
@@ -121,7 +123,6 @@ const [gridSections, setGridSections] = useState<GridSections>(getGridSections()
   useEffect(() => {
       checkWin()
   }, [currentBoard])
-  console.log('currentboard', currentBoard)
 
   return (
     <View
@@ -138,6 +139,7 @@ const [gridSections, setGridSections] = useState<GridSections>(getGridSections()
         <PuzzlePiece
           // this random key forces Draggable/React to rerender these pieces when changing board
           // seems like cheating, but maybe not?
+        // key={Math.random() * (1 + ix)}
           key={num}
           num={num}
           ix={ix}

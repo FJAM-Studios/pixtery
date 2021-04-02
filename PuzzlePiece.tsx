@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from "react";
 import Draggable from "react-native-draggable";
-import { Svg, Image, Defs, ClipPath, Path, Rect, NumberProp } from "react-native-svg";
+import { Svg, Image, Defs, ClipPath, Path, Rect } from "react-native-svg";
 import * as ImageManipulator from "expo-image-manipulator";
-import { TextComponent } from "react-native";
-import { SNAP_MARGIN, TESTING_MODE } from './constants';
+import { SNAP_MARGIN } from './constants';
 import { GridSections } from './types';
-  // to do set error emssage when piece cant move
-  // figure out if i need to retype props if type is aleady set on parent
 
 export default ({
   num,
@@ -138,18 +135,16 @@ export default ({
       _x: currentXY._x + gestureState.dx,
       _y: currentXY._y + gestureState.dy,
     };
-    // start here, the snappedY is coming up as undefined when it should notbe
     //if _x and _y are within a margin of a point on the grid, then snap!
-    let snappedX: number | undefined;
-    let snappedY: number | undefined;
-    let snappedRow: number | undefined;
-    let snappedCol: number | undefined;
+    let snappedX: number | undefined; // top left X position of snap grid
+    let snappedY: number | undefined; // top left Y position of snap grid
+    let snappedRow: number | undefined; // row index of snap
+    let snappedCol: number | undefined; // col index of snap
     const rowDividers: number[] = gridSections.rowDividers
     for(let i = 0; i < rowDividers.length; i++) {
         const rowDivider = rowDividers[i]
         if(Math.abs(newXY._y - rowDivider) < squareSize * SNAP_MARGIN) {
             snappedY = initY - newXY._y + rowDivider;
-            // snappedY = newXY.y - newXY._y + rowDivider;
             snappedRow = i;
             break;
         }
@@ -159,26 +154,21 @@ export default ({
         const colDivider = colDividers[i]
         if(Math.abs(newXY._x - colDivider) < squareSize * SNAP_MARGIN) {
             snappedX = initX - newXY._x + colDivider;
-            // snappedX = newXY.x - newXY._x + colDivider;
             snappedCol = i;
             break;
         }
     }
     let newIx: number | undefined;
-    // if there was a snap i.e. the piece came within the grid snap margin
-    console.log('snapx',snappedX, 'snapy', snappedY)
+    // if both snappedX and snapped Y are defined, there was a snap i.e. the piece came within the grid snap margin
     if(snappedX !== undefined && snappedY !== undefined) {
         // putting ! after a variable is to tell TS that in this case, the variable will not be null or undefined
         newIx = snappedRow! * gridSize + snappedCol!
-        console.log('board',currentBoard, newIx)
         if(currentBoard[newIx] === null) {
-            console.log('snapping to', newIx)
             newXY.x = snappedX;
             newXY.y = snappedY;
         }
-        // if the current board already has another piece in the new index...
+        // but if the current board already has another piece in the new index, do not let user move piece there
         else {
-            console.log('cannot move to ', newIx)
             setErrorMessage('There is a piece already in that spot. Please move that piece first!')
             newIx = undefined
             // need to check this - ideally would want to send piece back to original location
@@ -197,7 +187,6 @@ export default ({
   }
 
   const updateCurrentBoard = (): void => {
-    console.log('newsnappedix when board update:', newSnappedIx, 'prevIx', prevIx, 'num', num, 'ix', ix)
     let newBoard = [...currentBoard]
     // putting ! after a variable is to tell TS that in this case, the variable will not be null or undefined
     if (newSnappedIx! >= 0) newBoard[newSnappedIx!] = num
@@ -206,13 +195,9 @@ export default ({
     }
 
   useEffect(() => {
-    // if the piece has been mounted already (i.e. newSnappedIx is not -1), update board after currentXY changes
-    if(newSnappedIx !== -1) {
-        console.log('new snapped ix', newSnappedIx)
-        updateCurrentBoard()    
-    }
+    // if the piece has been mounted already (i.e. newSnappedIx is not -1), update current board after currentXY changes
+    if(newSnappedIx !== -1) updateCurrentBoard();
   }, [currentXY])
-
 
   if (!ready) return null;
 
