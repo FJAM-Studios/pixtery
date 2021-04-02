@@ -14,3 +14,13 @@ export interface GridSections {
     rowDividers: number[];
     colDividers: number[];
 }
+export interface Puzzle {
+  puzzleType: string;
+  gridSize: number;
+  senderName: string;
+  senderPhone: string;
+  imageURI: string;
+  message: string | null;
+  dateReceived: string;
+  completed: boolean;
+}

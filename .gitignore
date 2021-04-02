@@ -9,6 +9,7 @@ npm-debug.*
 *.orig.*
 web-build/
 .vscode
+*.bat
 
 # macOS
 .DS_Store
