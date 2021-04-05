@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import Draggable from "react-native-draggable";
 import { Svg, Image, Defs, ClipPath, Path, Rect } from "react-native-svg";
 import * as ImageManipulator from "expo-image-manipulator";
-import { SNAP_MARGIN } from './constants';
-import { GridSections } from './types';
+import { SNAP_MARGIN } from '../constants';
+import { GridSections } from '../types';
 
 export default ({
   num,

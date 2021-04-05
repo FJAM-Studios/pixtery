@@ -4,13 +4,13 @@ import {
   View,
   StyleSheet
 } from "react-native";
-import { TESTING_MODE } from "./constants";
-import { GridSections } from './types';
+import { TESTING_MODE } from "../constants";
+import { GridSections } from '../types';
 import { SafeAreaView } from "react-native-safe-area-context";
 import Header from "./Header";
 import PuzzlePiece from "./PuzzlePiece";
-import { shuffle, generateJigsawPiecePaths } from "./util";
-import { Puzzle } from "./types";
+import { shuffle, generateJigsawPiecePaths } from "../util";
+import { Puzzle } from "../types";
 
 //disable shuffling for testing
 const disableShuffle = TESTING_MODE;
