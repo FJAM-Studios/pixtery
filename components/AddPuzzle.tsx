@@ -7,7 +7,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Header from "./Header";
 import Logo from "./Logo";
 import Title from "./Title";
-import { Puzzle } from "./types";
+import { Puzzle } from "../types";
 
 //this component will receive a puzzle object from component that opens link
 //for now, though, the puzzle object is passed directly from DevTest

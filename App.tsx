@@ -5,14 +5,14 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { Provider as PaperProvider, DefaultTheme } from "react-native-paper";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
-import Puzzle from "./Puzzle";
-import HomeScreen from "./Home";
-import PuzzleList from "./PuzzleList";
-import DevTest from "./DevTest";
-import AddPuzzle from "./AddPuzzle";
-import Splash from "./Splash";
-import CreateProfile from "./CreateProfile";
-import Profile from "./Profile";
+import Puzzle from "./components/Puzzle";
+import HomeScreen from "./components/Home";
+import PuzzleList from "./components/PuzzleList";
+import DevTest from "./components/DevTest";
+import AddPuzzle from "./components/AddPuzzle";
+import Splash from "./components/Splash";
+import CreateProfile from "./components/CreateProfile";
+import Profile from "./components/Profile";
 
 import { Puzzle as PuzzleType, Profile as ProfileType } from "./types";
 
