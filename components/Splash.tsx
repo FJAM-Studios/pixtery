@@ -7,7 +7,7 @@ import { CommonActions } from "@react-navigation/native";
 import Logo from "./Logo";
 import Title from "./Title";
 
-import { Puzzle as PuzzleType, Profile as ProfileType } from "./types";
+import { Puzzle as PuzzleType, Profile as ProfileType } from "../types";
 
 export default ({
   theme,
