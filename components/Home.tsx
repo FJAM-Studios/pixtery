@@ -9,7 +9,6 @@ import {
   Surface,
   Headline,
   TextInput,
-  ActivityIndicator,
 } from "react-native-paper";
 import * as ImagePicker from "expo-image-picker";
 import Header from "./Header";
@@ -39,17 +38,17 @@ export default ({
   const selectImage = async (camera: boolean) => {
     let result = camera
       ? await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 4],
-        quality: 1,
-      })
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          allowsEditing: true,
+          aspect: [4, 4],
+          quality: 1,
+        })
       : await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 4],
-        quality: 1,
-      });
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          allowsEditing: true,
+          aspect: [4, 4],
+          quality: 1,
+        });
 
     if (!result.cancelled) {
       setImageURI(result.uri);
@@ -57,7 +56,6 @@ export default ({
   };
 
   const [message, setMessage] = React.useState("");
-  const [isLoading, setLoading] = React.useState(true);
   const [paths, setPaths] = React.useState(
     generateJigsawPiecePaths(gridSize, boardSize / (1.6 * gridSize), true)
   );

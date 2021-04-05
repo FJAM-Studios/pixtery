@@ -83,7 +83,23 @@ export default ({
           icon="account-multiple"
         />
         <Divider />
-        <Menu.Item onPress={() => {}} title="Profile" icon="cog" />
+        <Menu.Item
+          onPress={() => {
+            closeMenu();
+            navigation.navigate("Profile");
+          }}
+          title="Profile"
+          icon="cog"
+        />
+        <Menu.Item
+          onPress={() => {
+            closeMenu();
+            navigation.navigate("DevTest");
+          }}
+          title="DevTest"
+          icon="laptop"
+          style={{ backgroundColor: theme.colors.accent }}
+        />
       </Menu>
     </View>
   );
