@@ -89,32 +89,6 @@ export default ({
     })();
   }, []);
 
-  setTimeout(() => setLoading(false), 1500);
-  if (isLoading) {
-    return (
-      <View
-        style={{
-          flex: 1,
-          flexDirection: "column",
-          padding: 10,
-          backgroundColor: theme.colors.background,
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <Logo width="100" height="100" />
-        <Title width="100" height="35" />
-        <Headline>Pretending To Load</Headline>
-        <ActivityIndicator
-          animating={true}
-          color={theme.colors.text}
-          size="large"
-        />
-      </View>
-    );
-  }
-
-
   const submitToServer = async (): uuid => {
 
     const fileName: uuid = uuid.v4();
