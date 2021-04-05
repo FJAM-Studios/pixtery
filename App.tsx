@@ -4,11 +4,17 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { Provider as PaperProvider, DefaultTheme } from "react-native-paper";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { dummyPuzzles } from "./dummyData";
 
 import Puzzle from "./components/Puzzle";
 import HomeScreen from "./components/Home";
 import PuzzleList from "./components/PuzzleList";
+import DevTest from "./DevTest";
+import AddPuzzle from "./AddPuzzle";
+import Splash from "./Splash";
+import CreateProfile from "./CreateProfile";
+import Profile from "./Profile";
+
+import { Puzzle as PuzzleType, Profile as ProfileType } from "./types";
 
 const image = require("./assets/earth.jpg");
 
@@ -31,7 +37,8 @@ export const theme = {
 const Stack = createStackNavigator();
 
 const App = () => {
-  const [receivedPuzzles, setReceivedPuzzles] = useState(dummyPuzzles);
+  const [receivedPuzzles, setReceivedPuzzles] = useState<PuzzleType[]>([]);
+  const [profile, setProfile] = useState<ProfileType | null>(null);
 
   const { width, height } = useWindowDimensions();
   const boardSize = 0.95 * Math.min(height, width);
@@ -42,6 +49,27 @@ const App = () => {
         <NavigationContainer>
           <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
             <Stack.Navigator headerMode="none">
+              <Stack.Screen name="Splash">
+                {(props) => (
+                  <Splash
+                    {...props}
+                    theme={theme}
+                    setReceivedPuzzles={setReceivedPuzzles}
+                    profile={profile}
+                    setProfile={setProfile}
+                  />
+                )}
+              </Stack.Screen>
+              <Stack.Screen name="CreateProfile">
+                {(props) => (
+                  <CreateProfile
+                    {...props}
+                    theme={theme}
+                    profile={profile}
+                    setProfile={setProfile}
+                  />
+                )}
+              </Stack.Screen>
               <Stack.Screen name="Home">
                 {(props) => (
                   <HomeScreen
@@ -75,12 +103,33 @@ const App = () => {
                     boardSize={boardSize}
                     theme={theme}
                     receivedPuzzles={receivedPuzzles}
-
-                    // imageURI={image.uri}
-                    // puzzleType={"jigsaw"}
-                    // gridSize={3}
                   />
                 )}
+              </Stack.Screen>
+              <Stack.Screen name="AddPuzzle">
+                {(props) => (
+                  <AddPuzzle
+                    {...props}
+                    theme={theme}
+                    receivedPuzzles={receivedPuzzles}
+                    setReceivedPuzzles={setReceivedPuzzles}
+                  />
+                )}
+              </Stack.Screen>
+              <Stack.Screen name="Profile">
+                {(props) => (
+                  <Profile
+                    {...props}
+                    theme={theme}
+                    profile={profile}
+                    setProfile={setProfile}
+                    receivedPuzzles={receivedPuzzles}
+                    setReceivedPuzzles={setReceivedPuzzles}
+                  />
+                )}
+              </Stack.Screen>
+              <Stack.Screen name="DevTest">
+                {(props) => <DevTest {...props} theme={theme} />}
               </Stack.Screen>
             </Stack.Navigator>
           </View>

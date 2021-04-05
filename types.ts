@@ -10,6 +10,10 @@ export interface Point {
   y: number;
 }
 
+export interface GridSections {
+    rowDividers: number[];
+    colDividers: number[];
+}
 export interface Puzzle {
   puzzleType: string;
   gridSize: number;
@@ -19,4 +23,9 @@ export interface Puzzle {
   message: string | null;
   dateReceived: string;
   completed: boolean;
+}
+
+export interface Profile {
+  name: string;
+  phone: string;
 }
