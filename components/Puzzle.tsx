@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Text, View, StyleSheet } from "react-native";
-import { TESTING_MODE } from "./constants";
+import { TESTING_MODE } from "../constants";
+import { GridSections } from "../types";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Header from "./Header";
 import PuzzlePiece from "./PuzzlePiece";
-import { shuffle, generateJigsawPiecePaths } from "./util";
-import { Puzzle, GridSections } from "./types";
+import { shuffle, generateJigsawPiecePaths } from "../util";
+import { Puzzle } from "../types";
 
 //disable shuffling for testing
 const disableShuffle = TESTING_MODE;
@@ -27,9 +28,10 @@ export default ({
   const squareSize = boardSize / gridSize;
   const image = { uri: imageURI };
   //doesn't need to be part of state now, since you can't change a received puzzle
-  const [piecePaths, setPiecePaths] = useState(
-    generateJigsawPiecePaths(gridSize, squareSize)
-  );
+  // const [piecePaths, setPiecePaths] = useState(
+  //   generateJigsawPiecePaths(gridSize, squareSize)
+  // );
+  const piecePaths = generateJigsawPiecePaths(gridSize, squareSize);
 
   // populates X Y coordinates for upper left corner of each grid section
   const getGridSections = (): GridSections => {
@@ -57,9 +59,10 @@ export default ({
   };
 
   //same, doesn't need to be state
-  const [gridSections, setGridSections] = useState<GridSections>(
-    getGridSections()
-  );
+  // const [gridSections, setGridSections] = useState<GridSections>(
+  //   getGridSections()
+  // );
+  const gridSections = getGridSections();
 
   const fillArray = (gridSize: number): number[] => {
     const numberArray = [];
@@ -70,9 +73,10 @@ export default ({
   };
 
   //same, doesn't need to be state
-  const [shuffledPieces, setShuffledPieces] = useState<number[]>(
-    shuffle(fillArray(gridSize), disableShuffle)
-  );
+  // const [shuffledPieces, setShuffledPieces] = useState<number[]>(
+  //   shuffle(fillArray(gridSize), disableShuffle)
+  // );
+  const shuffledPieces = shuffle(fillArray(gridSize), disableShuffle);
 
   const [currentBoard, setCurrentBoard] = useState<(number | null)[]>([
     ...shuffledPieces,
