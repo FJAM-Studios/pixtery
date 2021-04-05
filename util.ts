@@ -1,6 +1,7 @@
 import { Piece } from "./types";
 
-export const shuffle = (array: number[]): number[] => {
+export const shuffle = (array: number[], disabledShuffle = true): number[] => {
+  if (disabledShuffle) return array;
   let currentIndex = array.length,
     temporaryValue: number,
     randomIndex: number;
