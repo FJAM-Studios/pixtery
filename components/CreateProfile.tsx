@@ -7,7 +7,7 @@ import { CommonActions } from "@react-navigation/native";
 import Logo from "./Logo";
 import Title from "./Title";
 
-import { Profile as ProfileType } from "./types";
+import { Profile as ProfileType } from "../types";
 import { View } from "react-native";
 
 export default ({

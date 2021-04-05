@@ -4,8 +4,8 @@ import {
   View,
   StyleSheet
 } from "react-native";
-import { TESTING_MODE } from "./constants";
-import { GridSections } from './types';
+import { TESTING_MODE } from "../constants";
+import { GridSections } from '../types';
 import { SafeAreaView } from "react-native-safe-area-context";
 import Header from "./Header";
 import PuzzlePiece from "./PuzzlePiece";
