@@ -27,11 +27,9 @@ export default ({
   const { imageURI, puzzleType, gridSize, message } = route.params;
   const squareSize = boardSize / gridSize;
   const image = { uri: imageURI };
-  //doesn't need to be part of state now, since you can't change a received puzzle
-  // const [piecePaths, setPiecePaths] = useState(
-  //   generateJigsawPiecePaths(gridSize, squareSize)
-  // );
-  const piecePaths = generateJigsawPiecePaths(gridSize, squareSize);
+  const [piecePaths, setPiecePaths] = useState(
+    generateJigsawPiecePaths(gridSize, squareSize)
+  );
 
   // populates X Y coordinates for upper left corner of each grid section
   const getGridSections = (): GridSections => {
@@ -58,11 +56,9 @@ export default ({
     return gridSections;
   };
 
-  //same, doesn't need to be state
-  // const [gridSections, setGridSections] = useState<GridSections>(
-  //   getGridSections()
-  // );
-  const gridSections = getGridSections();
+  const [gridSections, setGridSections] = useState<GridSections>(
+    getGridSections()
+  );
 
   const fillArray = (gridSize: number): number[] => {
     const numberArray = [];
@@ -72,11 +68,9 @@ export default ({
     return numberArray;
   };
 
-  //same, doesn't need to be state
-  // const [shuffledPieces, setShuffledPieces] = useState<number[]>(
-  //   shuffle(fillArray(gridSize), disableShuffle)
-  // );
-  const shuffledPieces = shuffle(fillArray(gridSize), disableShuffle);
+  const [shuffledPieces, setShuffledPieces] = useState<number[]>(
+    shuffle(fillArray(gridSize), disableShuffle)
+  );
 
   const [currentBoard, setCurrentBoard] = useState<(number | null)[]>([
     ...shuffledPieces,
