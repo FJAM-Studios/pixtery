@@ -1,6 +1,7 @@
 import { Piece } from "./types";
 
-export const shuffle = (array: number[]): number[] => {
+export const shuffle = (array: number[], disabledShuffle = true): number[] => {
+  if (disabledShuffle) return array;
   let currentIndex = array.length,
     temporaryValue: number,
     randomIndex: number;
@@ -280,7 +281,7 @@ export const generateSquarePiecePaths = (
 };
 
 //convert URI into a blob to transmit to server
-export const createBlob = (localUri): Promise<Blob> => {
+export const createBlob = (localUri: string): Promise<Blob> => {
   //converts the image URI into a blob. there are references to using fetch online,
   // but it looks like that was broken in the latest version of expo
 
