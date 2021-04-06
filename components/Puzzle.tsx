@@ -72,11 +72,11 @@ export default ({
     return numberArray;
   };
 
-  //same, doesn't need to be state
-  // const [shuffledPieces, setShuffledPieces] = useState<number[]>(
-  //   shuffle(fillArray(gridSize), disableShuffle)
-  // );
-  const shuffledPieces = shuffle(fillArray(gridSize), disableShuffle);
+  // same, doesn't need to be state
+  const [shuffledPieces, setShuffledPieces] = useState<number[]>(
+    shuffle(fillArray(gridSize), disableShuffle)
+  );
+  // const shuffledPieces = shuffle(fillArray(gridSize), disableShuffle);
 
   const [currentBoard, setCurrentBoard] = useState<(number | null)[]>([
     ...shuffledPieces,
