@@ -1,4 +1,4 @@
-import { app, db, storage } from "../FirebaseApp";
+import {app, db, storage} from '../FirebaseApp'
 import * as React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Image, View, Platform } from "react-native";
@@ -13,14 +13,12 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import Header from "./Header";
 const emptyImage = require("../assets/blank.jpg");
+import Logo from "./Logo";
+import Title from "./Title";
 import Svg, { Path } from "react-native-svg";
-import {
-  generateJigsawPiecePaths,
-  generateSquarePiecePaths,
-  createBlob,
-} from "../util";
+import { generateJigsawPiecePaths, generateSquarePiecePaths, createBlob } from "../util";
 import { Puzzle } from "../types";
-import uuid from "uuid";
+import uuid from 'uuid';
 
 export default ({
   navigation,
@@ -91,34 +89,35 @@ export default ({
     })();
   }, []);
 
-  const submitToServer = async (): Promise<string> => {
-    const fileName: string = uuid.v4();
+  const submitToServer = async (): uuid => {
+
+    const fileName: uuid = uuid.v4();
     await uploadImage(fileName);
-    const publicKey: Promise<string> = uploadPuzzleSettings(fileName);
+    const publicKey: uuid = uploadPuzzleSettings(fileName);
 
     //for now this function just returns a uuid
     //@todo use that key to build a public SMS
-    return publicKey;
-  };
+    return publicKey
+  }
 
-  const uploadImage = async (fileName: string): Promise<void> => {
+  const uploadImage = async (fileName: string) : Promise<void> => {
     const blob: Blob = await createBlob(imageURI);
     const ref = storage.ref().child(fileName);
     await ref.put(blob);
-    return;
-  };
+    return ;
+  }
 
-  const uploadPuzzleSettings = async (fileName: string): Promise<string> => {
-    const publicKey: string = uuid.v4();
+  const uploadPuzzleSettings = async (fileName: uuid): uuid => {
+    const publicKey: uuid = uuid.v4()
     await db.collection("puzzles").doc(fileName).set({
       imageRef: fileName,
       publicKey: publicKey,
       type: puzzleType,
       gridSize: gridSize,
-    });
+    })
 
-    return publicKey;
-  };
+    return publicKey
+  }
 
   return (
     <SafeAreaView
