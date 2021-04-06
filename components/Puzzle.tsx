@@ -60,7 +60,9 @@ export default ({
     return gridSections
 }
 
-const [gridSections, setGridSections] = useState<GridSections>(getGridSections());
+  const [gridSections, setGridSections] = useState<GridSections>(
+    getGridSections()
+  );
 
   const fillArray = (gridSize: number): number[] => {
     const numberArray = [];
