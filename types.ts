@@ -11,8 +11,8 @@ export interface Point {
 }
 
 export interface GridSections {
-  rowDividers: number[];
-  colDividers: number[];
+    rowDividers: number[];
+    colDividers: number[];
 }
 export interface Puzzle {
   puzzleType: string;
