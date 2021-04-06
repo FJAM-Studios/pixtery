@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import { db, storage } from './FirebaseApp';
+import React, { useEffect, useState } from "react";
 import { View, useWindowDimensions } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { Provider as PaperProvider, DefaultTheme } from "react-native-paper";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import * as Linking from "expo-linking";
 
 import Puzzle from "./components/Puzzle";
 import HomeScreen from "./components/Home";
@@ -37,11 +39,92 @@ export const theme = {
 const Stack = createStackNavigator();
 
 const App = () => {
+
+
   const [receivedPuzzles, setReceivedPuzzles] = useState<PuzzleType[]>([]);
   const [profile, setProfile] = useState<ProfileType | null>(null);
 
   const { width, height } = useWindowDimensions();
   const boardSize = 0.95 * Math.min(height, width);
+
+  useEffect(() => {
+    Linking.getInitialURL().then(url => {
+      console.log("resolved URL", url)
+      if (url) {
+        downloadPuzzle(url)
+      }
+    })
+
+  }, [])
+
+
+  // Linking.addEventListener('url', ev => {
+  //   console.log("url event", ev)
+  //   downloadPuzzle(ev.url)
+  // })
+
+  const downloadPuzzle = async (url: string): Promise<void> => {
+    const { puzzle } = Linking.parse(url).queryParams
+    console.log("DOWNLOAD PUZZLE", puzzle)
+    if (puzzle) {
+      for(let idx = 0; idx<receivedPuzzles.length; idx++){
+        if(puzzle === receivedPuzzles[idx].publicKey) {
+          console.log("puzzle already downloaded, should not go to fetch puzzle")
+          return;
+        }
+      }
+      fetchPuzzle(puzzle)
+    }
+  }
+
+  const fetchPuzzle = async (publicKey: string): Promise<void> => {
+    console.log("fetching puzzle")
+    const puzzleData: PuzzleType = await queryPuzzle(publicKey);
+    if (puzzleData) {
+      requestImage(puzzleData);
+      //@todo do something with the puzzle settings
+    }
+  }
+
+  const requestImage = (puzzle: PuzzleType): void => {
+
+    const imageRef = storage.ref('/' + puzzle.imageURI);
+    imageRef
+      .getDownloadURL()
+      .then((url) => {
+        //@todo do something with the downloaded image
+        puzzle.imageURI = url
+        setReceivedPuzzles([...receivedPuzzles,puzzle]);
+      })
+      .catch((e) => console.log('getting downloadURL of image error => ', e));
+  }
+
+  const queryPuzzle = async (publicKey: string): Promise<PuzzleType> | Promise<void> => {
+    console.log("query puzzle")
+    const snapshot = await db.collection("puzzles").where("publicKey", "==", publicKey).get();
+    if (snapshot.empty) {
+      console.log("no puzzle found!")
+    } else {
+      let puzzleData: PuzzleType = {
+        puzzleType: "",
+        gridSize: 0,
+        senderName: "",
+        senderPhone: "string",
+        imageURI: "",
+        message: null,
+        dateReceived: "",
+        completed: false
+      }
+      //NOTE: there SHOULD only be one puzzle but it's in an object that has to iterated through to access the data
+      snapshot.forEach( puzzle => {
+        puzzleData = puzzle.data()
+      })
+      console.log("retrieved puzzle data", puzzleData)
+      return puzzleData;
+    }
+
+
+  }
 
   return (
     <PaperProvider theme={theme}>

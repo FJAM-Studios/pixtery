@@ -20,9 +20,10 @@ export interface Puzzle {
   senderName: string;
   senderPhone: string;
   imageURI: string;
-  message: string | null;
-  dateReceived: string;
-  completed: boolean;
+  publicKey?: string;
+  message?: string | null;
+  dateReceived?: string;
+  completed?: boolean;
 }
 
 export interface Profile {

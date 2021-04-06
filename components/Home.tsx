@@ -11,6 +11,7 @@ import {
   TextInput,
 } from "react-native-paper";
 import * as ImagePicker from "expo-image-picker";
+import * as Linking from 'expo-linking';
 import Header from "./Header";
 const emptyImage = require("../assets/blank.jpg");
 import Logo from "./Logo";
@@ -89,15 +90,13 @@ export default ({
     })();
   }, []);
 
-  const submitToServer = async (): uuid => {
+  const submitToServer = async (): Promise<void> => {
 
     const fileName: uuid = uuid.v4();
     await uploadImage(fileName);
-    const publicKey: uuid = uploadPuzzleSettings(fileName);
+    const publicKey: uuid = await uploadPuzzleSettings(fileName);
 
-    //for now this function just returns a uuid
-    //@todo use that key to build a public SMS
-    return publicKey
+    shareLink(publicKey)
   }
 
   const uploadImage = async (fileName: string) : Promise<void> => {
@@ -110,13 +109,28 @@ export default ({
   const uploadPuzzleSettings = async (fileName: uuid): uuid => {
     const publicKey: uuid = uuid.v4()
     await db.collection("puzzles").doc(fileName).set({
-      imageRef: fileName,
-      publicKey: publicKey,
-      type: puzzleType,
+      puzzleType: puzzleType,
       gridSize: gridSize,
-    })
+      senderName: "Test",
+      senderPhone: "",
+      imageURI: fileName,
+      publicKey: publicKey,
+      message: null,
+      dateReceived: new Date().toISOString(),
+    }
+    )
 
     return publicKey
+  }
+
+  const shareLink = (publicKey: uuid): void => {
+    //first param is an empty string to allow Expo to dynamically determine path to app based on runtime environment
+    const deepLink = Linking.createURL("",{queryParams: {puzzle: publicKey}})
+    console.log(deepLink)
+
+    //@todo paste the link into an sms
+
+
   }
 
   return (
