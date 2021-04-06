@@ -47,29 +47,31 @@ const App = () => {
   const { width, height } = useWindowDimensions();
   const boardSize = 0.95 * Math.min(height, width);
 
+  //required to download puzzle if sms opens the open
   useEffect(() => {
     Linking.getInitialURL().then(url => {
       console.log("resolved URL", url)
       if (url) {
-        downloadPuzzle(url)
+        checkPuzzle(url)
       }
     })
 
   }, [])
 
+//required to download the puzzle if app is in background but it combines with the useeffect to cause downstream functions to fire multiple times
+  Linking.addEventListener('url', ev => {
+    console.log("url event", ev)
+    checkPuzzle(ev.url)
+  })
 
-  // Linking.addEventListener('url', ev => {
-  //   console.log("url event", ev)
-  //   downloadPuzzle(ev.url)
-  // })
-
-  const downloadPuzzle = async (url: string): Promise<void> => {
+  const checkPuzzle = async (url: string): Promise<void> => {
     const { puzzle } = Linking.parse(url).queryParams
-    console.log("DOWNLOAD PUZZLE", puzzle)
+
+    // download puzzle if link opens app, if not already downloaded
     if (puzzle) {
       for(let idx = 0; idx<receivedPuzzles.length; idx++){
         if(puzzle === receivedPuzzles[idx].publicKey) {
-          console.log("puzzle already downloaded, should not go to fetch puzzle")
+          //@todo: redirect user to existing puzzle
           return;
         }
       }
@@ -79,10 +81,16 @@ const App = () => {
 
   const fetchPuzzle = async (publicKey: string): Promise<void> => {
     console.log("fetching puzzle")
-    const puzzleData: PuzzleType = await queryPuzzle(publicKey);
+
+    //get the puzzle data, which includes the cloud storage reference to the image
+    const puzzleData: PuzzleType | void = await queryPuzzle(publicKey);
     if (puzzleData) {
-      requestImage(puzzleData);
-      //@todo do something with the puzzle settings
+
+      requestImage(puzzleData); //accepts the entire puzzle object, so that the imageURI property can be overwritten with the full image data
+      setReceivedPuzzles([...receivedPuzzles,puzzleData]);
+
+      //@todo: redirect user to just downloaded puzzle
+
     }
   }
 
@@ -91,12 +99,12 @@ const App = () => {
     const imageRef = storage.ref('/' + puzzle.imageURI);
     imageRef
       .getDownloadURL()
-      .then((url) => {
-        //@todo do something with the downloaded image
+      .then((url: string) => {
+
+        //reassigns imageURI to the actual image file, instead of just the filename
         puzzle.imageURI = url
-        setReceivedPuzzles([...receivedPuzzles,puzzle]);
       })
-      .catch((e) => console.log('getting downloadURL of image error => ', e));
+      .catch((e: unknown) => console.log('getting downloadURL of image error => ', e));
   }
 
   const queryPuzzle = async (publicKey: string): Promise<PuzzleType> | Promise<void> => {
@@ -116,7 +124,7 @@ const App = () => {
         completed: false
       }
       //NOTE: there SHOULD only be one puzzle but it's in an object that has to iterated through to access the data
-      snapshot.forEach( puzzle => {
+      snapshot.forEach( (puzzle: any) => {
         puzzleData = puzzle.data()
       })
       console.log("retrieved puzzle data", puzzleData)
