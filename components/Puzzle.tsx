@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Text, View, StyleSheet } from "react-native";
+import {
+  Text,
+  View,
+  StyleSheet
+} from "react-native";
 import { TESTING_MODE } from "../constants";
-import { GridSections } from "../types";
+import { GridSections } from '../types';
 import { SafeAreaView } from "react-native-safe-area-context";
 import Header from "./Header";
 import PuzzlePiece from "./PuzzlePiece";
@@ -24,45 +28,39 @@ export default ({
   receivedPuzzles: Puzzle[];
   route: any;
 }) => {
-  const { imageURI, puzzleType, gridSize, message } = route.params;
+  const { imageURI, puzzleType, gridSize } = route.params;
   const squareSize = boardSize / gridSize;
   const image = { uri: imageURI };
-  //doesn't need to be part of state now, since you can't change a received puzzle
-  // const [piecePaths, setPiecePaths] = useState(
-  //   generateJigsawPiecePaths(gridSize, squareSize)
-  // );
-  const piecePaths = generateJigsawPiecePaths(gridSize, squareSize);
+  const [piecePaths, setPiecePaths] = useState(
+    generateJigsawPiecePaths(gridSize, squareSize)
+  );
 
-  // populates X Y coordinates for upper left corner of each grid section
+// populates X Y coordinates for upper left corner of each grid section
   const getGridSections = (): GridSections => {
     // separated row and col in case needed for future flexibility
     let gridSections: GridSections = {
-      rowDividers: [0],
-      colDividers: [0],
+        rowDividers: [0],
+        colDividers: [0]
     };
-    for (let i = 1; i < gridSize; i++) {
-      let x: number;
-      let y: number;
-      if (puzzleType === "squares") {
-        x = i * squareSize;
-        y = i * squareSize;
-      }
-      //if jigsaw
-      else {
-        x = squareSize * 0.75 + (i - 1) * squareSize;
-        y = squareSize * 0.75 + (i - 1) * squareSize;
-      }
-      gridSections.rowDividers.push(x);
-      gridSections.colDividers.push(y);
+    for(let i = 1; i < gridSize; i++) {
+        let x: number;
+        let y: number;
+        if(puzzleType === 'squares') {
+            x = i * squareSize;
+            y = i * squareSize;
+        }
+        //if jigsaw
+        else {
+            x = squareSize * 0.75 + (i-1) * squareSize;
+            y = squareSize * 0.75 + (i-1) * squareSize;
+        }
+        gridSections.rowDividers.push(x)
+        gridSections.colDividers.push(y)
     }
-    return gridSections;
-  };
+    return gridSections
+}
 
-  //same, doesn't need to be state
-  // const [gridSections, setGridSections] = useState<GridSections>(
-  //   getGridSections()
-  // );
-  const gridSections = getGridSections();
+const [gridSections, setGridSections] = useState<GridSections>(getGridSections());
 
   const fillArray = (gridSize: number): number[] => {
     const numberArray = [];
@@ -72,33 +70,28 @@ export default ({
     return numberArray;
   };
 
-  // same, doesn't need to be state
   const [shuffledPieces, setShuffledPieces] = useState<number[]>(
     shuffle(fillArray(gridSize), disableShuffle)
   );
-  // const shuffledPieces = shuffle(fillArray(gridSize), disableShuffle);
 
-  const [currentBoard, setCurrentBoard] = useState<(number | null)[]>([
-    ...shuffledPieces,
-  ]);
+  const [currentBoard, setCurrentBoard] = useState<(number | null) []>(
+    [...shuffledPieces]
+  )
 
-  const [winMessage, setWinMessage] = useState<string>("");
-  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [winMessage, setWinMessage] = useState<string>('')
+  const [errorMessage, setErrorMessage] = useState<string>('')
 
   const checkWin = (): void => {
-    if (currentBoard[0] !== 0) return;
-    for (let i = 0; i < currentBoard.length; i++) {
-      if (currentBoard[i] !== i) return;
-    }
-    const winMessage = message.length
-      ? message
-      : "Congrats! You solved the puzzle!";
-    setWinMessage(winMessage);
-  };
+      if(currentBoard[0] !== 0) return;
+      for(let i = 0; i < currentBoard.length; i++){
+          if(currentBoard[i] !== i) return;
+      }
+      setWinMessage('Congrats! You solved the puzzle!')
+  }
 
   useEffect(() => {
-    checkWin();
-  }, [currentBoard]);
+      checkWin()
+  }, [currentBoard])
 
   return (
     <SafeAreaView
@@ -117,12 +110,7 @@ export default ({
         }
         navigation={navigation}
       />
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "flex-end",
-        }}
-      >
+      <View>
         {shuffledPieces.map((num: number, ix: number) => (
           <PuzzlePiece
             key={num}
@@ -140,36 +128,36 @@ export default ({
             setErrorMessage={setErrorMessage}
           />
         ))}
-        <View>
-          <View style={styles.messageContainer}>
+        <View style={{marginBottom: 40}}>
+        <View style={styles.messageContainer}>
             <Text style={styles.winText}>{winMessage}</Text>
-          </View>
-          <View style={styles.messageContainer}>
-            <Text style={styles.errorText}>{errorMessage}</Text>
-          </View>
         </View>
+        <View style={styles.messageContainer}>
+            <Text style={styles.errorText}>{errorMessage}</Text>
+        </View>
+      </View>
       </View>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  messageContainer: {
-    flexDirection: "row",
-    zIndex: -1,
-  },
-  errorText: {
-    fontSize: 20,
-    flexWrap: "wrap",
-    textAlign: "center",
-    flex: 1,
-    color: "orange",
-  },
-  winText: {
-    fontSize: 20,
-    flexWrap: "wrap",
-    textAlign: "center",
-    flex: 1,
-    color: "white",
-  },
-});
+    messageContainer: {
+        flexDirection: "row",
+        zIndex: -1,
+    },
+    errorText: {
+        fontSize: 20,
+        flexWrap: "wrap",
+        textAlign:"center",
+        flex: 1,
+        color: "orange"
+    },
+    winText: {
+        fontSize: 20,
+        flexWrap: "wrap",
+        textAlign:"center",
+        flex: 1,
+        color: "white"
+    }
+})

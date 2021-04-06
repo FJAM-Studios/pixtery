@@ -1,4 +1,4 @@
-import * as firebase from "firebase";
+import * as firebase from 'firebase';
 
 const firebaseConfig = {
   apiKey: "***REMOVED***",
@@ -8,14 +8,18 @@ const firebaseConfig = {
   storageBucket: "pixstery-7c9b9.appspot.com",
   messagingSenderId: "503392467903",
   appId: "1:503392467903:web:6283d87be13230e6caff0a",
-  measurementId: "G-5XDDLZ009P",
-};
+  measurementId: "G-5XDDLZ009P"
+}
 
 const initializeApp = (): any => {
+
   if (firebase.apps && firebase.apps.length > 0) {
-    return firebase.apps[0];
-  } else return firebase.initializeApp(firebaseConfig);
-};
+    return firebase.apps[0]
+  } else
+
+    return firebase.initializeApp(firebaseConfig);
+
+}
 
 const app = initializeApp();
 const db = app.firestore();
