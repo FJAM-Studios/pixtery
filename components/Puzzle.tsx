@@ -134,12 +134,10 @@ export default ({
           />
         ))}
         <View style={styles.messageContainer}>
-          <View style={styles.messageContainer}>
-            <Text style={styles.winText}>{winMessage}</Text>
-          </View>
-          <View style={styles.messageContainer}>
-            <Text style={styles.errorText}>{errorMessage}</Text>
-          </View>
+          <Text style={styles.winText}>{winMessage}</Text>
+        </View>
+        <View style={styles.messageContainer}>
+          <Text style={styles.errorText}>{errorMessage}</Text>
         </View>
       </View>
     </SafeAreaView>
