@@ -9,6 +9,9 @@ import {
   Surface,
   Headline,
   TextInput,
+  ActivityIndicator,
+  Modal,
+  Portal,
 } from "react-native-paper";
 import * as ImagePicker from "expo-image-picker";
 import Header from "./Header";
@@ -39,6 +42,7 @@ export default ({
   const [imageURI, setImageURI] = React.useState("");
   const [puzzleType, setPuzzleType] = React.useState("jigsaw");
   const [gridSize, setGridSize] = React.useState(3);
+  const [modalVisible, setModalVisible] = React.useState(false);
 
   const selectImage = async (camera: boolean) => {
     let result = camera
@@ -95,10 +99,13 @@ export default ({
   }, []);
 
   const submitToServer = async (): Promise<string> => {
+    setModalVisible(true);
     const fileName: string = uuid.v4();
     await uploadImage(fileName);
     const publicKey: Promise<string> = uploadPuzzleSettings(fileName);
 
+    //there could probably be some error handling here so that if your upload fails, something happens after the modal is dismissed
+    setModalVisible(false);
     //for now this function just returns a uuid
     //@todo use that key to build a public SMS
     return publicKey;
@@ -143,6 +150,24 @@ export default ({
         justifyContent: "space-between",
       }}
     >
+      {/* this isn't the nicest looking modal, but RN Paper was not being compliant, not sure why. Not the worst either, though. */}
+      <Portal>
+        <Modal
+          visible={modalVisible}
+          dismissable={false}
+          contentContainerStyle={{ alignItems: "center" }}
+        >
+          {gridSize % 2 ? <Text>Yeah you're working.</Text> : null}
+          <Headline>Building a Pixtery!</Headline>
+          {gridSize % 2 ? null : <Text>And choosing so carefully</Text>}
+          <ActivityIndicator
+            animating={true}
+            color={theme.colors.text}
+            size="large"
+            style={{ padding: 15 }}
+          />
+        </Modal>
+      </Portal>
       <Header
         theme={theme}
         notifications={
@@ -334,6 +359,7 @@ export default ({
         mode="contained"
         onPress={submitToServer}
         style={{ margin: 10 }}
+        disabled={imageURI.length === 0}
       >
         Send
       </Button>
