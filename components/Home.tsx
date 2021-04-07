@@ -21,6 +21,9 @@ import {
 } from "../util";
 import { Puzzle } from "../types";
 import uuid from "uuid";
+import * as ImageManipulator from "expo-image-manipulator";
+
+import { DEFAULT_IMAGE_SIZE, COMPRESSION } from "../constants";
 
 export default ({
   navigation,
@@ -102,7 +105,17 @@ export default ({
   };
 
   const uploadImage = async (fileName: string): Promise<void> => {
-    const blob: Blob = await createBlob(imageURI);
+    //resize and compress the image for upload
+    const resizedCompressedImage = await ImageManipulator.manipulateAsync(
+      imageURI,
+      [
+        {
+          resize: DEFAULT_IMAGE_SIZE,
+        },
+      ],
+      { compress: COMPRESSION, format: ImageManipulator.SaveFormat.JPEG }
+    );
+    const blob: Blob = await createBlob(resizedCompressedImage.uri);
     const ref = storage.ref().child(fileName);
     await ref.put(blob);
     return;
