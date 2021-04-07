@@ -1,4 +1,4 @@
-import {app, db, storage} from '../FirebaseApp'
+import { app, db, storage } from "../FirebaseApp";
 import * as React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Image, View, Platform } from "react-native";
@@ -14,12 +14,14 @@ import * as ImagePicker from "expo-image-picker";
 import * as Linking from 'expo-linking';
 import Header from "./Header";
 const emptyImage = require("../assets/blank.jpg");
-import Logo from "./Logo";
-import Title from "./Title";
 import Svg, { Path } from "react-native-svg";
-import { generateJigsawPiecePaths, generateSquarePiecePaths, createBlob } from "../util";
+import {
+  generateJigsawPiecePaths,
+  generateSquarePiecePaths,
+  createBlob,
+} from "../util";
 import { Puzzle } from "../types";
-import uuid from 'uuid';
+import uuid from "uuid";
 
 export default ({
   navigation,
@@ -99,15 +101,15 @@ export default ({
     shareLink(publicKey)
   }
 
-  const uploadImage = async (fileName: string) : Promise<void> => {
+  const uploadImage = async (fileName: string): Promise<void> => {
     const blob: Blob = await createBlob(imageURI);
     const ref = storage.ref().child(fileName);
     await ref.put(blob);
-    return ;
-  }
+    return;
+  };
 
-  const uploadPuzzleSettings = async (fileName: uuid): uuid => {
-    const publicKey: uuid = uuid.v4()
+  const uploadPuzzleSettings = async (fileName: string): Promise<string> => {
+    const publicKey: string = uuid.v4();
     await db.collection("puzzles").doc(fileName).set({
       puzzleType: puzzleType,
       gridSize: gridSize,
@@ -120,8 +122,8 @@ export default ({
     }
     )
 
-    return publicKey
-  }
+    return publicKey;
+  };
 
   const shareLink = (publicKey: uuid): void => {
     //first param is an empty string to allow Expo to dynamically determine path to app based on runtime environment
