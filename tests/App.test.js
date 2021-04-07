@@ -14,13 +14,10 @@ import {
   Headline,
   TextInput,
 } from "react-native-paper";
-const emptyImage = require("../assets/blank.jpg");
 
-// need to shallow render
 describe('App', () => {
   it('App screen renders correctly', () => { //snapshot testing
     const tree = renderer.create(<App />).toJSON();
     expect(tree).toMatchSnapshot();
   }); 
 })
-// look at expo guide https://docs.expo.io/guides/testing-with-jest/
