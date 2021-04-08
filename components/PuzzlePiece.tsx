@@ -4,6 +4,7 @@ import { Svg, Image, Defs, ClipPath, Path, Rect } from "react-native-svg";
 import * as ImageManipulator from "expo-image-manipulator";
 import { SNAP_MARGIN } from "../constants";
 import { GridSections } from "../types";
+import { getRandomInRange } from '../util'
 
 export default ({
   num,
@@ -18,6 +19,8 @@ export default ({
   currentBoard,
   setCurrentBoard,
   setErrorMessage,
+  sandBoxHeight,
+  sandBoxWidth
 }: {
   num: number;
   ix: number;
@@ -31,6 +34,8 @@ export default ({
   currentBoard: (number | null)[];
   setCurrentBoard: Function;
   setErrorMessage: Function;
+  sandBoxHeight: number;
+  sandBoxWidth: number;
 }) => {
   //squareX and squareY represent the row and col of the square in the solved puzzle
   const squareX = num % gridSize;
@@ -48,13 +53,20 @@ export default ({
     viewBoxX: number,
     viewBoxY: number,
     solutionX: number,
-    solutionY: number;
+    solutionY: number
+  
+  const minSandboxY = boardSize;
+  const maxSandboxY = minSandboxY + sandBoxHeight - squareSize;
 
   if (puzzleType === "squares") {
     //for square puzzles, everything is aligned to grid
     widthY = widthX = squareSize;
-    initX = (ix % gridSize) * squareSize;
-    initY = Math.floor(ix / gridSize) * squareSize;
+    initX = getRandomInRange(0, sandBoxWidth) * (ix % gridSize);
+    // initY = Math.floor(ix / gridSize) * squareSize;
+    // initX = (ix % gridSize) * squareSize;
+    initY = getRandomInRange(minSandboxY, maxSandboxY) * (ix % gridSize);
+    console.log('sandboxheight', sandBoxHeight, 'sandboxwidth', sandBoxWidth, 'min', minSandboxY, 'max', maxSandboxY, 'inity', initY, 'initx', initX)
+
     solutionX = (num % gridSize) * squareSize;
     solutionY = Math.floor(num / gridSize) * squareSize;
     viewBoxX = squareX * squareSize;

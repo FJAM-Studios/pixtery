@@ -299,3 +299,7 @@ export const createBlob = (localUri: string): Promise<Blob> => {
     xhr.send(null);
   });
 };
+
+export const getRandomInRange = (min: number, max: number): number => {
+  return Math.random() * (max - min) + min;
+}
