@@ -14,6 +14,7 @@ import {
   Portal,
 } from "react-native-paper";
 import * as ImagePicker from "expo-image-picker";
+import * as Linking from 'expo-linking';
 import Header from "./Header";
 const emptyImage = require("../assets/blank.jpg");
 import Svg, { Path } from "react-native-svg";
@@ -47,17 +48,17 @@ export default ({
   const selectImage = async (camera: boolean) => {
     let result = camera
       ? await ImagePicker.launchCameraAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.Images,
-          allowsEditing: true,
-          aspect: [4, 4],
-          quality: 1,
-        })
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 4],
+        quality: 1,
+      })
       : await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.Images,
-          allowsEditing: true,
-          aspect: [4, 4],
-          quality: 1,
-        });
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 4],
+        quality: 1,
+      });
 
     if (!result.cancelled) {
       setImageURI(result.uri);
@@ -98,18 +99,14 @@ export default ({
     })();
   }, []);
 
-  const submitToServer = async (): Promise<string> => {
-    setModalVisible(true);
-    const fileName: string = uuid.v4();
+  const submitToServer = async (): Promise<void> => {
+    setModalVisible(true)
+    const fileName: uuid = uuid.v4();
     await uploadImage(fileName);
-    const publicKey: Promise<string> = uploadPuzzleSettings(fileName);
-
-    //there could probably be some error handling here so that if your upload fails, something happens after the modal is dismissed
-    setModalVisible(false);
-    //for now this function just returns a uuid
-    //@todo use that key to build a public SMS
-    return publicKey;
-  };
+    const publicKey: uuid = await uploadPuzzleSettings(fileName);
+    setModalVisible(false)
+    shareLink(publicKey)
+  }
 
   const uploadImage = async (fileName: string): Promise<void> => {
     //resize and compress the image for upload
@@ -131,14 +128,29 @@ export default ({
   const uploadPuzzleSettings = async (fileName: string): Promise<string> => {
     const publicKey: string = uuid.v4();
     await db.collection("puzzles").doc(fileName).set({
-      imageRef: fileName,
-      publicKey: publicKey,
-      type: puzzleType,
+      puzzleType: puzzleType,
       gridSize: gridSize,
-    });
+      senderName: "Test",
+      senderPhone: "",
+      imageURI: fileName,
+      publicKey: publicKey,
+      message: null,
+      dateReceived: new Date().toISOString(),
+    }
+    )
 
     return publicKey;
   };
+
+  const shareLink = (publicKey: uuid): void => {
+    //first param is an empty string to allow Expo to dynamically determine path to app based on runtime environment
+    const deepLink = Linking.createURL("", { queryParams: { puzzle: publicKey } })
+    console.log(deepLink)
+
+    //@todo paste the link into an sms
+
+
+  }
 
   return (
     <SafeAreaView
