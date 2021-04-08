@@ -111,6 +111,7 @@ const App = () => {
     if (snapshot.empty) {
       console.log("no puzzle found!");
     } else {
+      //does this do anything? puzzleData is overwritten immediately below
       let puzzleData: PuzzleType = {
         puzzleType: "",
         gridSize: 0,
@@ -124,6 +125,7 @@ const App = () => {
       //NOTE: there SHOULD only be one puzzle but it's in an object that has to iterated through to access the data
       snapshot.forEach((puzzle: any) => {
         puzzleData = puzzle.data();
+        puzzleData.completed = false;
       });
       console.log("retrieved puzzle data", puzzleData);
       return puzzleData;
@@ -164,6 +166,7 @@ const App = () => {
                     boardSize={boardSize}
                     theme={theme}
                     receivedPuzzles={receivedPuzzles}
+                    profile={profile}
                   />
                 )}
               </Stack.Screen>
