@@ -5,10 +5,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import Header from "./Header";
 
-import { Profile as ProfileType } from "./types";
+import { Profile as ProfileType, Puzzle } from "../types";
 import { View } from "react-native";
-
-import { Puzzle } from "./types";
 
 export default ({
   theme,

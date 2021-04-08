@@ -1,6 +1,7 @@
 import { Piece } from "./types";
 
-export const shuffle = (array: number[]): number[] => {
+export const shuffle = (array: number[], disabledShuffle = true): number[] => {
+  if (disabledShuffle) return array;
   let currentIndex = array.length,
     temporaryValue: number,
     randomIndex: number;
@@ -277,4 +278,24 @@ export const generateSquarePiecePaths = (
     piecePaths[i] = str;
   }
   return piecePaths;
+};
+
+//convert URI into a blob to transmit to server
+export const createBlob = (localUri: string): Promise<Blob> => {
+  //converts the image URI into a blob. there are references to using fetch online,
+  // but it looks like that was broken in the latest version of expo
+
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.onload = function () {
+      resolve(xhr.response);
+    };
+    xhr.onerror = function (e) {
+      console.log(e);
+      reject(new TypeError("Network request failed"));
+    };
+    xhr.responseType = "blob";
+    xhr.open("GET", localUri, true);
+    xhr.send(null);
+  });
 };
