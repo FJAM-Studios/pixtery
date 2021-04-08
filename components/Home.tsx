@@ -95,10 +95,8 @@ export default ({
     const fileName: uuid = uuid.v4();
     await uploadImage(fileName);
     const publicKey: uuid = uploadPuzzleSettings(fileName);
-
-    //for now this function just returns a uuid
-    //@todo use that key to build a public SMS
-    shareMessage(publicKey)
+    const deepLink = Linking.createURL("", { queryParams: { puzzle: publicKey } })
+    shareMessage(deepLink)
   }
 
   const uploadImage = async (fileName: string) : Promise<void> => {
