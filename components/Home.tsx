@@ -1,4 +1,4 @@
-import { app, db, storage } from "../FirebaseApp";
+import { db, storage } from "../FirebaseApp";
 import * as React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Image, View, Platform } from "react-native";
@@ -14,7 +14,7 @@ import {
   Portal,
 } from "react-native-paper";
 import * as ImagePicker from "expo-image-picker";
-import * as Linking from 'expo-linking';
+import * as Linking from "expo-linking";
 import Header from "./Header";
 const emptyImage = require("../assets/blank.jpg");
 import Svg, { Path } from "react-native-svg";
@@ -48,17 +48,17 @@ export default ({
   const selectImage = async (camera: boolean) => {
     let result = camera
       ? await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 4],
-        quality: 1,
-      })
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          allowsEditing: true,
+          aspect: [4, 4],
+          quality: 1,
+        })
       : await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 4],
-        quality: 1,
-      });
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          allowsEditing: true,
+          aspect: [4, 4],
+          quality: 1,
+        });
 
     if (!result.cancelled) {
       setImageURI(result.uri);
@@ -100,13 +100,13 @@ export default ({
   }, []);
 
   const submitToServer = async (): Promise<void> => {
-    setModalVisible(true)
-    const fileName: uuid = uuid.v4();
+    setModalVisible(true);
+    const fileName: string = uuid.v4();
     await uploadImage(fileName);
-    const publicKey: uuid = await uploadPuzzleSettings(fileName);
-    setModalVisible(false)
-    shareLink(publicKey)
-  }
+    const publicKey: string = await uploadPuzzleSettings(fileName);
+    setModalVisible(false);
+    shareLink(publicKey);
+  };
 
   const uploadImage = async (fileName: string): Promise<void> => {
     //resize and compress the image for upload
@@ -136,21 +136,20 @@ export default ({
       publicKey: publicKey,
       message: null,
       dateReceived: new Date().toISOString(),
-    }
-    )
+    });
 
     return publicKey;
   };
 
-  const shareLink = (publicKey: uuid): void => {
+  const shareLink = (publicKey: string): void => {
     //first param is an empty string to allow Expo to dynamically determine path to app based on runtime environment
-    const deepLink = Linking.createURL("", { queryParams: { puzzle: publicKey } })
-    console.log(deepLink)
+    const deepLink = Linking.createURL("", {
+      queryParams: { puzzle: publicKey },
+    });
+    console.log(deepLink);
 
     //@todo paste the link into an sms
-
-
-  }
+  };
 
   return (
     <SafeAreaView
