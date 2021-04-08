@@ -83,7 +83,7 @@ export default ({
     for (let i = 0; i < currentBoard.length; i++) {
       if (currentBoard[i] !== i) return;
     }
-    const winMessage = message.length
+    const winMessage = message && message.length>0
       ? message
       : "Congrats! You solved the puzzle!";
     setWinMessage(winMessage);
