@@ -2,4 +2,11 @@ const TESTING_MODE = false;
 
 const SNAP_MARGIN = 0.25;
 
-export { TESTING_MODE, SNAP_MARGIN };
+const COMPRESSION = 0.5;
+
+const DEFAULT_IMAGE_SIZE = {
+  width: 1080,
+  height: 1080,
+};
+
+export { TESTING_MODE, SNAP_MARGIN, COMPRESSION, DEFAULT_IMAGE_SIZE };
