@@ -17,6 +17,7 @@ import Logo from "./Logo";
 import Title from "./Title";
 import Svg, { Path } from "react-native-svg";
 import { generateJigsawPiecePaths, generateSquarePiecePaths, createBlob } from "../util";
+import shareMessage from "./shareMessage";
 import { Puzzle } from "../types";
 import uuid from 'uuid';
 
@@ -97,7 +98,7 @@ export default ({
 
     //for now this function just returns a uuid
     //@todo use that key to build a public SMS
-    return publicKey
+    shareMessage(publicKey)
   }
 
   const uploadImage = async (fileName: string) : Promise<void> => {
