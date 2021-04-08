@@ -11,6 +11,7 @@ import {
   TextInput,
 } from "react-native-paper";
 import * as ImagePicker from "expo-image-picker";
+import * as Linking from 'expo-linking';
 import Header from "./Header";
 const emptyImage = require("../assets/blank.jpg");
 import Logo from "./Logo";
