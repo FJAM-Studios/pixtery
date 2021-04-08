@@ -7,7 +7,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Header from "./Header";
 import Logo from "./Logo";
 import Title from "./Title";
-import { Puzzle } from "./types";
+import { Puzzle } from "../types";
 
 //this component will receive a puzzle object from component that opens link
 //for now, though, the puzzle object is passed directly from DevTest
@@ -46,7 +46,7 @@ export default ({
         }
         // if you already have this image, don't download it
         const fileInfo = await FileSystem.getInfoAsync(pixteryDir + fileName);
-        if (!dirInfo.exists) {
+        if (!fileInfo.exists) {
           console.log("Image doesn't exist, downloading...");
           // download the image from pixtery server and save to pixtery dir
           await FileSystem.downloadAsync(imageURI, pixteryDir + fileName);
@@ -64,6 +64,9 @@ export default ({
             JSON.stringify(allPuzzles)
           );
           setReceivedPuzzles(allPuzzles);
+          navigation.navigate("PuzzleList");
+        } else {
+          // navigate there if you already have the puzz
           navigation.navigate("PuzzleList");
         }
       } catch (e) {
