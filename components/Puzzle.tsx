@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Text, View, StyleSheet } from "react-native";
+import { Text, View, StyleSheet, useWindowDimensions } from "react-native";
 import { TESTING_MODE } from "../constants";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Header from "./Header";
@@ -9,7 +9,7 @@ import { Puzzle, GridSections } from "../types";
 
 //disable shuffling for testing
 const disableShuffle = TESTING_MODE;
-// note: not working yet when grid changes; to confirm whether that is needed given that is info that is received
+
 export default ({
   boardSize,
   theme,
@@ -25,6 +25,9 @@ export default ({
 }) => {
   const { imageURI, puzzleType, gridSize, message } = route.params;
   const squareSize = boardSize / gridSize;
+  const { width, height } = useWindowDimensions();
+  const sandBoxHeight = height * 0.95 - squareSize * gridSize;
+  const sandBoxWidth = width * 0.95;
   const image = { uri: imageURI };
   const [piecePaths, setPiecePaths] = useState(
     generateJigsawPiecePaths(gridSize, squareSize)
@@ -131,6 +134,8 @@ export default ({
             currentBoard={currentBoard}
             setCurrentBoard={setCurrentBoard}
             setErrorMessage={setErrorMessage}
+            sandBoxHeight={sandBoxHeight}
+            sandBoxWidth={sandBoxWidth}
           />
         ))}
         <View style={styles.messageContainer}>
