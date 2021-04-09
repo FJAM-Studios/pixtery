@@ -9,8 +9,12 @@ import {
   Surface,
   Headline,
   TextInput,
+  ActivityIndicator,
+  Modal,
+  Portal,
 } from "react-native-paper";
 import * as ImagePicker from "expo-image-picker";
+import * as Linking from 'expo-linking';
 import Header from "./Header";
 const emptyImage = require("../assets/blank.jpg");
 import Svg, { Path } from "react-native-svg";
@@ -21,6 +25,9 @@ import {
 } from "../util";
 import { Puzzle } from "../types";
 import uuid from "uuid";
+import * as ImageManipulator from "expo-image-manipulator";
+
+import { DEFAULT_IMAGE_SIZE, COMPRESSION } from "../constants";
 
 export default ({
   navigation,
@@ -36,21 +43,22 @@ export default ({
   const [imageURI, setImageURI] = React.useState("");
   const [puzzleType, setPuzzleType] = React.useState("jigsaw");
   const [gridSize, setGridSize] = React.useState(3);
+  const [modalVisible, setModalVisible] = React.useState(false);
 
   const selectImage = async (camera: boolean) => {
     let result = camera
       ? await ImagePicker.launchCameraAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.Images,
-          allowsEditing: true,
-          aspect: [4, 4],
-          quality: 1,
-        })
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 4],
+        quality: 1,
+      })
       : await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.Images,
-          allowsEditing: true,
-          aspect: [4, 4],
-          quality: 1,
-        });
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 4],
+        quality: 1,
+      });
 
     if (!result.cancelled) {
       setImageURI(result.uri);
@@ -91,18 +99,27 @@ export default ({
     })();
   }, []);
 
-  const submitToServer = async (): Promise<string> => {
-    const fileName: string = uuid.v4();
+  const submitToServer = async (): Promise<void> => {
+    setModalVisible(true)
+    const fileName: uuid = uuid.v4();
     await uploadImage(fileName);
-    const publicKey: Promise<string> = uploadPuzzleSettings(fileName);
-
-    //for now this function just returns a uuid
-    //@todo use that key to build a public SMS
-    return publicKey;
-  };
+    const publicKey: uuid = await uploadPuzzleSettings(fileName);
+    setModalVisible(false)
+    shareLink(publicKey)
+  }
 
   const uploadImage = async (fileName: string): Promise<void> => {
-    const blob: Blob = await createBlob(imageURI);
+    //resize and compress the image for upload
+    const resizedCompressedImage = await ImageManipulator.manipulateAsync(
+      imageURI,
+      [
+        {
+          resize: DEFAULT_IMAGE_SIZE,
+        },
+      ],
+      { compress: COMPRESSION, format: ImageManipulator.SaveFormat.JPEG }
+    );
+    const blob: Blob = await createBlob(resizedCompressedImage.uri);
     const ref = storage.ref().child(fileName);
     await ref.put(blob);
     return;
@@ -111,14 +128,29 @@ export default ({
   const uploadPuzzleSettings = async (fileName: string): Promise<string> => {
     const publicKey: string = uuid.v4();
     await db.collection("puzzles").doc(fileName).set({
-      imageRef: fileName,
-      publicKey: publicKey,
-      type: puzzleType,
+      puzzleType: puzzleType,
       gridSize: gridSize,
-    });
+      senderName: "Test",
+      senderPhone: "",
+      imageURI: fileName,
+      publicKey: publicKey,
+      message: null,
+      dateReceived: new Date().toISOString(),
+    }
+    )
 
     return publicKey;
   };
+
+  const shareLink = (publicKey: uuid): void => {
+    //first param is an empty string to allow Expo to dynamically determine path to app based on runtime environment
+    const deepLink = Linking.createURL("", { queryParams: { puzzle: publicKey } })
+    console.log(deepLink)
+
+    //@todo paste the link into an sms
+
+
+  }
 
   return (
     <SafeAreaView
@@ -130,6 +162,24 @@ export default ({
         justifyContent: "space-between",
       }}
     >
+      {/* this isn't the nicest looking modal, but RN Paper was not being compliant, not sure why. Not the worst either, though. */}
+      <Portal>
+        <Modal
+          visible={modalVisible}
+          dismissable={false}
+          contentContainerStyle={{ alignItems: "center" }}
+        >
+          {gridSize % 2 ? <Text>Yeah you're working.</Text> : null}
+          <Headline>Building a Pixtery!</Headline>
+          {gridSize % 2 ? null : <Text>And choosing so carefully</Text>}
+          <ActivityIndicator
+            animating={true}
+            color={theme.colors.text}
+            size="large"
+            style={{ padding: 15 }}
+          />
+        </Modal>
+      </Portal>
       <Header
         theme={theme}
         notifications={
@@ -321,6 +371,7 @@ export default ({
         mode="contained"
         onPress={submitToServer}
         style={{ margin: 10 }}
+        disabled={imageURI.length === 0}
       >
         Send
       </Button>
