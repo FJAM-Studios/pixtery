@@ -5,6 +5,7 @@ import * as ImageManipulator from "expo-image-manipulator";
 import { SNAP_MARGIN } from "../constants";
 import { GridSections } from "../types";
 import { getRandomInRange } from '../util'
+import { View, useWindowDimensions } from "react-native";
 
 export default ({
   num,
@@ -20,7 +21,8 @@ export default ({
   setCurrentBoard,
   setErrorMessage,
   sandBoxHeight,
-  sandBoxWidth
+  sandBoxWidth,
+  puzzleAreaDimensions
 }: {
   num: number;
   ix: number;
@@ -36,6 +38,7 @@ export default ({
   setErrorMessage: Function;
   sandBoxHeight: number;
   sandBoxWidth: number;
+  puzzleAreaDimensions: any // change later
 }) => {
   //squareX and squareY represent the row and col of the square in the solved puzzle
   const squareX = num % gridSize;
@@ -55,8 +58,10 @@ export default ({
     solutionX: number,
     solutionY: number
   
+  const { puzzleAreaWidth, puzzleAreaHeight } = puzzleAreaDimensions;
+  console.log('puzzleAreaheight',puzzleAreaHeight)  
   const minSandboxY = boardSize;
-  const maxSandboxY = minSandboxY + sandBoxHeight - squareSize;
+  const maxSandboxY = puzzleAreaHeight - squareSize;
 
   if (puzzleType === "squares") {
     //for square puzzles, everything is aligned to grid
@@ -65,9 +70,10 @@ export default ({
     // initY = Math.floor(ix / gridSize) * squareSize;
     initX = Math.max((ix % gridSize) * squareSize - squareSize * 0.25 * Math.random(), 0);
     // start here - need a way for Y to spread out inside sandbox
-    initY = Math.min(minSandboxY + getRandomInRange(0, sandBoxHeight) * (ix % gridSize), 600);
-    console.log('sandboxheight', sandBoxHeight, 'sandboxwidth', sandBoxWidth, 'min', minSandboxY, 'max', maxSandboxY, 'inity', initY, 'initx', initX)
+    // initY = Math.min(minSandboxY + getRandomInRange(0, sandBoxHeight) * (ix % gridSize), 600);
+    initY = Math.min(minSandboxY + (ix % gridSize) * squareSize - squareSize * 0.25 * Math.random(), maxSandboxY);
 
+    console.log('sandboxheight', sandBoxHeight, 'sandboxwidth', sandBoxWidth, 'min', minSandboxY, 'max', maxSandboxY, 'inity', initY, 'initx', initX)
     solutionX = (num % gridSize) * squareSize;
     solutionY = Math.floor(num / gridSize) * squareSize;
     viewBoxX = squareX * squareSize;

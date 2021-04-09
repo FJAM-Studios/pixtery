@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Text, View, StyleSheet, useWindowDimensions } from "react-native";
+import { Text, View, StyleSheet, useWindowDimensions, onLayout } from "react-native";
 import { TESTING_MODE } from "../constants";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Header from "./Header";
@@ -32,6 +32,17 @@ export default ({
   const [piecePaths, setPiecePaths] = useState(
     generateJigsawPiecePaths(gridSize, squareSize)
   );
+  const [puzzleAreaDimensions, setPuzzleAreaDimensions] = useState({
+    puzzleAreaWidth: 0,
+    puzzleAreaHeight: 0
+  })
+  const measurePuzzleArea = (ev: any): void => {
+    if(puzzleAreaDimensions.puzzleAreaHeight) return;
+    setPuzzleAreaDimensions({ 
+        puzzleAreaWidth: ev.nativeEvent.layout.width,
+        puzzleAreaHeight: ev.nativeEvent.layout.height
+      })
+    };
 
   // populates X Y coordinates for upper left corner of each grid section
   const getGridSections = (): GridSections => {
@@ -96,6 +107,34 @@ export default ({
     checkWin();
   }, [currentBoard]);
 
+  // need to return dummy component to measure the puzzle area via onLayout
+  if(!puzzleAreaDimensions.puzzleAreaHeight) return (
+    <SafeAreaView
+    style={{
+      flex: 1,
+      flexDirection: "column",
+      padding: 10,
+      backgroundColor: theme.colors.background,
+      justifyContent: "flex-start",
+    }}
+  >
+    <Header
+      theme={theme}
+      notifications={
+        receivedPuzzles.filter((puzzle) => !puzzle.completed).length
+      }
+      navigation={navigation}
+    />
+    <View
+      onLayout={(ev) => measurePuzzleArea(ev)}
+      style={{
+        flex: 1,
+        justifyContent: "flex-end",
+      }}
+    >
+    </View>
+  </SafeAreaView>
+  )
   return (
     <SafeAreaView
       style={{
@@ -136,6 +175,7 @@ export default ({
             setErrorMessage={setErrorMessage}
             sandBoxHeight={sandBoxHeight}
             sandBoxWidth={sandBoxWidth}
+            puzzleAreaDimensions={puzzleAreaDimensions}
           />
         ))}
         <View style={styles.messageContainer}>
@@ -168,4 +208,5 @@ const styles = StyleSheet.create({
     flex: 1,
     color: "white",
   },
+
 });
