@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, LegacyRef } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { View } from "react-native";
 import { Headline, Text, TextInput, Button } from "react-native-paper";
@@ -25,7 +25,7 @@ export default ({
   setProfile: (profile: ProfileType) => void;
   navigation: any;
 }) => {
-  const recaptchaVerifier = useRef(null);
+  const recaptchaVerifier = useRef<FirebaseRecaptcha.FirebaseRecaptchaVerifierModal>(null);
   const [name, setName] = useState((profile && profile.name) || "");
   const [phone, setPhone] = useState((profile && profile.phone) || "");
   const [smsCode, setSmsCode] = useState("");
@@ -84,7 +84,7 @@ export default ({
         onPress={async () => {
           try {
             const formattedPhone = phoneFormat(phone)[0];
-            if (formattedPhone) {
+            if (formattedPhone && recaptchaVerifier && recaptchaVerifier.current) {
               setPhone(formattedPhone);
               const id = await phoneProvider.verifyPhoneNumber(
                 formattedPhone,
@@ -94,7 +94,7 @@ export default ({
               setErrors("");
             } else {
               throw new Error(
-                `Phone format can't be identified! Try +19995551234.`
+                `Please check the number that you entered and try again.`
               );
             }
           } catch (e) {
