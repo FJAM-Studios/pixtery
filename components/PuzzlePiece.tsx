@@ -61,10 +61,11 @@ export default ({
   if (puzzleType === "squares") {
     //for square puzzles, everything is aligned to grid
     widthY = widthX = squareSize;
-    initX = getRandomInRange(0, sandBoxWidth) * (ix % gridSize);
+    // initX = getRandomInRange(0, sandBoxWidth) / gridSize * (ix % gridSize + 1);
     // initY = Math.floor(ix / gridSize) * squareSize;
-    // initX = (ix % gridSize) * squareSize;
-    initY = getRandomInRange(minSandboxY, maxSandboxY) * (ix % gridSize);
+    initX = Math.max((ix % gridSize) * squareSize - squareSize * 0.25 * Math.random(), 0);
+    // start here - need a way for Y to spread out inside sandbox
+    initY = Math.min(minSandboxY + getRandomInRange(0, sandBoxHeight) * (ix % gridSize), 600);
     console.log('sandboxheight', sandBoxHeight, 'sandboxwidth', sandBoxWidth, 'min', minSandboxY, 'max', maxSandboxY, 'inity', initY, 'initx', initX)
 
     solutionX = (num % gridSize) * squareSize;
