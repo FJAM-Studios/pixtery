@@ -24,7 +24,7 @@ import {
   createBlob,
   shareMessage
 } from "../util";
-import { Puzzle } from "../types";
+import { Puzzle, Profile } from "../types";
 import uuid from "uuid";
 import * as ImageManipulator from "expo-image-manipulator";
 
@@ -35,11 +35,13 @@ export default ({
   boardSize,
   theme,
   receivedPuzzles,
+  profile,
 }: {
   navigation: any;
   boardSize: number;
   theme: any;
   receivedPuzzles: Puzzle[];
+  profile: Profile | null;
 }) => {
   const [imageURI, setImageURI] = React.useState("");
   const [puzzleType, setPuzzleType] = React.useState("jigsaw");
@@ -128,16 +130,20 @@ export default ({
 
   const uploadPuzzleSettings = async (fileName: string): Promise<string> => {
     const publicKey: string = uuid.v4();
-    await db.collection("puzzles").doc(fileName).set({
-      puzzleType: puzzleType,
-      gridSize: gridSize,
-      senderName: "Test",
-      senderPhone: "",
-      imageURI: fileName,
-      publicKey: publicKey,
-      message: null,
-      dateReceived: new Date().toISOString(),
-    });
+    await db
+      .collection("puzzles")
+      .doc(fileName)
+      .set({
+        puzzleType: puzzleType,
+        gridSize: gridSize,
+        senderName: profile ? profile.name : "No Sender",
+        senderPhone: profile ? profile.phone : "No Sender",
+        imageURI: fileName,
+        publicKey: publicKey,
+        message: message,
+        dateReceived: new Date().toISOString(),
+      });
+
 
     return publicKey;
   };
