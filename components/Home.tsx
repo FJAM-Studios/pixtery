@@ -22,6 +22,7 @@ import {
   generateJigsawPiecePaths,
   generateSquarePiecePaths,
   createBlob,
+  shareMessage
 } from "../util";
 import { Puzzle } from "../types";
 import uuid from "uuid";
@@ -105,7 +106,7 @@ export default ({
     await uploadImage(fileName);
     const publicKey: uuid = await uploadPuzzleSettings(fileName);
     setModalVisible(false)
-    shareLink(publicKey)
+    generateLink(publicKey)
   }
 
   const uploadImage = async (fileName: string): Promise<void> => {
@@ -142,14 +143,10 @@ export default ({
     return publicKey;
   };
 
-  const shareLink = (publicKey: uuid): void => {
+  const generateLink = (publicKey: uuid): void => {
     //first param is an empty string to allow Expo to dynamically determine path to app based on runtime environment
     const deepLink = Linking.createURL("", { queryParams: { puzzle: publicKey } })
-    console.log(deepLink)
-
-    //@todo paste the link into an sms
-
-
+    shareMessage(deepLink)
   }
 
   return (
