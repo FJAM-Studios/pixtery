@@ -1,5 +1,4 @@
-import * as firebase from "firebase";
-import "firebase/storage" // for testing purposes
+import firebase from "firebase";
 
 const firebaseConfig = {
   apiKey: "***REMOVED***",
