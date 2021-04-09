@@ -104,7 +104,7 @@ export default ({
     setModalVisible(true);
     const fileName: string = uuid.v4();
     await uploadImage(fileName);
-    const publicKey: uuid = await uploadPuzzleSettings(fileName);
+    const publicKey: string = await uploadPuzzleSettings(fileName);
     setModalVisible(false)
     generateLink(publicKey)
   };
@@ -142,7 +142,7 @@ export default ({
     return publicKey;
   };
 
-  const generateLink = (publicKey: uuid): void => {
+  const generateLink = (publicKey: string): void => {
     //first param is an empty string to allow Expo to dynamically determine path to app based on runtime environment
     const deepLink = Linking.createURL("", { queryParams: { puzzle: publicKey } })
     shareMessage(deepLink)
