@@ -7,6 +7,10 @@ import { GridSections } from "../types";
 import { getRandomInRange } from '../util'
 import { View, useWindowDimensions } from "react-native";
 
+// to do -
+// randomizer with even / odd indices?
+// fix when piece goes to same place 
+
 export default ({
   num,
   ix,
@@ -69,10 +73,10 @@ export default ({
     widthY = widthX = squareSize;
     // initX = getRandomInRange(0, sandBoxWidth) / gridSize * (ix % gridSize + 1);
     // initY = Math.floor(ix / gridSize) * squareSize;
-    initX = Math.max((ix % gridSize) * squareSize - squareSize * 0.5 * Math.random(), 0);
+    initX = Math.max((ix % gridSize) * squareSize - squareSize * 0.5, 0);
     // start here - need a way for Y to spread out inside sandbox
     // initY = Math.min(minSandboxY + getRandomInRange(0, sandBoxHeight) * (ix % gridSize), 600);
-    initY = Math.min(minSandboxY + Math.floor(ix / gridSize) * squareSize * ((maxSandboxY - minSandboxY) / puzzleAreaHeight) - squareSize * 0.25 * Math.random(), maxSandboxY);
+    initY = Math.min(minSandboxY + Math.floor(ix / gridSize) * squareSize * ((maxSandboxY - minSandboxY) / puzzleAreaHeight) - squareSize * 0.25, maxSandboxY);
 
     // console.log('sandboxheight', sandBoxHeight, 'sandboxwidth', sandBoxWidth, 'min', minSandboxY, 'max', maxSandboxY, 'inity', initY, 'initx', initX)
     solutionX = (num % gridSize) * squareSize;
@@ -148,7 +152,7 @@ export default ({
 
     manipulateImage();
   }, []);
-// start here - initX needs to be snapped for this to work
+
   const changePosition = (gestureState: { dx: number; dy: number }): void => {
     setErrorMessage("");
     //update the relative _x and _y but leave x and y the same unless snapping
@@ -170,7 +174,7 @@ export default ({
         console.log(initY, newXY._y, rowDivider)
         // snappedY = rowDivider;
         snappedY = initY - newXY._y + rowDivider;
-        if(snappedY % squareSize) snappedY -= snappedY % squareSize
+        // if(snappedY % squareSize) snappedY -= snappedY % squareSize
         snappedRow = i;
         break;
       // if (Math.abs(newXY._y - rowDivider) < squareSize * SNAP_MARGIN) {
@@ -186,7 +190,7 @@ export default ({
         // snappedX = colDivider;
         console.log(initX, newXY._x, colDivider)
         snappedX = initX - newXY._x + colDivider;
-        if(snappedX % squareSize) snappedX -= snappedX % squareSize
+        // if(snappedX % squareSize) snappedX -= snappedX % squareSize
         snappedCol = i;
         break;
       }
