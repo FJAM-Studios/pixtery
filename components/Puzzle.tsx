@@ -66,6 +66,7 @@ export default ({
       gridSections.rowDividers.push(x);
       gridSections.colDividers.push(y);
     }
+    console.log(gridSections)
     return gridSections;
   };
 
@@ -85,9 +86,9 @@ export default ({
     shuffle(fillArray(gridSize), disableShuffle)
   );
 
-  const [currentBoard, setCurrentBoard] = useState<(number | null)[]>([
-    ...shuffledPieces,
-  ]);
+  const [currentBoard, setCurrentBoard] = useState<(number | null)[]>(
+    Array(shuffledPieces.length).fill(null),
+  );
 
   const [winMessage, setWinMessage] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
