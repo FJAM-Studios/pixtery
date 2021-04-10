@@ -62,6 +62,7 @@ export default ({
   console.log('puzzleAreaheight',puzzleAreaHeight)  
   const minSandboxY = boardSize * 1.1;
   const maxSandboxY = puzzleAreaHeight * 0.95 - squareSize;
+  console.log(num, ix, 'board', currentBoard)
 
   if (puzzleType === "squares") {
     //for square puzzles, everything is aligned to grid
@@ -73,7 +74,7 @@ export default ({
     // initY = Math.min(minSandboxY + getRandomInRange(0, sandBoxHeight) * (ix % gridSize), 600);
     initY = Math.min(minSandboxY + Math.floor(ix / gridSize) * squareSize * ((maxSandboxY - minSandboxY) / puzzleAreaHeight) - squareSize * 0.25 * Math.random(), maxSandboxY);
 
-    console.log('sandboxheight', sandBoxHeight, 'sandboxwidth', sandBoxWidth, 'min', minSandboxY, 'max', maxSandboxY, 'inity', initY, 'initx', initX)
+    // console.log('sandboxheight', sandBoxHeight, 'sandboxwidth', sandBoxWidth, 'min', minSandboxY, 'max', maxSandboxY, 'inity', initY, 'initx', initX)
     solutionX = (num % gridSize) * squareSize;
     solutionY = Math.floor(num / gridSize) * squareSize;
     viewBoxX = squareX * squareSize;
@@ -107,7 +108,7 @@ export default ({
   const [newSnappedIx, setNewSnappedIx] = useState<number | undefined | null>(
     -1
   );
-  const [prevIx, setPrevIx] = useState<number | undefined | null>(ix);
+  const [prevIx, setPrevIx] = useState<number | undefined | null>(null);
 
   //_x and _y are used to keep track of where image is relative to its start positon
   const [currentXY, setXY] = useState({
@@ -116,6 +117,7 @@ export default ({
     _x: initX,
     _y: initY,
   });
+  console.log('before x', currentXY.x, 'y', currentXY.y)
 
   useEffect(() => {
     const manipulateImage = async () => {
@@ -146,7 +148,7 @@ export default ({
 
     manipulateImage();
   }, []);
-
+// start here - initX needs to be snapped for this to work
   const changePosition = (gestureState: { dx: number; dy: number }): void => {
     setErrorMessage("");
     //update the relative _x and _y but leave x and y the same unless snapping
@@ -159,22 +161,32 @@ export default ({
     //if _x and _y are within a margin of a point on the grid, then snap!
     let snappedX: number | undefined; // top left X position of snap grid
     let snappedY: number | undefined; // top left Y position of snap grid
-    let snappedRow: number | undefined; // row index of snap
-    let snappedCol: number | undefined; // col index of snap
+    let snappedRow: number | undefined; // row index where it snaps
+    let snappedCol: number | undefined; // col index where it snaps
     const rowDividers: number[] = gridSections.rowDividers;
     for (let i = 0; i < rowDividers.length; i++) {
       const rowDivider = rowDividers[i];
       if (Math.abs(newXY._y - rowDivider) < squareSize * SNAP_MARGIN) {
+        console.log(initY, newXY._y, rowDivider)
+        // snappedY = rowDivider;
         snappedY = initY - newXY._y + rowDivider;
+        if(snappedY % squareSize) snappedY -= snappedY % squareSize
         snappedRow = i;
         break;
+      // if (Math.abs(newXY._y - rowDivider) < squareSize * SNAP_MARGIN) {
+      //   snappedY = initY - newXY._y + rowDivider;
+      //   snappedRow = i;
+      //   break;
       }
     }
     const colDividers: number[] = gridSections.colDividers;
     for (let i = 0; i < colDividers.length; i++) {
       const colDivider = colDividers[i];
       if (Math.abs(newXY._x - colDivider) < squareSize * SNAP_MARGIN) {
+        // snappedX = colDivider;
+        console.log(initX, newXY._x, colDivider)
         snappedX = initX - newXY._x + colDivider;
+        if(snappedX % squareSize) snappedX -= snappedX % squareSize
         snappedCol = i;
         break;
       }
@@ -185,6 +197,7 @@ export default ({
       // putting ! after a variable is to tell TS that in this case, the variable will not be null or undefined
       newIx = snappedRow! * gridSize + snappedCol!;
       if (currentBoard[newIx] === null) {
+        console.log('snappedx', snappedX, 'snapy', snappedY)
         newXY.x = snappedX;
         newXY.y = snappedY;
       }
