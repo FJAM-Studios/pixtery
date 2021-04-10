@@ -60,18 +60,18 @@ export default ({
   
   const { puzzleAreaWidth, puzzleAreaHeight } = puzzleAreaDimensions;
   console.log('puzzleAreaheight',puzzleAreaHeight)  
-  const minSandboxY = boardSize;
-  const maxSandboxY = puzzleAreaHeight - squareSize;
+  const minSandboxY = boardSize * 1.1;
+  const maxSandboxY = puzzleAreaHeight * 0.95 - squareSize;
 
   if (puzzleType === "squares") {
     //for square puzzles, everything is aligned to grid
     widthY = widthX = squareSize;
     // initX = getRandomInRange(0, sandBoxWidth) / gridSize * (ix % gridSize + 1);
     // initY = Math.floor(ix / gridSize) * squareSize;
-    initX = Math.max((ix % gridSize) * squareSize - squareSize * 0.25 * Math.random(), 0);
+    initX = Math.max((ix % gridSize) * squareSize - squareSize * 0.5 * Math.random(), 0);
     // start here - need a way for Y to spread out inside sandbox
     // initY = Math.min(minSandboxY + getRandomInRange(0, sandBoxHeight) * (ix % gridSize), 600);
-    initY = Math.min(minSandboxY + (ix % gridSize) * squareSize - squareSize * 0.25 * Math.random(), maxSandboxY);
+    initY = Math.min(minSandboxY + Math.floor(ix / gridSize) * squareSize * ((maxSandboxY - minSandboxY) / puzzleAreaHeight) - squareSize * 0.25 * Math.random(), maxSandboxY);
 
     console.log('sandboxheight', sandBoxHeight, 'sandboxwidth', sandBoxWidth, 'min', minSandboxY, 'max', maxSandboxY, 'inity', initY, 'initx', initX)
     solutionX = (num % gridSize) * squareSize;
