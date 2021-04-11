@@ -10,6 +10,10 @@ import { View, useWindowDimensions } from "react-native";
 // to do -
 // randomizer with even / odd indices?
 // fix when piece goes to same place 
+// outline of grid
+// add snap sound
+// change name of newsnappedix
+// see if i acgtually need prev IX - maybe i can update the current board and set snappedIx in one go
 
 export default ({
   num,
@@ -63,10 +67,9 @@ export default ({
     solutionY: number
   
   const { puzzleAreaWidth, puzzleAreaHeight } = puzzleAreaDimensions;
-  console.log('puzzleAreaheight',puzzleAreaHeight)  
+  // console.log('puzzleAreaheight',puzzleAreaHeight)  
   const minSandboxY = boardSize * 1.1;
   const maxSandboxY = puzzleAreaHeight * 0.95 - squareSize;
-  console.log(num, ix, 'board', currentBoard)
 
   if (puzzleType === "squares") {
     //for square puzzles, everything is aligned to grid
@@ -109,9 +112,8 @@ export default ({
 
   const [ready, setReady] = useState<boolean>(false);
   const [croppedImage, setCroppedImage] = useState(image);
-  const [newSnappedIx, setNewSnappedIx] = useState<number | undefined | null>(
-    -1
-  );
+  const [newSnappedIx, setNewSnappedIx] = useState<number | undefined | null>(-1);
+  // previous index is needed to know where the piece moved from, to update to null on current board
   const [prevIx, setPrevIx] = useState<number | undefined | null>(null);
 
   //_x and _y are used to keep track of where image is relative to its start positon
@@ -121,7 +123,7 @@ export default ({
     _x: initX,
     _y: initY,
   });
-  console.log('before x', currentXY.x, 'y', currentXY.y)
+  // console.log('before x', currentXY.x, 'y', currentXY.y)
 
   useEffect(() => {
     const manipulateImage = async () => {
@@ -154,6 +156,8 @@ export default ({
   }, []);
 
   const changePosition = (gestureState: { dx: number; dy: number }): void => {
+    // start here - does new snap ix reset?
+    console.log('num',num, 'previx', prevIx, 'newsnapix', newSnappedIx, 'board before', currentBoard)
     setErrorMessage("");
     //update the relative _x and _y but leave x and y the same unless snapping
     const newXY = {
@@ -162,6 +166,7 @@ export default ({
       _x: currentXY._x + gestureState.dx,
       _y: currentXY._y + gestureState.dy,
     };
+    const originIx = newSnappedIx;
     //if _x and _y are within a margin of a point on the grid, then snap!
     let snappedX: number | undefined; // top left X position of snap grid
     let snappedY: number | undefined; // top left Y position of snap grid
@@ -171,26 +176,16 @@ export default ({
     for (let i = 0; i < rowDividers.length; i++) {
       const rowDivider = rowDividers[i];
       if (Math.abs(newXY._y - rowDivider) < squareSize * SNAP_MARGIN) {
-        console.log(initY, newXY._y, rowDivider)
-        // snappedY = rowDivider;
         snappedY = initY - newXY._y + rowDivider;
-        // if(snappedY % squareSize) snappedY -= snappedY % squareSize
         snappedRow = i;
         break;
-      // if (Math.abs(newXY._y - rowDivider) < squareSize * SNAP_MARGIN) {
-      //   snappedY = initY - newXY._y + rowDivider;
-      //   snappedRow = i;
-      //   break;
       }
     }
     const colDividers: number[] = gridSections.colDividers;
     for (let i = 0; i < colDividers.length; i++) {
       const colDivider = colDividers[i];
       if (Math.abs(newXY._x - colDivider) < squareSize * SNAP_MARGIN) {
-        // snappedX = colDivider;
-        console.log(initX, newXY._x, colDivider)
         snappedX = initX - newXY._x + colDivider;
-        // if(snappedX % squareSize) snappedX -= snappedX % squareSize
         snappedCol = i;
         break;
       }
@@ -200,13 +195,14 @@ export default ({
     if (snappedX !== undefined && snappedY !== undefined) {
       // putting ! after a variable is to tell TS that in this case, the variable will not be null or undefined
       newIx = snappedRow! * gridSize + snappedCol!;
-      if (currentBoard[newIx] === null) {
-        console.log('snappedx', snappedX, 'snapy', snappedY)
+      if (currentBoard[newIx] === null || newIx === newSnappedIx) {
+        // console.log('snappedx', snappedX, 'snapy', snappedY)
         newXY.x = snappedX;
         newXY.y = snappedY;
       }
       // but if the current board already has another piece in the new index, do not let user move piece there
       else {
+        // console.log('newix', newIx, 'prevIx', prevIx)
         setErrorMessage(
           "There is a piece already in that spot. Please move that piece first!"
         );
@@ -216,12 +212,13 @@ export default ({
         // newXY.y = currentXY.y + currentXY._y - gestureState.dy;
       }
     }
-    updateIx(newIx);
+    if(newIx !== newSnappedIx) updateIx(newIx);
     setXY(newXY);
   };
 
   // preserve previous Ix, and set the new Ix that it will snap to
   const updateIx = (newIx: number | undefined): void => {
+    // if newSpannedIx has been already set once before, save that index as the previous index
     if (newSnappedIx !== -1) setPrevIx(newSnappedIx);
     setNewSnappedIx(newIx);
   };
@@ -230,14 +227,15 @@ export default ({
     let newBoard = [...currentBoard];
     // putting ! after a variable is to tell TS that in this case, the variable will not be null or undefined
     if (newSnappedIx! >= 0) newBoard[newSnappedIx!] = num;
-    if (prevIx! >= 0) newBoard[prevIx!] = null;
+    if (prevIx! >= 0 && prevIx !== newSnappedIx) newBoard[prevIx!] = null;
+    console.log('board after', newBoard)
     setCurrentBoard(newBoard);
   };
 
   useEffect(() => {
     // if the piece has been mounted already (i.e. newSnappedIx is not -1), update current board after currentXY changes
     if (newSnappedIx !== -1) updateCurrentBoard();
-  }, [currentXY]);
+  }, [newSnappedIx]);
 
   if (!ready) return null;
 
