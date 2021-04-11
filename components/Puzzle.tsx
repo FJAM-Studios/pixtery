@@ -66,7 +66,6 @@ export default ({
       gridSections.rowDividers.push(x);
       gridSections.colDividers.push(y);
     }
-    console.log(gridSections)
     return gridSections;
   };
 
