@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Text, View, StyleSheet, useWindowDimensions, onLayout } from "react-native";
+import { Text, View, StyleSheet, useWindowDimensions } from "react-native";
 import { TESTING_MODE } from "../constants";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Header from "./Header";
@@ -158,6 +158,16 @@ export default ({
           justifyContent: "flex-end",
         }}
       >
+        <View
+          style={{ // not in StyleSheet since we need the squaresize and gridsize. might be a way to pull into StyleSheet
+            width: squareSize * gridSize,
+            height: squareSize * gridSize,
+            borderWidth: 4,
+            borderColor: "white",
+            position: "absolute",
+            top: "0%"
+          }}
+        />
         {shuffledPieces.map((num: number, ix: number) => (
           <PuzzlePiece
             key={num}
@@ -208,5 +218,4 @@ const styles = StyleSheet.create({
     flex: 1,
     color: "white",
   },
-
 });

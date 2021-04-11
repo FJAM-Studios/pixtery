@@ -8,12 +8,14 @@ import { getRandomInRange } from '../util'
 import { View, useWindowDimensions } from "react-native";
 
 // to do -
-// randomizer with even / odd indices?
-// fix when piece goes to same place 
 // outline of grid
+// jigsaw
+// randomizer with even / odd indices?
+// z index of piece moving
 // add snap sound
 // change name of newsnappedix
 // see if i acgtually need prev IX - maybe i can update the current board and set snappedIx in one go
+// return full image when solved
 
 export default ({
   num,
