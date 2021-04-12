@@ -149,9 +149,14 @@ export default ({
   };
 
   const generateLink = (publicKey: string): void => {
-    //first param is an empty string to allow Expo to dynamically determine path to app based on runtime environment
-    const deepLink = Linking.createURL("", { queryParams: { puzzle: publicKey } })
+    // now that we have a deployed site this is mostly just useful to get the correct format for the Expo link. I'm leacing it here for now because We may need to doublecheck it after we've ejected to a standalone app.
+    // first param is an empty string to allow Expo to dynamically determine path to app based on runtime environment
+    /* const deepLink = Linking.createURL("", { queryParams: { puzzle: publicKey } })
     shareMessage(deepLink)
+    */
+
+    const publicURL = `https://pixstery-7c9b9.web.app/${publicKey}`
+    shareMessage(publicURL);
   };
 
   return (
