@@ -4,12 +4,8 @@ import { Svg, Image, Defs, ClipPath, Path, Rect } from "react-native-svg";
 import * as ImageManipulator from "expo-image-manipulator";
 import { SNAP_MARGIN } from "../constants";
 import { GridSections } from "../types";
-import { getRandomInRange } from '../util'
-import { View, useWindowDimensions } from "react-native";
 
 // to do -
-// outline of grid
-// jigsaw
 // randomizer with even / odd indices?
 // z index of piece moving
 // add snap sound
@@ -70,19 +66,16 @@ export default ({
   
   const { puzzleAreaWidth, puzzleAreaHeight } = puzzleAreaDimensions;
   // console.log('puzzleAreaheight',puzzleAreaHeight)  
-  const minSandboxY = boardSize * 1.1;
-  const maxSandboxY = puzzleAreaHeight * 0.95 - squareSize;
+  const minSandboxY = boardSize * 1.05;
+  const maxSandboxY = puzzleAreaHeight - squareSize;
 
   if (puzzleType === "squares") {
     //for square puzzles, everything is aligned to grid
     widthY = widthX = squareSize;
-    // initX = getRandomInRange(0, sandBoxWidth) / gridSize * (ix % gridSize + 1);
-    // initY = Math.floor(ix / gridSize) * squareSize;
-    initX = Math.max((ix % gridSize) * squareSize - squareSize * 0.5, 0);
-    // start here - need a way for Y to spread out inside sandbox
-    // initY = Math.min(minSandboxY + getRandomInRange(0, sandBoxHeight) * (ix % gridSize), 600);
-    initY = Math.min(minSandboxY + Math.floor(ix / gridSize) * squareSize * ((maxSandboxY - minSandboxY) / puzzleAreaHeight) - squareSize * 0.25, maxSandboxY);
-
+    const randomFactor = ix % 2 ? squareSize * 0.1 : 0
+    const scaleSquaresToSandbox = ((maxSandboxY - minSandboxY) / minSandboxY)
+    initX = (ix % gridSize) * squareSize - randomFactor;
+    initY = minSandboxY + Math.floor(ix / gridSize) * squareSize * scaleSquaresToSandbox + randomFactor;
     // console.log('sandboxheight', sandBoxHeight, 'sandboxwidth', sandBoxWidth, 'min', minSandboxY, 'max', maxSandboxY, 'inity', initY, 'initx', initX)
     solutionX = (num % gridSize) * squareSize;
     solutionY = Math.floor(num / gridSize) * squareSize;
@@ -98,11 +91,14 @@ export default ({
       squareX === 0 || squareX === gridSize - 1
         ? squareSize * 1.25
         : squareSize * 1.5;
+    const scaleJigsawToSandbox = ((maxSandboxY  - squareSize * 0.25 - minSandboxY) / minSandboxY)
     initX = Math.max(0, (ix % gridSize) * squareSize - squareSize * 0.25);
-    initY = Math.max(
-      0,
-      Math.floor(ix / gridSize) * squareSize - squareSize * 0.25
-    );
+    initY = 
+      minSandboxY + 
+      Math.max(
+        0,
+        Math.floor(ix / gridSize) * squareSize - squareSize * 0.25
+      ) * scaleJigsawToSandbox
     solutionX = Math.max(0, (num % gridSize) * squareSize - squareSize * 0.25);
     solutionY = Math.max(
       0,
@@ -122,8 +118,10 @@ export default ({
   const [currentXY, setXY] = useState({
     x: initX,
     y: initY,
-    _x: initX,
-    _y: initY,
+    _x: initX, // to track cumulative X distance traveled from original position
+    _y: initY,  // to track cumulative Y distance traveled from original position
+    snapAdjusted_x: initX,
+    snapAdjusted_y: initY,
   });
   // console.log('before x', currentXY.x, 'y', currentXY.y)
 
@@ -160,6 +158,7 @@ export default ({
   const changePosition = (gestureState: { dx: number; dy: number }): void => {
     // start here - does new snap ix reset?
     console.log('num',num, 'previx', prevIx, 'newsnapix', newSnappedIx, 'board before', currentBoard)
+    console.log(squareSize, gridSections)
     setErrorMessage("");
     //update the relative _x and _y but leave x and y the same unless snapping
     const newXY = {
@@ -167,8 +166,16 @@ export default ({
       y: currentXY.y,
       _x: currentXY._x + gestureState.dx,
       _y: currentXY._y + gestureState.dy,
+      // snapAdjusted_x: currentXY.snapAdjusted_x + gestureState.dx,
+      // snapAdjusted_y: currentXY.snapAdjusted_y + gestureState.dy
     };
     const originIx = newSnappedIx;
+    console.log('currenty', newXY.y, 'currentx', newXY.x)
+    console.log('current_y', currentXY._y, 'current_x', currentXY._x)
+    console.log('dy', gestureState.dy, 'dx', gestureState.dx)
+    console.log('absY', newXY._y, 'absX', newXY._x)
+
+
     //if _x and _y are within a margin of a point on the grid, then snap!
     let snappedX: number | undefined; // top left X position of snap grid
     let snappedY: number | undefined; // top left Y position of snap grid
@@ -178,6 +185,7 @@ export default ({
     for (let i = 0; i < rowDividers.length; i++) {
       const rowDivider = rowDividers[i];
       if (Math.abs(newXY._y - rowDivider) < squareSize * SNAP_MARGIN) {
+        console.log('row margin from divider', newXY._y - rowDivider)
         snappedY = initY - newXY._y + rowDivider;
         snappedRow = i;
         break;
@@ -187,12 +195,14 @@ export default ({
     for (let i = 0; i < colDividers.length; i++) {
       const colDivider = colDividers[i];
       if (Math.abs(newXY._x - colDivider) < squareSize * SNAP_MARGIN) {
+        console.log('col margin from divider', newXY._x - colDivider)
         snappedX = initX - newXY._x + colDivider;
         snappedCol = i;
         break;
       }
     }
     let newIx: number | undefined;
+    console.log('snapedY', snappedY, 'snappedx', snappedX)
     // if both snappedX and snapped Y are defined, there was a snap i.e. the piece came within the grid snap margin
     if (snappedX !== undefined && snappedY !== undefined) {
       // putting ! after a variable is to tell TS that in this case, the variable will not be null or undefined
@@ -201,10 +211,13 @@ export default ({
         // console.log('snappedx', snappedX, 'snapy', snappedY)
         newXY.x = snappedX;
         newXY.y = snappedY;
+        // need to adjust accumulated distance if theres a snap?
+        // newXY.snapAdjusted_y += newXY._y - colDividers[snappedCol!] - (squareSize * SNAP_MARGIN - gestureState.dy)
+        // newXY.snapAdjusted_x += newXY._x - rowDividers[snappedRow!] - (squareSize * SNAP_MARGIN - gestureState.dx)
       }
       // but if the current board already has another piece in the new index, do not let user move piece there
       else {
-        // console.log('newix', newIx, 'prevIx', prevIx)
+        console.log('overlap at ',newIx)
         setErrorMessage(
           "There is a piece already in that spot. Please move that piece first!"
         );
@@ -214,6 +227,7 @@ export default ({
         // newXY.y = currentXY.y + currentXY._y - gestureState.dy;
       }
     }
+    console.log('newIx', newIx, 'newsnapix', newSnappedIx)
     if(newIx !== newSnappedIx) updateIx(newIx);
     setXY(newXY);
   };
