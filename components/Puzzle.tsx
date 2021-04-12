@@ -6,6 +6,7 @@ import Header from "./Header";
 import PuzzlePiece from "./PuzzlePiece";
 import { shuffle, generateJigsawPiecePaths } from "../util";
 import { Puzzle, GridSections } from "../types";
+// import { theme } from "../App";
 
 //disable shuffling for testing
 const disableShuffle = TESTING_MODE;
@@ -43,7 +44,6 @@ export default ({
         puzzleAreaHeight: ev.nativeEvent.layout.height
       })
     };
-
   // populates X Y coordinates for upper left corner of each grid section
   const getGridSections = (): GridSections => {
     // separated row and col in case needed for future flexibility
@@ -107,17 +107,15 @@ export default ({
     checkWin();
   }, [currentBoard]);
 
+  const styleProps = {
+    theme, boardSize
+  }
+
   // need to return dummy component to measure the puzzle area via onLayout
   if(!puzzleAreaDimensions.puzzleAreaHeight) return (
     <SafeAreaView
-    style={{
-      flex: 1,
-      flexDirection: "column",
-      padding: 10,
-      backgroundColor: theme.colors.background,
-      justifyContent: "flex-start",
-    }}
-  >
+      style={styles(styleProps).parentContainer}
+    >
     <Header
       theme={theme}
       notifications={
@@ -137,13 +135,7 @@ export default ({
   )
   return (
     <SafeAreaView
-      style={{
-        flex: 1,
-        flexDirection: "column",
-        padding: 10,
-        backgroundColor: theme.colors.background,
-        justifyContent: "flex-start",
-      }}
+      style={styles(styleProps).parentContainer}
     >
       <Header
         theme={theme}
@@ -159,15 +151,12 @@ export default ({
         }}
       >
         <View
-          style={{ // not in StyleSheet since we need the squaresize and gridsize. might be a way to pull into StyleSheet
-            width: squareSize * gridSize,
-            height: squareSize * gridSize,
-            borderWidth: 4,
-            borderColor: "white",
-            position: "absolute",
-            top: "0%"
-          }}
-        />
+          style={styles(styleProps).puzzleArea}
+        >
+          <View style={styles(styleProps).messageContainer}>
+            <Text style={styles(styleProps).startText}>Move pieces onto this board!</Text>
+          </View>
+        </View>
         {shuffledPieces.map((num: number, ix: number) => (
           <PuzzlePiece
             key={num}
@@ -188,18 +177,18 @@ export default ({
             puzzleAreaDimensions={puzzleAreaDimensions}
           />
         ))}
-        <View style={styles.messageContainer}>
-          <Text style={styles.winText}>{winMessage}</Text>
+        <View style={styles(styleProps).messageContainer}>
+          <Text style={styles(styleProps).winText}>{winMessage}</Text>
         </View>
-        <View style={styles.messageContainer}>
-          <Text style={styles.errorText}>{errorMessage}</Text>
+        <View style={styles(styleProps).messageContainer}>
+          <Text style={styles(styleProps).errorText}>{errorMessage}</Text>
         </View>
       </View>
     </SafeAreaView>
   );
 };
 
-const styles = StyleSheet.create({
+const styles = (props: any) => StyleSheet.create({
   messageContainer: {
     flexDirection: "row",
     zIndex: -1,
@@ -218,4 +207,27 @@ const styles = StyleSheet.create({
     flex: 1,
     color: "white",
   },
+  startText: {
+    fontSize: 20,
+    flexWrap: "wrap",
+    textAlign: "center",
+    flex: 1,
+    color: "white",
+  },
+  puzzleArea: { 
+    width: props.boardSize,
+    height: props.boardSize,
+    borderWidth: 4,
+    borderColor: "white",
+    position: "absolute",
+    top: "0%",
+    justifyContent: "center"
+  },
+  parentContainer: {
+    flex: 1,
+    flexDirection: "column",
+    padding: 10,
+    backgroundColor: props.theme.colors.background,
+    justifyContent: "flex-start",
+  }
 });

@@ -6,7 +6,6 @@ import { SNAP_MARGIN } from "../constants";
 import { GridSections } from "../types";
 
 // to do -
-// randomizer with even / odd indices?
 // z index of piece moving
 // add snap sound
 // change name of newsnappedix
@@ -72,6 +71,7 @@ export default ({
   if (puzzleType === "squares") {
     //for square puzzles, everything is aligned to grid
     widthY = widthX = squareSize;
+    // note Math.random() cannot be used here as it changes initial values at each render
     const randomFactor = ix % 2 ? squareSize * 0.1 : 0
     const scaleSquaresToSandbox = ((maxSandboxY - minSandboxY) / minSandboxY)
     initX = (ix % gridSize) * squareSize - randomFactor;
