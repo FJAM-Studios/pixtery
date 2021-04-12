@@ -6,7 +6,6 @@ import Header from "./Header";
 import PuzzlePiece from "./PuzzlePiece";
 import { shuffle, generateJigsawPiecePaths } from "../util";
 import { Puzzle, GridSections } from "../types";
-// import { theme } from "../App";
 
 //disable shuffling for testing
 const disableShuffle = TESTING_MODE;
@@ -26,9 +25,6 @@ export default ({
 }) => {
   const { imageURI, puzzleType, gridSize, message } = route.params;
   const squareSize = boardSize / gridSize;
-  const { width, height } = useWindowDimensions();
-  const sandBoxHeight = height * 0.95 - squareSize * gridSize;
-  const sandBoxWidth = width * 0.95;
   const image = { uri: imageURI };
   const [piecePaths, setPiecePaths] = useState(
     generateJigsawPiecePaths(gridSize, squareSize)
@@ -93,7 +89,6 @@ export default ({
   const [errorMessage, setErrorMessage] = useState<string>("");
 
   const checkWin = (): void => {
-    if (currentBoard[0] !== 0) return;
     for (let i = 0; i < currentBoard.length; i++) {
       if (currentBoard[i] !== i) return;
     }
@@ -172,8 +167,6 @@ export default ({
             currentBoard={currentBoard}
             setCurrentBoard={setCurrentBoard}
             setErrorMessage={setErrorMessage}
-            sandBoxHeight={sandBoxHeight}
-            sandBoxWidth={sandBoxWidth}
             puzzleAreaDimensions={puzzleAreaDimensions}
           />
         ))}
