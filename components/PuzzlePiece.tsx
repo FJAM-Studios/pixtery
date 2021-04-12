@@ -11,6 +11,7 @@ import { getInitialDimensions } from "../util";
 // add snap sound
 // see if i acgtually need prev IX - maybe i can update the current board and set snappedIx in one go
 // return full image when solved
+// grid msg disappears after first snap
 
 export default ({
   num,
@@ -25,7 +26,7 @@ export default ({
   currentBoard,
   setCurrentBoard,
   setErrorMessage,
-  puzzleAreaDimensions
+  puzzleAreaDimensions,
 }: {
   num: number;
   ix: number;
@@ -39,7 +40,7 @@ export default ({
   currentBoard: (number | null)[];
   setCurrentBoard: Function;
   setErrorMessage: Function;
-  puzzleAreaDimensions: { puzzleAreaWidth: number, puzzleAreaHeight: number }
+  puzzleAreaDimensions: { puzzleAreaWidth: number, puzzleAreaHeight: number };
 }) => {  
   const { puzzleAreaWidth, puzzleAreaHeight } = puzzleAreaDimensions;
   const minSandboxY = boardSize * 1.05;
@@ -75,10 +76,10 @@ export default ({
     y: initY,
     _x: initX, // to track cumulative X distance traveled from original position
     _y: initY,  // to track cumulative Y distance traveled from original position
+    // was exploring how to adjust cumulative position to snap below
     // snapAdjusted_x: initX,
     // snapAdjusted_y: initY,
   });
-  // console.log('before x', currentXY.x, 'y', currentXY.y)
 
   useEffect(() => {
     const manipulateImage = async () => {
@@ -151,6 +152,7 @@ export default ({
         // newXY.y = currentXY.y + currentXY._y - gestureState.dy;
       }
     }
+
     if(newIx !== currentSnappedIx) updateIx(newIx);
     setXY(newXY);
   };
@@ -195,7 +197,6 @@ export default ({
     // putting ! after a variable is to tell TS that in this case, the variable will not be null or undefined
     if (currentSnappedIx! >= 0) newBoard[currentSnappedIx!] = num;
     if (prevIx! >= 0 && prevIx !== currentSnappedIx) newBoard[prevIx!] = null;
-    console.log('board after', newBoard)
     setCurrentBoard(newBoard);
   };
 
