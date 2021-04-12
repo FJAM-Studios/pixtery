@@ -4,11 +4,11 @@ import { Svg, Image, Defs, ClipPath, Path, Rect } from "react-native-svg";
 import * as ImageManipulator from "expo-image-manipulator";
 import { SNAP_MARGIN } from "../constants";
 import { GridSections } from "../types";
+import { getInitialDimensions } from "../util";
 
 // to do -
 // z index of piece moving
 // add snap sound
-// change name of newsnappedix
 // see if i acgtually need prev IX - maybe i can update the current board and set snappedIx in one go
 // return full image when solved
 
@@ -25,8 +25,6 @@ export default ({
   currentBoard,
   setCurrentBoard,
   setErrorMessage,
-  sandBoxHeight,
-  sandBoxWidth,
   puzzleAreaDimensions
 }: {
   num: number;
@@ -41,76 +39,33 @@ export default ({
   currentBoard: (number | null)[];
   setCurrentBoard: Function;
   setErrorMessage: Function;
-  sandBoxHeight: number;
-  sandBoxWidth: number;
   puzzleAreaDimensions: any // change later
-}) => {
+}) => {  
+  const { puzzleAreaWidth, puzzleAreaHeight } = puzzleAreaDimensions;
+  const minSandboxY = boardSize * 1.05;
+  const maxSandboxY = puzzleAreaHeight - squareSize;
+  
   //squareX and squareY represent the row and col of the square in the solved puzzle
-  const squareX = num % gridSize;
-  const squareY = Math.floor(num / gridSize);
-
   //widthX and widthY are the size of the pieces (larger for jigsaw);
   //initX and initY are starting position for pieces (not aligned w grid for jigsaw)
   //viewBoxX and viewBoxY are 'panned' for selecting correct portion of image for piece
   //solutionX and solutionY are the top left coords for where the piece belongs in solution
-
-  let widthY: number,
-    widthX: number,
-    initX: number,
-    initY: number,
-    viewBoxX: number,
-    viewBoxY: number,
-    solutionX: number,
-    solutionY: number
-  
-  const { puzzleAreaWidth, puzzleAreaHeight } = puzzleAreaDimensions;
-  // console.log('puzzleAreaheight',puzzleAreaHeight)  
-  const minSandboxY = boardSize * 1.05;
-  const maxSandboxY = puzzleAreaHeight - squareSize;
-
-  if (puzzleType === "squares") {
-    //for square puzzles, everything is aligned to grid
-    widthY = widthX = squareSize;
-    // note Math.random() cannot be used here as it changes initial values at each render
-    const randomFactor = ix % 2 ? squareSize * 0.1 : 0
-    const scaleSquaresToSandbox = ((maxSandboxY - minSandboxY) / minSandboxY)
-    initX = (ix % gridSize) * squareSize - randomFactor;
-    initY = minSandboxY + Math.floor(ix / gridSize) * squareSize * scaleSquaresToSandbox + randomFactor;
-    // console.log('sandboxheight', sandBoxHeight, 'sandboxwidth', sandBoxWidth, 'min', minSandboxY, 'max', maxSandboxY, 'inity', initY, 'initx', initX)
-    solutionX = (num % gridSize) * squareSize;
-    solutionY = Math.floor(num / gridSize) * squareSize;
-    viewBoxX = squareX * squareSize;
-    viewBoxY = squareY * squareSize;
-  } else {
-    //for jigsaw puzzles, some pieces must be offset or larger viewbox to account for jigsaw "tabs"
-    widthY =
-      squareY === 0 || squareY === gridSize - 1
-        ? squareSize * 1.25
-        : squareSize * 1.5;
-    widthX =
-      squareX === 0 || squareX === gridSize - 1
-        ? squareSize * 1.25
-        : squareSize * 1.5;
-    const scaleJigsawToSandbox = ((maxSandboxY  - squareSize * 0.25 - minSandboxY) / minSandboxY)
-    initX = Math.max(0, (ix % gridSize) * squareSize - squareSize * 0.25);
-    initY = 
-      minSandboxY + 
-      Math.max(
-        0,
-        Math.floor(ix / gridSize) * squareSize - squareSize * 0.25
-      ) * scaleJigsawToSandbox
-    solutionX = Math.max(0, (num % gridSize) * squareSize - squareSize * 0.25);
-    solutionY = Math.max(
-      0,
-      Math.floor(num / gridSize) * squareSize - squareSize * 0.25
-    );
-    viewBoxX = Math.max(0, squareX * squareSize - squareSize * 0.25);
-    viewBoxY = Math.max(0, squareY * squareSize - squareSize * 0.25);
-  }
+  const [
+    squareX,
+    squareY,
+    widthY,
+    widthX,
+    initX,
+    initY,
+    viewBoxX,
+    viewBoxY,
+    solutionX,
+    solutionY
+  ] = getInitialDimensions(puzzleType, minSandboxY, maxSandboxY, num, ix, gridSize, squareSize)
 
   const [ready, setReady] = useState<boolean>(false);
   const [croppedImage, setCroppedImage] = useState(image);
-  const [newSnappedIx, setNewSnappedIx] = useState<number | undefined | null>(-1);
+  const [currentSnappedIx, setCurrentSnappedIx] = useState<number | undefined | null>(-1);
   // previous index is needed to know where the piece moved from, to update to null on current board
   const [prevIx, setPrevIx] = useState<number | undefined | null>(null);
 
@@ -120,8 +75,8 @@ export default ({
     y: initY,
     _x: initX, // to track cumulative X distance traveled from original position
     _y: initY,  // to track cumulative Y distance traveled from original position
-    snapAdjusted_x: initX,
-    snapAdjusted_y: initY,
+    // snapAdjusted_x: initX,
+    // snapAdjusted_y: initY,
   });
   // console.log('before x', currentXY.x, 'y', currentXY.y)
 
@@ -156,8 +111,7 @@ export default ({
   }, []);
 
   const changePosition = (gestureState: { dx: number; dy: number }): void => {
-    // start here - does new snap ix reset?
-    console.log('num',num, 'previx', prevIx, 'newsnapix', newSnappedIx, 'board before', currentBoard)
+    console.log('num',num, 'previx', prevIx, 'newsnapix', currentSnappedIx, 'board before', currentBoard)
     console.log(squareSize, gridSections)
     setErrorMessage("");
     //update the relative _x and _y but leave x and y the same unless snapping
@@ -169,12 +123,10 @@ export default ({
       // snapAdjusted_x: currentXY.snapAdjusted_x + gestureState.dx,
       // snapAdjusted_y: currentXY.snapAdjusted_y + gestureState.dy
     };
-    const originIx = newSnappedIx;
     console.log('currenty', newXY.y, 'currentx', newXY.x)
     console.log('current_y', currentXY._y, 'current_x', currentXY._x)
     console.log('dy', gestureState.dy, 'dx', gestureState.dx)
     console.log('absY', newXY._y, 'absX', newXY._x)
-
 
     //if _x and _y are within a margin of a point on the grid, then snap!
     let snappedX: number | undefined; // top left X position of snap grid
@@ -207,7 +159,7 @@ export default ({
     if (snappedX !== undefined && snappedY !== undefined) {
       // putting ! after a variable is to tell TS that in this case, the variable will not be null or undefined
       newIx = snappedRow! * gridSize + snappedCol!;
-      if (currentBoard[newIx] === null || newIx === newSnappedIx) {
+      if (currentBoard[newIx] === null || newIx === currentSnappedIx) {
         // console.log('snappedx', snappedX, 'snapy', snappedY)
         newXY.x = snappedX;
         newXY.y = snappedY;
@@ -227,31 +179,31 @@ export default ({
         // newXY.y = currentXY.y + currentXY._y - gestureState.dy;
       }
     }
-    console.log('newIx', newIx, 'newsnapix', newSnappedIx)
-    if(newIx !== newSnappedIx) updateIx(newIx);
+    console.log('newIx', newIx, 'newsnapix', currentSnappedIx)
+    if(newIx !== currentSnappedIx) updateIx(newIx);
     setXY(newXY);
   };
 
   // preserve previous Ix, and set the new Ix that it will snap to
   const updateIx = (newIx: number | undefined): void => {
-    // if newSpannedIx has been already set once before, save that index as the previous index
-    if (newSnappedIx !== -1) setPrevIx(newSnappedIx);
-    setNewSnappedIx(newIx);
+    // if currentSnappedIx has been already set once before, save that index as the previous index
+    if (currentSnappedIx !== -1) setPrevIx(currentSnappedIx);
+    setCurrentSnappedIx(newIx);
   };
 
   const updateCurrentBoard = (): void => {
     let newBoard = [...currentBoard];
     // putting ! after a variable is to tell TS that in this case, the variable will not be null or undefined
-    if (newSnappedIx! >= 0) newBoard[newSnappedIx!] = num;
-    if (prevIx! >= 0 && prevIx !== newSnappedIx) newBoard[prevIx!] = null;
+    if (currentSnappedIx! >= 0) newBoard[currentSnappedIx!] = num;
+    if (prevIx! >= 0 && prevIx !== currentSnappedIx) newBoard[prevIx!] = null;
     console.log('board after', newBoard)
     setCurrentBoard(newBoard);
   };
 
   useEffect(() => {
-    // if the piece has been mounted already (i.e. newSnappedIx is not -1), update current board after currentXY changes
-    if (newSnappedIx !== -1) updateCurrentBoard();
-  }, [newSnappedIx]);
+    // if the piece has been mounted already (i.e. currentSnappedIx is not -1), update current board after currentXY changes
+    if (currentSnappedIx !== -1) updateCurrentBoard();
+  }, [currentSnappedIx]);
 
   if (!ready) return null;
 
