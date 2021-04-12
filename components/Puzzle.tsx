@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Text, View, StyleSheet, useWindowDimensions } from "react-native";
+import { Text, View, StyleSheet, Image } from "react-native";
 import { TESTING_MODE } from "../constants";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Header from "./Header";
@@ -32,7 +32,8 @@ export default ({
   const [puzzleAreaDimensions, setPuzzleAreaDimensions] = useState({
     puzzleAreaWidth: 0,
     puzzleAreaHeight: 0
-  })
+  });
+
   const measurePuzzleArea = (ev: any): void => {
     if(puzzleAreaDimensions.puzzleAreaHeight) return;
     setPuzzleAreaDimensions({ 
@@ -98,8 +99,16 @@ export default ({
     setWinMessage(winMessage);
   };
 
+  const [firstSnap, setFirstSnap] = useState(false)
+  const checkFirstSnap = (): void => {
+    for (let i = 0; i < currentBoard.length; i++) {
+      if (currentBoard[i] !== null) setFirstSnap(true);
+    }
+  }
+
   useEffect(() => {
     checkWin();
+    if(!firstSnap) checkFirstSnap();
   }, [currentBoard]);
 
   const styleProps = {
@@ -149,10 +158,13 @@ export default ({
           style={styles(styleProps).puzzleArea}
         >
           <View style={styles(styleProps).messageContainer}>
-            <Text style={styles(styleProps).startText}>Move pieces onto this board!</Text>
+            { !firstSnap ? 
+              <Text style={styles(styleProps).startText}>Move pieces onto this board!</Text>
+              : null }
           </View>
         </View>
-        {shuffledPieces.map((num: number, ix: number) => (
+        {!winMessage ? 
+        shuffledPieces.map((num: number, ix: number) => (
           <PuzzlePiece
             key={num}
             num={num}
@@ -169,7 +181,13 @@ export default ({
             setErrorMessage={setErrorMessage}
             puzzleAreaDimensions={puzzleAreaDimensions}
           />
-        ))}
+        )) 
+        : <Image 
+            source={{uri: imageURI}}
+            style={{width: boardSize, height: boardSize, position: "absolute",
+            top: "0%"}}
+            />
+        }
         <View style={styles(styleProps).messageContainer}>
           <Text style={styles(styleProps).winText}>{winMessage}</Text>
         </View>
