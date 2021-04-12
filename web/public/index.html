@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Pixtery</title>
+  </head>
+  <body>
+    <h1>Pixtery</h1>
+    <h2>Webapp coming soon!</h2>
+    <button id="appRedirect" onclick="redirect()">Open Puzzle in App</button>
+    <script>
+      let key = window.location.pathname
+      key = key.slice(1);
+
+      const redirect = () =>
+      {
+        if(key.length<1){
+          alert("No puzzle provided. Make sure to use the link sent to you!")
+        }
+        else{
+        const linkToApp = `exp://192.168.1.12:19000?puzzle=${key}`
+        window.location.replace(linkToApp);
+        console.log(key)
+        }
+      }
+    </script>
+  </body>
+</html>
