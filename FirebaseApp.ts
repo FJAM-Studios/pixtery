@@ -1,5 +1,4 @@
-import * as firebase from "firebase";
-import "firebase/storage" // for testing purposes
+import firebase from "firebase";
 
 const firebaseConfig = {
   apiKey: "***REMOVED***",
@@ -21,5 +20,11 @@ const initializeApp = (): any => {
 const app = initializeApp();
 const db = app.firestore();
 const storage = app.storage();
+const phoneProvider = new firebase.auth.PhoneAuthProvider();
+const verifySms = (id: string, code: string) => {
+  const credential = firebase.auth.PhoneAuthProvider.credential(id, code);
+  const signInResponse = firebase.auth().signInWithCredential(credential);
+  return signInResponse;
+};
 
-export { app, db, storage };
+export { app, db, storage, phoneProvider, firebaseConfig, verifySms };

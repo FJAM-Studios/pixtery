@@ -6,13 +6,6 @@ import { SNAP_MARGIN } from "../constants";
 import { GridSections } from "../types";
 import { getInitialDimensions } from "../util";
 
-// to do -
-// z index of piece moving
-// add snap sound
-// see if i acgtually need prev IX - maybe i can update the current board and set snappedIx in one go
-// return full image when solved
-// grid msg disappears after first snap
-
 export default ({
   num,
   ix,

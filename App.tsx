@@ -1,4 +1,4 @@
-import { db, storage } from './FirebaseApp';
+import { db, storage } from "./FirebaseApp";
 import React, { useEffect, useState } from "react";
 import { View, useWindowDimensions } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
@@ -39,8 +39,6 @@ export const theme = {
 const Stack = createStackNavigator();
 
 const App = () => {
-
-
   const [receivedPuzzles, setReceivedPuzzles] = useState<PuzzleType[]>([]);
   const [profile, setProfile] = useState<ProfileType | null>(null);
 
@@ -49,70 +47,71 @@ const App = () => {
 
   //required to download puzzle if sms opens the open
   useEffect(() => {
-    Linking.getInitialURL().then(url => {
-      console.log("resolved URL", url)
+    Linking.getInitialURL().then((url) => {
+      console.log("resolved URL", url);
       if (url) {
-        checkPuzzle(url)
+        checkPuzzle(url);
       }
-    })
+    });
+  }, []);
 
-  }, [])
-
-//required to download the puzzle if app is in background but it combines with the useeffect to cause downstream functions to fire multiple times
-  Linking.addEventListener('url', ev => {
-    console.log("url event", ev)
-    checkPuzzle(ev.url)
-  })
+  //required to download the puzzle if app is in background but it combines with the useeffect to cause downstream functions to fire multiple times
+  Linking.addEventListener("url", (ev) => {
+    console.log("url event", ev);
+    checkPuzzle(ev.url);
+  });
 
   const checkPuzzle = async (url: string): Promise<void> => {
-    const { puzzle } = Linking.parse(url).queryParams
+    const { puzzle }: any = Linking.parse(url).queryParams;
 
     // download puzzle if link opens app, if not already downloaded
     if (puzzle) {
-      for(let idx = 0; idx<receivedPuzzles.length; idx++){
-        if(puzzle === receivedPuzzles[idx].publicKey) {
+      for (let idx = 0; idx < receivedPuzzles.length; idx++) {
+        if (puzzle === receivedPuzzles[idx].publicKey) {
           //@todo: redirect user to existing puzzle
           return;
         }
       }
-      fetchPuzzle(puzzle)
+      fetchPuzzle(puzzle);
     }
-  }
+  };
 
   const fetchPuzzle = async (publicKey: string): Promise<void> => {
-    console.log("fetching puzzle")
+    console.log("fetching puzzle");
 
     //get the puzzle data, which includes the cloud storage reference to the image
     const puzzleData: PuzzleType | void = await queryPuzzle(publicKey);
     if (puzzleData) {
-
       requestImage(puzzleData); //accepts the entire puzzle object, so that the imageURI property can be overwritten with the full image data
-      setReceivedPuzzles([...receivedPuzzles,puzzleData]);
+      setReceivedPuzzles([...receivedPuzzles, puzzleData]);
 
       //@todo: redirect user to just downloaded puzzle
-
     }
-  }
+  };
 
   const requestImage = (puzzle: PuzzleType): void => {
-
-    const imageRef = storage.ref('/' + puzzle.imageURI);
+    const imageRef = storage.ref("/" + puzzle.imageURI);
     imageRef
       .getDownloadURL()
       .then((url: string) => {
-
         //reassigns imageURI to the actual image file, instead of just the filename
-        puzzle.imageURI = url
+        puzzle.imageURI = url;
       })
-      .catch((e: unknown) => console.log('getting downloadURL of image error => ', e));
-  }
+      .catch((e: unknown) =>
+        console.log("getting downloadURL of image error => ", e)
+      );
+  };
 
-  const queryPuzzle = async (publicKey: string): Promise<PuzzleType> | Promise<void> => {
-    console.log("query puzzle")
-    const snapshot = await db.collection("puzzles").where("publicKey", "==", publicKey).get();
+  const queryPuzzle = async (publicKey: string): Promise<PuzzleType | void> => {
+    console.log("query puzzle");
+    const snapshot = await db
+      .collection("puzzles")
+      .where("publicKey", "==", publicKey)
+      .get();
     if (snapshot.empty) {
-      console.log("no puzzle found!")
+      console.log("no puzzle found!");
     } else {
+      //does this do anything? puzzleData is overwritten immediately below
       let puzzleData: PuzzleType = {
         puzzleType: "",
         gridSize: 0,
@@ -121,18 +120,17 @@ const App = () => {
         imageURI: "",
         message: null,
         dateReceived: "",
-        completed: false
-      }
+        completed: false,
+      };
       //NOTE: there SHOULD only be one puzzle but it's in an object that has to iterated through to access the data
-      snapshot.forEach( (puzzle: any) => {
-        puzzleData = puzzle.data()
-      })
-      console.log("retrieved puzzle data", puzzleData)
+      snapshot.forEach((puzzle: any) => {
+        puzzleData = puzzle.data();
+        puzzleData.completed = false;
+      });
+      console.log("retrieved puzzle data", puzzleData);
       return puzzleData;
     }
-
-
-  }
+  };
 
   return (
     <PaperProvider theme={theme}>
@@ -168,6 +166,7 @@ const App = () => {
                     boardSize={boardSize}
                     theme={theme}
                     receivedPuzzles={receivedPuzzles}
+                    profile={profile}
                   />
                 )}
               </Stack.Screen>
