@@ -1,13 +1,14 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as FileSystem from "expo-file-system";
 import * as React from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { View } from "react-native";
 import { Headline, ActivityIndicator } from "react-native-paper";
-import * as FileSystem from "expo-file-system";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { SafeAreaView } from "react-native-safe-area-context";
+
+import { Puzzle } from "../types";
 import Header from "./Header";
 import Logo from "./Logo";
 import Title from "./Title";
-import { Puzzle } from "../types";
 
 //this component will receive a puzzle object from component that opens link
 //for now, though, the puzzle object is passed directly from DevTest
@@ -91,11 +92,7 @@ export default ({
         <Logo width="100" height="100" />
         <Title width="100" height="35" />
         <Headline>Adding New Pixtery</Headline>
-        <ActivityIndicator
-          animating={true}
-          color={theme.colors.text}
-          size="large"
-        />
+        <ActivityIndicator animating color={theme.colors.text} size="large" />
       </View>
     );
   }

@@ -1,7 +1,8 @@
+import * as ImageManipulator from "expo-image-manipulator";
 import React, { useState, useEffect } from "react";
 import Draggable from "react-native-draggable";
 import { Svg, Image, Defs, ClipPath, Path, Rect } from "react-native-svg";
-import * as ImageManipulator from "expo-image-manipulator";
+
 import { SNAP_MARGIN } from "../constants";
 import { GridSections } from "../types";
 
@@ -191,7 +192,7 @@ export default ({
   };
 
   const updateCurrentBoard = (): void => {
-    let newBoard = [...currentBoard];
+    const newBoard = [...currentBoard];
     // putting ! after a variable is to tell TS that in this case, the variable will not be null or undefined
     if (newSnappedIx! >= 0) newBoard[newSnappedIx!] = num;
     if (prevIx! >= 0) newBoard[prevIx!] = null;

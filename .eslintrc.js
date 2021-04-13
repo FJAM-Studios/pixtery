@@ -8,7 +8,6 @@ module.exports = {
   },
   extends: [
     "universe/native",
-    "universe/shared/typescript-analysis",
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:react/recommended",

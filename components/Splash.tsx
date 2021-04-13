@@ -1,13 +1,12 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { CommonActions } from "@react-navigation/native";
 import React, { useEffect } from "react";
 import { View } from "react-native";
 import { ActivityIndicator } from "react-native-paper";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { CommonActions } from "@react-navigation/native";
-
-import Logo from "./Logo";
-import Title from "./Title";
 
 import { Puzzle as PuzzleType, Profile as ProfileType } from "../types";
+import Logo from "./Logo";
+import Title from "./Title";
 
 export default ({
   theme,
@@ -97,11 +96,7 @@ export default ({
     >
       <Logo width="100" height="100" />
       <Title width="100" height="35" />
-      <ActivityIndicator
-        animating={true}
-        color={theme.colors.text}
-        size="large"
-      />
+      <ActivityIndicator animating color={theme.colors.text} size="large" />
     </View>
   );
 };

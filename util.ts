@@ -1,5 +1,6 @@
-import { Piece } from "./types";
 import { Share } from "react-native";
+
+import { Piece } from "./types";
 
 export const shuffle = (array: number[], disabledShuffle = true): number[] => {
   if (disabledShuffle) return array;
@@ -8,7 +9,7 @@ export const shuffle = (array: number[], disabledShuffle = true): number[] => {
     randomIndex: number;
 
   // While there remain elements to shuffle...
-  while (0 !== currentIndex) {
+  while (currentIndex !== 0) {
     // Pick a remaining element...
     randomIndex = Math.floor(Math.random() * currentIndex);
     currentIndex -= 1;
@@ -27,7 +28,7 @@ export const shuffle = (array: number[], disabledShuffle = true): number[] => {
 export const generateJigsawPiecePaths = (
   gridSize: number,
   squareSize: number,
-  disableOffset: boolean = false
+  disableOffset = false
 ): string[] => {
   //create empty array for storing Pieces in order
   const pieces: Piece[] = new Array(gridSize * gridSize);
@@ -200,7 +201,7 @@ export const generateJigsawPiecePaths = (
     } `;
     //idk if this is good typescript
     const sides = ["top", "right", "bottom", "left"] as const;
-    for (let side of sides) {
+    for (const side of sides) {
       //if only two points, denote line
       str += piece[side].length === 2 ? "L " : "";
       str += piece[side]
@@ -263,7 +264,7 @@ export const generateSquarePiecePaths = (
     } `;
     //idk if this is good typescript
     const sides = ["top", "right", "bottom", "left"] as const;
-    for (let side of sides) {
+    for (const side of sides) {
       //if only two points, denote line
       str += piece[side].length === 2 ? "L " : "";
       str += piece[side]
