@@ -25,7 +25,9 @@ export default ({
   setProfile: (profile: ProfileType) => void;
   navigation: any;
 }) => {
-  const recaptchaVerifier = useRef<FirebaseRecaptcha.FirebaseRecaptchaVerifierModal>(null);
+  const recaptchaVerifier = useRef<FirebaseRecaptcha.FirebaseRecaptchaVerifierModal>(
+    null
+  );
   const [name, setName] = useState((profile && profile.name) || "");
   const [phone, setPhone] = useState((profile && profile.phone) || "");
   const [smsCode, setSmsCode] = useState("");
@@ -84,7 +86,11 @@ export default ({
         onPress={async () => {
           try {
             const formattedPhone = phoneFormat(phone)[0];
-            if (formattedPhone && recaptchaVerifier && recaptchaVerifier.current) {
+            if (
+              formattedPhone &&
+              recaptchaVerifier &&
+              recaptchaVerifier.current
+            ) {
               setPhone(formattedPhone);
               const id = await phoneProvider.verifyPhoneNumber(
                 formattedPhone,
