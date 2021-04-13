@@ -27,11 +27,12 @@
     "@react-navigation/native": "^5.9.3",
     "@react-navigation/stack": "^5.14.3",
     "expo": "~40.0.0",
+    "expo-file-system": "~9.3.0",
     "expo-image-manipulator": "~8.4.0",
     "expo-image-picker": "~9.2.0",
     "expo-linking": "^2.1.1",
     "expo-status-bar": "~1.0.3",
-    "firebase": "^8.3.1",
+    "firebase": "8.3.1",
     "moment": "^2.29.1",
     "react": "16.13.1",
     "react-dom": "16.13.1",
@@ -45,8 +46,7 @@
     "react-native-screens": "~2.15.2",
     "react-native-svg": "12.1.0",
     "react-native-web": "~0.13.12",
-    "uuid": "^3.3.2",
-    "expo-file-system": "~9.3.0"
+    "uuid": "^3.3.2"
   },
   "devDependencies": {
     "@babel/core": "^7.9.6",
