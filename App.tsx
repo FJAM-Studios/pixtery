@@ -1,5 +1,5 @@
 import { db, storage } from "./FirebaseApp";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { View, useWindowDimensions } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -41,51 +41,41 @@ const Stack = createStackNavigator();
 const App = () => {
   const [receivedPuzzles, setReceivedPuzzles] = useState<PuzzleType[]>([]);
   const [profile, setProfile] = useState<ProfileType | null>(null);
+  const [initialLoad, setInitialLoad] = useState(false);
+  const navigationRef = useRef();
 
   const { width, height } = useWindowDimensions();
   const boardSize = 0.95 * Math.min(height, width);
 
   //required to download puzzle if sms opens the open
   useEffect(() => {
-    Linking.getInitialURL().then((url) => {
-      console.log("resolved URL", url);
-      if (url) {
-        checkPuzzle(url);
-      }
+    let url;
+    const getInitialUrl = async () => {
+      url = await Linking.getInitialURL();
+      if (url && initialLoad) fetchPuzzle(url);
+    };
+    Linking.addEventListener("url", (ev) => {
+      url = ev.url;
+      if (url && initialLoad) fetchPuzzle(url);
     });
-  }, []);
+    if (!url) getInitialUrl();
+  }, [initialLoad]);
 
-  //required to download the puzzle if app is in background but it combines with the useeffect to cause downstream functions to fire multiple times
-  Linking.addEventListener("url", (ev) => {
-    console.log("url event", ev);
-    checkPuzzle(ev.url);
-  });
-
-  const checkPuzzle = async (url: string): Promise<void> => {
-    const { puzzle }: any = Linking.parse(url).queryParams;
-
-    // download puzzle if link opens app, if not already downloaded
-    if (puzzle) {
-      for (let idx = 0; idx < receivedPuzzles.length; idx++) {
-        if (puzzle === receivedPuzzles[idx].publicKey) {
-          //@todo: redirect user to existing puzzle
-          return;
-        }
+  const fetchPuzzle = async (url: string): Promise<void> => {
+    const { publicKey }: any = Linking.parse(url).queryParams;
+    if (publicKey) {
+      const matchingPuzzle = receivedPuzzles.filter(
+        (puz) => puz.publicKey === publicKey
+      );
+      if (matchingPuzzle) {
+        //navigate to that puzzle
+        navigationRef.current.navigate("Home");
+      } else {
+        //get the puzzle data, which includes the cloud storage reference to the image
+        const puzzleData: PuzzleType | void = await queryPuzzle(publicKey);
       }
-      fetchPuzzle(puzzle);
-    }
-  };
-
-  const fetchPuzzle = async (publicKey: string): Promise<void> => {
-    console.log("fetching puzzle");
-
-    //get the puzzle data, which includes the cloud storage reference to the image
-    const puzzleData: PuzzleType | void = await queryPuzzle(publicKey);
-    if (puzzleData) {
-      requestImage(puzzleData); //accepts the entire puzzle object, so that the imageURI property can be overwritten with the full image data
-      setReceivedPuzzles([...receivedPuzzles, puzzleData]);
-
-      //@todo: redirect user to just downloaded puzzle
+    } else {
+      //tell you there's no puzzle
     }
   };
 
@@ -111,7 +101,6 @@ const App = () => {
     if (snapshot.empty) {
       console.log("no puzzle found!");
     } else {
-      //does this do anything? puzzleData is overwritten immediately below
       let puzzleData: PuzzleType = {
         puzzleType: "",
         gridSize: 0,
@@ -135,7 +124,7 @@ const App = () => {
   return (
     <PaperProvider theme={theme}>
       <SafeAreaProvider>
-        <NavigationContainer>
+        <NavigationContainer ref={navigationRef}>
           <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
             <Stack.Navigator headerMode="none">
               <Stack.Screen name="Splash">
@@ -146,6 +135,8 @@ const App = () => {
                     setReceivedPuzzles={setReceivedPuzzles}
                     profile={profile}
                     setProfile={setProfile}
+                    initialLoad={initialLoad}
+                    setInitialLoad={setInitialLoad}
                   />
                 )}
               </Stack.Screen>
