@@ -17,6 +17,7 @@ import CreateProfile from "./components/CreateProfile";
 import Profile from "./components/Profile";
 
 import { Puzzle as PuzzleType, Profile as ProfileType } from "./types";
+import SentPuzzleList from "./components/SentPuzzleList";
 
 const image = require("./assets/earth.jpg");
 
@@ -40,6 +41,7 @@ const Stack = createStackNavigator();
 
 const App = () => {
   const [receivedPuzzles, setReceivedPuzzles] = useState<PuzzleType[]>([]);
+  const [sentPuzzles, setSentPuzzles] = useState<PuzzleType[]>([]);
   const [profile, setProfile] = useState<ProfileType | null>(null);
 
   const { width, height } = useWindowDimensions();
@@ -144,6 +146,7 @@ const App = () => {
                     {...props}
                     theme={theme}
                     setReceivedPuzzles={setReceivedPuzzles}
+                    setSentPuzzles={setSentPuzzles}
                     profile={profile}
                     setProfile={setProfile}
                   />
@@ -167,6 +170,8 @@ const App = () => {
                     theme={theme}
                     receivedPuzzles={receivedPuzzles}
                     profile={profile}
+                    sentPuzzles={sentPuzzles}
+                    setSentPuzzles={setSentPuzzles}
                   />
                 )}
               </Stack.Screen>
@@ -176,6 +181,17 @@ const App = () => {
                     {...props}
                     theme={theme}
                     receivedPuzzles={receivedPuzzles}
+                  />
+                )}
+              </Stack.Screen>
+              <Stack.Screen name="SentPuzzleList">
+                {(props) => (
+                  <SentPuzzleList
+                    {...props}
+                    theme={theme}
+                    receivedPuzzles={receivedPuzzles}
+                    sentPuzzles={sentPuzzles}
+                    setSentPuzzles={setSentPuzzles}
                   />
                 )}
               </Stack.Screen>
@@ -214,6 +230,8 @@ const App = () => {
                     profile={profile}
                     setProfile={setProfile}
                     receivedPuzzles={receivedPuzzles}
+                    setSentPuzzles={setSentPuzzles}
+                    sentPuzzles={sentPuzzles}
                     setReceivedPuzzles={setReceivedPuzzles}
                   />
                 )}
