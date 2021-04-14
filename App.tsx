@@ -1,7 +1,11 @@
 import { db, storage } from "./FirebaseApp";
-import React, { useEffect, useRef, useState } from "react";
+import React, { createRef, useEffect, useState } from "react";
 import { View, useWindowDimensions } from "react-native";
-import { NavigationContainer } from "@react-navigation/native";
+import {
+  CommonActions,
+  NavigationContainer,
+  NavigationContainerRef,
+} from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { Provider as PaperProvider, DefaultTheme } from "react-native-paper";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -42,7 +46,7 @@ const App = () => {
   const [receivedPuzzles, setReceivedPuzzles] = useState<PuzzleType[]>([]);
   const [profile, setProfile] = useState<ProfileType | null>(null);
   const [initialLoad, setInitialLoad] = useState(false);
-  const navigationRef = useRef();
+  const navigationRef = createRef<NavigationContainerRef>();
 
   const { width, height } = useWindowDimensions();
   const boardSize = 0.95 * Math.min(height, width);
@@ -59,37 +63,45 @@ const App = () => {
       if (url && initialLoad) fetchPuzzle(url);
     });
     if (!url) getInitialUrl();
-  }, [initialLoad]);
+  }, [initialLoad, navigationRef]);
 
   const fetchPuzzle = async (url: string): Promise<void> => {
+    console.log(url);
     const { publicKey }: any = Linking.parse(url).queryParams;
-    if (publicKey) {
+
+    // if the puzzle URL has a public key, find either the matching puzzle locally or online
+    if (publicKey && navigationRef.current) {
       const matchingPuzzle = receivedPuzzles.filter(
         (puz) => puz.publicKey === publicKey
       );
-      if (matchingPuzzle) {
-        //navigate to that puzzle
-        navigationRef.current.navigate("Home");
-      } else {
-        //get the puzzle data, which includes the cloud storage reference to the image
-        const puzzleData: PuzzleType | void = await queryPuzzle(publicKey);
-      }
-    } else {
-      //tell you there's no puzzle
-    }
-  };
 
-  const requestImage = (puzzle: PuzzleType): void => {
-    const imageRef = storage.ref("/" + puzzle.imageURI);
-    imageRef
-      .getDownloadURL()
-      .then((url: string) => {
-        //reassigns imageURI to the actual image file, instead of just the filename
-        puzzle.imageURI = url;
-      })
-      .catch((e: unknown) =>
-        console.log("getting downloadURL of image error => ", e)
-      );
+      //if there's a matching puzzle then
+      if (matchingPuzzle.length) {
+        //navigate to that puzzle
+        navigationRef.current.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: "Puzzle", params: { ...matchingPuzzle[0] } }],
+          })
+        );
+      } else {
+        //otherwise get the puzzle data, which includes the cloud storage reference to the image
+        const puzzleData = await queryPuzzle(publicKey);
+        //if you have the puzzle, go to the add puzzle component
+        if (puzzleData) {
+          navigationRef.current.dispatch(
+            CommonActions.reset({
+              index: 0,
+              routes: [{ name: "AddPuzzle", params: { ...puzzleData } }],
+            })
+          );
+        } else {
+          //tell you there's no puzzle bc it wasn't online or local
+          //@todo some error message in the UI
+          console.log("no puzzle found!");
+        }
+      }
+    }
   };
 
   const queryPuzzle = async (publicKey: string): Promise<PuzzleType | void> => {
@@ -116,7 +128,7 @@ const App = () => {
         puzzleData = puzzle.data();
         puzzleData.completed = false;
       });
-      console.log("retrieved puzzle data", puzzleData);
+      console.log("retrieved puzzle data");
       return puzzleData;
     }
   };
