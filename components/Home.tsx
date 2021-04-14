@@ -1,4 +1,5 @@
 import { db, storage } from "../FirebaseApp";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Image, View, Platform } from "react-native";
@@ -22,7 +23,7 @@ import {
   generateJigsawPiecePaths,
   generateSquarePiecePaths,
   createBlob,
-  shareMessage
+  shareMessage,
 } from "../util";
 import { Puzzle, Profile } from "../types";
 import uuid from "uuid";
@@ -36,12 +37,16 @@ export default ({
   theme,
   receivedPuzzles,
   profile,
+  sentPuzzles,
+  setSentPuzzles,
 }: {
   navigation: any;
   boardSize: number;
   theme: any;
   receivedPuzzles: Puzzle[];
   profile: Profile | null;
+  sentPuzzles: Puzzle[];
+  setSentPuzzles: (puzzles: Puzzle[]) => void;
 }) => {
   const [imageURI, setImageURI] = React.useState("");
   const [puzzleType, setPuzzleType] = React.useState("jigsaw");
@@ -105,13 +110,24 @@ export default ({
   const submitToServer = async (): Promise<void> => {
     setModalVisible(true);
     const fileName: string = uuid.v4();
-    await uploadImage(fileName);
-    const publicKey: string = await uploadPuzzleSettings(fileName);
-    setModalVisible(false)
-    generateLink(publicKey)
+    const localURI = await uploadImage(fileName);
+    const newPuzzle = await uploadPuzzleSettings(fileName);
+    newPuzzle.imageURI = localURI;
+    setModalVisible(false);
+    if (newPuzzle.publicKey) generateLink(newPuzzle.publicKey);
+    addToSent(newPuzzle);
   };
 
-  const uploadImage = async (fileName: string): Promise<void> => {
+  const addToSent = async (puzzle: Puzzle) => {
+    const allPuzzles = [...sentPuzzles, puzzle];
+    await AsyncStorage.setItem(
+      "@pixterySentPuzzles",
+      JSON.stringify(allPuzzles)
+    );
+    setSentPuzzles(allPuzzles);
+  };
+
+  const uploadImage = async (fileName: string): Promise<string> => {
     //resize and compress the image for upload
     const resizedCompressedImage = await ImageManipulator.manipulateAsync(
       imageURI,
@@ -125,33 +141,31 @@ export default ({
     const blob: Blob = await createBlob(resizedCompressedImage.uri);
     const ref = storage.ref().child(fileName);
     await ref.put(blob);
-    return;
+    return resizedCompressedImage.uri;
   };
 
-  const uploadPuzzleSettings = async (fileName: string): Promise<string> => {
+  const uploadPuzzleSettings = async (fileName: string): Promise<Puzzle> => {
     const publicKey: string = uuid.v4();
-    await db
-      .collection("puzzles")
-      .doc(fileName)
-      .set({
-        puzzleType: puzzleType,
-        gridSize: gridSize,
-        senderName: profile ? profile.name : "No Sender",
-        senderPhone: profile ? profile.phone : "No Sender",
-        imageURI: fileName,
-        publicKey: publicKey,
-        message: message,
-        dateReceived: new Date().toISOString(),
-      });
-
-
-    return publicKey;
+    const newPuzzle = {
+      puzzleType: puzzleType,
+      gridSize: gridSize,
+      senderName: profile ? profile.name : "No Sender",
+      senderPhone: profile ? profile.phone : "No Sender",
+      imageURI: fileName,
+      publicKey: publicKey,
+      message: message,
+      dateReceived: new Date().toISOString(),
+    };
+    await db.collection("puzzles").doc(fileName).set(newPuzzle);
+    return newPuzzle;
   };
 
   const generateLink = (publicKey: string): void => {
     //first param is an empty string to allow Expo to dynamically determine path to app based on runtime environment
-    const deepLink = Linking.createURL("", { queryParams: { puzzle: publicKey } })
-    shareMessage(deepLink)
+    const deepLink = Linking.createURL("", {
+      queryParams: { puzzle: publicKey },
+    });
+    shareMessage(deepLink);
   };
 
   return (
