@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Text, View, StyleSheet } from "react-native";
+import { Text, View, StyleSheet, Image } from "react-native";
 import { BANNER_ID, TESTING_MODE } from "../constants";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Header from "./Header";
@@ -10,7 +10,7 @@ import { AdMobBanner } from "expo-ads-admob";
 
 //disable shuffling for testing
 const disableShuffle = TESTING_MODE;
-// note: not working yet when grid changes; to confirm whether that is needed given that is info that is received
+
 export default ({
   boardSize,
   theme,
@@ -30,7 +30,18 @@ export default ({
   const [piecePaths, setPiecePaths] = useState(
     generateJigsawPiecePaths(gridSize, squareSize)
   );
+  const [puzzleAreaDimensions, setPuzzleAreaDimensions] = useState({
+    puzzleAreaWidth: 0,
+    puzzleAreaHeight: 0,
+  });
 
+  const measurePuzzleArea = (ev: any): void => {
+    if (puzzleAreaDimensions.puzzleAreaHeight) return;
+    setPuzzleAreaDimensions({
+      puzzleAreaWidth: ev.nativeEvent.layout.width,
+      puzzleAreaHeight: ev.nativeEvent.layout.height,
+    });
+  };
   // populates X Y coordinates for upper left corner of each grid section
   const getGridSections = (): GridSections => {
     // separated row and col in case needed for future flexibility
@@ -72,15 +83,14 @@ export default ({
     shuffle(fillArray(gridSize), disableShuffle)
   );
 
-  const [currentBoard, setCurrentBoard] = useState<(number | null)[]>([
-    ...shuffledPieces,
-  ]);
+  const [currentBoard, setCurrentBoard] = useState<(number | null)[]>(
+    Array(shuffledPieces.length).fill(null)
+  );
 
   const [winMessage, setWinMessage] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
 
   const checkWin = (): void => {
-    if (currentBoard[0] !== 0) return;
     for (let i = 0; i < currentBoard.length; i++) {
       if (currentBoard[i] !== i) return;
     }
@@ -91,20 +101,45 @@ export default ({
     setWinMessage(winMessage);
   };
 
+  const [firstSnap, setFirstSnap] = useState(false);
+  const checkFirstSnap = (): void => {
+    for (let i = 0; i < currentBoard.length; i++) {
+      if (currentBoard[i] !== null) setFirstSnap(true);
+    }
+  };
+
   useEffect(() => {
     checkWin();
+    if (!firstSnap) checkFirstSnap();
   }, [currentBoard]);
 
+  const styleProps = {
+    theme,
+    boardSize,
+  };
+
+  // need to return dummy component to measure the puzzle area via onLayout
+  if (!puzzleAreaDimensions.puzzleAreaHeight)
+    return (
+      <SafeAreaView style={styles(styleProps).parentContainer}>
+        <Header
+          theme={theme}
+          notifications={
+            receivedPuzzles.filter((puzzle) => !puzzle.completed).length
+          }
+          navigation={navigation}
+        />
+        <View
+          onLayout={(ev) => measurePuzzleArea(ev)}
+          style={{
+            flex: 1,
+            justifyContent: "flex-end",
+          }}
+        ></View>
+      </SafeAreaView>
+    );
   return (
-    <SafeAreaView
-      style={{
-        flex: 1,
-        flexDirection: "column",
-        padding: 10,
-        backgroundColor: theme.colors.background,
-        justifyContent: "flex-start",
-      }}
-    >
+    <SafeAreaView style={styles(styleProps).parentContainer}>
       <Header
         theme={theme}
         notifications={
@@ -118,28 +153,50 @@ export default ({
           justifyContent: "flex-end",
         }}
       >
-        {shuffledPieces.map((num: number, ix: number) => (
-          <PuzzlePiece
-            key={num}
-            num={num}
-            ix={ix}
-            gridSize={gridSize}
-            squareSize={squareSize}
-            puzzleType={puzzleType}
-            image={image}
-            piecePath={piecePaths[num]}
-            boardSize={boardSize}
-            gridSections={gridSections}
-            currentBoard={currentBoard}
-            setCurrentBoard={setCurrentBoard}
-            setErrorMessage={setErrorMessage}
-          />
-        ))}
-        <View style={styles.messageContainer}>
-          <Text style={styles.winText}>{winMessage}</Text>
+        <View style={styles(styleProps).puzzleArea}>
+          <View style={styles(styleProps).messageContainer}>
+            {!firstSnap ? (
+              <Text style={styles(styleProps).startText}>
+                Move pieces onto this board!
+              </Text>
+            ) : null}
+          </View>
         </View>
-        <View style={styles.messageContainer}>
-          <Text style={styles.errorText}>{errorMessage}</Text>
+        {!winMessage ? (
+          shuffledPieces.map((num: number, ix: number) => (
+            <PuzzlePiece
+              key={num}
+              num={num}
+              ix={ix}
+              gridSize={gridSize}
+              squareSize={squareSize}
+              puzzleType={puzzleType}
+              image={image}
+              piecePath={piecePaths[num]}
+              boardSize={boardSize}
+              gridSections={gridSections}
+              currentBoard={currentBoard}
+              setCurrentBoard={setCurrentBoard}
+              setErrorMessage={setErrorMessage}
+              puzzleAreaDimensions={puzzleAreaDimensions}
+            />
+          ))
+        ) : (
+          <Image
+            source={{ uri: imageURI }}
+            style={{
+              width: boardSize,
+              height: boardSize,
+              position: "absolute",
+              top: "0%",
+            }}
+          />
+        )}
+        <View style={styles(styleProps).messageContainer}>
+          <Text style={styles(styleProps).winText}>{winMessage}</Text>
+        </View>
+        <View style={styles(styleProps).messageContainer}>
+          <Text style={styles(styleProps).errorText}>{errorMessage}</Text>
         </View>
         <AdMobBanner bannerSize="smartBannerPortrait" adUnitID={BANNER_ID} />
       </View>
@@ -147,23 +204,47 @@ export default ({
   );
 };
 
-const styles = StyleSheet.create({
-  messageContainer: {
-    flexDirection: "row",
-    zIndex: -1,
-  },
-  errorText: {
-    fontSize: 20,
-    flexWrap: "wrap",
-    textAlign: "center",
-    flex: 1,
-    color: "orange",
-  },
-  winText: {
-    fontSize: 20,
-    flexWrap: "wrap",
-    textAlign: "center",
-    flex: 1,
-    color: "white",
-  },
-});
+const styles = (props: any) =>
+  StyleSheet.create({
+    messageContainer: {
+      flexDirection: "row",
+      zIndex: -1,
+    },
+    errorText: {
+      fontSize: 20,
+      flexWrap: "wrap",
+      textAlign: "center",
+      flex: 1,
+      color: "orange",
+    },
+    winText: {
+      fontSize: 20,
+      flexWrap: "wrap",
+      textAlign: "center",
+      flex: 1,
+      color: "white",
+    },
+    startText: {
+      fontSize: 20,
+      flexWrap: "wrap",
+      textAlign: "center",
+      flex: 1,
+      color: "white",
+    },
+    puzzleArea: {
+      width: props.boardSize,
+      height: props.boardSize,
+      borderWidth: 4,
+      borderColor: "white",
+      position: "absolute",
+      top: "0%",
+      justifyContent: "center",
+    },
+    parentContainer: {
+      flex: 1,
+      flexDirection: "column",
+      padding: 10,
+      backgroundColor: props.theme.colors.background,
+      justifyContent: "flex-start",
+    },
+  });

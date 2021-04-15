@@ -4,6 +4,7 @@ import { Svg, Image, Defs, ClipPath, Path, Rect } from "react-native-svg";
 import * as ImageManipulator from "expo-image-manipulator";
 import { SNAP_MARGIN } from "../constants";
 import { GridSections } from "../types";
+import { getInitialDimensions } from "../util";
 
 export default ({
   num,
@@ -18,6 +19,7 @@ export default ({
   currentBoard,
   setCurrentBoard,
   setErrorMessage,
+  puzzleAreaDimensions,
 }: {
   num: number;
   ix: number;
@@ -31,71 +33,45 @@ export default ({
   currentBoard: (number | null)[];
   setCurrentBoard: Function;
   setErrorMessage: Function;
-}) => {
+  puzzleAreaDimensions: { puzzleAreaWidth: number, puzzleAreaHeight: number };
+}) => {  
+  const { puzzleAreaWidth, puzzleAreaHeight } = puzzleAreaDimensions;
+  const minSandboxY = boardSize * 1.05;
+  const maxSandboxY = puzzleAreaHeight - squareSize;
+  
   //squareX and squareY represent the row and col of the square in the solved puzzle
-  const squareX = num % gridSize;
-  const squareY = Math.floor(num / gridSize);
-
   //widthX and widthY are the size of the pieces (larger for jigsaw);
   //initX and initY are starting position for pieces (not aligned w grid for jigsaw)
   //viewBoxX and viewBoxY are 'panned' for selecting correct portion of image for piece
   //solutionX and solutionY are the top left coords for where the piece belongs in solution
-
-  let widthY: number,
-    widthX: number,
-    initX: number,
-    initY: number,
-    viewBoxX: number,
-    viewBoxY: number,
-    solutionX: number,
-    solutionY: number;
-
-  if (puzzleType === "squares") {
-    //for square puzzles, everything is aligned to grid
-    widthY = widthX = squareSize;
-    initX = (ix % gridSize) * squareSize;
-    initY = Math.floor(ix / gridSize) * squareSize;
-    solutionX = (num % gridSize) * squareSize;
-    solutionY = Math.floor(num / gridSize) * squareSize;
-    viewBoxX = squareX * squareSize;
-    viewBoxY = squareY * squareSize;
-  } else {
-    //for jigsaw puzzles, some pieces must be offset or larger viewbox to account for jigsaw "tabs"
-    widthY =
-      squareY === 0 || squareY === gridSize - 1
-        ? squareSize * 1.25
-        : squareSize * 1.5;
-    widthX =
-      squareX === 0 || squareX === gridSize - 1
-        ? squareSize * 1.25
-        : squareSize * 1.5;
-    initX = Math.max(0, (ix % gridSize) * squareSize - squareSize * 0.25);
-    initY = Math.max(
-      0,
-      Math.floor(ix / gridSize) * squareSize - squareSize * 0.25
-    );
-    solutionX = Math.max(0, (num % gridSize) * squareSize - squareSize * 0.25);
-    solutionY = Math.max(
-      0,
-      Math.floor(num / gridSize) * squareSize - squareSize * 0.25
-    );
-    viewBoxX = Math.max(0, squareX * squareSize - squareSize * 0.25);
-    viewBoxY = Math.max(0, squareY * squareSize - squareSize * 0.25);
-  }
+  const [
+    squareX,
+    squareY,
+    widthY,
+    widthX,
+    initX,
+    initY,
+    viewBoxX,
+    viewBoxY,
+    solutionX,
+    solutionY
+  ] = getInitialDimensions(puzzleType, minSandboxY, maxSandboxY, num, ix, gridSize, squareSize)
 
   const [ready, setReady] = useState<boolean>(false);
   const [croppedImage, setCroppedImage] = useState(image);
-  const [newSnappedIx, setNewSnappedIx] = useState<number | undefined | null>(
-    -1
-  );
-  const [prevIx, setPrevIx] = useState<number | undefined | null>(ix);
+  const [currentSnappedIx, setCurrentSnappedIx] = useState<number | undefined | null>(-1);
+  // previous index is needed to know where the piece moved from, to update to null on current board
+  const [prevIx, setPrevIx] = useState<number | undefined | null>(null);
 
   //_x and _y are used to keep track of where image is relative to its start positon
   const [currentXY, setXY] = useState({
     x: initX,
     y: initY,
-    _x: initX,
-    _y: initY,
+    _x: initX, // to track cumulative X distance traveled from original position
+    _y: initY,  // to track cumulative Y distance traveled from original position
+    // was exploring how to adjust cumulative position to snap below
+    // snapAdjusted_x: initX,
+    // snapAdjusted_y: initY,
   });
 
   useEffect(() => {
@@ -136,13 +112,53 @@ export default ({
       y: currentXY.y,
       _x: currentXY._x + gestureState.dx,
       _y: currentXY._y + gestureState.dy,
+      // snapAdjusted_x: currentXY.snapAdjusted_x + gestureState.dx,
+      // snapAdjusted_y: currentXY.snapAdjusted_y + gestureState.dy
     };
-    //if _x and _y are within a margin of a point on the grid, then snap!
+
+    // snappedX: top left X position of snap grid
+    // snappedY: top left Y position of snap grid
+    // snappedRow: row index where it snaps
+    // snappedCol: col index where it snaps
+    const [snappedX, snappedY, snappedRow, snappedCol] = determineSnap(newXY)
+
+    let newIx: number | undefined;
+    // if both snappedX and snapped Y are defined, there was a snap i.e. the piece came within the grid snap margin
+    if (snappedX !== undefined && snappedY !== undefined) {
+      // putting ! after a variable is to tell TS that in this case, the variable will not be null or undefined
+      newIx = snappedRow! * gridSize + snappedCol!;
+      if (currentBoard[newIx] === null || newIx === currentSnappedIx) {
+        newXY.x = snappedX;
+        newXY.y = snappedY;
+        // need to adjust accumulated distance if theres a snap - leave for later
+        // newXY.snapAdjusted_y += newXY._y - colDividers[snappedCol!] - (squareSize * SNAP_MARGIN - gestureState.dy)
+        // newXY.snapAdjusted_x += newXY._x - rowDividers[snappedRow!] - (squareSize * SNAP_MARGIN - gestureState.dx)
+      }
+      // but if the current board already has another piece in the new index, do not let user move piece there
+      else {
+        setErrorMessage(
+          "There is a piece already in that spot. Please move that piece first!"
+        );
+        newIx = undefined;
+        // this is where overlap result would be defined. maybe send piece back to original location, or push other piece out
+        // newXY.x = currentXY.x + currentXY._x - gestureState.dx;
+        // newXY.y = currentXY.y + currentXY._y - gestureState.dy;
+      }
+    }
+
+    if(newIx !== currentSnappedIx) updateIx(newIx);
+    setXY(newXY);
+  };
+
+  const determineSnap = (newXY: {x: number, y: number, _x: number, _y: number}) => {
     let snappedX: number | undefined; // top left X position of snap grid
     let snappedY: number | undefined; // top left Y position of snap grid
-    let snappedRow: number | undefined; // row index of snap
-    let snappedCol: number | undefined; // col index of snap
+    let snappedRow: number | undefined; // row index where it snaps
+    let snappedCol: number | undefined; // col index where it snaps
     const rowDividers: number[] = gridSections.rowDividers;
+    const colDividers: number[] = gridSections.colDividers;
+
+    //if _x and _y are within a margin of a point on the grid, then snap!
     for (let i = 0; i < rowDividers.length; i++) {
       const rowDivider = rowDividers[i];
       if (Math.abs(newXY._y - rowDivider) < squareSize * SNAP_MARGIN) {
@@ -151,7 +167,6 @@ export default ({
         break;
       }
     }
-    const colDividers: number[] = gridSections.colDividers;
     for (let i = 0; i < colDividers.length; i++) {
       const colDivider = colDividers[i];
       if (Math.abs(newXY._x - colDivider) < squareSize * SNAP_MARGIN) {
@@ -160,48 +175,28 @@ export default ({
         break;
       }
     }
-    let newIx: number | undefined;
-    // if both snappedX and snapped Y are defined, there was a snap i.e. the piece came within the grid snap margin
-    if (snappedX !== undefined && snappedY !== undefined) {
-      // putting ! after a variable is to tell TS that in this case, the variable will not be null or undefined
-      newIx = snappedRow! * gridSize + snappedCol!;
-      if (currentBoard[newIx] === null) {
-        newXY.x = snappedX;
-        newXY.y = snappedY;
-      }
-      // but if the current board already has another piece in the new index, do not let user move piece there
-      else {
-        setErrorMessage(
-          "There is a piece already in that spot. Please move that piece first!"
-        );
-        newIx = undefined;
-        // need to check this - ideally would want to send piece back to original location
-        // newXY.x = currentXY.x + currentXY._x - gestureState.dx;
-        // newXY.y = currentXY.y + currentXY._y - gestureState.dy;
-      }
-    }
-    updateIx(newIx);
-    setXY(newXY);
-  };
+    return [snappedX, snappedY, snappedRow, snappedCol]
+  }
 
   // preserve previous Ix, and set the new Ix that it will snap to
   const updateIx = (newIx: number | undefined): void => {
-    if (newSnappedIx !== -1) setPrevIx(newSnappedIx);
-    setNewSnappedIx(newIx);
+    // if currentSnappedIx has been already set once before, save that index as the previous index
+    if (currentSnappedIx !== -1) setPrevIx(currentSnappedIx);
+    setCurrentSnappedIx(newIx);
   };
 
   const updateCurrentBoard = (): void => {
     let newBoard = [...currentBoard];
     // putting ! after a variable is to tell TS that in this case, the variable will not be null or undefined
-    if (newSnappedIx! >= 0) newBoard[newSnappedIx!] = num;
-    if (prevIx! >= 0) newBoard[prevIx!] = null;
+    if (currentSnappedIx! >= 0) newBoard[currentSnappedIx!] = num;
+    if (prevIx! >= 0 && prevIx !== currentSnappedIx) newBoard[prevIx!] = null;
     setCurrentBoard(newBoard);
   };
 
   useEffect(() => {
-    // if the piece has been mounted already (i.e. newSnappedIx is not -1), update current board after currentXY changes
-    if (newSnappedIx !== -1) updateCurrentBoard();
-  }, [currentXY]);
+    // if the piece has been mounted already (i.e. currentSnappedIx is not -1), update current board after currentXY changes
+    if (currentSnappedIx !== -1) updateCurrentBoard();
+  }, [currentSnappedIx]);
 
   if (!ready) return null;
 
