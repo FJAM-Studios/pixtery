@@ -130,7 +130,7 @@ export default ({
 
   const uploadPuzzleSettings = async (fileName: string): Promise<string> => {
     const publicKey: string = uuid.v4();
-    await db
+    await db //cloud function can hide this code collection bc its written on "server"
       .collection("puzzles")
       .doc(fileName)
       .set({
