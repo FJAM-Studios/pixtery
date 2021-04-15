@@ -162,9 +162,7 @@ export default ({
 
   const generateLink = (publicKey: string): void => {
     //first param is an empty string to allow Expo to dynamically determine path to app based on runtime environment
-    const deepLink = Linking.createURL("", {
-      queryParams: { puzzle: publicKey },
-    });
+    const deepLink = Linking.createURL("", { queryParams: { publicKey } });
     shareMessage(deepLink);
   };
 
