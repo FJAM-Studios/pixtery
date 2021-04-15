@@ -176,6 +176,7 @@ const App = () => {
                     {...props}
                     theme={theme}
                     receivedPuzzles={receivedPuzzles}
+                    setReceivedPuzzles={setReceivedPuzzles}
                   />
                 )}
               </Stack.Screen>
