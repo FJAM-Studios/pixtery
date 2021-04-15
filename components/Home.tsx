@@ -22,7 +22,7 @@ import {
   generateJigsawPiecePaths,
   generateSquarePiecePaths,
   createBlob,
-  shareMessage
+  shareMessage,
 } from "../util";
 import { Puzzle, Profile } from "../types";
 import uuid from "uuid";
@@ -107,8 +107,8 @@ export default ({
     const fileName: string = uuid.v4();
     await uploadImage(fileName);
     const publicKey: string = await uploadPuzzleSettings(fileName);
-    setModalVisible(false)
-    generateLink(publicKey)
+    setModalVisible(false);
+    generateLink(publicKey);
   };
 
   const uploadImage = async (fileName: string): Promise<void> => {
@@ -144,14 +144,13 @@ export default ({
         dateReceived: new Date().toISOString(),
       });
 
-
     return publicKey;
   };
 
   const generateLink = (publicKey: string): void => {
     //first param is an empty string to allow Expo to dynamically determine path to app based on runtime environment
-    const deepLink = Linking.createURL("", { queryParams: { puzzle: publicKey } })
-    shareMessage(deepLink)
+    const deepLink = Linking.createURL("", { queryParams: { publicKey } });
+    shareMessage(deepLink);
   };
 
   return (
