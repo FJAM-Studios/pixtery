@@ -36,7 +36,6 @@ export default ({
     puzzleAreaWidth: 0,
     puzzleAreaHeight: 0,
   });
-
   const measurePuzzleArea = (ev: any): void => {
     if (puzzleAreaDimensions.puzzleAreaHeight) return;
     setPuzzleAreaDimensions({
@@ -124,7 +123,10 @@ export default ({
   const markPuzzleComplete = async (key: string) => {
     const allPuzzles = [
       ...receivedPuzzles.map((puz) => {
-        return { ...puz, completed: key === publicKey ? true : puz.completed };
+        return {
+          ...puz,
+          completed: key === puz.publicKey ? true : puz.completed,
+        };
       }),
     ];
     await AsyncStorage.setItem("@pixteryPuzzles", JSON.stringify(allPuzzles));
