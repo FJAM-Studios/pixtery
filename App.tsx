@@ -92,7 +92,7 @@ const App = () => {
   const requestImage = (puzzle: PuzzleType): void => {
     const imageRef = storage.ref("/" + puzzle.imageURI);
     imageRef
-      .getDownloadURL()
+      .getDownloadURL() // look into whether there is a different way to get this, like raw image
       .then((url: string) => {
         //reassigns imageURI to the actual image file, instead of just the filename
         puzzle.imageURI = url;
@@ -104,7 +104,7 @@ const App = () => {
 
   const queryPuzzle = async (publicKey: string): Promise<PuzzleType | void> => {
     console.log("query puzzle");
-    const snapshot = await db
+    const snapshot = await db // cloud function
       .collection("puzzles")
       .where("publicKey", "==", publicKey)
       .get();
