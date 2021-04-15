@@ -301,6 +301,83 @@ export const createBlob = (localUri: string): Promise<Blob> => {
   });
 };
 
+export const getRandomInRange = (min: number, max: number): number => {
+  return Math.random() * (max - min) + min;
+};
+
+export const getInitialDimensions = (
+  puzzleType: string,
+  minSandboxY: number,
+  maxSandboxY: number,
+  num: number,
+  ix: number,
+  gridSize: number,
+  squareSize: number
+) => {
+  let widthY: number,
+    widthX: number,
+    initX: number,
+    initY: number,
+    viewBoxX: number,
+    viewBoxY: number,
+    solutionX: number,
+    solutionY: number;
+  const squareX = num % gridSize;
+  const squareY = Math.floor(num / gridSize);
+
+  if (puzzleType === "squares") {
+    //for square puzzles, everything is aligned to grid
+    widthY = widthX = squareSize;
+    // note Math.random() cannot be used here as it changes initial values at each render
+    const randomFactor = ix % 2 ? squareSize * 0.1 : 0;
+    const scaleSquaresToSandbox = (maxSandboxY - minSandboxY) / minSandboxY;
+    initX = (ix % gridSize) * squareSize - randomFactor;
+    initY =
+      minSandboxY +
+      Math.floor(ix / gridSize) * squareSize * scaleSquaresToSandbox +
+      randomFactor;
+    solutionX = (num % gridSize) * squareSize;
+    solutionY = Math.floor(num / gridSize) * squareSize;
+    viewBoxX = squareX * squareSize;
+    viewBoxY = squareY * squareSize;
+  } else {
+    //for jigsaw puzzles, some pieces must be offset or larger viewbox to account for jigsaw "tabs"
+    widthY =
+      squareY === 0 || squareY === gridSize - 1
+        ? squareSize * 1.25
+        : squareSize * 1.5;
+    widthX =
+      squareX === 0 || squareX === gridSize - 1
+        ? squareSize * 1.25
+        : squareSize * 1.5;
+    const scaleJigsawToSandbox =
+      (maxSandboxY - squareSize * 0.25 - minSandboxY) / minSandboxY;
+    initX = Math.max(0, (ix % gridSize) * squareSize - squareSize * 0.25);
+    initY =
+      minSandboxY +
+      Math.max(0, Math.floor(ix / gridSize) * squareSize - squareSize * 0.25) *
+        scaleJigsawToSandbox;
+    solutionX = Math.max(0, (num % gridSize) * squareSize - squareSize * 0.25);
+    solutionY = Math.max(
+      0,
+      Math.floor(num / gridSize) * squareSize - squareSize * 0.25
+    );
+    viewBoxX = Math.max(0, squareX * squareSize - squareSize * 0.25);
+    viewBoxY = Math.max(0, squareY * squareSize - squareSize * 0.25);
+  }
+  return [
+    squareX,
+    squareY,
+    widthY,
+    widthX,
+    initX,
+    initY,
+    viewBoxX,
+    viewBoxY,
+    solutionX,
+    solutionY,
+  ];
+};
 export const shareMessage = async (pixUrl: string): Promise<void> => {
   try {
     const content = {

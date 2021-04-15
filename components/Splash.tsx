@@ -16,6 +16,8 @@ export default ({
   profile,
   setProfile,
   navigation,
+  initialLoad,
+  setInitialLoad,
 }: {
   theme: any;
   setReceivedPuzzles: (puzzles: PuzzleType[]) => void;
@@ -23,6 +25,8 @@ export default ({
   profile: ProfileType | null;
   setProfile: (profile: ProfileType) => void;
   navigation: any;
+  initialLoad: boolean;
+  setInitialLoad: (initialLoad: boolean) => void;
 }) => {
   useEffect(() => {
     const loadProfile = async () => {
@@ -56,6 +60,7 @@ export default ({
       await loadPuzzles();
       //if you have a profile, navigate home
       if (profile) {
+        setInitialLoad(true);
         // navigation.navigate("Home");
         navigation.dispatch(
           CommonActions.reset({
