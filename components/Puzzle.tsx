@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Text, View, StyleSheet } from "react-native";
-import { TESTING_MODE } from "../constants";
+import { BANNER_ID, TESTING_MODE } from "../constants";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Header from "./Header";
 import PuzzlePiece from "./PuzzlePiece";
 import { shuffle, generateJigsawPiecePaths } from "../util";
 import { Puzzle, GridSections } from "../types";
+import { AdMobBanner } from "expo-ads-admob";
 
 //disable shuffling for testing
 const disableShuffle = TESTING_MODE;
@@ -83,9 +84,10 @@ export default ({
     for (let i = 0; i < currentBoard.length; i++) {
       if (currentBoard[i] !== i) return;
     }
-    const winMessage = message && message.length>0
-      ? message
-      : "Congrats! You solved the puzzle!";
+    const winMessage =
+      message && message.length > 0
+        ? message
+        : "Congrats! You solved the puzzle!";
     setWinMessage(winMessage);
   };
 
@@ -139,6 +141,7 @@ export default ({
         <View style={styles.messageContainer}>
           <Text style={styles.errorText}>{errorMessage}</Text>
         </View>
+        <AdMobBanner bannerSize="smartBannerPortrait" adUnitID={BANNER_ID} />
       </View>
     </SafeAreaView>
   );
