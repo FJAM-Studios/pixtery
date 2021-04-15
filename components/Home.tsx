@@ -22,13 +22,22 @@ import {
   generateJigsawPiecePaths,
   generateSquarePiecePaths,
   createBlob,
-  shareMessage
+  shareMessage,
 } from "../util";
 import { Puzzle, Profile } from "../types";
 import uuid from "uuid";
 import * as ImageManipulator from "expo-image-manipulator";
+import { AdMobInterstitial, AdMobBanner } from "expo-ads-admob";
 
-import { DEFAULT_IMAGE_SIZE, COMPRESSION } from "../constants";
+import {
+  DEFAULT_IMAGE_SIZE,
+  COMPRESSION,
+  BANNER_ID,
+  INTERSTITIAL_ID,
+  DISPLAY_PAINFUL_ADS,
+} from "../constants";
+
+AdMobInterstitial.setAdUnitID(INTERSTITIAL_ID);
 
 export default ({
   navigation,
@@ -104,11 +113,12 @@ export default ({
 
   const submitToServer = async (): Promise<void> => {
     setModalVisible(true);
+    await displayPainfulAd();
     const fileName: string = uuid.v4();
     await uploadImage(fileName);
     const publicKey: string = await uploadPuzzleSettings(fileName);
-    setModalVisible(false)
-    generateLink(publicKey)
+    generateLink(publicKey);
+    setModalVisible(false);
   };
 
   const uploadImage = async (fileName: string): Promise<void> => {
@@ -144,14 +154,22 @@ export default ({
         dateReceived: new Date().toISOString(),
       });
 
-
     return publicKey;
   };
 
   const generateLink = (publicKey: string): void => {
     //first param is an empty string to allow Expo to dynamically determine path to app based on runtime environment
-    const deepLink = Linking.createURL("", { queryParams: { puzzle: publicKey } })
-    shareMessage(deepLink)
+    const deepLink = Linking.createURL("", {
+      queryParams: { puzzle: publicKey },
+    });
+    shareMessage(deepLink);
+  };
+
+  const displayPainfulAd = async () => {
+    if (DISPLAY_PAINFUL_ADS) {
+      await AdMobInterstitial.requestAdAsync();
+      await AdMobInterstitial.showAdAsync();
+    }
   };
 
   return (
@@ -377,6 +395,7 @@ export default ({
       >
         Send
       </Button>
+      <AdMobBanner bannerSize="smartBannerPortrait" adUnitID={BANNER_ID} />
     </SafeAreaView>
   );
 };
