@@ -211,6 +211,7 @@ const App = () => {
                     boardSize={boardSize}
                     theme={theme}
                     receivedPuzzles={receivedPuzzles}
+                    sentPuzzles={sentPuzzles}
                   />
                 )}
               </Stack.Screen>

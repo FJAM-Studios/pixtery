@@ -15,7 +15,7 @@ export default ({
   puzzleType,
   boardSize,
   piecePath,
-  image,
+  imageURI,
   gridSections,
   currentBoard,
   setCurrentBoard,
@@ -29,7 +29,7 @@ export default ({
   puzzleType: string;
   boardSize: number;
   piecePath: string;
-  image: { uri: string };
+  imageURI: string;
   gridSections: GridSections;
   currentBoard: (number | null)[];
   setCurrentBoard: Function;
@@ -67,7 +67,7 @@ export default ({
   );
 
   const [ready, setReady] = useState<boolean>(false);
-  const [croppedImage, setCroppedImage] = useState(image);
+  const [croppedImage, setCroppedImage] = useState({ uri: imageURI });
   const [currentSnappedIx, setCurrentSnappedIx] = useState<
     number | undefined | null
   >(-1);
@@ -89,7 +89,7 @@ export default ({
     const manipulateImage = async () => {
       setReady(false);
       const croppedImage = await ImageManipulator.manipulateAsync(
-        image.uri,
+        imageURI,
         [
           {
             resize: {
@@ -111,9 +111,16 @@ export default ({
       setCroppedImage(croppedImage);
       setReady(true);
     };
-
     manipulateImage();
-  }, []);
+    setCurrentSnappedIx(-1);
+    setPrevIx(null);
+    setXY({
+      x: initX,
+      y: initY,
+      _x: initX,
+      _y: initY,
+    });
+  }, [imageURI]);
 
   const changePosition = (gestureState: { dx: number; dy: number }): void => {
     setErrorMessage("");
