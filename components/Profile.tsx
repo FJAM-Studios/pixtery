@@ -13,6 +13,8 @@ export default ({
   setProfile,
   navigation,
   receivedPuzzles,
+  sentPuzzles,
+  setSentPuzzles,
   setReceivedPuzzles,
 }: {
   theme: any;
@@ -20,7 +22,9 @@ export default ({
   setProfile: (profile: ProfileType | null) => void;
   navigation: any;
   receivedPuzzles: Puzzle[];
+  sentPuzzles: Puzzle[];
   setReceivedPuzzles: (puzzles: Puzzle[]) => void;
+  setSentPuzzles: (puzzles: Puzzle[]) => void;
 }) => {
   const [name, setName] = useState((profile && profile.name) || "");
   const [phone, setPhone] = useState((profile && profile.phone) || "");
@@ -105,7 +109,22 @@ export default ({
         }}
         style={{ margin: 10 }}
       >
-        Delete Local Puzzle Store
+        Delete Received Puzzles
+      </Button>
+      <Button
+        icon="delete"
+        mode="contained"
+        disabled={sentPuzzles.length === 0}
+        onPress={async () => {
+          //delete local storage
+          await AsyncStorage.removeItem("@pixterySentPuzzles");
+          //update app state
+          setSentPuzzles([]);
+          //send you to splash
+        }}
+        style={{ margin: 10 }}
+      >
+        Delete Sent Puzzles
       </Button>
     </SafeAreaView>
   );
