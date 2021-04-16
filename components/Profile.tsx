@@ -1,14 +1,12 @@
 import React, { useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { Headline, Text, TextInput, Button } from "react-native-paper";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { AdMobBanner } from "expo-ads-admob";
 
+import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 
 import { Profile as ProfileType, Puzzle } from "../types";
 import { View } from "react-native";
-import { BANNER_ID } from "../constants";
 
 export default ({
   theme,
@@ -29,7 +27,7 @@ export default ({
   const [phone, setPhone] = useState((profile && profile.phone) || "");
   const [errors, setErrors] = useState("");
   return (
-    <SafeAreaView
+    <AdSafeAreaView
       style={{
         flex: 1,
         flexDirection: "column",
@@ -110,7 +108,6 @@ export default ({
       >
         Delete Local Puzzle Store
       </Button>
-      <AdMobBanner bannerSize="smartBannerPortrait" adUnitID={BANNER_ID} />
-    </SafeAreaView>
+    </AdSafeAreaView>
   );
 };
