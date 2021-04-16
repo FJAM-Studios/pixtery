@@ -1,12 +1,11 @@
-import React, { useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { Headline, Text, TextInput, Button } from "react-native-paper";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
-import Header from "./Header";
+import React, { useState } from "react";
+import { View } from "react-native";
+import { Headline, Text, TextInput, Button } from "react-native-paper";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Profile as ProfileType, Puzzle } from "../types";
-import { View } from "react-native";
+import Header from "./Header";
 
 export default ({
   theme,
