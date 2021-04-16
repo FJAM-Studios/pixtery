@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImageManipulator from "expo-image-manipulator";
 import * as ImagePicker from "expo-image-picker";
 import * as Linking from "expo-linking";
@@ -38,12 +39,16 @@ export default ({
   theme,
   receivedPuzzles,
   profile,
+  sentPuzzles,
+  setSentPuzzles,
 }: {
   navigation: any;
   boardSize: number;
   theme: any;
   receivedPuzzles: Puzzle[];
   profile: Profile | null;
+  sentPuzzles: Puzzle[];
+  setSentPuzzles: (puzzles: Puzzle[]) => void;
 }) => {
   const [imageURI, setImageURI] = React.useState("");
   const [puzzleType, setPuzzleType] = React.useState("jigsaw");
@@ -107,13 +112,24 @@ export default ({
   const submitToServer = async (): Promise<void> => {
     setModalVisible(true);
     const fileName: string = uuid.v4();
-    await uploadImage(fileName);
-    const publicKey: string = await uploadPuzzleSettings(fileName);
+    const localURI = await uploadImage(fileName);
+    const newPuzzle = await uploadPuzzleSettings(fileName);
+    newPuzzle.imageURI = localURI;
     setModalVisible(false);
-    generateLink(publicKey);
+    if (newPuzzle.publicKey) generateLink(newPuzzle.publicKey);
+    addToSent(newPuzzle);
   };
 
-  const uploadImage = async (fileName: string): Promise<void> => {
+  const addToSent = async (puzzle: Puzzle) => {
+    const allPuzzles = [...sentPuzzles, puzzle];
+    await AsyncStorage.setItem(
+      "@pixterySentPuzzles",
+      JSON.stringify(allPuzzles)
+    );
+    setSentPuzzles(allPuzzles);
+  };
+
+  const uploadImage = async (fileName: string): Promise<string> => {
     //resize and compress the image for upload
     const resizedCompressedImage = await ImageManipulator.manipulateAsync(
       imageURI,
@@ -127,25 +143,23 @@ export default ({
     const blob: Blob = await createBlob(resizedCompressedImage.uri);
     const ref = storage.ref().child(fileName);
     await ref.put(blob);
+    return resizedCompressedImage.uri;
   };
 
-  const uploadPuzzleSettings = async (fileName: string): Promise<string> => {
+  const uploadPuzzleSettings = async (fileName: string): Promise<Puzzle> => {
     const publicKey: string = uuid.v4();
-    await db
-      .collection("puzzles")
-      .doc(fileName)
-      .set({
-        puzzleType,
-        gridSize,
-        senderName: profile ? profile.name : "No Sender",
-        senderPhone: profile ? profile.phone : "No Sender",
-        imageURI: fileName,
-        publicKey,
-        message,
-        dateReceived: new Date().toISOString(),
-      });
-
-    return publicKey;
+    const newPuzzle = {
+      puzzleType: puzzleType,
+      gridSize: gridSize,
+      senderName: profile ? profile.name : "No Sender",
+      senderPhone: profile ? profile.phone : "No Sender",
+      imageURI: fileName,
+      publicKey: publicKey,
+      message: message,
+      dateReceived: new Date().toISOString(),
+    };
+    await db.collection("puzzles").doc(fileName).set(newPuzzle);
+    return newPuzzle;
   };
 
   const generateLink = (publicKey: string): void => {
