@@ -36,7 +36,7 @@ export default ({
 
   const measurePuzzleArea = (ev: any): void => {
     if(puzzleAreaDimensions.puzzleAreaHeight) return;
-    setPuzzleAreaDimensions({ 
+    setPuzzleAreaDimensions({
         puzzleAreaWidth: ev.nativeEvent.layout.width,
         puzzleAreaHeight: ev.nativeEvent.layout.height
       })
@@ -116,6 +116,13 @@ export default ({
     theme, boardSize
   }
 
+  const moveToFront = (index: number): void => {
+    const firstSection = shuffledPieces.slice(0,index);
+    const secondSection = shuffledPieces.slice(index+1)
+    setShuffledPieces([...firstSection,...secondSection, shuffledPieces[index]])
+
+  }
+
   // need to return dummy component to measure the puzzle area via onLayout
   if(!puzzleAreaDimensions.puzzleAreaHeight) return (
     <SafeAreaView
@@ -159,12 +166,12 @@ export default ({
           style={styles(styleProps).puzzleArea}
         >
           <View style={styles(styleProps).messageContainer}>
-            { !firstSnap ? 
+            { !firstSnap ?
               <Text style={styles(styleProps).startText}>Move pieces onto this board!</Text>
               : null }
           </View>
         </View>
-        {!winMessage ? 
+        {!winMessage ?
         shuffledPieces.map((num: number, ix: number) => (
           <PuzzlePiece
             key={num}
@@ -181,9 +188,10 @@ export default ({
             setCurrentBoard={setCurrentBoard}
             setErrorMessage={setErrorMessage}
             puzzleAreaDimensions={puzzleAreaDimensions}
+            moveToFront={moveToFront}
           />
-        )) 
-        : <Image 
+        ))
+        : <Image
             source={{uri: imageURI}}
             style={{width: boardSize, height: boardSize, position: "absolute",
             top: "0%"}}
@@ -226,7 +234,7 @@ const styles = (props: any) => StyleSheet.create({
     flex: 1,
     color: "white",
   },
-  puzzleArea: { 
+  puzzleArea: {
     width: props.boardSize,
     height: props.boardSize,
     borderWidth: 4,
