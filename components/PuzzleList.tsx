@@ -1,11 +1,12 @@
+import moment from "moment";
 import * as React from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { View, TouchableOpacity } from "react-native";
 import { Text, Card, IconButton } from "react-native-paper";
-import moment from "moment";
-import Header from "./Header";
-import { Puzzle } from "../types";
+import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
+import { Puzzle } from "../types";
+import Header from "./Header";
 
 export default ({
   navigation,

@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Text, View, StyleSheet, Image } from "react-native";
-import { TESTING_MODE } from "../constants";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+import { TESTING_MODE } from "../constants";
+import { Puzzle, GridSections } from "../types";
+import { shuffle, generateJigsawPiecePaths } from "../util";
 import Header from "./Header";
 import PuzzlePiece from "./PuzzlePiece";
-import { shuffle, generateJigsawPiecePaths } from "../util";
-import { Puzzle, GridSections } from "../types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 //disable shuffling for testing
@@ -46,7 +47,7 @@ export default ({
   // populates X Y coordinates for upper left corner of each grid section
   const getGridSections = (): GridSections => {
     // separated row and col in case needed for future flexibility
-    let gridSections: GridSections = {
+    const gridSections: GridSections = {
       rowDividers: [0],
       colDividers: [0],
     };
