@@ -20,6 +20,7 @@ export default ({
   setCurrentBoard,
   setErrorMessage,
   puzzleAreaDimensions,
+  moveToFront
 }: {
   num: number;
   ix: number;
@@ -34,11 +35,12 @@ export default ({
   setCurrentBoard: Function;
   setErrorMessage: Function;
   puzzleAreaDimensions: { puzzleAreaWidth: number, puzzleAreaHeight: number };
-}) => {  
+  moveToFront: Function;
+}) => {
   const { puzzleAreaWidth, puzzleAreaHeight } = puzzleAreaDimensions;
   const minSandboxY = boardSize * 1.05;
   const maxSandboxY = puzzleAreaHeight - squareSize;
-  
+
   //squareX and squareY represent the row and col of the square in the solved puzzle
   //widthX and widthY are the size of the pieces (larger for jigsaw);
   //initX and initY are starting position for pieces (not aligned w grid for jigsaw)
@@ -206,6 +208,7 @@ export default ({
       x={currentXY.x}
       y={currentXY.y}
       //on release of a piece, update the state and check for snapping
+      onPressIn={() => moveToFront(ix)}
       onDragRelease={(ev, gestureState) => changePosition(gestureState)}
     >
       <Svg
