@@ -1,7 +1,8 @@
-import { db, storage } from "../FirebaseApp";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as ImageManipulator from "expo-image-manipulator";
+import * as ImagePicker from "expo-image-picker";
+import * as Linking from "expo-linking";
 import * as React from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { Image, View, Platform } from "react-native";
 import {
   Button,
@@ -14,22 +15,23 @@ import {
   Modal,
   Portal,
 } from "react-native-paper";
-import * as ImagePicker from "expo-image-picker";
-import * as Linking from "expo-linking";
-import Header from "./Header";
-const emptyImage = require("../assets/blank.jpg");
+import { SafeAreaView } from "react-native-safe-area-context";
 import Svg, { Path } from "react-native-svg";
+
+import uuid from "uuid";
+import { db, storage } from "../FirebaseApp";
+
+import { DEFAULT_IMAGE_SIZE, COMPRESSION } from "../constants";
+import { Puzzle, Profile } from "../types";
 import {
   generateJigsawPiecePaths,
   generateSquarePiecePaths,
   createBlob,
   shareMessage,
 } from "../util";
-import { Puzzle, Profile } from "../types";
-import uuid from "uuid";
-import * as ImageManipulator from "expo-image-manipulator";
+import Header from "./Header";
 
-import { DEFAULT_IMAGE_SIZE, COMPRESSION } from "../constants";
+const emptyImage = require("../assets/blank.jpg");
 
 export default ({
   navigation,
@@ -54,7 +56,7 @@ export default ({
   const [modalVisible, setModalVisible] = React.useState(false);
 
   const selectImage = async (camera: boolean) => {
-    let result = camera
+    const result = camera
       ? await ImagePicker.launchCameraAsync({
           mediaTypes: ImagePicker.MediaTypeOptions.Images,
           allowsEditing: true,
@@ -187,7 +189,7 @@ export default ({
           <Headline>Building a Pixtery!</Headline>
           {gridSize % 2 ? null : <Text>And choosing so carefully</Text>}
           <ActivityIndicator
-            animating={true}
+            animating
             color={theme.colors.text}
             size="large"
             style={{ padding: 15 }}
@@ -327,7 +329,7 @@ export default ({
             disabled={!imageURI.length}
             onPress={() => setGridSize(2)}
             color="white"
-            compact={true}
+            compact
           >
             2
           </Button>
@@ -347,7 +349,7 @@ export default ({
             disabled={!imageURI.length}
             onPress={() => setGridSize(3)}
             color="white"
-            compact={true}
+            compact
           >
             3
           </Button>
@@ -367,7 +369,7 @@ export default ({
             disabled={!imageURI.length}
             onPress={() => setGridSize(4)}
             color="white"
-            compact={true}
+            compact
           >
             4
           </Button>

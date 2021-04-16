@@ -1,7 +1,8 @@
+import * as ImageManipulator from "expo-image-manipulator";
 import React, { useState, useEffect } from "react";
 import Draggable from "react-native-draggable";
 import { Svg, Image, Defs, ClipPath, Path, Rect } from "react-native-svg";
-import * as ImageManipulator from "expo-image-manipulator";
+
 import { SNAP_MARGIN } from "../constants";
 import { GridSections } from "../types";
 import { getInitialDimensions } from "../util";
@@ -33,12 +34,12 @@ export default ({
   currentBoard: (number | null)[];
   setCurrentBoard: Function;
   setErrorMessage: Function;
-  puzzleAreaDimensions: { puzzleAreaWidth: number, puzzleAreaHeight: number };
-}) => {  
+  puzzleAreaDimensions: { puzzleAreaWidth: number; puzzleAreaHeight: number };
+}) => {
   const { puzzleAreaWidth, puzzleAreaHeight } = puzzleAreaDimensions;
   const minSandboxY = boardSize * 1.05;
   const maxSandboxY = puzzleAreaHeight - squareSize;
-  
+
   //squareX and squareY represent the row and col of the square in the solved puzzle
   //widthX and widthY are the size of the pieces (larger for jigsaw);
   //initX and initY are starting position for pieces (not aligned w grid for jigsaw)
@@ -54,12 +55,22 @@ export default ({
     viewBoxX,
     viewBoxY,
     solutionX,
-    solutionY
-  ] = getInitialDimensions(puzzleType, minSandboxY, maxSandboxY, num, ix, gridSize, squareSize)
+    solutionY,
+  ] = getInitialDimensions(
+    puzzleType,
+    minSandboxY,
+    maxSandboxY,
+    num,
+    ix,
+    gridSize,
+    squareSize
+  );
 
   const [ready, setReady] = useState<boolean>(false);
   const [croppedImage, setCroppedImage] = useState(image);
-  const [currentSnappedIx, setCurrentSnappedIx] = useState<number | undefined | null>(-1);
+  const [currentSnappedIx, setCurrentSnappedIx] = useState<
+    number | undefined | null
+  >(-1);
   // previous index is needed to know where the piece moved from, to update to null on current board
   const [prevIx, setPrevIx] = useState<number | undefined | null>(null);
 
@@ -68,7 +79,7 @@ export default ({
     x: initX,
     y: initY,
     _x: initX, // to track cumulative X distance traveled from original position
-    _y: initY,  // to track cumulative Y distance traveled from original position
+    _y: initY, // to track cumulative Y distance traveled from original position
     // was exploring how to adjust cumulative position to snap below
     // snapAdjusted_x: initX,
     // snapAdjusted_y: initY,
@@ -120,7 +131,7 @@ export default ({
     // snappedY: top left Y position of snap grid
     // snappedRow: row index where it snaps
     // snappedCol: col index where it snaps
-    const [snappedX, snappedY, snappedRow, snappedCol] = determineSnap(newXY)
+    const [snappedX, snappedY, snappedRow, snappedCol] = determineSnap(newXY);
 
     let newIx: number | undefined;
     // if both snappedX and snapped Y are defined, there was a snap i.e. the piece came within the grid snap margin
@@ -146,11 +157,16 @@ export default ({
       }
     }
 
-    if(newIx !== currentSnappedIx) updateIx(newIx);
+    if (newIx !== currentSnappedIx) updateIx(newIx);
     setXY(newXY);
   };
 
-  const determineSnap = (newXY: {x: number, y: number, _x: number, _y: number}) => {
+  const determineSnap = (newXY: {
+    x: number;
+    y: number;
+    _x: number;
+    _y: number;
+  }) => {
     let snappedX: number | undefined; // top left X position of snap grid
     let snappedY: number | undefined; // top left Y position of snap grid
     let snappedRow: number | undefined; // row index where it snaps
@@ -175,8 +191,8 @@ export default ({
         break;
       }
     }
-    return [snappedX, snappedY, snappedRow, snappedCol]
-  }
+    return [snappedX, snappedY, snappedRow, snappedCol];
+  };
 
   // preserve previous Ix, and set the new Ix that it will snap to
   const updateIx = (newIx: number | undefined): void => {
@@ -186,7 +202,7 @@ export default ({
   };
 
   const updateCurrentBoard = (): void => {
-    let newBoard = [...currentBoard];
+    const newBoard = [...currentBoard];
     // putting ! after a variable is to tell TS that in this case, the variable will not be null or undefined
     if (currentSnappedIx! >= 0) newBoard[currentSnappedIx!] = num;
     if (prevIx! >= 0 && prevIx !== currentSnappedIx) newBoard[prevIx!] = null;

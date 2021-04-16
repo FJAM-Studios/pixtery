@@ -1,11 +1,12 @@
-import * as React from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { View } from "react-native";
-import { Text, Card, IconButton } from "react-native-paper";
 import moment from "moment";
-import Header from "./Header";
-import { Puzzle } from "../types";
+import * as React from "react";
+import { View } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import { Text, Card, IconButton } from "react-native-paper";
+import { SafeAreaView } from "react-native-safe-area-context";
+
+import { Puzzle } from "../types";
+import Header from "./Header";
 
 export default ({
   navigation,
