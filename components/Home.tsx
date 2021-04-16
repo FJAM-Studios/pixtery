@@ -1,6 +1,5 @@
 import { db, storage } from "../FirebaseApp";
 import * as React from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { Image, View, Platform } from "react-native";
 import {
   Button,
@@ -15,6 +14,7 @@ import {
 } from "react-native-paper";
 import * as ImagePicker from "expo-image-picker";
 import * as Linking from "expo-linking";
+import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 const emptyImage = require("../assets/blank.jpg");
 import Svg, { Path } from "react-native-svg";
@@ -27,12 +27,11 @@ import {
 import { Puzzle, Profile } from "../types";
 import uuid from "uuid";
 import * as ImageManipulator from "expo-image-manipulator";
-import { AdMobInterstitial, AdMobBanner } from "expo-ads-admob";
+import { AdMobInterstitial } from "expo-ads-admob";
 
 import {
   DEFAULT_IMAGE_SIZE,
   COMPRESSION,
-  BANNER_ID,
   INTERSTITIAL_ID,
   DISPLAY_PAINFUL_ADS,
 } from "../constants";
@@ -171,7 +170,7 @@ export default ({
   };
 
   return (
-    <SafeAreaView
+    <AdSafeAreaView
       style={{
         flex: 1,
         flexDirection: "column",
@@ -393,7 +392,6 @@ export default ({
       >
         Send
       </Button>
-      <AdMobBanner bannerSize="smartBannerPortrait" adUnitID={BANNER_ID} />
-    </SafeAreaView>
+    </AdSafeAreaView>
   );
 };

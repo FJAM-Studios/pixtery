@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Text, View, StyleSheet, Image } from "react-native";
 import { BANNER_ID, TESTING_MODE } from "../constants";
-import { SafeAreaView } from "react-native-safe-area-context";
+import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 import PuzzlePiece from "./PuzzlePiece";
 import { shuffle, generateJigsawPiecePaths } from "../util";
 import { Puzzle, GridSections } from "../types";
-import { AdMobBanner } from "expo-ads-admob";
 
 //disable shuffling for testing
 const disableShuffle = TESTING_MODE;
@@ -121,7 +120,7 @@ export default ({
   // need to return dummy component to measure the puzzle area via onLayout
   if (!puzzleAreaDimensions.puzzleAreaHeight)
     return (
-      <SafeAreaView style={styles(styleProps).parentContainer}>
+      <AdSafeAreaView style={styles(styleProps).parentContainer}>
         <Header
           theme={theme}
           notifications={
@@ -136,10 +135,10 @@ export default ({
             justifyContent: "flex-end",
           }}
         ></View>
-      </SafeAreaView>
+      </AdSafeAreaView>
     );
   return (
-    <SafeAreaView style={styles(styleProps).parentContainer}>
+    <AdSafeAreaView style={styles(styleProps).parentContainer}>
       <Header
         theme={theme}
         notifications={
@@ -198,9 +197,8 @@ export default ({
         <View style={styles(styleProps).messageContainer}>
           <Text style={styles(styleProps).errorText}>{errorMessage}</Text>
         </View>
-        <AdMobBanner bannerSize="smartBannerPortrait" adUnitID={BANNER_ID} />
       </View>
-    </SafeAreaView>
+    </AdSafeAreaView>
   );
 };
 

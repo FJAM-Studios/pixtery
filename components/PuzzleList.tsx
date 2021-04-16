@@ -1,8 +1,8 @@
 import * as React from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { View } from "react-native";
 import { Text, Card, IconButton } from "react-native-paper";
 import moment from "moment";
+import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 import { Puzzle } from "../types";
 import { TouchableOpacity } from "react-native-gesture-handler";
@@ -17,7 +17,7 @@ export default ({
   receivedPuzzles: Puzzle[];
 }) => {
   return (
-    <SafeAreaView
+    <AdSafeAreaView
       style={{
         flex: 1,
         flexDirection: "column",
@@ -71,6 +71,6 @@ export default ({
           </TouchableOpacity>
         ))}
       </View>
-    </SafeAreaView>
+    </AdSafeAreaView>
   );
 };
