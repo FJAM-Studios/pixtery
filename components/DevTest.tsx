@@ -1,5 +1,4 @@
 import * as React from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { View } from "react-native";
 import {
   Button,
@@ -10,6 +9,8 @@ import {
   Headline,
   Title,
 } from "react-native-paper";
+import { SafeAreaView } from "react-native-safe-area-context";
+
 import Header from "./Header";
 
 export default ({ navigation, theme }: { navigation: any; theme: any }) => {
@@ -45,7 +46,7 @@ export default ({ navigation, theme }: { navigation: any; theme: any }) => {
         For now, choose URL of a reasonably sized test image such as one below,
         which you can copy/paste:
       </Text>
-      <Text selectable={true} style={{ padding: 2 }}>
+      <Text selectable style={{ padding: 2 }}>
         https://imgur.com/uHmfGfm.jpg
       </Text>
       <TextInput
@@ -123,7 +124,7 @@ export default ({ navigation, theme }: { navigation: any; theme: any }) => {
             mode="text"
             onPress={() => setGridSize(2)}
             color="white"
-            compact={true}
+            compact
           >
             2
           </Button>
@@ -142,7 +143,7 @@ export default ({ navigation, theme }: { navigation: any; theme: any }) => {
             mode="text"
             onPress={() => setGridSize(3)}
             color="white"
-            compact={true}
+            compact
           >
             3
           </Button>
@@ -161,7 +162,7 @@ export default ({ navigation, theme }: { navigation: any; theme: any }) => {
             mode="text"
             onPress={() => setGridSize(4)}
             color="white"
-            compact={true}
+            compact
           >
             4
           </Button>

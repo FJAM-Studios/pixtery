@@ -1,6 +1,7 @@
 import React from "react";
 import { View, TouchableWithoutFeedback } from "react-native";
 import { IconButton, Badge, Menu, Divider } from "react-native-paper";
+
 import Logo from "./Logo";
 import Title from "./Title";
 

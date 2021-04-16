@@ -1,1 +1,1 @@
-export default '/dummy/path/to/dummyImage.jpg';
+export default "/dummy/path/to/dummyImage.jpg";

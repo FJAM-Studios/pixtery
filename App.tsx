@@ -1,25 +1,24 @@
-import { db, storage } from "./FirebaseApp";
-import React, { createRef, useEffect, useState } from "react";
-import { View, useWindowDimensions } from "react-native";
 import {
   CommonActions,
   NavigationContainer,
   NavigationContainerRef,
 } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
+import * as Linking from "expo-linking";
+import React, { createRef, useEffect, useState } from "react";
+import { View, useWindowDimensions } from "react-native";
 import { Provider as PaperProvider, DefaultTheme } from "react-native-paper";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import * as Linking from "expo-linking";
 
-import Puzzle from "./components/Puzzle";
-import HomeScreen from "./components/Home";
-import PuzzleList from "./components/PuzzleList";
-import DevTest from "./components/DevTest";
+import { db, storage } from "./FirebaseApp";
 import AddPuzzle from "./components/AddPuzzle";
-import Splash from "./components/Splash";
 import CreateProfile from "./components/CreateProfile";
+import DevTest from "./components/DevTest";
+import HomeScreen from "./components/Home";
 import Profile from "./components/Profile";
-
+import Puzzle from "./components/Puzzle";
+import PuzzleList from "./components/PuzzleList";
+import Splash from "./components/Splash";
 import { Puzzle as PuzzleType, Profile as ProfileType } from "./types";
 
 const image = require("./assets/earth.jpg");
