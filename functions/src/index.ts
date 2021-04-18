@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as functions from "firebase-functions";
 import {db} from "../../FirebaseApp";
+import {Puzzle as PuzzleType} from "../../types";
 
 
 // // Start writing Firebase Functions
@@ -73,7 +74,7 @@ import {db} from "../../FirebaseApp";
 //   }
 // })
 
-exports.uploadPuzzleSettings = functions.https.onCall(async (data: { puzzleType: any; gridSize: any; profile: any; fileName: any; message: any; publicKey: any; }, context: any) => {
+exports.uploadPuzzleSettings = functions.https.onCall(async (data: { puzzleType: string; gridSize: number; profile: any; fileName: string; message: string; publicKey: string; }, context: any) => {
   const {puzzleType, gridSize, profile, fileName, message, publicKey} = data;
   // cloud function can hide this code collection bc its written on "server"
   console.log("uploading puzz settings");
@@ -92,6 +93,41 @@ exports.uploadPuzzleSettings = functions.https.onCall(async (data: { puzzleType:
           dateReceived: new Date().toISOString(),
         });
     return {result: `successfully uploaded ${fileName}`};
+  } catch (error) {
+    throw new functions.https.HttpsError("unknown", error.message, error);
+  }
+});
+
+exports.queryPuzzle = functions.https.onCall(async (data) => {
+  try {
+    const {publicKey} = data;
+    const snapshot = await db
+        .collection("puzzles")
+        .where("publicKey", "==", publicKey)
+        .get();
+    if (snapshot.empty) {
+      console.log("no puzzle found!");
+      return "no puzzle found!";
+    } else {
+    //does this do anything? puzzleData is overwritten immediately below
+      let puzzleData: PuzzleType = {
+        puzzleType: "",
+        gridSize: 0,
+        senderName: "",
+        senderPhone: "string",
+        imageURI: "",
+        message: null,
+        dateReceived: "",
+        completed: false,
+      };
+      //NOTE: there SHOULD only be one puzzle but it's in an object that has to iterated through to access the data
+      snapshot.forEach((puzzle: any) => {
+        puzzleData = puzzle.data();
+        puzzleData.completed = false;
+      });
+      console.log("retrieved puzzle data", puzzleData);
+      return puzzleData;
+    } 
   } catch (error) {
     throw new functions.https.HttpsError("unknown", error.message, error);
   }

@@ -1,4 +1,4 @@
-import { db, storage } from "./FirebaseApp";
+import { db, storage, functions } from "./FirebaseApp";
 import React, { useEffect, useState } from "react";
 import { View, useWindowDimensions } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
@@ -102,34 +102,44 @@ const App = () => {
       );
   };
 
+// start here 
   const queryPuzzle = async (publicKey: string): Promise<PuzzleType | void> => {
     console.log("query puzzle");
-    const snapshot = await db // cloud function
-      .collection("puzzles")
-      .where("publicKey", "==", publicKey)
-      .get();
-    if (snapshot.empty) {
-      console.log("no puzzle found!");
-    } else {
-      //does this do anything? puzzleData is overwritten immediately below
-      let puzzleData: PuzzleType = {
-        puzzleType: "",
-        gridSize: 0,
-        senderName: "",
-        senderPhone: "string",
-        imageURI: "",
-        message: null,
-        dateReceived: "",
-        completed: false,
-      };
-      //NOTE: there SHOULD only be one puzzle but it's in an object that has to iterated through to access the data
-      snapshot.forEach((puzzle: any) => {
-        puzzleData = puzzle.data();
-        puzzleData.completed = false;
-      });
-      console.log("retrieved puzzle data", puzzleData);
-      return puzzleData;
-    }
+      const queryPuzzle = functions.httpsCallable("queryPuzzle")
+  queryPuzzle({ 
+    publicKey
+  }).then((result: any) => {
+    console.log('result', result);
+  }).catch((error: any) => {
+    console.error(error);
+  })
+
+    // const snapshot = await db // cloud function
+    //   .collection("puzzles")
+    //   .where("publicKey", "==", publicKey)
+    //   .get();
+    // if (snapshot.empty) {
+    //   console.log("no puzzle found!");
+    // } else {
+    //   //does this do anything? puzzleData is overwritten immediately below
+    //   let puzzleData: PuzzleType = {
+    //     puzzleType: "",
+    //     gridSize: 0,
+    //     senderName: "",
+    //     senderPhone: "string",
+    //     imageURI: "",
+    //     message: null,
+    //     dateReceived: "",
+    //     completed: false,
+    //   };
+    //   //NOTE: there SHOULD only be one puzzle but it's in an object that has to iterated through to access the data
+    //   snapshot.forEach((puzzle: any) => {
+    //     puzzleData = puzzle.data();
+    //     puzzleData.completed = false;
+    //   });
+    //   console.log("retrieved puzzle data", puzzleData);
+    //   return puzzleData;
+    // }
   };
 
   return (
