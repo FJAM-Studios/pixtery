@@ -23,14 +23,14 @@ const initializeApp = (): any => {
 const app = initializeApp();
 const db = app.firestore();
 
-// db.settings({ host: "localhost:8080", ssl: false });
+// start here - db emulator
+db.settings({ host: "192.168.1.215:8080", ssl: false });
 let functions = app.functions()
 // functions.useFunctionsEmulator("http://localhost:5001")
 // functions.useFunctionsEmulator("http://127.0.0.1:5001")
 // functions.useFunctionsEmulator("http://192.168.1.69:5001")
+// Metro Bundler LAN IP address
 functions.useFunctionsEmulator("http://192.168.1.215:5001")
-
-// start here- try iphone ip address
 
 const storage = app.storage();
 const phoneProvider = new firebase.auth.PhoneAuthProvider();
@@ -42,17 +42,18 @@ const verifySms = (id: string, code: string) => {
 // const functions = firebase.functions().useEmulator("localhost", 5001);
 // let functions = firebase.functions()
 // functions.useFunctionsEmulator("http://localhost:5001")
-const addNumbers = app.functions().httpsCallable("addNumbers")
 
-addNumbers({firstNumber: 1, secondNumber: 2})
-    .then((result: any) => {
-    console.log('result test in firebaseapp', result)
-  }).catch((e: any) => {
-    console.log('there is error in firebaseapp')
-    console.error('message', e.message)
-    console.error('code', e.code)
-    console.error('details', e.details)
-  })
+// const addNumbers = app.functions().httpsCallable("addNumbers")
+
+// addNumbers({firstNumber: 1, secondNumber: 2})
+//     .then((result: any) => {
+//     console.log('result test in firebaseapp', result)
+//   }).catch((e: any) => {
+//     console.log('there is error in firebaseapp')
+//     console.error('message', e.message)
+//     console.error('code', e.code)
+//     console.error('details', e.details)
+//   })
 
 export { app, db, storage, phoneProvider, firebaseConfig, verifySms, functions };
 

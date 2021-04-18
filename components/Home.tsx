@@ -138,39 +138,33 @@ export default ({
 // start here - differentiate data with context (eg profile). need to run this on emulator i think
 // also need to generate public key here and return it?
   const uploadPuzzleSettings = (fileName: string) => {
-    // const publicKey: string = uuid.v4();
-    // firebase.functions().useEmulator("localhost", 5001);
-    // app.functions().useFunctionsEmulator("http://localhost:5001")
-    // const addMessageCall = firebase.functions().httpsCallable("addMessageCall")
-    // const addNumbers = app.functions().httpsCallable("addNumbers")
-    const addNumbers = functions.httpsCallable("addNumbers")
+      //   const addNumbers = functions.httpsCallable("addNumbers")
+  //   addNumbers({firstNumber: 1, secondNumber: 2})
+  //   .then((result: any) => {
+  //   console.log('result test from press', result)
+  // }).catch((e: any) => {
+  //   console.log('there is error in home')
+  //   console.error('message', e.message)
+  //   console.error('code', e.code)
+  //   console.error('details', e.details)
+  // })
 
-
-    // const callTest = firebase.functions().httpsCallable('test')
-    addNumbers({firstNumber: 1, secondNumber: 2})
-    .then((result: any) => {
-    console.log('result test from press', result)
-  }).catch((e: any) => {
-    console.log('there is error in home')
-    console.error('message', e.message)
-    console.error('code', e.code)
-    console.error('details', e.details)
-  })
-    // const callableUploadPuzzleSettings = functions.httpsCallable("uploadPuzzleSettings")
-    // callableUploadPuzzleSettings({
-    //   fileName,
-    //   puzzleType,
-    //   gridSize,
-    //   profile,
-    //   message, 
-    //   publicKey
-    // }).then((result) => {
-    //   console.log('result', result.data.output);
-    //   // return publicKey;
-    // }).catch((error) => {
-    //   console.log(error);
-    // })
-    // return publicKey;
+    const publicKey: string = uuid.v4();
+    const callableUploadPuzzleSettings = functions.httpsCallable("uploadPuzzleSettings")
+    callableUploadPuzzleSettings({
+      fileName,
+      puzzleType,
+      gridSize,
+      profile,
+      message, 
+      publicKey
+    }).then((result) => {
+      console.log('result', result);
+      // return publicKey;
+    }).catch((error) => {
+      console.log(error);
+    })
+    return publicKey;
   };
 
   // const uploadPuzzleSettings = async (fileName: string): Promise<string> => {
