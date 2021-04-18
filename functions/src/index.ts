@@ -14,6 +14,7 @@ import {db} from "../../FirebaseApp";
 
 // Take the text parameter passed to this HTTP endpoint and insert it into 
 // Firestore under the path /messages/:documentId/original
+
 // exports.addMessage = functions.https.onRequest(async (req, res) => {
 //   // Grab the text parameter.
 //   const original = req.query.text
@@ -75,19 +76,25 @@ import {db} from "../../FirebaseApp";
 exports.uploadPuzzleSettings = functions.https.onCall(async (data: { puzzleType: any; gridSize: any; profile: any; fileName: any; message: any; publicKey: any; }, context: any) => {
   const {puzzleType, gridSize, profile, fileName, message, publicKey} = data;
   // cloud function can hide this code collection bc its written on "server"
-  await db
-      .collection("puzzles")
-      .doc(fileName)
-      .set({
-        puzzleType: puzzleType,
-        gridSize: gridSize,
-        senderName: profile ? profile.name : "No Sender",
-        senderPhone: profile ? profile.phone : "No Sender",
-        imageURI: fileName,
-        publicKey: publicKey,
-        message: message,
-        dateReceived: new Date().toISOString(),
-      });
+  console.log("uploading puzz settings");
+  try {
+    await db
+        .collection("puzzles")
+        .doc(fileName)
+        .set({
+          puzzleType: puzzleType,
+          gridSize: gridSize,
+          senderName: profile ? profile.name : "No Sender",
+          senderPhone: profile ? profile.phone : "No Sender",
+          imageURI: fileName,
+          publicKey: publicKey,
+          message: message,
+          dateReceived: new Date().toISOString(),
+        });
+    return {result: `successfully uploaded ${fileName}`};
+  } catch (error) {
+    throw new functions.https.HttpsError("unknown", error.message, error);
+  }
 });
 
 exports.addNumbers = functions.https.onCall((data: { firstNumber: any; secondNumber: any; }) => {
