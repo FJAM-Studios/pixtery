@@ -1,4 +1,11 @@
-import { db, storage } from "../FirebaseApp";
+import { db, storage, functions, app } from "../FirebaseApp";
+// const firebase = require("firebase");
+// // Required for side-effects
+require("firebase/functions");
+import * as firebase from "firebase";
+import "firebase/functions";
+// import * as functions from "firebase-functions";
+// import functions from "../functions/src/index";
 import * as React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Image, View, Platform } from "react-native";
@@ -29,6 +36,7 @@ import uuid from "uuid";
 import * as ImageManipulator from "expo-image-manipulator";
 
 import { DEFAULT_IMAGE_SIZE, COMPRESSION } from "../constants";
+// const functions = firebase.functions();
 
 export default ({
   navigation,
@@ -127,26 +135,61 @@ export default ({
     await ref.put(blob);
     return;
   };
-
-  const uploadPuzzleSettings = async (fileName: string): Promise<string> => {
-    const publicKey: string = uuid.v4();
-    await db //cloud function can hide this code collection bc its written on "server"
-      .collection("puzzles")
-      .doc(fileName)
-      .set({
-        puzzleType: puzzleType,
-        gridSize: gridSize,
-        senderName: profile ? profile.name : "No Sender",
-        senderPhone: profile ? profile.phone : "No Sender",
-        imageURI: fileName,
-        publicKey: publicKey,
-        message: message,
-        dateReceived: new Date().toISOString(),
-      });
+// start here - differentiate data with context (eg profile). need to run this on emulator i think
+// also need to generate public key here and return it?
+  const uploadPuzzleSettings = (fileName: string) => {
+    // const publicKey: string = uuid.v4();
+    // firebase.functions().useEmulator("localhost", 5001);
+    // app.functions().useFunctionsEmulator("http://localhost:5001")
+    // const addMessageCall = firebase.functions().httpsCallable("addMessageCall")
+    // const addNumbers = app.functions().httpsCallable("addNumbers")
+    const addNumbers = functions.httpsCallable("addNumbers")
 
 
-    return publicKey;
+    // const callTest = firebase.functions().httpsCallable('test')
+    addNumbers({firstNumber: 1, secondNumber: 2})
+    .then((result: any) => {
+    console.log('result test from press', result)
+  }).catch((e: any) => {
+    console.log('there is error in home')
+    console.error('message', e.message)
+    console.error('code', e.code)
+    console.error('details', e.details)
+  })
+    // const callableUploadPuzzleSettings = functions.httpsCallable("uploadPuzzleSettings")
+    // callableUploadPuzzleSettings({
+    //   fileName,
+    //   puzzleType,
+    //   gridSize,
+    //   profile,
+    //   message, 
+    //   publicKey
+    // }).then((result) => {
+    //   console.log('result', result.data.output);
+    //   // return publicKey;
+    // }).catch((error) => {
+    //   console.log(error);
+    // })
+    // return publicKey;
   };
+
+  // const uploadPuzzleSettings = async (fileName: string): Promise<string> => {
+  //   const publicKey: string = uuid.v4();
+  //   await db //cloud function can hide this code collection bc its written on "server"
+  //     .collection("puzzles")
+  //     .doc(fileName)
+  //     .set({
+        // puzzleType: puzzleType,
+        // gridSize: gridSize,
+        // senderName: profile ? profile.name : "No Sender",
+        // senderPhone: profile ? profile.phone : "No Sender",
+        // imageURI: fileName,
+        // publicKey: publicKey,
+        // message: message,
+        // dateReceived: new Date().toISOString(),
+  //     });
+  //   return publicKey;
+  // };
 
   const generateLink = (publicKey: string): void => {
     //first param is an empty string to allow Expo to dynamically determine path to app based on runtime environment
