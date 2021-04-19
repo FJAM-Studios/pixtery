@@ -18,10 +18,9 @@ import {
 } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Svg, { Path } from "react-native-svg";
-
 import uuid from "uuid";
-import { storage, functions } from "../FirebaseApp";
 
+import { storage, functions } from "../FirebaseApp";
 import { DEFAULT_IMAGE_SIZE, COMPRESSION } from "../constants";
 import { Puzzle, Profile } from "../types";
 import {
@@ -149,25 +148,27 @@ export default ({
 
   const uploadPuzzleSettings = async (fileName: string) => {
     const publicKey: string = uuid.v4();
-    const uploadPuzzleSettings = functions.httpsCallable("uploadPuzzleSettings")
+    const uploadPuzzleSettings = functions.httpsCallable(
+      "uploadPuzzleSettings"
+    );
     const newPuzzle = {
-      puzzleType: puzzleType,
-      gridSize: gridSize,
+      puzzleType,
+      gridSize,
       senderName: profile ? profile.name : "No Sender",
       senderPhone: profile ? profile.phone : "No Sender",
       imageURI: fileName,
-      publicKey: publicKey,
-      message: message,
+      publicKey,
+      message,
       dateReceived: new Date().toISOString(),
     };
     try {
       await uploadPuzzleSettings({
         fileName,
-        newPuzzle
+        newPuzzle,
       });
-      return newPuzzle
+      return newPuzzle;
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
   };
 

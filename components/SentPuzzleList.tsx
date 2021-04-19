@@ -1,13 +1,14 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Linking from "expo-linking";
+import moment from "moment";
 import * as React from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { ImageBackground, View } from "react-native";
 import { Card, IconButton } from "react-native-paper";
-import moment from "moment";
-import Header from "./Header";
+import { SafeAreaView } from "react-native-safe-area-context";
+
 import { Puzzle } from "../types";
-import * as Linking from "expo-linking";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { shareMessage } from "../util";
+import Header from "./Header";
 
 export default ({
   navigation,
@@ -70,7 +71,7 @@ export default ({
               right={() => (
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
                   <IconButton
-                    icon={"puzzle"}
+                    icon="puzzle"
                     onPress={() =>
                       navigation.navigate("Puzzle", {
                         ...receivedPuzzle,
@@ -78,11 +79,11 @@ export default ({
                     }
                   />
                   <IconButton
-                    icon={"delete"}
+                    icon="delete"
                     onPress={() => deletePuzzle(receivedPuzzle)}
                   />
                   <IconButton
-                    icon={"send"}
+                    icon="send"
                     onPress={() => sendPuzzle(receivedPuzzle.publicKey)}
                   />
                 </View>
@@ -97,7 +98,7 @@ export default ({
                     justifyContent: "space-around",
                     padding: 1,
                   }}
-                ></ImageBackground>
+                />
               )}
             />
           </Card>
