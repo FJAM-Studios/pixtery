@@ -7,7 +7,12 @@
     "sourceMap": true,
     "strict": true,
     "target": "es2017",
-    "typeRoots": ["node_modules/@types"] 
+    "typeRoots": ["node_modules/@types"],
+    "importHelpers": true,
+    // "baseUrl": ".",
+    // "paths": {
+    //   "tslib" : ["/functions/node_modules/tslib/tslib.d.ts"]
+    // },
   },
   "compileOnSave": true,
   "include": [
