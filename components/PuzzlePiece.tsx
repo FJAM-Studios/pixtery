@@ -20,7 +20,10 @@ export default ({
   setCurrentBoard,
   setErrorMessage,
   puzzleAreaDimensions,
-  moveToFront
+  moveToFront,
+  puzzleLoaded,
+  prevX,
+  prevY
 }: {
   num: number;
   ix: number;
@@ -36,6 +39,9 @@ export default ({
   setErrorMessage: Function;
   puzzleAreaDimensions: { puzzleAreaWidth: number, puzzleAreaHeight: number };
   moveToFront: Function;
+  puzzleLoaded:boolean;
+  prevX: number;
+  prevY: number;
 }) => {
   const { puzzleAreaWidth, puzzleAreaHeight } = puzzleAreaDimensions;
   const minSandboxY = boardSize * 1.05;
@@ -57,7 +63,7 @@ export default ({
     viewBoxY,
     solutionX,
     solutionY
-  ] = getInitialDimensions(puzzleType, minSandboxY, maxSandboxY, num, ix, gridSize, squareSize)
+  ] = getInitialDimensions(puzzleType, minSandboxY, maxSandboxY, num, ix, gridSize, squareSize, prevX, prevY)
 
   const [ready, setReady] = useState<boolean>(false);
   const [croppedImage, setCroppedImage] = useState(image);
@@ -150,6 +156,9 @@ export default ({
 
     if(newIx !== currentSnappedIx) updateIx(newIx);
     setXY(newXY);
+
+    moveToFront(ix, newXY.x, newXY.y)
+    console.log("piece place at",`${newXY.x} ${newXY.y}`)
   };
 
   const determineSnap = (newXY: {x: number, y: number, _x: number, _y: number}) => {
@@ -208,7 +217,7 @@ export default ({
       x={currentXY.x}
       y={currentXY.y}
       //on release of a piece, update the state and check for snapping
-      onPressIn={() => moveToFront(ix)}
+      onPressIn={() => moveToFront(ix, currentXY.x, currentXY.y)}
       onDragRelease={(ev, gestureState) => changePosition(gestureState)}
     >
       <Svg

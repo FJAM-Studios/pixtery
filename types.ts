@@ -30,3 +30,9 @@ export interface Profile {
   name: string;
   phone: string;
 }
+
+export interface PieceLocation{
+  i: number;
+  prevX: number | null;
+  prevY: number | null;
+}

@@ -5,7 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Header from "./Header";
 import PuzzlePiece from "./PuzzlePiece";
 import { shuffle, generateJigsawPiecePaths } from "../util";
-import { Puzzle, GridSections } from "../types";
+import { Puzzle, GridSections, PieceLocation, Piece } from "../types";
 
 //disable shuffling for testing
 const disableShuffle = TESTING_MODE;
@@ -33,6 +33,8 @@ export default ({
     puzzleAreaWidth: 0,
     puzzleAreaHeight: 0
   });
+
+  const [puzzleLoaded, setPuzzleLoaded] = useState<boolean>(false);
 
   const measurePuzzleArea = (ev: any): void => {
     if(puzzleAreaDimensions.puzzleAreaHeight) return;
@@ -70,15 +72,15 @@ export default ({
     getGridSections()
   );
 
-  const fillArray = (gridSize: number): number[] => {
+  const fillArray = (gridSize: number): PieceLocation[] => {
     const numberArray = [];
     for (let i = 0; i < gridSize * gridSize; i++) {
-      numberArray.push(i);
+      numberArray.push({i, prevX: null, prevY:null});
     }
     return numberArray;
   };
 
-  const [shuffledPieces, setShuffledPieces] = useState<number[]>(
+  const [shuffledPieces, setShuffledPieces] = useState<PieceLocation[]>(
     shuffle(fillArray(gridSize), disableShuffle)
   );
 
@@ -116,11 +118,41 @@ export default ({
     theme, boardSize
   }
 
-  const moveToFront = (index: number): void => {
+  const moveToFront = (index: number, prevX:number, prevY: number): void => {
+    shuffledPieces[index].prevX= prevX;
+    shuffledPieces[index].prevY=prevY;
     const firstSection = shuffledPieces.slice(0,index);
     const secondSection = shuffledPieces.slice(index+1)
     setShuffledPieces([...firstSection,...secondSection, shuffledPieces[index]])
+  }
 
+  const loadBoard = (): JSX.Element[] =>{
+    const board = shuffledPieces.map((piece: PieceLocation, ix: number) => (
+      <PuzzlePiece
+        key={piece.i}
+        num={piece.i}
+        ix={ix}
+        gridSize={gridSize}
+        squareSize={squareSize}
+        puzzleType={puzzleType}
+        image={image}
+        piecePath={piecePaths[piece.i]}
+        boardSize={boardSize}
+        gridSections={gridSections}
+        currentBoard={currentBoard}
+        setCurrentBoard={setCurrentBoard}
+        setErrorMessage={setErrorMessage}
+        puzzleAreaDimensions={puzzleAreaDimensions}
+        moveToFront={moveToFront}
+        puzzleLoaded={puzzleLoaded}
+        prevX = {piece.prevX}
+        prevY = {piece.prevY}
+      />
+    ));
+
+    // if statement required to prevent infinite rerendering
+    if(!puzzleLoaded)setPuzzleLoaded(true);
+    return board;
   }
 
   // need to return dummy component to measure the puzzle area via onLayout
@@ -172,25 +204,7 @@ export default ({
           </View>
         </View>
         {!winMessage ?
-        shuffledPieces.map((num: number, ix: number) => (
-          <PuzzlePiece
-            key={num}
-            num={num}
-            ix={ix}
-            gridSize={gridSize}
-            squareSize={squareSize}
-            puzzleType={puzzleType}
-            image={image}
-            piecePath={piecePaths[num]}
-            boardSize={boardSize}
-            gridSections={gridSections}
-            currentBoard={currentBoard}
-            setCurrentBoard={setCurrentBoard}
-            setErrorMessage={setErrorMessage}
-            puzzleAreaDimensions={puzzleAreaDimensions}
-            moveToFront={moveToFront}
-          />
-        ))
+        loadBoard()
         : <Image
             source={{uri: imageURI}}
             style={{width: boardSize, height: boardSize, position: "absolute",

@@ -1,7 +1,7 @@
-import { Piece } from "./types";
+import { Piece, PieceLocation } from "./types";
 import { Share } from 'react-native';
 
-export const shuffle = (array: number[], disabledShuffle = true): number[] => {
+export const shuffle = (array: PieceLocation[], disabledShuffle = true): PieceLocation[] => {
   if (disabledShuffle) return array;
   let currentIndex = array.length,
     temporaryValue: number,
@@ -14,9 +14,9 @@ export const shuffle = (array: number[], disabledShuffle = true): number[] => {
     currentIndex -= 1;
 
     // And swap it with the current element.
-    temporaryValue = array[currentIndex];
-    array[currentIndex] = array[randomIndex];
-    array[randomIndex] = temporaryValue;
+    temporaryValue = array[currentIndex].i;
+    array[currentIndex].i = array[randomIndex].i;
+    array[randomIndex].i = temporaryValue;
   }
 
   return array;
@@ -306,13 +306,15 @@ export const getRandomInRange = (min: number, max: number): number => {
 }
 
 export const getInitialDimensions = (
-  puzzleType: string, 
-  minSandboxY: number, 
-  maxSandboxY: number, 
+  puzzleType: string,
+  minSandboxY: number,
+  maxSandboxY: number,
   num: number,
-  ix: number, 
-  gridSize: number, 
-  squareSize: number
+  ix: number,
+  gridSize: number,
+  squareSize: number,
+  prevX: number | null,
+  prevY: number| null
 ) => {
   let widthY: number,
   widthX: number,
@@ -331,8 +333,9 @@ export const getInitialDimensions = (
     // note Math.random() cannot be used here as it changes initial values at each render
     const randomFactor = ix % 2 ? squareSize * 0.1 : 0
     const scaleSquaresToSandbox = ((maxSandboxY - minSandboxY) / minSandboxY)
-    initX = (ix % gridSize) * squareSize - randomFactor;
-    initY = minSandboxY + Math.floor(ix / gridSize) * squareSize * scaleSquaresToSandbox + randomFactor;
+
+    initX = prevX ? prevX : (ix % gridSize) * squareSize - randomFactor;
+    initY = prevY ? prevY : minSandboxY + Math.floor(ix / gridSize) * squareSize * scaleSquaresToSandbox + randomFactor;
     solutionX = (num % gridSize) * squareSize;
     solutionY = Math.floor(num / gridSize) * squareSize;
     viewBoxX = squareX * squareSize;
@@ -348,9 +351,9 @@ export const getInitialDimensions = (
         ? squareSize * 1.25
         : squareSize * 1.5;
     const scaleJigsawToSandbox = ((maxSandboxY  - squareSize * 0.25 - minSandboxY) / minSandboxY)
-    initX = Math.max(0, (ix % gridSize) * squareSize - squareSize * 0.25);
-    initY = 
-      minSandboxY + 
+    initX = prevX ? prevX : Math.max(0, (ix % gridSize) * squareSize - squareSize * 0.25);
+    initY = prevY ? prevY :
+      minSandboxY +
       Math.max(
         0,
         Math.floor(ix / gridSize) * squareSize - squareSize * 0.25
