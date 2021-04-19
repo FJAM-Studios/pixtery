@@ -1,6 +1,5 @@
 import { storage, functions } from "../FirebaseApp";
 import "firebase/functions";
-import "tslib"
 import * as React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Image, View, Platform } from "react-native";
@@ -132,7 +131,6 @@ export default ({
 
   const uploadPuzzleSettings = (fileName: string) => {
     const publicKey: string = uuid.v4();
-    // functions.useFunctionsEmulator("http://192.168.1.215:5001")
     const callableUploadPuzzleSettings = functions.httpsCallable("uploadPuzzleSettings")
     callableUploadPuzzleSettings({
       fileName,
