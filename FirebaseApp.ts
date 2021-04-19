@@ -24,7 +24,7 @@ const app = initializeApp();
 const db = app.firestore();
 
 // for host, put in host: <Metro Bundler LAN IP address>:8080
-db.settings({ host: "192.168.1.215:8080", ssl: false });
+// db.settings({ host: "192.168.1.215:8080", ssl: false });
 let functions = app.functions()
 // for http, put in http: <Metro Bundler LAN IP address>:5001
 functions.useFunctionsEmulator("http://192.168.1.215:5001")

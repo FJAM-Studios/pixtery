@@ -98,7 +98,7 @@ exports.uploadPuzzleSettings = functions.https.onCall(async (data: { puzzleType:
   }
 });
 
-exports.queryPuzzle = functions.https.onCall(async (data) => {
+exports.queryPuzzle = functions.https.onCall(async (data) : Promise<PuzzleType | void>=> {
   try {
     const {publicKey} = data;
     const snapshot = await db
@@ -107,7 +107,7 @@ exports.queryPuzzle = functions.https.onCall(async (data) => {
         .get();
     if (snapshot.empty) {
       console.log("no puzzle found!");
-      return "no puzzle found!";
+      throw new functions.https.HttpsError("not-found", "no puzzle found!");
     } else {
     //does this do anything? puzzleData is overwritten immediately below
       let puzzleData: PuzzleType = {
@@ -127,7 +127,7 @@ exports.queryPuzzle = functions.https.onCall(async (data) => {
       });
       console.log("retrieved puzzle data", puzzleData);
       return puzzleData;
-    } 
+    }
   } catch (error) {
     throw new functions.https.HttpsError("unknown", error.message, error);
   }
