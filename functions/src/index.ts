@@ -74,8 +74,8 @@ import {Puzzle as PuzzleType} from "../../types";
 //   }
 // })
 
-exports.uploadPuzzleSettings = functions.https.onCall(async (data: { puzzleType: string; gridSize: number; profile: any; fileName: string; message: string; publicKey: string; }, context: any) => {
-  const {puzzleType, gridSize, profile, fileName, message, publicKey} = data;
+exports.uploadPuzzleSettings = functions.https.onCall(async (data: { fileName: string; puzzleType: string; gridSize: number; profile: any; message: string; publicKey: string; }) => {
+  const {fileName, puzzleType, gridSize, profile, message, publicKey} = data;
   // cloud function can hide this code collection bc its written on "server"
   console.log("uploading puzz settings");
   try {

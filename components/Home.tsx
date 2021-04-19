@@ -1,9 +1,8 @@
 import { db, storage, functions, app } from "../FirebaseApp";
 // const firebase = require("firebase");
 // // Required for side-effects
-require("firebase/functions");
-import * as firebase from "firebase";
 import "firebase/functions";
+import "tslib"
 import * as React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Image, View, Platform } from "react-native";
@@ -132,9 +131,10 @@ export default ({
     await ref.put(blob);
     return;
   };
-// start here - differentiate data with context (eg profile). need to run this on emulator i think
+
   const uploadPuzzleSettings = (fileName: string) => {
     const publicKey: string = uuid.v4();
+    functions.useFunctionsEmulator("http://192.168.1.215:5001")
     const callableUploadPuzzleSettings = functions.httpsCallable("uploadPuzzleSettings")
     callableUploadPuzzleSettings({
       fileName,

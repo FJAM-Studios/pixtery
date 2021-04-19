@@ -90,9 +90,9 @@ const App = () => {
     }
   };
 
-  const requestImage = (puzzle): void => {
-    console.log(puzzle, puzzle.data.imageURI)
-    const imageRef = storage.ref("/" + puzzle.data.imageURI);
+  const requestImage = (puzzle: PuzzleType): void => {
+    console.log(puzzle, puzzle.imageURI)
+    const imageRef = storage.ref("/" + puzzle.imageURI);
     imageRef
       .getDownloadURL() // look into whether there is a different way to get this, like raw image
       .then((url: string) => {
