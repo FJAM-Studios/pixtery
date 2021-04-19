@@ -1,5 +1,4 @@
 import React from "react";
-import ReactDOM from "react-dom";
 import { create, act } from "react-test-renderer";
 import ShallowRenderer from "react-test-renderer/shallow";
 import {
@@ -30,20 +29,17 @@ describe("Home screen", () => {
   let homeScreenInstance;
 
   beforeAll(() => {
-    // ReactDOM.createPortal = jest.fn((element, node) => {
-    //   return element;
-    // });
-    homeScreen = create(
-      <PaperProvider theme={theme}>
-        <Home theme={theme} receivedPuzzles={[]} />
-      </PaperProvider>
-    );
+    homeScreen = create(<Home theme={theme} receivedPuzzles={[]} />);
     homeScreenInstance = homeScreen.root;
   });
 
   test("Home screen renders correctly", () => {
     //snapshot testing
     expect(homeScreen.toJSON()).toMatchSnapshot();
+  });
+
+  test("has 7 children", () => {
+    expect(homeScreen.toJSON().children.length).toBe(7);
   });
 
   test("has 6 Buttons (excluding puzzle type buttons)", () => {

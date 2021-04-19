@@ -1,12 +1,11 @@
-import React, { useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { Headline, Text, TextInput, Button } from "react-native-paper";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
-import Header from "./Header";
+import React, { useState } from "react";
+import { View } from "react-native";
+import { Headline, Text, TextInput, Button } from "react-native-paper";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Profile as ProfileType, Puzzle } from "../types";
-import { View } from "react-native";
+import Header from "./Header";
 
 export default ({
   theme,
@@ -14,6 +13,8 @@ export default ({
   setProfile,
   navigation,
   receivedPuzzles,
+  sentPuzzles,
+  setSentPuzzles,
   setReceivedPuzzles,
 }: {
   theme: any;
@@ -21,7 +22,9 @@ export default ({
   setProfile: (profile: ProfileType | null) => void;
   navigation: any;
   receivedPuzzles: Puzzle[];
+  sentPuzzles: Puzzle[];
   setReceivedPuzzles: (puzzles: Puzzle[]) => void;
+  setSentPuzzles: (puzzles: Puzzle[]) => void;
 }) => {
   const [name, setName] = useState((profile && profile.name) || "");
   const [phone, setPhone] = useState((profile && profile.phone) || "");
@@ -106,7 +109,22 @@ export default ({
         }}
         style={{ margin: 10 }}
       >
-        Delete Local Puzzle Store
+        Delete Received Puzzles
+      </Button>
+      <Button
+        icon="delete"
+        mode="contained"
+        disabled={sentPuzzles.length === 0}
+        onPress={async () => {
+          //delete local storage
+          await AsyncStorage.removeItem("@pixterySentPuzzles");
+          //update app state
+          setSentPuzzles([]);
+          //send you to splash
+        }}
+        style={{ margin: 10 }}
+      >
+        Delete Sent Puzzles
       </Button>
     </SafeAreaView>
   );
