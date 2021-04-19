@@ -1,16 +1,17 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { CommonActions } from "@react-navigation/native";
+import * as FileSystem from "expo-file-system";
 import * as React from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { View } from "react-native";
 import { Headline, ActivityIndicator } from "react-native-paper";
-import * as FileSystem from "expo-file-system";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { SafeAreaView } from "react-native-safe-area-context";
+
+import { storage } from "../FirebaseApp";
+import { Puzzle } from "../types";
 import Header from "./Header";
 import Logo from "./Logo";
 import Title from "./Title";
-import { Puzzle } from "../types";
 
-//this component will receive a puzzle object from component that opens link
-//for now, though, the puzzle object is passed directly from DevTest
 export default ({
   navigation,
   theme,
@@ -25,8 +26,7 @@ export default ({
   setReceivedPuzzles: (puzzles: Puzzle[]) => void;
 }) => {
   const newPuzzle: Puzzle = route.params;
-  const { imageURI } = newPuzzle;
-
+  const { imageURI, publicKey } = newPuzzle;
   const [isLoading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
@@ -34,6 +34,7 @@ export default ({
       try {
         // for now, giving image a filename based on URL from server, can change later if needed
         const fileName = imageURI.slice(imageURI.lastIndexOf("/") + 1);
+        const downloadURL = await storage.ref("/" + imageURI).getDownloadURL();
 
         // create directory for pixtery files if it doesn't exist
         const pixteryDir = FileSystem.cacheDirectory + "pixtery/";
@@ -44,31 +45,28 @@ export default ({
             intermediates: true,
           });
         }
+        const localURI = pixteryDir + fileName;
         // if you already have this image, don't download it
-        const fileInfo = await FileSystem.getInfoAsync(pixteryDir + fileName);
+        const fileInfo = await FileSystem.getInfoAsync(localURI);
         if (!fileInfo.exists) {
           console.log("Image doesn't exist, downloading...");
           // download the image from pixtery server and save to pixtery dir
-          await FileSystem.downloadAsync(imageURI, pixteryDir + fileName);
+          await FileSystem.downloadAsync(downloadURL, localURI);
         }
-        // save puzzle data to localStorage if it's not already there
-        // should probably use a UUID for the puzzle, but for now use filenames
-        const puzzleImageFileNames = receivedPuzzles.map((puzzle) =>
-          puzzle.imageURI.slice(puzzle.imageURI.lastIndexOf("/") + 1)
+        // save puzzle data to localStorage
+        newPuzzle.imageURI = localURI;
+        const allPuzzles = [...receivedPuzzles, newPuzzle];
+        await AsyncStorage.setItem(
+          "@pixteryPuzzles",
+          JSON.stringify(allPuzzles)
         );
-        if (!puzzleImageFileNames.includes(fileName)) {
-          //update local storage and app state
-          const allPuzzles = [...receivedPuzzles, newPuzzle];
-          await AsyncStorage.setItem(
-            "@pixteryPuzzles",
-            JSON.stringify(allPuzzles)
-          );
-          setReceivedPuzzles(allPuzzles);
-          navigation.navigate("PuzzleList");
-        } else {
-          // navigate there if you already have the puzz
-          navigation.navigate("PuzzleList");
-        }
+        setReceivedPuzzles(allPuzzles);
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: "Puzzle", params: { ...newPuzzle } }],
+          })
+        );
       } catch (e) {
         console.log(e);
       }
@@ -91,11 +89,7 @@ export default ({
         <Logo width="100" height="100" />
         <Title width="100" height="35" />
         <Headline>Adding New Pixtery</Headline>
-        <ActivityIndicator
-          animating={true}
-          color={theme.colors.text}
-          size="large"
-        />
+        <ActivityIndicator animating color={theme.colors.text} size="large" />
       </View>
     );
   }

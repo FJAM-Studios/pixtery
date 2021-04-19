@@ -2,24 +2,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as functions from "firebase-functions";
 import {db} from "../../FirebaseApp";
+import {Puzzle} from "../../types";
 
-exports.uploadPuzzleSettings = functions.https.onCall(async (data: { fileName: string; puzzleType: string; gridSize: number; profile: any; message: string; publicKey: string; }) => {
-  const {fileName, puzzleType, gridSize, profile, message, publicKey} = data;
+exports.uploadPuzzleSettings = functions.https.onCall(async (data: { fileName: string; newPuzzle: Puzzle }) => {
+  const {fileName, newPuzzle} = data;
   console.log("uploading puzzle settings");
   try {
     await db
         .collection("puzzles")
         .doc(fileName)
-        .set({
-          puzzleType: puzzleType,
-          gridSize: gridSize,
-          senderName: profile ? profile.name : "No Sender",
-          senderPhone: profile ? profile.phone : "No Sender",
-          imageURI: fileName,
-          publicKey: publicKey,
-          message: message,
-          dateReceived: new Date().toISOString(),
-        });
+        .set(newPuzzle);
     return {result: `successfully uploaded ${fileName}`};
   } catch (error) {
     throw new functions.https.HttpsError("unknown", error.message, error);
