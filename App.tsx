@@ -18,9 +18,9 @@ import HomeScreen from "./components/Home";
 import Profile from "./components/Profile";
 import Puzzle from "./components/Puzzle";
 import PuzzleList from "./components/PuzzleList";
+import SentPuzzleList from "./components/SentPuzzleList";
 import Splash from "./components/Splash";
 import { Puzzle as PuzzleType, Profile as ProfileType } from "./types";
-import SentPuzzleList from "./components/SentPuzzleList";
 
 const image = require("./assets/earth.jpg");
 
@@ -120,10 +120,10 @@ const App = () => {
 
   const queryPuzzle = async (publicKey: string): Promise<PuzzleType | void> => {
     console.log("query puzzle");
-    const queryPuzzle = functions.httpsCallable("queryPuzzle")
+    const queryPuzzle = functions.httpsCallable("queryPuzzle");
     let puzzleData: PuzzleType;
     try {
-      puzzleData = await queryPuzzle({publicKey})
+      puzzleData = await queryPuzzle({ publicKey });
       return puzzleData.data; // get just nested data from returned JSON
     } catch (error) {
       console.error(error);

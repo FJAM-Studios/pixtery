@@ -1,7 +1,7 @@
 import firebase from "firebase";
 import "firebase/functions";
 import "firebase/firestore";
-import "firebase/storage" // for jest testing purposes
+import "firebase/storage"; // for jest testing purposes
 
 const firebaseConfig = {
   apiKey: "***REMOVED***",
@@ -23,9 +23,9 @@ const initializeApp = (): any => {
 const app = initializeApp();
 const db = app.firestore();
 
-let functions = app.functions()
+const functions = app.functions();
 // for http, put in http: <Metro Bundler LAN IP address>:5001
-functions.useFunctionsEmulator("http://192.168.1.215:5001")
+functions.useFunctionsEmulator("http://192.168.1.215:5001");
 
 const storage = app.storage();
 const phoneProvider = new firebase.auth.PhoneAuthProvider();
@@ -48,4 +48,12 @@ const verifySms = (id: string, code: string) => {
 //     console.error('details', e.details)
 //   })
 
-export { app, db, storage, phoneProvider, firebaseConfig, verifySms, functions };
+export {
+  app,
+  db,
+  storage,
+  phoneProvider,
+  firebaseConfig,
+  verifySms,
+  functions,
+};
