@@ -6,6 +6,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { Provider as PaperProvider, DefaultTheme } from "react-native-paper";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import * as Linking from "expo-linking";
+import "tslib"
 
 import Puzzle from "./components/Puzzle";
 import HomeScreen from "./components/Home";
@@ -82,7 +83,6 @@ const App = () => {
     //get the puzzle data, which includes the cloud storage reference to the image
     const puzzleData: PuzzleType | void = await queryPuzzle(publicKey);
     if (puzzleData) {
-      console.log('puzzledata', puzzleData)
       requestImage(puzzleData); //accepts the entire puzzle object, so that the imageURI property can be overwritten with the full image data
       setReceivedPuzzles([...receivedPuzzles, puzzleData]);
 
@@ -91,13 +91,11 @@ const App = () => {
   };
 
   const requestImage = (puzzle: PuzzleType): void => {
-    console.log(puzzle, puzzle.imageURI)
     const imageRef = storage.ref("/" + puzzle.imageURI);
     imageRef
-      .getDownloadURL() // look into whether there is a different way to get this, like raw image
+      .getDownloadURL() // to do: look into whether there is a different way to get this, like raw image
       .then((url: string) => {
         //reassigns imageURI to the actual image file, instead of just the filename
-        console.log('url', url)
         puzzle.imageURI = url;
       })
       .catch((e: unknown) =>
@@ -105,53 +103,16 @@ const App = () => {
       );
   };
 
-// start here 
   const queryPuzzle = async (publicKey: string): Promise<PuzzleType | void> => {
     console.log("query puzzle");
     const queryPuzzle = functions.httpsCallable("queryPuzzle")
     let puzzleData: PuzzleType;
     try {
       puzzleData = await queryPuzzle({publicKey})
-      return puzzleData;
+      return puzzleData.data; // get just nested data from returned JSON
     } catch (error) {
       console.error(error);
     }
-
-    // queryPuzzle({ 
-    //   publicKey
-    // }).then((result: PuzzleType) => {
-    //   console.log('result', result);
-    //   const puzzleData : PuzzleType = result;
-    // }).catch((error: any) => {
-    //   console.error(error);
-    // })
-
-    // const snapshot = await db // cloud function
-    //   .collection("puzzles")
-    //   .where("publicKey", "==", publicKey)
-    //   .get();
-    // if (snapshot.empty) {
-    //   console.log("no puzzle found!");
-    // } else {
-    //   //does this do anything? puzzleData is overwritten immediately below
-    //   let puzzleData: PuzzleType = {
-    //     puzzleType: "",
-    //     gridSize: 0,
-    //     senderName: "",
-    //     senderPhone: "string",
-    //     imageURI: "",
-    //     message: null,
-    //     dateReceived: "",
-    //     completed: false,
-    //   };
-    //   //NOTE: there SHOULD only be one puzzle but it's in an object that has to iterated through to access the data
-    //   snapshot.forEach((puzzle: any) => {
-    //     puzzleData = puzzle.data();
-    //     puzzleData.completed = false;
-    //   });
-    //   console.log("retrieved puzzle data", puzzleData);
-    //   return puzzleData;
-    // }
   };
 
   return (

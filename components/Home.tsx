@@ -1,6 +1,4 @@
-import { db, storage, functions, app } from "../FirebaseApp";
-// const firebase = require("firebase");
-// // Required for side-effects
+import { storage, functions } from "../FirebaseApp";
 import "firebase/functions";
 import "tslib"
 import * as React from "react";
@@ -134,7 +132,7 @@ export default ({
 
   const uploadPuzzleSettings = (fileName: string) => {
     const publicKey: string = uuid.v4();
-    functions.useFunctionsEmulator("http://192.168.1.215:5001")
+    // functions.useFunctionsEmulator("http://192.168.1.215:5001")
     const callableUploadPuzzleSettings = functions.httpsCallable("uploadPuzzleSettings")
     callableUploadPuzzleSettings({
       fileName,
