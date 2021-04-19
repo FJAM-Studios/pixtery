@@ -6,7 +6,6 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { Provider as PaperProvider, DefaultTheme } from "react-native-paper";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import * as Linking from "expo-linking";
-import "tslib"
 
 import Puzzle from "./components/Puzzle";
 import HomeScreen from "./components/Home";
