@@ -1,26 +1,26 @@
-import { db, storage } from "./FirebaseApp";
-import React, { createRef, useEffect, useState } from "react";
-import { View, useWindowDimensions } from "react-native";
 import {
   CommonActions,
   NavigationContainer,
   NavigationContainerRef,
 } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
+import * as Linking from "expo-linking";
+import React, { createRef, useEffect, useState } from "react";
+import { View, useWindowDimensions } from "react-native";
 import { Provider as PaperProvider, DefaultTheme } from "react-native-paper";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import * as Linking from "expo-linking";
 
-import Puzzle from "./components/Puzzle";
-import HomeScreen from "./components/Home";
-import PuzzleList from "./components/PuzzleList";
-import DevTest from "./components/DevTest";
+import { db, storage } from "./FirebaseApp";
 import AddPuzzle from "./components/AddPuzzle";
-import Splash from "./components/Splash";
 import CreateProfile from "./components/CreateProfile";
+import DevTest from "./components/DevTest";
+import HomeScreen from "./components/Home";
 import Profile from "./components/Profile";
-
+import Puzzle from "./components/Puzzle";
+import PuzzleList from "./components/PuzzleList";
+import Splash from "./components/Splash";
 import { Puzzle as PuzzleType, Profile as ProfileType } from "./types";
+import SentPuzzleList from "./components/SentPuzzleList";
 
 const image = require("./assets/earth.jpg");
 
@@ -44,6 +44,7 @@ const Stack = createStackNavigator();
 
 const App = () => {
   const [receivedPuzzles, setReceivedPuzzles] = useState<PuzzleType[]>([]);
+  const [sentPuzzles, setSentPuzzles] = useState<PuzzleType[]>([]);
   const [profile, setProfile] = useState<ProfileType | null>(null);
   const [initialLoad, setInitialLoad] = useState(false);
   const navigationRef = createRef<NavigationContainerRef>();
@@ -145,6 +146,7 @@ const App = () => {
                     {...props}
                     theme={theme}
                     setReceivedPuzzles={setReceivedPuzzles}
+                    setSentPuzzles={setSentPuzzles}
                     profile={profile}
                     setProfile={setProfile}
                     initialLoad={initialLoad}
@@ -170,6 +172,8 @@ const App = () => {
                     theme={theme}
                     receivedPuzzles={receivedPuzzles}
                     profile={profile}
+                    sentPuzzles={sentPuzzles}
+                    setSentPuzzles={setSentPuzzles}
                   />
                 )}
               </Stack.Screen>
@@ -179,6 +183,18 @@ const App = () => {
                     {...props}
                     theme={theme}
                     receivedPuzzles={receivedPuzzles}
+                    setReceivedPuzzles={setReceivedPuzzles}
+                  />
+                )}
+              </Stack.Screen>
+              <Stack.Screen name="SentPuzzleList">
+                {(props) => (
+                  <SentPuzzleList
+                    {...props}
+                    theme={theme}
+                    receivedPuzzles={receivedPuzzles}
+                    sentPuzzles={sentPuzzles}
+                    setSentPuzzles={setSentPuzzles}
                   />
                 )}
               </Stack.Screen>
@@ -196,6 +212,7 @@ const App = () => {
                     boardSize={boardSize}
                     theme={theme}
                     receivedPuzzles={receivedPuzzles}
+                    setReceivedPuzzles={setReceivedPuzzles}
                   />
                 )}
               </Stack.Screen>
@@ -217,6 +234,8 @@ const App = () => {
                     profile={profile}
                     setProfile={setProfile}
                     receivedPuzzles={receivedPuzzles}
+                    setSentPuzzles={setSentPuzzles}
+                    sentPuzzles={sentPuzzles}
                     setReceivedPuzzles={setReceivedPuzzles}
                   />
                 )}
