@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Text, View, StyleSheet, Image } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { ActivityIndicator } from "react-native-paper";
+import AdSafeAreaView from "./AdSafeAreaView";
 import { SafeAreaView } from "react-native-safe-area-context";
-
 import { TESTING_MODE } from "../constants";
 import { Puzzle, GridSections } from "../types";
 import {
@@ -14,6 +14,7 @@ import {
 } from "../util";
 import Header from "./Header";
 import PuzzlePiece from "./PuzzlePiece";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 //disable shuffling for testing
 const disableShuffle = TESTING_MODE;
@@ -25,6 +26,7 @@ export default ({
   receivedPuzzles,
   sentPuzzles,
   route,
+  setReceivedPuzzles,
 }: {
   boardSize: number;
   theme: any;
@@ -32,6 +34,7 @@ export default ({
   receivedPuzzles: Puzzle[];
   sentPuzzles: Puzzle[];
   route: any;
+  setReceivedPuzzles: (puzzles: Puzzle[]) => void;
 }) => {
   const { publicKey } = route.params;
 
@@ -49,7 +52,6 @@ export default ({
     puzzleAreaWidth: 0,
     puzzleAreaHeight: 0,
   });
-
   const measurePuzzleArea = (ev: any): void => {
     if (puzzleAreaDimensions.puzzleAreaHeight) return;
     setPuzzleAreaDimensions({
@@ -116,10 +118,23 @@ export default ({
     boardSize,
   };
 
+  const markPuzzleComplete = async (key: string) => {
+    const allPuzzles = [
+      ...receivedPuzzles.map((puz) => {
+        return {
+          ...puz,
+          completed: key === puz.publicKey ? true : puz.completed,
+        };
+      }),
+    ];
+    await AsyncStorage.setItem("@pixteryPuzzles", JSON.stringify(allPuzzles));
+    setReceivedPuzzles(allPuzzles);
+  };
+
   // need to return dummy component to measure the puzzle area via onLayout
   if (!puzzleAreaDimensions.puzzleAreaHeight)
     return (
-      <SafeAreaView style={styles(styleProps).parentContainer}>
+      <AdSafeAreaView style={styles(styleProps).parentContainer}>
         <Header
           theme={theme}
           notifications={
@@ -133,12 +148,12 @@ export default ({
             flex: 1,
             justifyContent: "flex-end",
           }}
-        />
-      </SafeAreaView>
+        ></View>
+      </AdSafeAreaView>
     );
   if (puzzle && gridSections && piecePaths && shuffledPieces) {
     return (
-      <SafeAreaView style={styles(styleProps).parentContainer}>
+      <AdSafeAreaView style={styles(styleProps).parentContainer}>
         <Header
           theme={theme}
           notifications={
@@ -198,7 +213,7 @@ export default ({
             <Text style={styles(styleProps).errorText}>{errorMessage}</Text>
           </View>
         </View>
-      </SafeAreaView>
+      </AdSafeAreaView>
     );
   } else {
     return (
