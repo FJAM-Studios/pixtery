@@ -49,7 +49,7 @@ export default ({
           <TouchableOpacity
             onPress={() =>
               navigation.navigate("Puzzle", {
-                ...receivedPuzzle,
+                publicKey: receivedPuzzle.publicKey,
               })
             }
             key={ix}
