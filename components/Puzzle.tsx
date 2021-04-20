@@ -7,6 +7,7 @@ import { Puzzle, GridSections } from "../types";
 import { shuffle, generateJigsawPiecePaths } from "../util";
 import Header from "./Header";
 import PuzzlePiece from "./PuzzlePiece";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 //disable shuffling for testing
 const disableShuffle = TESTING_MODE;
@@ -17,14 +18,16 @@ export default ({
   navigation,
   receivedPuzzles,
   route,
+  setReceivedPuzzles,
 }: {
   boardSize: number;
   theme: any;
   navigation: any;
   receivedPuzzles: Puzzle[];
   route: any;
+  setReceivedPuzzles: (puzzles: Puzzle[]) => void;
 }) => {
-  const { imageURI, puzzleType, gridSize, message } = route.params;
+  const { imageURI, puzzleType, gridSize, message, publicKey } = route.params;
   const squareSize = boardSize / gridSize;
   const image = { uri: imageURI };
   const [piecePaths, setPiecePaths] = useState(
@@ -34,7 +37,6 @@ export default ({
     puzzleAreaWidth: 0,
     puzzleAreaHeight: 0,
   });
-
   const measurePuzzleArea = (ev: any): void => {
     if (puzzleAreaDimensions.puzzleAreaHeight) return;
     setPuzzleAreaDimensions({
@@ -99,6 +101,7 @@ export default ({
         ? message
         : "Congrats! You solved the puzzle!";
     setWinMessage(winMessage);
+    markPuzzleComplete(publicKey);
   };
 
   const [firstSnap, setFirstSnap] = useState(false);
@@ -118,6 +121,19 @@ export default ({
     boardSize,
   };
 
+  const markPuzzleComplete = async (key: string) => {
+    const allPuzzles = [
+      ...receivedPuzzles.map((puz) => {
+        return {
+          ...puz,
+          completed: key === puz.publicKey ? true : puz.completed,
+        };
+      }),
+    ];
+    await AsyncStorage.setItem("@pixteryPuzzles", JSON.stringify(allPuzzles));
+    setReceivedPuzzles(allPuzzles);
+  };
+
   // need to return dummy component to measure the puzzle area via onLayout
   if (!puzzleAreaDimensions.puzzleAreaHeight)
     return (
@@ -135,7 +151,7 @@ export default ({
             flex: 1,
             justifyContent: "flex-end",
           }}
-        />
+        ></View>
       </SafeAreaView>
     );
   return (
