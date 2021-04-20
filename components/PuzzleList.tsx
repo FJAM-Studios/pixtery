@@ -1,8 +1,8 @@
 import moment from "moment";
 import * as React from "react";
-import { View, TouchableOpacity } from "react-native";
 import { Text, Card, IconButton } from "react-native-paper";
-import { SafeAreaView } from "react-native-safe-area-context";
+import AdSafeAreaView from "./AdSafeAreaView";
+import { View, TouchableOpacity } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { Puzzle } from "../types";
@@ -28,7 +28,7 @@ export default ({
   };
 
   return (
-    <SafeAreaView
+    <AdSafeAreaView
       style={{
         flex: 1,
         flexDirection: "column",
@@ -96,6 +96,6 @@ export default ({
           </TouchableOpacity>
         ))}
       </View>
-    </SafeAreaView>
+    </AdSafeAreaView>
   );
 };
