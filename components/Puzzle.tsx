@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import { Text, View, StyleSheet, Image } from "react-native";
 import { TESTING_MODE } from "../constants";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -75,7 +75,7 @@ export default ({
   const fillArray = (gridSize: number): PieceLocation[] => {
     const numberArray = [];
     for (let i = 0; i < gridSize * gridSize; i++) {
-      numberArray.push({i, prevX: null, prevY:null});
+      numberArray.push({key: i, i, prevX: null, prevY:null});
     }
     return numberArray;
   };
@@ -118,19 +118,22 @@ export default ({
     theme, boardSize
   }
 
-  const moveToFront = (index: number, prevX:number, prevY: number): void => {
+  const moveToFront = (key: number, index: number, prevX:number, prevY: number): void => {
     shuffledPieces[index].prevX= prevX;
     shuffledPieces[index].prevY=prevY;
+    const selectedPiece = shuffledPieces[index]
+    const newPiece= {key, i: index, prevX, prevY}
     const firstSection = shuffledPieces.slice(0,index);
     const secondSection = shuffledPieces.slice(index+1)
-    setShuffledPieces([...firstSection,...secondSection, shuffledPieces[index]])
+    setShuffledPieces([...firstSection,...secondSection, selectedPiece])
   }
 
   const loadBoard = (): JSX.Element[] =>{
+
     const board = shuffledPieces.map((piece: PieceLocation, ix: number) => (
       <PuzzlePiece
-        key={piece.i}
-        num={piece.i}
+        key={piece.key}
+        num={piece.key}
         ix={ix}
         gridSize={gridSize}
         squareSize={squareSize}
@@ -154,6 +157,10 @@ export default ({
     if(!puzzleLoaded)setPuzzleLoaded(true);
     return board;
   }
+
+  useLayoutEffect(() => {
+    console.log("MOUNTING")
+  }, [])
 
   // need to return dummy component to measure the puzzle area via onLayout
   if(!puzzleAreaDimensions.puzzleAreaHeight) return (
