@@ -1,21 +1,32 @@
-import * as React from "react";
-import { View } from "react-native";
-import { Text, Card, IconButton } from "react-native-paper";
 import moment from "moment";
+import * as React from "react";
+import { Text, Card, IconButton } from "react-native-paper";
 import AdSafeAreaView from "./AdSafeAreaView";
-import Header from "./Header";
+import { View, TouchableOpacity } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 import { Puzzle } from "../types";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import Header from "./Header";
 
 export default ({
   navigation,
   theme,
   receivedPuzzles,
+  setReceivedPuzzles,
 }: {
   navigation: any;
   theme: any;
   receivedPuzzles: Puzzle[];
+  setReceivedPuzzles: (puzzles: Puzzle[]) => void;
 }) => {
+  const deletePuzzle = async (puzzle: Puzzle) => {
+    const newPuzzles = [
+      ...receivedPuzzles.filter((puz) => puz.publicKey !== puzzle.publicKey),
+    ];
+    await AsyncStorage.setItem("@pixteryPuzzles", JSON.stringify(newPuzzles));
+    setReceivedPuzzles(newPuzzles);
+  };
+
   return (
     <AdSafeAreaView
       style={{
@@ -52,7 +63,15 @@ export default ({
               }}
             >
               <Card.Title
-                title={receivedPuzzle.senderName}
+                title={
+                  receivedPuzzle.completed
+                    ? `${receivedPuzzle.senderName} - ${
+                        receivedPuzzle.message && receivedPuzzle.message.length
+                          ? receivedPuzzle.message
+                          : "(No Message)"
+                      }`
+                    : receivedPuzzle.senderName
+                }
                 subtitle={moment(receivedPuzzle.dateReceived).calendar()}
                 right={() => (
                   <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -64,6 +83,12 @@ export default ({
                           : "view-grid"
                       }
                     />
+                    {receivedPuzzle.completed ? (
+                      <IconButton
+                        icon={"delete"}
+                        onPress={() => deletePuzzle(receivedPuzzle)}
+                      />
+                    ) : null}
                   </View>
                 )}
               />
