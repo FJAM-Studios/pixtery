@@ -212,6 +212,7 @@ const App = () => {
                     boardSize={boardSize}
                     theme={theme}
                     receivedPuzzles={receivedPuzzles}
+                    sentPuzzles={sentPuzzles}
                     setReceivedPuzzles={setReceivedPuzzles}
                   />
                 )}
