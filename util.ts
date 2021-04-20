@@ -2,7 +2,9 @@ import { Piece, PieceLocation } from "./types";
 import { Share } from 'react-native';
 
 export const shuffle = (array: PieceLocation[], disabledShuffle = true): PieceLocation[] => {
+
   if (disabledShuffle) return array;
+  console.log("shuffling")
   let currentIndex = array.length,
     temporaryValue: number,
     randomIndex: number;
@@ -16,7 +18,9 @@ export const shuffle = (array: PieceLocation[], disabledShuffle = true): PieceLo
     // And swap it with the current element.
     temporaryValue = array[currentIndex].i;
     array[currentIndex].i = array[randomIndex].i;
+    array[currentIndex].key = array[randomIndex].key;
     array[randomIndex].i = temporaryValue;
+    array[randomIndex].key = temporaryValue;
   }
 
   return array;

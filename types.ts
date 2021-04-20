@@ -32,6 +32,7 @@ export interface Profile {
 }
 
 export interface PieceLocation{
+  key: number;
   i: number;
   prevX: number | null;
   prevY: number | null;
