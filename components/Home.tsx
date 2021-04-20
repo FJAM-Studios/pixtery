@@ -1,4 +1,7 @@
-import { db, storage } from "../FirebaseApp";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as ImageManipulator from "expo-image-manipulator";
+import * as ImagePicker from "expo-image-picker";
+import * as Linking from "expo-linking";
 import * as React from "react";
 import { Image, View, Platform } from "react-native";
 import {
@@ -12,21 +15,21 @@ import {
   Modal,
   Portal,
 } from "react-native-paper";
-import * as ImagePicker from "expo-image-picker";
-import * as Linking from "expo-linking";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 const emptyImage = require("../assets/blank.jpg");
 import Svg, { Path } from "react-native-svg";
+
+import uuid from "uuid";
+import { db, storage } from "../FirebaseApp";
+
+import { Puzzle, Profile } from "../types";
 import {
   generateJigsawPiecePaths,
   generateSquarePiecePaths,
   createBlob,
   shareMessage,
 } from "../util";
-import { Puzzle, Profile } from "../types";
-import uuid from "uuid";
-import * as ImageManipulator from "expo-image-manipulator";
 import { AdMobInterstitial } from "expo-ads-admob";
 
 import {
@@ -44,12 +47,16 @@ export default ({
   theme,
   receivedPuzzles,
   profile,
+  sentPuzzles,
+  setSentPuzzles,
 }: {
   navigation: any;
   boardSize: number;
   theme: any;
   receivedPuzzles: Puzzle[];
   profile: Profile | null;
+  sentPuzzles: Puzzle[];
+  setSentPuzzles: (puzzles: Puzzle[]) => void;
 }) => {
   const [imageURI, setImageURI] = React.useState("");
   const [puzzleType, setPuzzleType] = React.useState("jigsaw");
@@ -57,7 +64,7 @@ export default ({
   const [modalVisible, setModalVisible] = React.useState(false);
 
   const selectImage = async (camera: boolean) => {
-    let result = camera
+    const result = camera
       ? await ImagePicker.launchCameraAsync({
           mediaTypes: ImagePicker.MediaTypeOptions.Images,
           allowsEditing: true,
@@ -114,13 +121,24 @@ export default ({
     setModalVisible(true);
     await displayPainfulAd();
     const fileName: string = uuid.v4();
-    await uploadImage(fileName);
-    const publicKey: string = await uploadPuzzleSettings(fileName);
-    generateLink(publicKey);
+    const localURI = await uploadImage(fileName);
+    const newPuzzle = await uploadPuzzleSettings(fileName);
+    newPuzzle.imageURI = localURI;
     setModalVisible(false);
+    if (newPuzzle.publicKey) generateLink(newPuzzle.publicKey);
+    addToSent(newPuzzle);
   };
 
-  const uploadImage = async (fileName: string): Promise<void> => {
+  const addToSent = async (puzzle: Puzzle) => {
+    const allPuzzles = [...sentPuzzles, puzzle];
+    await AsyncStorage.setItem(
+      "@pixterySentPuzzles",
+      JSON.stringify(allPuzzles)
+    );
+    setSentPuzzles(allPuzzles);
+  };
+
+  const uploadImage = async (fileName: string): Promise<string> => {
     //resize and compress the image for upload
     const resizedCompressedImage = await ImageManipulator.manipulateAsync(
       imageURI,
@@ -134,26 +152,23 @@ export default ({
     const blob: Blob = await createBlob(resizedCompressedImage.uri);
     const ref = storage.ref().child(fileName);
     await ref.put(blob);
-    return;
+    return resizedCompressedImage.uri;
   };
 
-  const uploadPuzzleSettings = async (fileName: string): Promise<string> => {
+  const uploadPuzzleSettings = async (fileName: string): Promise<Puzzle> => {
     const publicKey: string = uuid.v4();
-    await db
-      .collection("puzzles")
-      .doc(fileName)
-      .set({
-        puzzleType: puzzleType,
-        gridSize: gridSize,
-        senderName: profile ? profile.name : "No Sender",
-        senderPhone: profile ? profile.phone : "No Sender",
-        imageURI: fileName,
-        publicKey: publicKey,
-        message: message,
-        dateReceived: new Date().toISOString(),
-      });
-
-    return publicKey;
+    const newPuzzle = {
+      puzzleType: puzzleType,
+      gridSize: gridSize,
+      senderName: profile ? profile.name : "No Sender",
+      senderPhone: profile ? profile.phone : "No Sender",
+      imageURI: fileName,
+      publicKey: publicKey,
+      message: message,
+      dateReceived: new Date().toISOString(),
+    };
+    await db.collection("puzzles").doc(fileName).set(newPuzzle);
+    return newPuzzle;
   };
 
   const generateLink = (publicKey: string): void => {
@@ -190,7 +205,7 @@ export default ({
           <Headline>Building a Pixtery!</Headline>
           {gridSize % 2 ? null : <Text>And choosing so carefully</Text>}
           <ActivityIndicator
-            animating={true}
+            animating
             color={theme.colors.text}
             size="large"
             style={{ padding: 15 }}
@@ -330,7 +345,7 @@ export default ({
             disabled={!imageURI.length}
             onPress={() => setGridSize(2)}
             color="white"
-            compact={true}
+            compact
           >
             2
           </Button>
@@ -350,7 +365,7 @@ export default ({
             disabled={!imageURI.length}
             onPress={() => setGridSize(3)}
             color="white"
-            compact={true}
+            compact
           >
             3
           </Button>
@@ -370,7 +385,7 @@ export default ({
             disabled={!imageURI.length}
             onPress={() => setGridSize(4)}
             color="white"
-            compact={true}
+            compact
           >
             4
           </Button>

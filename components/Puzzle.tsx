@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Text, View, StyleSheet, Image } from "react-native";
-import { BANNER_ID, TESTING_MODE } from "../constants";
 import AdSafeAreaView from "./AdSafeAreaView";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { TESTING_MODE } from "../constants";
+import { Puzzle, GridSections } from "../types";
+import { shuffle, generateJigsawPiecePaths } from "../util";
 import Header from "./Header";
 import PuzzlePiece from "./PuzzlePiece";
-import { shuffle, generateJigsawPiecePaths } from "../util";
-import { Puzzle, GridSections } from "../types";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 //disable shuffling for testing
 const disableShuffle = TESTING_MODE;
@@ -16,14 +18,16 @@ export default ({
   navigation,
   receivedPuzzles,
   route,
+  setReceivedPuzzles,
 }: {
   boardSize: number;
   theme: any;
   navigation: any;
   receivedPuzzles: Puzzle[];
   route: any;
+  setReceivedPuzzles: (puzzles: Puzzle[]) => void;
 }) => {
-  const { imageURI, puzzleType, gridSize, message } = route.params;
+  const { imageURI, puzzleType, gridSize, message, publicKey } = route.params;
   const squareSize = boardSize / gridSize;
   const image = { uri: imageURI };
   const [piecePaths, setPiecePaths] = useState(
@@ -33,7 +37,6 @@ export default ({
     puzzleAreaWidth: 0,
     puzzleAreaHeight: 0,
   });
-
   const measurePuzzleArea = (ev: any): void => {
     if (puzzleAreaDimensions.puzzleAreaHeight) return;
     setPuzzleAreaDimensions({
@@ -44,7 +47,7 @@ export default ({
   // populates X Y coordinates for upper left corner of each grid section
   const getGridSections = (): GridSections => {
     // separated row and col in case needed for future flexibility
-    let gridSections: GridSections = {
+    const gridSections: GridSections = {
       rowDividers: [0],
       colDividers: [0],
     };
@@ -98,6 +101,7 @@ export default ({
         ? message
         : "Congrats! You solved the puzzle!";
     setWinMessage(winMessage);
+    markPuzzleComplete(publicKey);
   };
 
   const [firstSnap, setFirstSnap] = useState(false);
@@ -115,6 +119,19 @@ export default ({
   const styleProps = {
     theme,
     boardSize,
+  };
+
+  const markPuzzleComplete = async (key: string) => {
+    const allPuzzles = [
+      ...receivedPuzzles.map((puz) => {
+        return {
+          ...puz,
+          completed: key === puz.publicKey ? true : puz.completed,
+        };
+      }),
+    ];
+    await AsyncStorage.setItem("@pixteryPuzzles", JSON.stringify(allPuzzles));
+    setReceivedPuzzles(allPuzzles);
   };
 
   // need to return dummy component to measure the puzzle area via onLayout

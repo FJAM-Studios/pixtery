@@ -1,6 +1,7 @@
 import React from "react";
 import { View, TouchableWithoutFeedback } from "react-native";
 import { IconButton, Badge, Menu, Divider } from "react-native-paper";
+
 import Logo from "./Logo";
 import Title from "./Title";
 
@@ -62,7 +63,7 @@ export default ({
             navigation.navigate("Home");
           }}
           title="Make"
-          icon="send"
+          icon="camera-iris"
         />
         <Divider />
         <Menu.Item
@@ -77,10 +78,10 @@ export default ({
         <Menu.Item
           onPress={() => {
             closeMenu();
-            // navigation.navigate("Squares");
+            navigation.navigate("SentPuzzleList");
           }}
-          title="Friends"
-          icon="account-multiple"
+          title="Sent"
+          icon="send"
         />
         <Divider />
         <Menu.Item
