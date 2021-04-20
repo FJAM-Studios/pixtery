@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Text, View, StyleSheet, Image } from "react-native";
+import AdSafeAreaView from "./AdSafeAreaView";
 import { SafeAreaView } from "react-native-safe-area-context";
-
 import { TESTING_MODE } from "../constants";
 import { Puzzle, GridSections } from "../types";
 import { shuffle, generateJigsawPiecePaths } from "../util";
@@ -137,7 +137,7 @@ export default ({
   // need to return dummy component to measure the puzzle area via onLayout
   if (!puzzleAreaDimensions.puzzleAreaHeight)
     return (
-      <SafeAreaView style={styles(styleProps).parentContainer}>
+      <AdSafeAreaView style={styles(styleProps).parentContainer}>
         <Header
           theme={theme}
           notifications={
@@ -152,10 +152,10 @@ export default ({
             justifyContent: "flex-end",
           }}
         ></View>
-      </SafeAreaView>
+      </AdSafeAreaView>
     );
   return (
-    <SafeAreaView style={styles(styleProps).parentContainer}>
+    <AdSafeAreaView style={styles(styleProps).parentContainer}>
       <Header
         theme={theme}
         notifications={
@@ -215,7 +215,7 @@ export default ({
           <Text style={styles(styleProps).errorText}>{errorMessage}</Text>
         </View>
       </View>
-    </SafeAreaView>
+    </AdSafeAreaView>
   );
 };
 
