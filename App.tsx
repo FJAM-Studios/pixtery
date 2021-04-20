@@ -183,6 +183,7 @@ const App = () => {
                     {...props}
                     theme={theme}
                     receivedPuzzles={receivedPuzzles}
+                    setReceivedPuzzles={setReceivedPuzzles}
                   />
                 )}
               </Stack.Screen>
@@ -212,6 +213,7 @@ const App = () => {
                     theme={theme}
                     receivedPuzzles={receivedPuzzles}
                     sentPuzzles={sentPuzzles}
+                    setReceivedPuzzles={setReceivedPuzzles}
                   />
                 )}
               </Stack.Screen>

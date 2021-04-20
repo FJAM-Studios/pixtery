@@ -1,8 +1,8 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useState } from "react";
-import { View } from "react-native";
 import { Headline, Text, TextInput, Button } from "react-native-paper";
-import { SafeAreaView } from "react-native-safe-area-context";
+import AdSafeAreaView from "./AdSafeAreaView";
+import { View } from "react-native";
 
 import { Profile as ProfileType, Puzzle } from "../types";
 import Header from "./Header";
@@ -30,7 +30,7 @@ export default ({
   const [phone, setPhone] = useState((profile && profile.phone) || "");
   const [errors, setErrors] = useState("");
   return (
-    <SafeAreaView
+    <AdSafeAreaView
       style={{
         flex: 1,
         flexDirection: "column",
@@ -126,6 +126,6 @@ export default ({
       >
         Delete Sent Puzzles
       </Button>
-    </SafeAreaView>
+    </AdSafeAreaView>
   );
 };
