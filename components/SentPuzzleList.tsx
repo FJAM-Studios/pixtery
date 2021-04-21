@@ -1,7 +1,7 @@
 import * as React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ImageBackground, View } from "react-native";
-import { Card, IconButton, Headline } from "react-native-paper";
+import { Card, IconButton, Button, Headline } from "react-native-paper";
 import moment from "moment";
 import Header from "./Header";
 import { Puzzle } from "../types";
@@ -72,7 +72,7 @@ export default ({
       >
         <View
           style={{
-            padding: 50,
+            padding: 30,
             alignSelf: "center",
             alignItems: "center",
             justifyContent: "center",
@@ -81,12 +81,27 @@ export default ({
           }}
         >
           <Headline>Delete Puzzle?</Headline>
-          <View style={{ flexDirection: "row" }}>
-            <IconButton
+          <View
+            style={{
+              flexDirection: "row",
+            }}
+          >
+            <Button
               icon="delete"
+              mode="contained"
               onPress={() => deletePuzzle(puzzleToDelete)}
-            />
-            <IconButton icon="close" onPress={() => setModalVisible(false)} />
+              style={{ margin: 5 }}
+            >
+              Delete
+            </Button>
+            <Button
+              icon="close"
+              mode="contained"
+              onPress={() => setModalVisible(false)}
+              style={{ margin: 5 }}
+            >
+              Cancel
+            </Button>
           </View>
         </View>
       </Modal>

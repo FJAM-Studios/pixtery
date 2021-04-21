@@ -1,6 +1,6 @@
 import moment from "moment";
 import * as React from "react";
-import { Text, Card, IconButton, Headline } from "react-native-paper";
+import { Text, Card, IconButton, Button, Headline } from "react-native-paper";
 import AdSafeAreaView from "./AdSafeAreaView";
 import { View, TouchableOpacity } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -61,7 +61,7 @@ export default ({
       >
         <View
           style={{
-            padding: 50,
+            padding: 30,
             alignSelf: "center",
             alignItems: "center",
             justifyContent: "center",
@@ -69,13 +69,28 @@ export default ({
             borderRadius: theme.roundness,
           }}
         >
-          <Headline>Delete Puzzle?</Headline>
-          <View style={{ flexDirection: "row" }}>
-            <IconButton
+          <Headline>Are you sure?</Headline>
+          <View
+            style={{
+              flexDirection: "row",
+            }}
+          >
+            <Button
               icon="delete"
+              mode="contained"
               onPress={() => deletePuzzle(puzzleToDelete)}
-            />
-            <IconButton icon="close" onPress={() => setModalVisible(false)} />
+              style={{ margin: 5 }}
+            >
+              Delete
+            </Button>
+            <Button
+              icon="close"
+              mode="contained"
+              onPress={() => setModalVisible(false)}
+              style={{ margin: 5 }}
+            >
+              Cancel
+            </Button>
           </View>
         </View>
       </Modal>
