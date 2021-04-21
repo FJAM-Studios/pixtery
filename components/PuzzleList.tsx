@@ -69,7 +69,7 @@ export default ({
             borderRadius: theme.roundness,
           }}
         >
-          <Headline>Are you sure?</Headline>
+          <Headline>Delete Puzzle?</Headline>
           <View
             style={{
               flexDirection: "row",
