@@ -125,12 +125,10 @@ export default ({
                           : "view-grid"
                       }
                     />
-                    {receivedPuzzle.completed ? (
-                      <IconButton
-                        icon={"delete"}
-                        onPress={() => showDeleteModal(receivedPuzzle)}
-                      />
-                    ) : null}
+                    <IconButton
+                      icon={"delete"}
+                      onPress={() => showDeleteModal(receivedPuzzle)}
+                    />
                   </View>
                 )}
               />
