@@ -75,24 +75,36 @@ describe("Puzzle screen", () => {
 
     React.useState = jest
       .fn()
-      .mockReturnValueOnce([piecePaths, {}])
-      .mockReturnValueOnce([puzzleAreaDimensions, {}])
-      .mockReturnValueOnce([gridSections, {}])
-      .mockReturnValueOnce([shuffledPieces, {}])
-      .mockReturnValueOnce([currentBoard, {}])
-      .mockReturnValueOnce([winMessage, {}])
-      .mockReturnValueOnce([errorMessage, {}])
-      .mockReturnValueOnce([firstSnap, {}]);
+      .mockReturnValueOnce([piecePaths, function () {}])
+      .mockReturnValueOnce([puzzleAreaDimensions, function () {}])
+      .mockReturnValueOnce([gridSections, function () {}])
+      .mockReturnValueOnce([shuffledPieces, function () {}])
+      .mockReturnValueOnce([currentBoard, function () {}])
+      .mockReturnValueOnce([winMessage, function () {}])
+      .mockReturnValueOnce([errorMessage, function () {}])
+      .mockReturnValueOnce([firstSnap, function () {}]);
+
     // React.useState = jest
     //   .fn()
-    //   .mockReturnValueOnce([[], {}])
-    //   .mockReturnValueOnce([{}, {}])
-    //   .mockReturnValueOnce([{}, {}])
-    //   .mockReturnValueOnce([[], {}])
-    //   .mockReturnValueOnce([[], {}])
-    //   .mockReturnValueOnce(["", {}])
-    //   .mockReturnValueOnce(["", {}])
-    //   .mockReturnValueOnce([false, {}]);
+    //   .mockReturnValueOnce(piecePaths, {})
+    //   .mockReturnValueOnce(puzzleAreaDimensions, () => {})
+    //   .mockReturnValueOnce(gridSections, {})
+    //   .mockReturnValueOnce(shuffledPieces, {})
+    //   .mockReturnValueOnce(currentBoard, {})
+    //   .mockReturnValueOnce(winMessage, {})
+    //   .mockReturnValueOnce(errorMessage, {})
+    //   .mockReturnValueOnce(firstSnap, {});
+
+    // React.useState = jest
+    //   .fn()
+    //   .mockReturnValueOnce([[], function () {}])
+    //   .mockReturnValueOnce([{}, function () {}])
+    //   .mockReturnValueOnce([{}, function () {}])
+    //   .mockReturnValueOnce([[], function () {}])
+    //   .mockReturnValueOnce([[], function () {}])
+    //   .mockReturnValueOnce(["", function () {}])
+    //   .mockReturnValueOnce(["", function () {}])
+    //   .mockReturnValueOnce([false, function () {}]);
 
     jest.mock("../components/Header");
     const { getByText, update } = render(
@@ -112,6 +124,7 @@ describe("Puzzle screen", () => {
             completed: false,
           },
         ]}
+        setReceivedPuzzles={() => {}}
       />
     );
 

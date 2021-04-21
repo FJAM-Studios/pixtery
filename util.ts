@@ -1,5 +1,6 @@
+import { Share } from "react-native";
+
 import { Piece } from "./types";
-import { Share } from 'react-native';
 
 export const shuffle = (array: number[], disabledShuffle = true): number[] => {
   if (disabledShuffle) return array;
@@ -8,7 +9,7 @@ export const shuffle = (array: number[], disabledShuffle = true): number[] => {
     randomIndex: number;
 
   // While there remain elements to shuffle...
-  while (0 !== currentIndex) {
+  while (currentIndex !== 0) {
     // Pick a remaining element...
     randomIndex = Math.floor(Math.random() * currentIndex);
     currentIndex -= 1;
@@ -27,7 +28,7 @@ export const shuffle = (array: number[], disabledShuffle = true): number[] => {
 export const generateJigsawPiecePaths = (
   gridSize: number,
   squareSize: number,
-  disableOffset: boolean = false
+  disableOffset = false
 ): string[] => {
   //create empty array for storing Pieces in order
   const pieces: Piece[] = new Array(gridSize * gridSize);
@@ -200,7 +201,7 @@ export const generateJigsawPiecePaths = (
     } `;
     //idk if this is good typescript
     const sides = ["top", "right", "bottom", "left"] as const;
-    for (let side of sides) {
+    for (const side of sides) {
       //if only two points, denote line
       str += piece[side].length === 2 ? "L " : "";
       str += piece[side]
@@ -263,7 +264,7 @@ export const generateSquarePiecePaths = (
     } `;
     //idk if this is good typescript
     const sides = ["top", "right", "bottom", "left"] as const;
-    for (let side of sides) {
+    for (const side of sides) {
       //if only two points, denote line
       str += piece[side].length === 2 ? "L " : "";
       str += piece[side]
@@ -303,25 +304,25 @@ export const createBlob = (localUri: string): Promise<Blob> => {
 
 export const getRandomInRange = (min: number, max: number): number => {
   return Math.random() * (max - min) + min;
-}
+};
 
 export const getInitialDimensions = (
-  puzzleType: string, 
-  minSandboxY: number, 
-  maxSandboxY: number, 
+  puzzleType: string,
+  minSandboxY: number,
+  maxSandboxY: number,
   num: number,
-  ix: number, 
-  gridSize: number, 
+  ix: number,
+  gridSize: number,
   squareSize: number
 ) => {
   let widthY: number,
-  widthX: number,
-  initX: number,
-  initY: number,
-  viewBoxX: number,
-  viewBoxY: number,
-  solutionX: number,
-  solutionY: number
+    widthX: number,
+    initX: number,
+    initY: number,
+    viewBoxX: number,
+    viewBoxY: number,
+    solutionX: number,
+    solutionY: number;
   const squareX = num % gridSize;
   const squareY = Math.floor(num / gridSize);
 
@@ -329,10 +330,13 @@ export const getInitialDimensions = (
     //for square puzzles, everything is aligned to grid
     widthY = widthX = squareSize;
     // note Math.random() cannot be used here as it changes initial values at each render
-    const randomFactor = ix % 2 ? squareSize * 0.1 : 0
-    const scaleSquaresToSandbox = ((maxSandboxY - minSandboxY) / minSandboxY)
+    const randomFactor = ix % 2 ? squareSize * 0.1 : 0;
+    const scaleSquaresToSandbox = (maxSandboxY - minSandboxY) / minSandboxY;
     initX = (ix % gridSize) * squareSize - randomFactor;
-    initY = minSandboxY + Math.floor(ix / gridSize) * squareSize * scaleSquaresToSandbox + randomFactor;
+    initY =
+      minSandboxY +
+      Math.floor(ix / gridSize) * squareSize * scaleSquaresToSandbox +
+      randomFactor;
     solutionX = (num % gridSize) * squareSize;
     solutionY = Math.floor(num / gridSize) * squareSize;
     viewBoxX = squareX * squareSize;
@@ -347,14 +351,13 @@ export const getInitialDimensions = (
       squareX === 0 || squareX === gridSize - 1
         ? squareSize * 1.25
         : squareSize * 1.5;
-    const scaleJigsawToSandbox = ((maxSandboxY  - squareSize * 0.25 - minSandboxY) / minSandboxY)
+    const scaleJigsawToSandbox =
+      (maxSandboxY - squareSize * 0.25 - minSandboxY) / minSandboxY;
     initX = Math.max(0, (ix % gridSize) * squareSize - squareSize * 0.25);
-    initY = 
-      minSandboxY + 
-      Math.max(
-        0,
-        Math.floor(ix / gridSize) * squareSize - squareSize * 0.25
-      ) * scaleJigsawToSandbox
+    initY =
+      minSandboxY +
+      Math.max(0, Math.floor(ix / gridSize) * squareSize - squareSize * 0.25) *
+        scaleJigsawToSandbox;
     solutionX = Math.max(0, (num % gridSize) * squareSize - squareSize * 0.25);
     solutionY = Math.max(
       0,
@@ -373,24 +376,28 @@ export const getInitialDimensions = (
     viewBoxX,
     viewBoxY,
     solutionX,
-    solutionY
-  ]
-}
-export const shareMessage = async (pixUrl: string): Promise <void> => {
+    solutionY,
+  ];
+};
+export const shareMessage = async (pixUrl: string): Promise<void> => {
   try {
     const content = {
-      message: "Can you solve this Pixtery?" + String.fromCharCode(0xD83D, 0xDCF7) + String.fromCharCode(0xD83D, 0xDD75) + pixUrl,
-    }
+      message:
+        "Can you solve this Pixtery?" +
+        String.fromCharCode(0xd83d, 0xdcf7) +
+        String.fromCharCode(0xd83d, 0xdd75) +
+        pixUrl,
+    };
     const options = {
-      subject: "Someone sent you a Pixtery to solve!"
-    }
-    const result = await Share.share(
-        content, options
-    );
+      subject: "Someone sent you a Pixtery to solve!",
+    };
+    const result = await Share.share(content, options);
     if (result.action === Share.sharedAction) {
       if (result.activityType) {
-      } else {}
-    } else if (result.action === Share.dismissedAction) {}
+      } else {
+      }
+    } else if (result.action === Share.dismissedAction) {
+    }
   } catch (error) {
     alert(error.message);
   }

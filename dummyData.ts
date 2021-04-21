@@ -1,5 +1,7 @@
 import { Asset } from "expo-asset";
+
 import { Puzzle as PuzzleType } from "./types";
+
 const image = Asset.fromModule(require("./assets/earth.jpg"));
 
 export const dummyPuzzles: PuzzleType[] = [
