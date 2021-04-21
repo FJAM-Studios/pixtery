@@ -60,7 +60,7 @@ export default ({
         />
         <Logo width="100" height="100" />
         <Title width="100" height="35" />
-        <Headline>Create a Pixtery Profile</Headline>
+        <Headline>Sign In</Headline>
       </View>
       <Text>Name</Text>
       <TextInput
