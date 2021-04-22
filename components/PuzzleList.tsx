@@ -1,11 +1,12 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import moment from "moment";
 import * as React from "react";
+import { Text, Card, IconButton, Button, Headline } from "react-native-paper";
+import AdSafeAreaView from "./AdSafeAreaView";
 import { View, TouchableOpacity } from "react-native";
-import { Text, Card, IconButton } from "react-native-paper";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import Modal from "react-native-modal";
 
 import { Puzzle } from "../types";
-import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 
 export default ({
@@ -19,12 +20,26 @@ export default ({
   receivedPuzzles: Puzzle[];
   setReceivedPuzzles: (puzzles: Puzzle[]) => void;
 }) => {
-  const deletePuzzle = async (puzzle: Puzzle) => {
-    const newPuzzles = [
-      ...receivedPuzzles.filter((puz) => puz.publicKey !== puzzle.publicKey),
-    ];
-    await AsyncStorage.setItem("@pixteryPuzzles", JSON.stringify(newPuzzles));
-    setReceivedPuzzles(newPuzzles);
+  const [modalVisible, setModalVisible] = React.useState(false);
+  const [puzzleToDelete, setPuzzleToDelete] = React.useState<Puzzle | null>(
+    null
+  );
+
+  const showDeleteModal = (puzzle: Puzzle) => {
+    setModalVisible(true);
+    setPuzzleToDelete(puzzle);
+  };
+
+  const deletePuzzle = async (puzzle: Puzzle | null) => {
+    if (puzzle) {
+      const newPuzzles = [
+        ...receivedPuzzles.filter((puz) => puz.publicKey !== puzzle.publicKey),
+      ];
+      await AsyncStorage.setItem("@pixteryPuzzles", JSON.stringify(newPuzzles));
+      setReceivedPuzzles(newPuzzles);
+    }
+    setPuzzleToDelete(null);
+    setModalVisible(false);
   };
 
   return (
@@ -37,6 +52,48 @@ export default ({
         justifyContent: "flex-start",
       }}
     >
+      <Modal
+        isVisible={modalVisible}
+        onBackdropPress={() => setModalVisible(false)}
+        animationIn={"fadeIn"}
+        animationOut={"fadeOut"}
+        backdropTransitionOutTiming={0}
+      >
+        <View
+          style={{
+            padding: 30,
+            alignSelf: "center",
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: theme.colors.backdrop,
+            borderRadius: theme.roundness,
+          }}
+        >
+          <Headline>Delete Puzzle?</Headline>
+          <View
+            style={{
+              flexDirection: "row",
+            }}
+          >
+            <Button
+              icon="delete"
+              mode="contained"
+              onPress={() => deletePuzzle(puzzleToDelete)}
+              style={{ margin: 5 }}
+            >
+              Delete
+            </Button>
+            <Button
+              icon="close"
+              mode="contained"
+              onPress={() => setModalVisible(false)}
+              style={{ margin: 5 }}
+            >
+              Cancel
+            </Button>
+          </View>
+        </View>
+      </Modal>
       <Header
         theme={theme}
         notifications={
@@ -81,12 +138,10 @@ export default ({
                           : "view-grid"
                       }
                     />
-                    {receivedPuzzle.completed ? (
-                      <IconButton
-                        icon="delete"
-                        onPress={() => deletePuzzle(receivedPuzzle)}
-                      />
-                    ) : null}
+                    <IconButton
+                      icon={"delete"}
+                      onPress={() => showDeleteModal(receivedPuzzle)}
+                    />
                   </View>
                 )}
               />
