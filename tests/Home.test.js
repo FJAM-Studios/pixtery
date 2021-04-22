@@ -15,7 +15,10 @@ import {
   Surface,
   Headline,
   TextInput,
+  Modal,
+  Portal,
 } from "react-native-paper";
+import { Provider as PaperProvider, DefaultTheme } from "react-native-paper";
 
 // other test ideas:
 // test for logging in twice?

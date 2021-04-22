@@ -1,3 +1,4 @@
+import "firebase/functions";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AdMobInterstitial } from "expo-ads-admob";
 import * as ImageManipulator from "expo-image-manipulator";
@@ -19,7 +20,7 @@ import {
 import Svg, { Path } from "react-native-svg";
 import uuid from "uuid";
 
-import { db, storage } from "../FirebaseApp";
+import { storage, functions } from "../FirebaseApp";
 import {
   DEFAULT_IMAGE_SIZE,
   COMPRESSION,
@@ -56,7 +57,7 @@ export default ({
   profile: Profile | null;
   sentPuzzles: Puzzle[];
   setSentPuzzles: (puzzles: Puzzle[]) => void;
-}) => {
+}): JSX.Element => {
   const [imageURI, setImageURI] = React.useState("");
   const [puzzleType, setPuzzleType] = React.useState("jigsaw");
   const [gridSize, setGridSize] = React.useState(3);
@@ -122,10 +123,17 @@ export default ({
     const fileName: string = uuid.v4();
     const localURI = await uploadImage(fileName);
     const newPuzzle = await uploadPuzzleSettings(fileName);
-    newPuzzle.imageURI = localURI;
+    if (newPuzzle) {
+      newPuzzle.imageURI = localURI;
+    }
     setModalVisible(false);
-    if (newPuzzle.publicKey) generateLink(newPuzzle.publicKey);
-    addToSent(newPuzzle);
+    if (newPuzzle) {
+      if (newPuzzle.publicKey) {
+        generateLink(newPuzzle.publicKey);
+        addToSent(newPuzzle);
+      }
+    }
+    // need to add else for error handling if uploadPuzzSettings throws error
   };
 
   const addToSent = async (puzzle: Puzzle) => {
@@ -154,8 +162,13 @@ export default ({
     return resizedCompressedImage.uri;
   };
 
-  const uploadPuzzleSettings = async (fileName: string): Promise<Puzzle> => {
+  const uploadPuzzleSettings = async (
+    fileName: string
+  ): Promise<Puzzle | undefined> => {
     const publicKey: string = uuid.v4();
+    const uploadPuzzleSettingsCallable = functions.httpsCallable(
+      "uploadPuzzleSettings"
+    );
     const newPuzzle = {
       puzzleType,
       gridSize,
@@ -166,8 +179,15 @@ export default ({
       message,
       dateReceived: new Date().toISOString(),
     };
-    await db.collection("puzzles").doc(fileName).set(newPuzzle);
-    return newPuzzle;
+    try {
+      await uploadPuzzleSettingsCallable({
+        fileName,
+        newPuzzle,
+      });
+      return newPuzzle;
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const generateLink = (publicKey: string): void => {
