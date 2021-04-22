@@ -172,22 +172,6 @@ export default ({
     }
   };
 
-  // const uploadPuzzleSettings = async (fileName: string): Promise<Puzzle> => {
-  //   const publicKey: string = uuid.v4();
-  //   const newPuzzle = {
-  //     puzzleType: puzzleType,
-  //     gridSize: gridSize,
-  //     senderName: profile ? profile.name : "No Sender",
-  //     senderPhone: profile ? profile.phone : "No Sender",
-  //     imageURI: fileName,
-  //     publicKey: publicKey,
-  //     message: message,
-  //     dateReceived: new Date().toISOString(),
-  //   };
-  //   await db.collection("puzzles").doc(fileName).set(newPuzzle);
-  //   return newPuzzle;
-  // };
-
   const generateLink = (publicKey: string): void => {
     //first param is an empty string to allow Expo to dynamically determine path to app based on runtime environment
     const deepLink = Linking.createURL("", { queryParams: { publicKey } });

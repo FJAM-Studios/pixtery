@@ -2,6 +2,12 @@ import firebase from "firebase";
 import "firebase/functions";
 import "firebase/firestore";
 import "firebase/storage"; // for jest testing purposes
+// import * as dotenv from "dotenv"
+
+// require('dotenv').config();
+// import {MY_LAN_IP} from "react-native-dotenv";
+import {MY_LAN_IP} from "@env";
+// const myLanIP = process.env.MY_LAN_IP
 
 const firebaseConfig = {
   apiKey: "***REMOVED***",
@@ -25,7 +31,9 @@ const db = app.firestore();
 
 const functions = app.functions();
 // for http, put in http: <Metro Bundler LAN IP address>:5001
-functions.useFunctionsEmulator("http://192.168.1.215:5001");
+console.log('IP', MY_LAN_IP)
+functions.useFunctionsEmulator(`${MY_LAN_IP}:5001`);
+// functions.useFunctionsEmulator("http://192.168.1.215:5001");
 
 const storage = app.storage();
 const phoneProvider = new firebase.auth.PhoneAuthProvider();
@@ -34,19 +42,6 @@ const verifySms = (id: string, code: string) => {
   const signInResponse = firebase.auth().signInWithCredential(credential);
   return signInResponse;
 };
-
-// test to see if cloud funcs are running
-// const addNumbers = app.functions().httpsCallable("addNumbers")
-
-// addNumbers({firstNumber: 1, secondNumber: 2})
-//     .then((result: any) => {
-//     console.log('result test in firebaseapp', result)
-//   }).catch((e: any) => {
-//     console.log('there is error in firebaseapp')
-//     console.error('message', e.message)
-//     console.error('code', e.code)
-//     console.error('details', e.details)
-//   })
 
 export {
   app,

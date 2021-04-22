@@ -27,10 +27,10 @@ export default ({
   const { imageURI, puzzleType, gridSize, message } = route.params;
   const squareSize = boardSize / gridSize;
   const image = { uri: imageURI };
-  const [piecePaths, setPiecePaths] = React.useState(
+  const [piecePaths, setPiecePaths] = useState(
     generateJigsawPiecePaths(gridSize, squareSize)
   );
-  const [puzzleAreaDimensions, setPuzzleAreaDimensions] = React.useState({
+  const [puzzleAreaDimensions, setPuzzleAreaDimensions] = useState({
     puzzleAreaWidth: 0,
     puzzleAreaHeight: 0,
   });
@@ -67,7 +67,7 @@ export default ({
     return gridSections;
   };
 
-  const [gridSections, setGridSections] = React.useState<GridSections>(
+  const [gridSections, setGridSections] = useState<GridSections>(
     getGridSections()
   );
 
@@ -79,7 +79,7 @@ export default ({
     return numberArray;
   };
 
-  const [shuffledPieces, setShuffledPieces] = React.useState<number[]>(
+  const [shuffledPieces, setShuffledPieces] = useState<number[]>(
     shuffle(fillArray(gridSize), disableShuffle)
   );
 
@@ -87,8 +87,8 @@ export default ({
     Array(shuffledPieces.length).fill(null)
   );
 
-  const [winMessage, setWinMessage] = React.useState<string>("");
-  const [errorMessage, setErrorMessage] = React.useState<string>("");
+  const [winMessage, setWinMessage] = useState<string>("");
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   const checkWin = (): void => {
     for (let i = 0; i < currentBoard.length; i++) {
