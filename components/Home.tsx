@@ -20,6 +20,7 @@ import {
 import Svg, { Path } from "react-native-svg";
 import uuid from "uuid";
 
+import { storage, functions } from "../FirebaseApp";
 import {
   DEFAULT_IMAGE_SIZE,
   COMPRESSION,
@@ -122,10 +123,12 @@ export default ({
     const fileName: string = uuid.v4();
     const localURI = await uploadImage(fileName);
     const newPuzzle = await uploadPuzzleSettings(fileName);
-    newPuzzle.imageURI = localURI;
-    setModalVisible(false);
-    if (newPuzzle.publicKey) generateLink(newPuzzle.publicKey);
-    addToSent(newPuzzle);
+    if (newPuzzle) {
+      newPuzzle.imageURI = localURI;
+      setModalVisible(false);
+      if (newPuzzle.publicKey) generateLink(newPuzzle.publicKey);
+      addToSent(newPuzzle);
+    } // need to add to do if uploadPuzzSettings throws error
   };
 
   const addToSent = async (puzzle: Puzzle) => {
@@ -154,9 +157,11 @@ export default ({
     return resizedCompressedImage.uri;
   };
 
-  const uploadPuzzleSettings = async (fileName: string) => {
+  const uploadPuzzleSettings = async (
+    fileName: string
+  ): Promise<Puzzle | undefined> => {
     const publicKey: string = uuid.v4();
-    const uploadPuzzleSettings = functions.httpsCallable(
+    const uploadPuzzleSettingsCallable = functions.httpsCallable(
       "uploadPuzzleSettings"
     );
     const newPuzzle = {
@@ -170,7 +175,7 @@ export default ({
       dateReceived: new Date().toISOString(),
     };
     try {
-      await uploadPuzzleSettings({
+      await uploadPuzzleSettingsCallable({
         fileName,
         newPuzzle,
       });
