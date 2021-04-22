@@ -4,7 +4,6 @@ import { Piece, Puzzle, GridSections } from "./types";
 
 export const shuffle = (array: number[], disabledShuffle = true): number[] => {
   if (disabledShuffle) return array;
-  console.log("shuffling");
   let currentIndex = array.length,
     temporaryValue: number,
     randomIndex: number;
