@@ -5,7 +5,6 @@ import * as ImageManipulator from "expo-image-manipulator";
 import { SNAP_MARGIN } from "../constants";
 import { GridSections } from "../types";
 import { getInitialDimensions } from "../util";
-import TestMove from "./TestMove";
 
 export default ({
   num,
