@@ -129,7 +129,6 @@ export default ({
     moveX: number;
     moveY: number;
   }): void => {
-    let snapped = false;
     setErrorMessage("");
     //update the relative _x and _y but leave x and y the same unless snapping
     const newXY = {
@@ -140,13 +139,6 @@ export default ({
       // snapAdjusted_x: currentXY.snapAdjusted_x + gestureState.dx,
       // snapAdjusted_y: currentXY.snapAdjusted_y + gestureState.dy
     };
-
-    console.log("moved to X", gestureState.moveX);
-    console.log("moved to Y", gestureState.moveY);
-
-    console.log("calulated position x", newXY._x);
-    console.log("calulated position x", newXY._y);
-
     // snappedX: top left X position of snap grid
     // snappedY: top left Y position of snap grid
     // snappedRow: row index where it snaps
@@ -164,8 +156,6 @@ export default ({
         // need to adjust accumulated distance if theres a snap - leave for later
         // newXY.snapAdjusted_y += newXY._y - colDividers[snappedCol!] - (squareSize * SNAP_MARGIN - gestureState.dy)
         // newXY.snapAdjusted_x += newXY._x - rowDividers[snappedRow!] - (squareSize * SNAP_MARGIN - gestureState.dx)
-        console.log("snap to", newXY.x, newXY.y);
-        snapped = true;
       }
       // but if the current board already has another piece in the new index, do not let user move piece there
       else {
@@ -196,8 +186,6 @@ export default ({
     let snappedCol: number | undefined; // col index where it snaps
     const rowDividers: number[] = gridSections.rowDividers;
     const colDividers: number[] = gridSections.colDividers;
-
-    //pieces aren't snapping to the actual coordinates, they're based on the piece's coordinates for some reason
 
     //if _x and _y are within a margin of a point on the grid, then snap!
     for (let i = 0; i < rowDividers.length; i++) {
