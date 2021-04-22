@@ -125,10 +125,10 @@ export default ({
     const newPuzzle = await uploadPuzzleSettings(fileName);
     if (newPuzzle) {
       newPuzzle.imageURI = localURI;
-      setModalVisible(false);
       if (newPuzzle.publicKey) generateLink(newPuzzle.publicKey);
       addToSent(newPuzzle);
-    } // need to add to do if uploadPuzzSettings throws error
+    } // need to add else for error handling if uploadPuzzSettings throws error
+    setModalVisible(false);
   };
 
   const addToSent = async (puzzle: Puzzle) => {
