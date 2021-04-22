@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
-import Draggable from "./CustomDraggable";
-import { Svg, Image, Defs, ClipPath, Path, Rect } from "react-native-svg";
 import * as ImageManipulator from "expo-image-manipulator";
+import React, { useState, useEffect } from "react";
+import { Svg, Image, Defs, ClipPath, Path, Rect } from "react-native-svg";
+
 import { SNAP_MARGIN } from "../constants";
 import { GridSections } from "../types";
 import { getInitialDimensions } from "../util";
+import Draggable from "./CustomDraggable";
 
 export default ({
   num,
@@ -14,14 +15,12 @@ export default ({
   puzzleType,
   boardSize,
   piecePath,
-  image,
+  imageURI,
   gridSections,
   currentBoard,
   setCurrentBoard,
   setErrorMessage,
   puzzleAreaDimensions,
-  prevX,
-  prevY,
 }: {
   num: number;
   ix: number;
@@ -30,15 +29,13 @@ export default ({
   puzzleType: string;
   boardSize: number;
   piecePath: string;
-  image: { uri: string };
+  imageURI: string;
   gridSections: GridSections;
   currentBoard: (number | null)[];
   setCurrentBoard: Function;
   setErrorMessage: Function;
-  puzzleAreaDimensions: { puzzleAreaWidth: number, puzzleAreaHeight: number };
-  prevX: number | null;
-  prevY: number | null;
-}) => {
+  puzzleAreaDimensions: { puzzleAreaWidth: number; puzzleAreaHeight: number };
+}): JSX.Element | null => {
   const { puzzleAreaWidth, puzzleAreaHeight } = puzzleAreaDimensions;
   const minSandboxY = boardSize * 1.05;
   const maxSandboxY = puzzleAreaHeight - squareSize;
@@ -59,11 +56,21 @@ export default ({
     viewBoxY,
     solutionX,
     solutionY
-  ] = getInitialDimensions(puzzleType, minSandboxY, maxSandboxY, num, ix, gridSize, squareSize, prevX, prevY)
+  ] = getInitialDimensions(
+    puzzleType,
+    minSandboxY,
+    maxSandboxY,
+    num,
+    ix,
+    gridSize,
+    squareSize
+  );
 
   const [ready, setReady] = useState<boolean>(false);
-  const [croppedImage, setCroppedImage] = useState(image);
-  const [currentSnappedIx, setCurrentSnappedIx] = useState<number | undefined | null>(-1);
+  const [croppedImage, setCroppedImage] = useState({ uri: imageURI });
+  const [currentSnappedIx, setCurrentSnappedIx] = useState<
+    number | undefined | null
+  >(-1);
   // previous index is needed to know where the piece moved from, to update to null on current board
   const [prevIx, setPrevIx] = useState<number | undefined | null>(null);
   const [zIndex, setZ] = useState<number>(z);
@@ -73,7 +80,7 @@ export default ({
     x: initX,
     y: initY,
     _x: initX, // to track cumulative X distance traveled from original position
-    _y: initY,  // to track cumulative Y distance traveled from original position
+    _y: initY, // to track cumulative Y distance traveled from original position
     // was exploring how to adjust cumulative position to snap below
     // snapAdjusted_x: initX,
     // snapAdjusted_y: initY,
@@ -83,7 +90,7 @@ export default ({
     const manipulateImage = async () => {
       setReady(false);
       const croppedImage = await ImageManipulator.manipulateAsync(
-        image.uri,
+        imageURI,
         [
           {
             resize: {
@@ -105,12 +112,19 @@ export default ({
       setCroppedImage(croppedImage);
       setReady(true);
     };
-
     manipulateImage();
-  }, []);
+    setCurrentSnappedIx(-1);
+    setPrevIx(null);
+    setXY({
+      x: initX,
+      y: initY,
+      _x: initX,
+      _y: initY,
+    });
+  }, [imageURI]);
 
   const changePosition = (gestureState: { dx: number; dy: number, moveX: number, moveY: number }): void => {
-    let snapped = false
+    let snapped = false;
     setErrorMessage("");
     //update the relative _x and _y but leave x and y the same unless snapping
     const newXY = {
@@ -132,7 +146,7 @@ export default ({
     // snappedY: top left Y position of snap grid
     // snappedRow: row index where it snaps
     // snappedCol: col index where it snaps
-    const [snappedX, snappedY, snappedRow, snappedCol] = determineSnap(newXY)
+    const [snappedX, snappedY, snappedRow, snappedCol] = determineSnap(newXY);
 
     let newIx: number | undefined;
     // if both snappedX and snapped Y are defined, there was a snap i.e. the piece came within the grid snap margin
@@ -160,13 +174,18 @@ export default ({
       }
     }
 
-    if(newIx !== currentSnappedIx) updateIx(newIx);
+    if (newIx !== currentSnappedIx) updateIx(newIx);
     setXY(newXY);
     setZ(1)
 
   };
 
-  const determineSnap = (newXY: {x: number, y: number, _x: number, _y: number}) => {
+  const determineSnap = (newXY: {
+    x: number;
+    y: number;
+    _x: number;
+    _y: number;
+  }) => {
     let snappedX: number | undefined; // top left X position of snap grid
     let snappedY: number | undefined; // top left Y position of snap grid
     let snappedRow: number | undefined; // row index where it snaps
@@ -194,8 +213,8 @@ export default ({
         break;
       }
     }
-    return [snappedX, snappedY, snappedRow, snappedCol]
-  }
+    return [snappedX, snappedY, snappedRow, snappedCol];
+  };
 
   // preserve previous Ix, and set the new Ix that it will snap to
   const updateIx = (newIx: number | undefined): void => {
@@ -205,7 +224,7 @@ export default ({
   };
 
   const updateCurrentBoard = (): void => {
-    let newBoard = [...currentBoard];
+    const newBoard = [...currentBoard];
     // putting ! after a variable is to tell TS that in this case, the variable will not be null or undefined
     if (currentSnappedIx! >= 0) newBoard[currentSnappedIx!] = num;
     if (prevIx! >= 0 && prevIx !== currentSnappedIx) newBoard[prevIx!] = null;
