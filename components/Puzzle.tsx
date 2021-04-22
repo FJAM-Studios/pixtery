@@ -85,6 +85,7 @@ export default ({
           ? puzzle.message
           : "Congrats! You solved the puzzle!";
       setWinMessage(winMessage);
+      markPuzzleComplete(publicKey);
     }
     if (!firstSnap) checkFirstSnap();
   }, [currentBoard]);

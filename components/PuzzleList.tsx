@@ -121,12 +121,10 @@ export default ({
             >
               <Card.Title
                 title={
+                  receivedPuzzle.message &&
+                  receivedPuzzle.message.length &&
                   receivedPuzzle.completed
-                    ? `${receivedPuzzle.senderName} - ${
-                        receivedPuzzle.message && receivedPuzzle.message.length
-                          ? receivedPuzzle.message
-                          : "(No Message)"
-                      }`
+                    ? receivedPuzzle.senderName + " - " + receivedPuzzle.message
                     : receivedPuzzle.senderName
                 }
                 subtitle={moment(receivedPuzzle.dateReceived).calendar()}
