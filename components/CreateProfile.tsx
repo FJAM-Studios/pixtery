@@ -1,16 +1,15 @@
-import React, { useState, useRef, LegacyRef } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { View } from "react-native";
-import { Headline, Text, TextInput, Button } from "react-native-paper";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { CommonActions } from "@react-navigation/native";
 import * as FirebaseRecaptcha from "expo-firebase-recaptcha";
+import React, { useState, useRef, LegacyRef } from "react";
+import { View } from "react-native";
+import { Headline, Text, TextInput, Button } from "react-native-paper";
+import { SafeAreaView } from "react-native-safe-area-context";
 
+import { phoneProvider, firebaseConfig, verifySms } from "../FirebaseApp";
+import { Profile as ProfileType } from "../types";
 import Logo from "./Logo";
 import Title from "./Title";
-import { phoneProvider, firebaseConfig, verifySms } from "../FirebaseApp";
-
-import { Profile as ProfileType } from "../types";
 
 const phoneFormat = require("phone");
 
@@ -25,7 +24,9 @@ export default ({
   setProfile: (profile: ProfileType) => void;
   navigation: any;
 }) => {
-  const recaptchaVerifier = useRef<FirebaseRecaptcha.FirebaseRecaptchaVerifierModal>(null);
+  const recaptchaVerifier = useRef<FirebaseRecaptcha.FirebaseRecaptchaVerifierModal>(
+    null
+  );
   const [name, setName] = useState((profile && profile.name) || "");
   const [phone, setPhone] = useState((profile && profile.phone) || "");
   const [smsCode, setSmsCode] = useState("");
@@ -59,7 +60,7 @@ export default ({
         />
         <Logo width="100" height="100" />
         <Title width="100" height="35" />
-        <Headline>Create a Pixtery Profile</Headline>
+        <Headline>Sign In</Headline>
       </View>
       <Text>Name</Text>
       <TextInput
@@ -84,7 +85,11 @@ export default ({
         onPress={async () => {
           try {
             const formattedPhone = phoneFormat(phone)[0];
-            if (formattedPhone && recaptchaVerifier && recaptchaVerifier.current) {
+            if (
+              formattedPhone &&
+              recaptchaVerifier &&
+              recaptchaVerifier.current
+            ) {
               setPhone(formattedPhone);
               const id = await phoneProvider.verifyPhoneNumber(
                 formattedPhone,
@@ -104,7 +109,7 @@ export default ({
         }}
         style={{ margin: 10 }}
       >
-        Create
+        Sign In
       </Button>
       {verificationId.length ? (
         <View>
