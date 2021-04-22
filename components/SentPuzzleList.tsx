@@ -57,7 +57,7 @@ export default ({
         navigation={navigation}
       />
       <View>
-        {sentPuzzles.map((receivedPuzzle, ix) => (
+        {sentPuzzles.map((sentPuzzle, ix) => (
           <Card
             key={ix}
             style={{
@@ -66,32 +66,32 @@ export default ({
             }}
           >
             <Card.Title
-              title={receivedPuzzle.message || "No message"}
-              subtitle={moment(receivedPuzzle.dateReceived).calendar()}
+              title={sentPuzzle.message || "No message"}
+              subtitle={moment(sentPuzzle.dateReceived).calendar()}
               right={() => (
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
                   <IconButton
                     icon="puzzle"
                     onPress={() =>
                       navigation.navigate("Puzzle", {
-                        ...receivedPuzzle,
+                        publicKey: sentPuzzle.publicKey,
                       })
                     }
                   />
                   <IconButton
                     icon="delete"
-                    onPress={() => deletePuzzle(receivedPuzzle)}
+                    onPress={() => deletePuzzle(sentPuzzle)}
                   />
                   <IconButton
                     icon="send"
-                    onPress={() => sendPuzzle(receivedPuzzle.publicKey)}
+                    onPress={() => sendPuzzle(sentPuzzle.publicKey)}
                   />
                 </View>
               )}
               left={() => (
                 <ImageBackground
                   source={{
-                    uri: receivedPuzzle.imageURI,
+                    uri: sentPuzzle.imageURI,
                   }}
                   style={{
                     flex: 1,
