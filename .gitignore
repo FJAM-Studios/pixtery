@@ -12,6 +12,8 @@ web-build/
 cors_instructions.txt
 .vscode
 *.bat
+functions/firebase-debug.log
 
 # macOS
 .DS_Store
+node_modules
