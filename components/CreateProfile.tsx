@@ -109,7 +109,7 @@ export default ({
         }}
         style={{ margin: 10 }}
       >
-        Create
+        Sign In
       </Button>
       {verificationId.length ? (
         <View>
