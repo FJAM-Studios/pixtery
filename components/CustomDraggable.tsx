@@ -1,5 +1,6 @@
 /**
- *	* https://github.com/tongyy/react-native-draggable
+ *  This component is based on react-native-draggable but the zIndex styling has been moved to to affect the outermost container
+ * 	* https://github.com/tongyy/react-native-draggable
  *
  */
 
