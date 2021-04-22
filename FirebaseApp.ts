@@ -2,12 +2,8 @@ import firebase from "firebase";
 import "firebase/functions";
 import "firebase/firestore";
 import "firebase/storage"; // for jest testing purposes
-// import * as dotenv from "dotenv"
 
-// require('dotenv').config();
-// import {MY_LAN_IP} from "react-native-dotenv";
-import {MY_LAN_IP} from "@env";
-// const myLanIP = process.env.MY_LAN_IP
+import { MY_LAN_IP } from "./ip";
 
 const firebaseConfig = {
   apiKey: "AIzaSyANqRXsUQIKxT9HtG4gIQ6EmsKEMCzCyuo",
@@ -30,10 +26,7 @@ const app = initializeApp();
 const db = app.firestore();
 
 const functions = app.functions();
-// for http, put in http: <Metro Bundler LAN IP address>:5001
-console.log('IP', MY_LAN_IP)
 functions.useFunctionsEmulator(`${MY_LAN_IP}:5001`);
-// functions.useFunctionsEmulator("http://192.168.1.215:5001");
 
 const storage = app.storage();
 const phoneProvider = new firebase.auth.PhoneAuthProvider();
