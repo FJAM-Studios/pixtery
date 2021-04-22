@@ -12,6 +12,7 @@ web-build/
 *.bat
 *-debug.log
 .env
+ip.ts
 
 # macOS
 .DS_Store
