@@ -1,9 +1,10 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFocusEffect } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
 import { Text, View, StyleSheet, Image } from "react-native";
-import { useFocusEffect } from "@react-navigation/native";
 import { ActivityIndicator } from "react-native-paper";
-import AdSafeAreaView from "./AdSafeAreaView";
 import { SafeAreaView } from "react-native-safe-area-context";
+
 import { TESTING_MODE } from "../constants";
 import { Puzzle, GridSections } from "../types";
 import {
@@ -12,9 +13,9 @@ import {
   getGridSections,
   fillArray,
 } from "../util";
+import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 import PuzzlePiece from "./PuzzlePiece";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 //disable shuffling for testing
 const disableShuffle = TESTING_MODE;
@@ -149,7 +150,7 @@ export default ({
             flex: 1,
             justifyContent: "flex-end",
           }}
-        ></View>
+        />
       </AdSafeAreaView>
     );
   if (puzzle && gridSections && piecePaths && shuffledPieces) {
