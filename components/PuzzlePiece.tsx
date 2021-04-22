@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import Draggable from "react-native-draggable";
+import Draggable from "./CustomDraggable";
 import { Svg, Image, Defs, ClipPath, Path, Rect } from "react-native-svg";
 import * as ImageManipulator from "expo-image-manipulator";
 import { SNAP_MARGIN } from "../constants";
 import { GridSections } from "../types";
 import { getInitialDimensions } from "../util";
+import TestMove from "./TestMove";
 
 export default ({
   num,
@@ -20,10 +21,8 @@ export default ({
   setCurrentBoard,
   setErrorMessage,
   puzzleAreaDimensions,
-  moveToFront,
-  puzzleLoaded,
   prevX,
-  prevY
+  prevY,
 }: {
   num: number;
   ix: number;
@@ -38,8 +37,6 @@ export default ({
   setCurrentBoard: Function;
   setErrorMessage: Function;
   puzzleAreaDimensions: { puzzleAreaWidth: number, puzzleAreaHeight: number };
-  moveToFront: Function;
-  puzzleLoaded:boolean;
   prevX: number | null;
   prevY: number | null;
 }) => {
@@ -70,6 +67,7 @@ export default ({
   const [currentSnappedIx, setCurrentSnappedIx] = useState<number | undefined | null>(-1);
   // previous index is needed to know where the piece moved from, to update to null on current board
   const [prevIx, setPrevIx] = useState<number | undefined | null>(null);
+  const [zIndex, setZ] = useState<number>(z);
 
   //_x and _y are used to keep track of where image is relative to its start positon
   const [currentXY, setXY] = useState({
@@ -164,15 +162,8 @@ export default ({
     }
 
     if(newIx !== currentSnappedIx) updateIx(newIx);
-
-
-    if(snapped)
-    {
-      setXY(newXY);
-      moveToFront(num, ix, newXY.x, newXY.y)
-    } else {
-      setXY(newXY);
-      moveToFront(num, ix, newXY._x,  newXY._y)}
+    setXY(newXY);
+    setZ(1)
 
   };
 
@@ -227,6 +218,8 @@ export default ({
     if (currentSnappedIx !== -1) updateCurrentBoard();
   }, [currentSnappedIx]);
 
+
+
   if (!ready) return null;
 
   return (
@@ -234,8 +227,9 @@ export default ({
       //draggable SVG needs to be placed where cropped image starts. jigsaw shape extends beyond square
       x={currentXY.x}
       y={currentXY.y}
+      z={zIndex}
       //on release of a piece, update the state and check for snapping
-      onPressIn={() => moveToFront(num, ix, currentXY.x, currentXY.y)}
+      onPressIn={()=> setZ(999)}
       onDragRelease={(ev, gestureState) => changePosition(gestureState)}
     >
       <Svg
