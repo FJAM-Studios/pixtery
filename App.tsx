@@ -10,7 +10,7 @@ import { View, useWindowDimensions } from "react-native";
 import { Provider as PaperProvider, DefaultTheme } from "react-native-paper";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
-import { db, storage, functions } from "./FirebaseApp";
+import { functions } from "./FirebaseApp";
 import AddPuzzle from "./components/AddPuzzle";
 import CreateProfile from "./components/CreateProfile";
 import DevTest from "./components/DevTest";
@@ -108,7 +108,7 @@ const App = () => {
   const queryPuzzle = async (publicKey: string): Promise<PuzzleType | void> => {
     console.log("query puzzle");
     const queryPuzzle = functions.httpsCallable("queryPuzzle");
-    let puzzleData: PuzzleType;
+    let puzzleData;
     try {
       puzzleData = await queryPuzzle({ publicKey });
       return puzzleData.data; // get just nested data from returned JSON
