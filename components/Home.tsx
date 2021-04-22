@@ -1,5 +1,6 @@
 import "firebase/functions";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { AdMobInterstitial } from "expo-ads-admob";
 import * as ImageManipulator from "expo-image-manipulator";
 import * as ImagePicker from "expo-image-picker";
 import * as Linking from "expo-linking";
@@ -16,12 +17,15 @@ import {
   Modal,
   Portal,
 } from "react-native-paper";
-import { SafeAreaView } from "react-native-safe-area-context";
 import Svg, { Path } from "react-native-svg";
 import uuid from "uuid";
 
-import { storage, functions } from "../FirebaseApp";
-import { DEFAULT_IMAGE_SIZE, COMPRESSION } from "../constants";
+import {
+  DEFAULT_IMAGE_SIZE,
+  COMPRESSION,
+  INTERSTITIAL_ID,
+  DISPLAY_PAINFUL_ADS,
+} from "../constants";
 import { Puzzle, Profile } from "../types";
 import {
   generateJigsawPiecePaths,
@@ -29,9 +33,12 @@ import {
   createBlob,
   shareMessage,
 } from "../util";
+import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 
 const emptyImage = require("../assets/blank.jpg");
+
+AdMobInterstitial.setAdUnitID(INTERSTITIAL_ID);
 
 export default ({
   navigation,
@@ -111,6 +118,7 @@ export default ({
 
   const submitToServer = async (): Promise<void> => {
     setModalVisible(true);
+    await displayPainfulAd();
     const fileName: string = uuid.v4();
     const localURI = await uploadImage(fileName);
     const newPuzzle = await uploadPuzzleSettings(fileName);
@@ -178,8 +186,15 @@ export default ({
     shareMessage(deepLink);
   };
 
+  const displayPainfulAd = async () => {
+    if (DISPLAY_PAINFUL_ADS) {
+      await AdMobInterstitial.requestAdAsync();
+      await AdMobInterstitial.showAdAsync();
+    }
+  };
+
   return (
-    <SafeAreaView
+    <AdSafeAreaView
       style={{
         flex: 1,
         flexDirection: "column",
@@ -401,6 +416,6 @@ export default ({
       >
         Send
       </Button>
-    </SafeAreaView>
+    </AdSafeAreaView>
   );
 };
