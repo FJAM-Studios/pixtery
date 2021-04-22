@@ -386,6 +386,7 @@ export const shareMessage = async (pixUrl: string): Promise<void> => {
         "Can you solve this Pixtery?" +
         String.fromCharCode(0xd83d, 0xdcf7) +
         String.fromCharCode(0xd83d, 0xdd75) +
+        "\r\n" +
         pixUrl,
     };
     const options = {
