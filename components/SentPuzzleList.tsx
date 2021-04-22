@@ -1,24 +1,27 @@
-import moment from "moment";
 import * as React from "react";
-import { Text, Card, IconButton, Button, Headline } from "react-native-paper";
+import { ImageBackground, View, TouchableOpacity } from "react-native";
+import { Card, IconButton, Button, Headline } from "react-native-paper";
 import AdSafeAreaView from "./AdSafeAreaView";
-import { View, TouchableOpacity } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import Modal from "react-native-modal";
-
-import { Puzzle } from "../types";
+import moment from "moment";
 import Header from "./Header";
+import { Puzzle } from "../types";
+import Modal from "react-native-modal";
+import * as Linking from "expo-linking";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { shareMessage } from "../util";
 
 export default ({
   navigation,
   theme,
   receivedPuzzles,
-  setReceivedPuzzles,
+  sentPuzzles,
+  setSentPuzzles,
 }: {
   navigation: any;
   theme: any;
   receivedPuzzles: Puzzle[];
-  setReceivedPuzzles: (puzzles: Puzzle[]) => void;
+  sentPuzzles: Puzzle[];
+  setSentPuzzles: (puzzles: Puzzle[]) => void;
 }) => {
   const [modalVisible, setModalVisible] = React.useState(false);
   const [puzzleToDelete, setPuzzleToDelete] = React.useState<Puzzle | null>(
@@ -30,18 +33,26 @@ export default ({
     setPuzzleToDelete(puzzle);
   };
 
+  const sendPuzzle = (publicKey: string | undefined) => {
+    const deepLink = Linking.createURL("", {
+      queryParams: { puzzle: publicKey },
+    });
+    shareMessage(deepLink);
+  };
   const deletePuzzle = async (puzzle: Puzzle | null) => {
     if (puzzle) {
       const newPuzzles = [
-        ...receivedPuzzles.filter((puz) => puz.publicKey !== puzzle.publicKey),
+        ...sentPuzzles.filter((puz) => puz.publicKey !== puzzle.publicKey),
       ];
-      await AsyncStorage.setItem("@pixteryPuzzles", JSON.stringify(newPuzzles));
-      setReceivedPuzzles(newPuzzles);
+      await AsyncStorage.setItem(
+        "@pixterySentPuzzles",
+        JSON.stringify(newPuzzles)
+      );
+      setSentPuzzles(newPuzzles);
     }
     setPuzzleToDelete(null);
     setModalVisible(false);
   };
-
   return (
     <AdSafeAreaView
       style={{
@@ -102,11 +113,11 @@ export default ({
         navigation={navigation}
       />
       <View>
-        {receivedPuzzles.map((receivedPuzzle, ix) => (
+        {sentPuzzles.map((sentPuzzle, ix) => (
           <TouchableOpacity
             onPress={() =>
               navigation.navigate("Puzzle", {
-                publicKey: receivedPuzzle.publicKey,
+                publicKey: sentPuzzle.publicKey,
               })
             }
             key={ix}
@@ -114,35 +125,43 @@ export default ({
             <Card
               style={{
                 margin: 1,
-                backgroundColor: receivedPuzzle.completed
-                  ? theme.colors.disabled
-                  : theme.colors.surface,
+                backgroundColor: theme.colors.surface,
               }}
             >
               <Card.Title
-                title={
-                  receivedPuzzle.message &&
-                  receivedPuzzle.message.length &&
-                  receivedPuzzle.completed
-                    ? receivedPuzzle.senderName + " - " + receivedPuzzle.message
-                    : receivedPuzzle.senderName
-                }
-                subtitle={moment(receivedPuzzle.dateReceived).calendar()}
+                title={sentPuzzle.message || ""}
+                subtitle={moment(sentPuzzle.dateReceived).calendar()}
                 right={() => (
                   <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <Text>{receivedPuzzle.gridSize}</Text>
                     <IconButton
-                      icon={
-                        receivedPuzzle.puzzleType === "jigsaw"
-                          ? "puzzle"
-                          : "view-grid"
+                      icon={"puzzle"}
+                      onPress={() =>
+                        navigation.navigate("Puzzle", {
+                          publicKey: sentPuzzle.publicKey,
+                        })
                       }
                     />
                     <IconButton
                       icon={"delete"}
-                      onPress={() => showDeleteModal(receivedPuzzle)}
+                      onPress={() => showDeleteModal(sentPuzzle)}
+                    />
+                    <IconButton
+                      icon={"send"}
+                      onPress={() => sendPuzzle(sentPuzzle.publicKey)}
                     />
                   </View>
+                )}
+                left={() => (
+                  <ImageBackground
+                    source={{
+                      uri: sentPuzzle.imageURI,
+                    }}
+                    style={{
+                      flex: 1,
+                      justifyContent: "space-around",
+                      padding: 1,
+                    }}
+                  ></ImageBackground>
                 )}
               />
             </Card>
