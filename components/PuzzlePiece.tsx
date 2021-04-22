@@ -73,7 +73,7 @@ export default ({
   >(-1);
   // previous index is needed to know where the piece moved from, to update to null on current board
   const [prevIx, setPrevIx] = useState<number | undefined | null>(null);
-  const [zIndex, setZ] = useState<number>(z);
+  const [zIndex, setZ] = useState<number>(1);
 
   //_x and _y are used to keep track of where image is relative to its start positon
   const [currentXY, setXY] = useState({

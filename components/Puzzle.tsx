@@ -35,7 +35,7 @@ export default ({
   sentPuzzles: Puzzle[];
   route: any;
   setReceivedPuzzles: (puzzles: Puzzle[]) => void;
-}) => {
+}): JSX.Element => {
   const { publicKey } = route.params;
 
   const [puzzle, setPuzzle] = useState<Puzzle>();
