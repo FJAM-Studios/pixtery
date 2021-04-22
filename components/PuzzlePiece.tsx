@@ -55,7 +55,7 @@ export default ({
     viewBoxX,
     viewBoxY,
     solutionX,
-    solutionY
+    solutionY,
   ] = getInitialDimensions(
     puzzleType,
     minSandboxY,
@@ -123,7 +123,12 @@ export default ({
     });
   }, [imageURI]);
 
-  const changePosition = (gestureState: { dx: number; dy: number, moveX: number, moveY: number }): void => {
+  const changePosition = (gestureState: {
+    dx: number;
+    dy: number;
+    moveX: number;
+    moveY: number;
+  }): void => {
     let snapped = false;
     setErrorMessage("");
     //update the relative _x and _y but leave x and y the same unless snapping
@@ -136,11 +141,11 @@ export default ({
       // snapAdjusted_y: currentXY.snapAdjusted_y + gestureState.dy
     };
 
-    console.log("moved to X", gestureState.moveX)
-    console.log("moved to Y", gestureState.moveY)
+    console.log("moved to X", gestureState.moveX);
+    console.log("moved to Y", gestureState.moveY);
 
-    console.log("calulated position x", newXY._x)
-    console.log("calulated position x", newXY._y)
+    console.log("calulated position x", newXY._x);
+    console.log("calulated position x", newXY._y);
 
     // snappedX: top left X position of snap grid
     // snappedY: top left Y position of snap grid
@@ -159,7 +164,7 @@ export default ({
         // need to adjust accumulated distance if theres a snap - leave for later
         // newXY.snapAdjusted_y += newXY._y - colDividers[snappedCol!] - (squareSize * SNAP_MARGIN - gestureState.dy)
         // newXY.snapAdjusted_x += newXY._x - rowDividers[snappedRow!] - (squareSize * SNAP_MARGIN - gestureState.dx)
-        console.log("snap to", newXY.x, newXY.y)
+        console.log("snap to", newXY.x, newXY.y);
         snapped = true;
       }
       // but if the current board already has another piece in the new index, do not let user move piece there
@@ -176,8 +181,7 @@ export default ({
 
     if (newIx !== currentSnappedIx) updateIx(newIx);
     setXY(newXY);
-    setZ(1)
-
+    setZ(1);
   };
 
   const determineSnap = (newXY: {
@@ -192,7 +196,6 @@ export default ({
     let snappedCol: number | undefined; // col index where it snaps
     const rowDividers: number[] = gridSections.rowDividers;
     const colDividers: number[] = gridSections.colDividers;
-
 
     //pieces aren't snapping to the actual coordinates, they're based on the piece's coordinates for some reason
 
@@ -236,8 +239,6 @@ export default ({
     if (currentSnappedIx !== -1) updateCurrentBoard();
   }, [currentSnappedIx]);
 
-
-
   if (!ready) return null;
 
   return (
@@ -247,7 +248,7 @@ export default ({
       y={currentXY.y}
       z={zIndex}
       //on release of a piece, update the state and check for snapping
-      onPressIn={()=> setZ(999)}
+      onPressIn={() => setZ(999)}
       onDragRelease={(ev, gestureState) => changePosition(gestureState)}
     >
       <Svg
