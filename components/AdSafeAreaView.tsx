@@ -1,6 +1,7 @@
 import { AdMobBanner } from "expo-ads-admob";
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
+
 import { BANNER_ID } from "../constants";
 
 export default (props: any) => {

@@ -18,9 +18,9 @@ import HomeScreen from "./components/Home";
 import Profile from "./components/Profile";
 import Puzzle from "./components/Puzzle";
 import PuzzleList from "./components/PuzzleList";
+import SentPuzzleList from "./components/SentPuzzleList";
 import Splash from "./components/Splash";
 import { Puzzle as PuzzleType, Profile as ProfileType } from "./types";
-import SentPuzzleList from "./components/SentPuzzleList";
 
 const image = require("./assets/earth.jpg");
 
