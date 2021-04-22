@@ -64,7 +64,7 @@ export default ({
         navigation.dispatch(
           CommonActions.reset({
             index: 0,
-            routes: [{ name: "Puzzle", params: { ...newPuzzle } }],
+            routes: [{ name: "Puzzle", params: { publicKey } }],
           })
         );
       } catch (e) {

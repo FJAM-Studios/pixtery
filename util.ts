@@ -1,6 +1,6 @@
 import { Share } from "react-native";
 
-import { Piece } from "./types";
+import { Piece, Puzzle, GridSections } from "./types";
 
 export const shuffle = (array: number[], disabledShuffle = true): number[] => {
   if (disabledShuffle) return array;
@@ -401,4 +401,40 @@ export const shareMessage = async (pixUrl: string): Promise<void> => {
   } catch (error) {
     alert(error.message);
   }
+};
+
+// populates X Y coordinates for upper left corner of each grid section
+export const getGridSections = (
+  puz: Puzzle,
+  squareSize: number
+): GridSections => {
+  // separated row and col in case needed for future flexibility
+  const gridSections: GridSections = {
+    rowDividers: [0],
+    colDividers: [0],
+  };
+  for (let i = 1; i < puz.gridSize; i++) {
+    let x: number;
+    let y: number;
+    if (puz.puzzleType === "squares") {
+      x = i * squareSize;
+      y = i * squareSize;
+    }
+    //if jigsaw
+    else {
+      x = squareSize * 0.75 + (i - 1) * squareSize;
+      y = squareSize * 0.75 + (i - 1) * squareSize;
+    }
+    gridSections.rowDividers.push(x);
+    gridSections.colDividers.push(y);
+  }
+  return gridSections;
+};
+
+export const fillArray = (gridSize: number): number[] => {
+  const numberArray = [];
+  for (let i = 0; i < gridSize * gridSize; i++) {
+    numberArray.push(i);
+  }
+  return numberArray;
 };
