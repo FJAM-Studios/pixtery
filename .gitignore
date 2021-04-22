@@ -10,6 +10,9 @@ npm-debug.*
 web-build/
 .vscode
 *.bat
+*-debug.log
+.env
+ip.ts
 
 # macOS
 .DS_Store

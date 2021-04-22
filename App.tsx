@@ -10,7 +10,7 @@ import { View, useWindowDimensions } from "react-native";
 import { Provider as PaperProvider, DefaultTheme } from "react-native-paper";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
-import { db, storage } from "./FirebaseApp";
+import { functions } from "./FirebaseApp";
 import AddPuzzle from "./components/AddPuzzle";
 import CreateProfile from "./components/CreateProfile";
 import DevTest from "./components/DevTest";
@@ -18,9 +18,9 @@ import HomeScreen from "./components/Home";
 import Profile from "./components/Profile";
 import Puzzle from "./components/Puzzle";
 import PuzzleList from "./components/PuzzleList";
+import SentPuzzleList from "./components/SentPuzzleList";
 import Splash from "./components/Splash";
 import { Puzzle as PuzzleType, Profile as ProfileType } from "./types";
-import SentPuzzleList from "./components/SentPuzzleList";
 
 const image = require("./assets/earth.jpg");
 
@@ -107,30 +107,13 @@ const App = () => {
 
   const queryPuzzle = async (publicKey: string): Promise<PuzzleType | void> => {
     console.log("query puzzle");
-    const snapshot = await db
-      .collection("puzzles")
-      .where("publicKey", "==", publicKey)
-      .get();
-    if (snapshot.empty) {
-      console.log("no puzzle found!");
-    } else {
-      let puzzleData: PuzzleType = {
-        puzzleType: "",
-        gridSize: 0,
-        senderName: "",
-        senderPhone: "string",
-        imageURI: "",
-        message: null,
-        dateReceived: "",
-        completed: false,
-      };
-      //NOTE: there SHOULD only be one puzzle but it's in an object that has to iterated through to access the data
-      snapshot.forEach((puzzle: any) => {
-        puzzleData = puzzle.data();
-        puzzleData.completed = false;
-      });
-      console.log("retrieved puzzle data");
-      return puzzleData;
+    const queryPuzzleCallable = functions.httpsCallable("queryPuzzle");
+    let puzzleData;
+    try {
+      puzzleData = await queryPuzzleCallable({ publicKey });
+      return puzzleData.data; // get just nested data from returned JSON
+    } catch (error) {
+      console.error(error);
     }
   };
 

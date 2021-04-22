@@ -1,4 +1,6 @@
+import "firebase/functions";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { AdMobInterstitial } from "expo-ads-admob";
 import * as ImageManipulator from "expo-image-manipulator";
 import * as ImagePicker from "expo-image-picker";
 import * as Linking from "expo-linking";
@@ -15,14 +17,16 @@ import {
   Modal,
   Portal,
 } from "react-native-paper";
-import AdSafeAreaView from "./AdSafeAreaView";
-import Header from "./Header";
-const emptyImage = require("../assets/blank.jpg");
 import Svg, { Path } from "react-native-svg";
-
 import uuid from "uuid";
-import { db, storage } from "../FirebaseApp";
 
+import { storage, functions } from "../FirebaseApp";
+import {
+  DEFAULT_IMAGE_SIZE,
+  COMPRESSION,
+  INTERSTITIAL_ID,
+  DISPLAY_PAINFUL_ADS,
+} from "../constants";
 import { Puzzle, Profile } from "../types";
 import {
   generateJigsawPiecePaths,
@@ -30,14 +34,10 @@ import {
   createBlob,
   shareMessage,
 } from "../util";
-import { AdMobInterstitial } from "expo-ads-admob";
+import AdSafeAreaView from "./AdSafeAreaView";
+import Header from "./Header";
 
-import {
-  DEFAULT_IMAGE_SIZE,
-  COMPRESSION,
-  INTERSTITIAL_ID,
-  DISPLAY_PAINFUL_ADS,
-} from "../constants";
+const emptyImage = require("../assets/blank.jpg");
 
 AdMobInterstitial.setAdUnitID(INTERSTITIAL_ID);
 
@@ -123,10 +123,17 @@ export default ({
     const fileName: string = uuid.v4();
     const localURI = await uploadImage(fileName);
     const newPuzzle = await uploadPuzzleSettings(fileName);
-    newPuzzle.imageURI = localURI;
+    if (newPuzzle) {
+      newPuzzle.imageURI = localURI;
+    }
     setModalVisible(false);
-    if (newPuzzle.publicKey) generateLink(newPuzzle.publicKey);
-    addToSent(newPuzzle);
+    if (newPuzzle) {
+      if (newPuzzle.publicKey) {
+        generateLink(newPuzzle.publicKey);
+        addToSent(newPuzzle);
+      }
+    }
+    // need to add else for error handling if uploadPuzzSettings throws error
   };
 
   const addToSent = async (puzzle: Puzzle) => {
@@ -155,20 +162,32 @@ export default ({
     return resizedCompressedImage.uri;
   };
 
-  const uploadPuzzleSettings = async (fileName: string): Promise<Puzzle> => {
+  const uploadPuzzleSettings = async (
+    fileName: string
+  ): Promise<Puzzle | undefined> => {
     const publicKey: string = uuid.v4();
+    const uploadPuzzleSettingsCallable = functions.httpsCallable(
+      "uploadPuzzleSettings"
+    );
     const newPuzzle = {
-      puzzleType: puzzleType,
-      gridSize: gridSize,
+      puzzleType,
+      gridSize,
       senderName: profile ? profile.name : "No Sender",
       senderPhone: profile ? profile.phone : "No Sender",
       imageURI: fileName,
-      publicKey: publicKey,
-      message: message,
+      publicKey,
+      message,
       dateReceived: new Date().toISOString(),
     };
-    await db.collection("puzzles").doc(fileName).set(newPuzzle);
-    return newPuzzle;
+    try {
+      await uploadPuzzleSettingsCallable({
+        fileName,
+        newPuzzle,
+      });
+      return newPuzzle;
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const generateLink = (publicKey: string): void => {
