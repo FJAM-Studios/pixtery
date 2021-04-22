@@ -53,29 +53,3 @@ exports.queryPuzzle = functions.https.onCall(
       }
     }
 );
-
-// for testing cloud function connectivity on client
-exports.addNumbers = functions.https.onCall(
-    (data: { firstNumber: any; secondNumber: any }) => {
-      console.log("adding nums");
-      // Numbers passed from the client.
-      const firstNumber = data.firstNumber;
-      const secondNumber = data.secondNumber;
-      // Checking that attributes are present and are numbers.
-      if (!Number.isFinite(firstNumber) || !Number.isFinite(secondNumber)) {
-      // Throwing an HttpsError so that the client gets the error details.
-        throw new functions.https.HttpsError(
-            "invalid-argument",
-            "The function must be called with " +
-          "two arguments \"firstNumber\" and \"secondNumber\" which must both be numbers."
-        );
-      }
-      // returning result.
-      return {
-        firstNumber: firstNumber,
-        secondNumber: secondNumber,
-        operator: "+",
-        operationResult: firstNumber + secondNumber,
-      };
-    }
-);

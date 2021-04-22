@@ -105,19 +105,6 @@ const App = () => {
     }
   };
 
-  const requestImage = (puzzle: PuzzleType): void => {
-    const imageRef = storage.ref("/" + puzzle.imageURI);
-    imageRef
-      .getDownloadURL() // to do: look into whether there is a different way to get this, like raw image
-      .then((url: string) => {
-        //reassigns imageURI to the actual image file, instead of just the filename
-        puzzle.imageURI = url;
-      })
-      .catch((e: unknown) =>
-        console.log("getting downloadURL of image error => ", e)
-      );
-  };
-
   const queryPuzzle = async (publicKey: string): Promise<PuzzleType | void> => {
     console.log("query puzzle");
     const queryPuzzle = functions.httpsCallable("queryPuzzle");

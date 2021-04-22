@@ -7,8 +7,8 @@
     "sourceMap": true,
     "strict": true,
     "target": "es2017",
-    "typeRoots": ["node_modules/@types"],
-    "importHelpers": true
+    "typeRoots": ["node_modules/@types", "types/env.d.ts"],
+    "importHelpers": true,
     // "baseUrl": ".",
     // "paths": {
     //   "tslib" : ["/functions/node_modules/tslib/tslib.d.ts"]
