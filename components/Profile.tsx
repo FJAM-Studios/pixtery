@@ -1,10 +1,10 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useState } from "react";
-import { Headline, Text, TextInput, Button } from "react-native-paper";
-import AdSafeAreaView from "./AdSafeAreaView";
 import { View } from "react-native";
+import { Headline, Text, TextInput, Button } from "react-native-paper";
 
 import { Profile as ProfileType, Puzzle } from "../types";
+import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 
 export default ({
