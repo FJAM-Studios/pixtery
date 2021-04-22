@@ -107,10 +107,10 @@ const App = () => {
 
   const queryPuzzle = async (publicKey: string): Promise<PuzzleType | void> => {
     console.log("query puzzle");
-    const queryPuzzle = functions.httpsCallable("queryPuzzle");
+    const queryPuzzleCallable = functions.httpsCallable("queryPuzzle");
     let puzzleData;
     try {
-      puzzleData = await queryPuzzle({ publicKey });
+      puzzleData = await queryPuzzleCallable({ publicKey });
       return puzzleData.data; // get just nested data from returned JSON
     } catch (error) {
       console.error(error);

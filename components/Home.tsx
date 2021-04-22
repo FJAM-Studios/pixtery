@@ -133,8 +133,7 @@ export default ({
         addToSent(newPuzzle);
       }
     }
-// need to add else for error handling if uploadPuzzSettings throws error
-    
+    // need to add else for error handling if uploadPuzzSettings throws error
   };
 
   const addToSent = async (puzzle: Puzzle) => {
