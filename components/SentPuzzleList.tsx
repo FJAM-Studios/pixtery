@@ -1,7 +1,7 @@
 import * as React from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { ImageBackground, View } from "react-native";
+import { ImageBackground, View, TouchableOpacity } from "react-native";
 import { Card, IconButton, Button, Headline } from "react-native-paper";
+import AdSafeAreaView from "./AdSafeAreaView";
 import moment from "moment";
 import Header from "./Header";
 import { Puzzle } from "../types";
@@ -54,7 +54,7 @@ export default ({
     setModalVisible(false);
   };
   return (
-    <SafeAreaView
+    <AdSafeAreaView
       style={{
         flex: 1,
         flexDirection: "column",
@@ -114,52 +114,60 @@ export default ({
       />
       <View>
         {sentPuzzles.map((sentPuzzle, ix) => (
-          <Card
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate("Puzzle", {
+                publicKey: sentPuzzle.publicKey,
+              })
+            }
             key={ix}
-            style={{
-              margin: 1,
-              backgroundColor: theme.colors.surface,
-            }}
           >
-            <Card.Title
-              title={sentPuzzle.message || "No message"}
-              subtitle={moment(sentPuzzle.dateReceived).calendar()}
-              right={() => (
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <IconButton
-                    icon={"puzzle"}
-                    onPress={() =>
-                      navigation.navigate("Puzzle", {
-                        publicKey: sentPuzzle.publicKey,
-                      })
-                    }
-                  />
-                  <IconButton
-                    icon={"delete"}
-                    onPress={() => showDeleteModal(sentPuzzle)}
-                  />
-                  <IconButton
-                    icon={"send"}
-                    onPress={() => sendPuzzle(sentPuzzle.publicKey)}
-                  />
-                </View>
-              )}
-              left={() => (
-                <ImageBackground
-                  source={{
-                    uri: sentPuzzle.imageURI,
-                  }}
-                  style={{
-                    flex: 1,
-                    justifyContent: "space-around",
-                    padding: 1,
-                  }}
-                ></ImageBackground>
-              )}
-            />
-          </Card>
+            <Card
+              style={{
+                margin: 1,
+                backgroundColor: theme.colors.surface,
+              }}
+            >
+              <Card.Title
+                title={sentPuzzle.message || ""}
+                subtitle={moment(sentPuzzle.dateReceived).calendar()}
+                right={() => (
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <IconButton
+                      icon={"puzzle"}
+                      onPress={() =>
+                        navigation.navigate("Puzzle", {
+                          publicKey: sentPuzzle.publicKey,
+                        })
+                      }
+                    />
+                    <IconButton
+                      icon={"delete"}
+                      onPress={() => showDeleteModal(sentPuzzle)}
+                    />
+                    <IconButton
+                      icon={"send"}
+                      onPress={() => sendPuzzle(sentPuzzle.publicKey)}
+                    />
+                  </View>
+                )}
+                left={() => (
+                  <ImageBackground
+                    source={{
+                      uri: sentPuzzle.imageURI,
+                    }}
+                    style={{
+                      flex: 1,
+                      justifyContent: "space-around",
+                      padding: 1,
+                    }}
+                  ></ImageBackground>
+                )}
+              />
+            </Card>
+          </TouchableOpacity>
         ))}
       </View>
-    </SafeAreaView>
+    </AdSafeAreaView>
   );
 };
