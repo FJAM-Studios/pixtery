@@ -36,7 +36,7 @@ export default ({
   sentPuzzles: Puzzle[];
   route: any;
   setReceivedPuzzles: (puzzles: Puzzle[]) => void;
-}) => {
+}): JSX.Element => {
   const { publicKey } = route.params;
 
   const [puzzle, setPuzzle] = useState<Puzzle>();
@@ -46,6 +46,10 @@ export default ({
   const [gridSections, setGridSections] = useState<GridSections>();
 
   const [shuffledPieces, setShuffledPieces] = useState<number[]>();
+
+  const [zIndexes, setZIndexes] = useState<number[]>([]);
+
+  const [highestZ, setHighestZ] = useState<number>(1);
 
   const [currentBoard, setCurrentBoard] = useState<number[]>([]);
 
@@ -63,6 +67,13 @@ export default ({
 
   const [winMessage, setWinMessage] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
+
+  const moveToTop = (idx: number): void => {
+    const newIndices = [...zIndexes];
+    newIndices[idx] = highestZ + 1;
+    setHighestZ(highestZ + 1);
+    setZIndexes(newIndices);
+  };
 
   const checkWin = (): boolean => {
     for (let i = 0; i < currentBoard.length; i++) {
@@ -97,18 +108,15 @@ export default ({
     );
     if (matchingPuzzles.length) {
       const pickedPuzzle = matchingPuzzles[0];
-      const squareSize = boardSize / pickedPuzzle.gridSize;
+      const { gridSize } = pickedPuzzle;
+      const squareSize = boardSize / gridSize;
+      const numPieces = gridSize * gridSize;
       setPuzzle(pickedPuzzle);
-      setPiecePaths(
-        generateJigsawPiecePaths(pickedPuzzle.gridSize, squareSize)
-      );
+      setPiecePaths(generateJigsawPiecePaths(gridSize, squareSize));
       setGridSections(getGridSections(pickedPuzzle, squareSize));
-      setShuffledPieces(
-        shuffle(fillArray(pickedPuzzle.gridSize), disableShuffle)
-      );
-      setCurrentBoard(
-        new Array(pickedPuzzle.gridSize * pickedPuzzle.gridSize).fill(null)
-      );
+      setShuffledPieces(shuffle(fillArray(gridSize), disableShuffle));
+      setCurrentBoard(new Array(numPieces).fill(null));
+      setZIndexes(new Array(numPieces).fill(1));
       setWinMessage("");
       setErrorMessage("");
       setFirstSnap(false);
@@ -195,6 +203,8 @@ export default ({
                 setCurrentBoard={setCurrentBoard}
                 setErrorMessage={setErrorMessage}
                 puzzleAreaDimensions={puzzleAreaDimensions}
+                z={zIndexes[ix]}
+                moveToTop={moveToTop}
               />
             ))
           ) : (
