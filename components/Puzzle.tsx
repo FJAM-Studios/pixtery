@@ -108,16 +108,13 @@ export default ({
     );
     if (matchingPuzzles.length) {
       const pickedPuzzle = matchingPuzzles[0];
-      const squareSize = boardSize / pickedPuzzle.gridSize;
-      const numPieces = pickedPuzzle.gridSize * pickedPuzzle.gridSize;
+      const { gridSize } = pickedPuzzle;
+      const squareSize = boardSize / gridSize;
+      const numPieces = gridSize * gridSize;
       setPuzzle(pickedPuzzle);
-      setPiecePaths(
-        generateJigsawPiecePaths(pickedPuzzle.gridSize, squareSize)
-      );
+      setPiecePaths(generateJigsawPiecePaths(gridSize, squareSize));
       setGridSections(getGridSections(pickedPuzzle, squareSize));
-      setShuffledPieces(
-        shuffle(fillArray(pickedPuzzle.gridSize), disableShuffle)
-      );
+      setShuffledPieces(shuffle(fillArray(gridSize), disableShuffle));
       setCurrentBoard(new Array(numPieces).fill(null));
       setZIndexes(new Array(numPieces).fill(1));
       setWinMessage("");
