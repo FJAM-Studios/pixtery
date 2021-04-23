@@ -23,7 +23,7 @@ export default ({
   receivedPuzzles: Puzzle[];
   sentPuzzles: Puzzle[];
   setSentPuzzles: (puzzles: Puzzle[]) => void;
-}) => {
+}): JSX.Element => {
   const [modalVisible, setModalVisible] = React.useState(false);
   const [puzzleToDelete, setPuzzleToDelete] = React.useState<Puzzle | null>(
     null
@@ -36,7 +36,7 @@ export default ({
 
   const sendPuzzle = (publicKey: string | undefined) => {
     const deepLink = Linking.createURL("", {
-      queryParams: { puzzle: publicKey },
+      queryParams: { publicKey },
     });
     shareMessage(deepLink);
   };
