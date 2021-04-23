@@ -314,7 +314,7 @@ export const getInitialDimensions = (
   ix: number,
   gridSize: number,
   squareSize: number
-) => {
+): number[] => {
   let widthY: number,
     widthX: number,
     initX: number,
@@ -393,12 +393,14 @@ export const shareMessage = async (pixUrl: string): Promise<void> => {
       subject: "Someone sent you a Pixtery to solve!",
     };
     const result = await Share.share(content, options);
-    if (result.action === Share.sharedAction) {
-      if (result.activityType) {
-      } else {
-      }
-    } else if (result.action === Share.dismissedAction) {
-    }
+
+    // All of these conditionals are empty. What is supposed to be happening here?
+    // if (result.action === Share.sharedAction) {
+    //   if (result.activityType) {
+    //   } else {
+    //   }
+    // } else if (result.action === Share.dismissedAction) {
+    // }
   } catch (error) {
     alert(error.message);
   }
