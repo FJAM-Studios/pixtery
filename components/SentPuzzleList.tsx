@@ -1,14 +1,15 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Linking from "expo-linking";
+import moment from "moment";
 import * as React from "react";
 import { ImageBackground, View, TouchableOpacity } from "react-native";
-import { Card, IconButton, Button, Headline } from "react-native-paper";
-import AdSafeAreaView from "./AdSafeAreaView";
-import moment from "moment";
-import Header from "./Header";
-import { Puzzle } from "../types";
 import Modal from "react-native-modal";
-import * as Linking from "expo-linking";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Card, IconButton, Button, Headline } from "react-native-paper";
+
+import { Puzzle } from "../types";
 import { shareMessage } from "../util";
+import AdSafeAreaView from "./AdSafeAreaView";
+import Header from "./Header";
 
 export default ({
   navigation,
@@ -66,8 +67,8 @@ export default ({
       <Modal
         isVisible={modalVisible}
         onBackdropPress={() => setModalVisible(false)}
-        animationIn={"fadeIn"}
-        animationOut={"fadeOut"}
+        animationIn="fadeIn"
+        animationOut="fadeOut"
         backdropTransitionOutTiming={0}
       >
         <View
@@ -134,7 +135,7 @@ export default ({
                 right={() => (
                   <View style={{ flexDirection: "row", alignItems: "center" }}>
                     <IconButton
-                      icon={"puzzle"}
+                      icon="puzzle"
                       onPress={() =>
                         navigation.navigate("Puzzle", {
                           publicKey: sentPuzzle.publicKey,
@@ -142,11 +143,11 @@ export default ({
                       }
                     />
                     <IconButton
-                      icon={"delete"}
+                      icon="delete"
                       onPress={() => showDeleteModal(sentPuzzle)}
                     />
                     <IconButton
-                      icon={"send"}
+                      icon="send"
                       onPress={() => sendPuzzle(sentPuzzle.publicKey)}
                     />
                   </View>
@@ -161,7 +162,7 @@ export default ({
                       justifyContent: "space-around",
                       padding: 1,
                     }}
-                  ></ImageBackground>
+                  />
                 )}
               />
             </Card>
