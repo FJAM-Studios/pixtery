@@ -6,7 +6,7 @@ import {
 import { createStackNavigator } from "@react-navigation/stack";
 import * as Linking from "expo-linking";
 import React, { createRef, useEffect, useState } from "react";
-import { View, useWindowDimensions } from "react-native";
+import { View, LogBox, useWindowDimensions } from "react-native";
 import { Provider as PaperProvider, DefaultTheme } from "react-native-paper";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
@@ -21,6 +21,9 @@ import PuzzleList from "./components/PuzzleList";
 import SentPuzzleList from "./components/SentPuzzleList";
 import Splash from "./components/Splash";
 import { Puzzle as PuzzleType, Profile as ProfileType } from "./types";
+
+//less than ideal, but idk if we have a choice right now. suppresses the firebase timeout warning
+LogBox.ignoreLogs(["Setting a timer for a long period of time"]);
 
 const image = require("./assets/earth.jpg");
 
