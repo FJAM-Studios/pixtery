@@ -1,12 +1,12 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import moment from "moment";
 import * as React from "react";
-import { Text, Card, IconButton, Button, Headline } from "react-native-paper";
-import AdSafeAreaView from "./AdSafeAreaView";
 import { View, TouchableOpacity } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import Modal from "react-native-modal";
+import { Text, Card, IconButton, Button, Headline } from "react-native-paper";
 
 import { Puzzle } from "../types";
+import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 
 export default ({
@@ -55,8 +55,8 @@ export default ({
       <Modal
         isVisible={modalVisible}
         onBackdropPress={() => setModalVisible(false)}
-        animationIn={"fadeIn"}
-        animationOut={"fadeOut"}
+        animationIn="fadeIn"
+        animationOut="fadeOut"
         backdropTransitionOutTiming={0}
       >
         <View
@@ -139,7 +139,7 @@ export default ({
                       }
                     />
                     <IconButton
-                      icon={"delete"}
+                      icon="delete"
                       onPress={() => showDeleteModal(receivedPuzzle)}
                     />
                   </View>
