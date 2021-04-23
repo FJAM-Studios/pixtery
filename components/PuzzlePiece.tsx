@@ -21,6 +21,8 @@ export default ({
   setCurrentBoard,
   setErrorMessage,
   puzzleAreaDimensions,
+  z,
+  moveToTop
 }: {
   num: number;
   ix: number;
@@ -35,6 +37,8 @@ export default ({
   setCurrentBoard: Function;
   setErrorMessage: Function;
   puzzleAreaDimensions: { puzzleAreaWidth: number; puzzleAreaHeight: number };
+  z: number;
+  moveToTop: Function;
 }): JSX.Element | null => {
   const { puzzleAreaWidth, puzzleAreaHeight } = puzzleAreaDimensions;
   const minSandboxY = boardSize * 1.05;
@@ -73,7 +77,6 @@ export default ({
   >(-1);
   // previous index is needed to know where the piece moved from, to update to null on current board
   const [prevIx, setPrevIx] = useState<number | undefined | null>(null);
-  const [zIndex, setZ] = useState<number>(1);
 
   //_x and _y are used to keep track of where image is relative to its start positon
   const [currentXY, setXY] = useState({
@@ -171,7 +174,6 @@ export default ({
 
     if (newIx !== currentSnappedIx) updateIx(newIx);
     setXY(newXY);
-    setZ(1);
   };
 
   const determineSnap = (newXY: {
@@ -234,9 +236,9 @@ export default ({
       //draggable SVG needs to be placed where cropped image starts. jigsaw shape extends beyond square
       x={currentXY.x}
       y={currentXY.y}
-      z={zIndex}
+      z={z}
       //on release of a piece, update the state and check for snapping
-      onPressIn={() => setZ(999)}
+      onPressIn={() => moveToTop(ix)}
       onDragRelease={(ev, gestureState) => changePosition(gestureState)}
     >
       <Svg
