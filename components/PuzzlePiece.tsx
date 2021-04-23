@@ -1,11 +1,11 @@
 import * as ImageManipulator from "expo-image-manipulator";
 import React, { useState, useEffect } from "react";
-import Draggable from "react-native-draggable";
 import { Svg, Image, Defs, ClipPath, Path, Rect } from "react-native-svg";
 
 import { SNAP_MARGIN } from "../constants";
 import { GridSections } from "../types";
 import { getInitialDimensions } from "../util";
+import Draggable from "./CustomDraggable";
 
 export default ({
   num,
@@ -21,6 +21,8 @@ export default ({
   setCurrentBoard,
   setErrorMessage,
   puzzleAreaDimensions,
+  z,
+  moveToTop
 }: {
   num: number;
   ix: number;
@@ -35,7 +37,9 @@ export default ({
   setCurrentBoard: Function;
   setErrorMessage: Function;
   puzzleAreaDimensions: { puzzleAreaWidth: number; puzzleAreaHeight: number };
-}) => {
+  z: number;
+  moveToTop: Function;
+}): JSX.Element | null => {
   const { puzzleAreaWidth, puzzleAreaHeight } = puzzleAreaDimensions;
   const minSandboxY = boardSize * 1.05;
   const maxSandboxY = puzzleAreaHeight - squareSize;
@@ -122,7 +126,12 @@ export default ({
     });
   }, [imageURI]);
 
-  const changePosition = (gestureState: { dx: number; dy: number }): void => {
+  const changePosition = (gestureState: {
+    dx: number;
+    dy: number;
+    moveX: number;
+    moveY: number;
+  }): void => {
     setErrorMessage("");
     //update the relative _x and _y but leave x and y the same unless snapping
     const newXY = {
@@ -135,7 +144,6 @@ export default ({
       // snapAdjusted_x: currentXY.snapAdjusted_x + gestureState.dx,
       // snapAdjusted_y: currentXY.snapAdjusted_y + gestureState.dy
     };
-
     // snappedX: top left X position of snap grid
     // snappedY: top left Y position of snap grid
     // snappedRow: row index where it snaps
@@ -236,7 +244,9 @@ export default ({
       //draggable SVG needs to be placed where cropped image starts. jigsaw shape extends beyond square
       x={currentXY.x}
       y={currentXY.y}
+      z={z}
       //on release of a piece, update the state and check for snapping
+      onPressIn={() => moveToTop(ix)}
       onDragRelease={(ev, gestureState) => changePosition(gestureState)}
     >
       <Svg
