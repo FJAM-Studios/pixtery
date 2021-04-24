@@ -43,7 +43,6 @@ export default ({
   const { puzzleAreaWidth, puzzleAreaHeight } = puzzleAreaDimensions;
   const minSandboxY = boardSize * 1.05;
   const maxSandboxY = puzzleAreaHeight - squareSize;
-
   //squareX and squareY represent the row and col of the square in the solved puzzle
   //widthX and widthY are the size of the pieces (larger for jigsaw);
   //initX and initY are starting position for pieces (not aligned w grid for jigsaw)
@@ -84,9 +83,8 @@ export default ({
     y: initY,
     _x: initX, // to track cumulative X distance traveled from original position
     _y: initY, // to track cumulative Y distance traveled from original position
-    // was exploring how to adjust cumulative position to snap below
-    // snapAdjusted_x: initX,
-    // snapAdjusted_y: initY,
+    _xOffset: initX, //to track distance offset from snapping X
+    _yOffset: initY, //to track distance offset from snapping Y
   });
 
   useEffect(() => {
@@ -123,6 +121,8 @@ export default ({
       y: initY,
       _x: initX,
       _y: initY,
+      _xOffset: initX,
+      _yOffset: initY,
     });
   }, [imageURI]);
 
@@ -139,6 +139,8 @@ export default ({
       y: currentXY.y,
       _x: currentXY._x + gestureState.dx,
       _y: currentXY._y + gestureState.dy,
+      _xOffset: currentXY._xOffset + gestureState.dx,
+      _yOffset: currentXY._yOffset + gestureState.dy,
       // snapAdjusted_x: currentXY.snapAdjusted_x + gestureState.dx,
       // snapAdjusted_y: currentXY.snapAdjusted_y + gestureState.dy
     };
@@ -154,8 +156,13 @@ export default ({
       // putting ! after a variable is to tell TS that in this case, the variable will not be null or undefined
       newIx = snappedRow! * gridSize + snappedCol!;
       if (currentBoard[newIx] === null || newIx === currentSnappedIx) {
+        //update the offset to keep track of the 'snapped' distance for subsequent snapping calculations
+        newXY._xOffset += snappedX - newXY.x;
+        newXY._yOffset += snappedY - newXY.y;
         newXY.x = snappedX;
         newXY.y = snappedY;
+        // newXY._x = snappedRow * gridSize
+        // newXY._y = snappedCol * gridSize
         // need to adjust accumulated distance if theres a snap - leave for later
         // newXY.snapAdjusted_y += newXY._y - colDividers[snappedCol!] - (squareSize * SNAP_MARGIN - gestureState.dy)
         // newXY.snapAdjusted_x += newXY._x - rowDividers[snappedRow!] - (squareSize * SNAP_MARGIN - gestureState.dx)
@@ -181,6 +188,8 @@ export default ({
     y: number;
     _x: number;
     _y: number;
+    _xOffset: number;
+    _yOffset: number;
   }) => {
     let snappedX: number | undefined; // top left X position of snap grid
     let snappedY: number | undefined; // top left Y position of snap grid
@@ -188,11 +197,10 @@ export default ({
     let snappedCol: number | undefined; // col index where it snaps
     const rowDividers: number[] = gridSections.rowDividers;
     const colDividers: number[] = gridSections.colDividers;
-
     //if _x and _y are within a margin of a point on the grid, then snap!
     for (let i = 0; i < rowDividers.length; i++) {
       const rowDivider = rowDividers[i];
-      if (Math.abs(newXY._y - rowDivider) < squareSize * SNAP_MARGIN) {
+      if (Math.abs(newXY._yOffset - rowDivider) < squareSize * SNAP_MARGIN) {
         snappedY = initY - newXY._y + rowDivider;
         snappedRow = i;
         break;
@@ -200,7 +208,7 @@ export default ({
     }
     for (let i = 0; i < colDividers.length; i++) {
       const colDivider = colDividers[i];
-      if (Math.abs(newXY._x - colDivider) < squareSize * SNAP_MARGIN) {
+      if (Math.abs(newXY._xOffset - colDivider) < squareSize * SNAP_MARGIN) {
         snappedX = initX - newXY._x + colDivider;
         snappedCol = i;
         break;
