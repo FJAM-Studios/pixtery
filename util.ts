@@ -19,7 +19,14 @@ export const shuffle = (array: number[], disabledShuffle = true): number[] => {
     array[currentIndex] = array[randomIndex];
     array[randomIndex] = temporaryValue;
   }
-
+  let reshuffle = true;
+  for (let i = 0; i < array.length; i++) {
+    if (array[i] !== i) {
+      reshuffle = false;
+      break;
+    }
+  }
+  if (reshuffle) array = shuffle(array);
   return array;
 };
 
