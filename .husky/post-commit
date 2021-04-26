@@ -1,7 +1,6 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-#npm run format
-#npm test
-#npm run lint:fix
-npm run commit
+npm run format
+npm test
+npm run lint:fix
