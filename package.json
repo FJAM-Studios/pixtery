@@ -10,6 +10,7 @@
     "format": "npx prettier --write .",
     "lint": "eslint --ext .ts,.tsx,.js,.json ./",
     "lint:fix": "npm run lint -- --fix --quiet",
+    "commit": "npm test && npm run format && npm run lint:fix",
     "env-fix": "env 2.5.5"
   },
   "jest": {
