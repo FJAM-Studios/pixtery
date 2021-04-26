@@ -6,6 +6,7 @@ import * as ImagePicker from "expo-image-picker";
 import * as Linking from "expo-linking";
 import * as React from "react";
 import { Image, View, Platform } from "react-native";
+import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scrollview";
 import {
   Button,
   IconButton,
@@ -238,194 +239,199 @@ export default ({
         }
         navigation={navigation}
       />
-      <View
-        style={{
-          alignSelf: "center",
-          alignItems: "center",
-        }}
+      <KeyboardAwareScrollView
+        resetScrollToCoords={{ x: 0, y: 0 }}
+        scrollEnabled
       >
-        <Surface
+        <View
           style={{
-            padding: 4,
+            alignSelf: "center",
             alignItems: "center",
-            justifyContent: "center",
-            elevation: 4,
-            borderRadius: theme.roundness,
-            backgroundColor: theme.colors.accent,
           }}
         >
-          <Image
-            source={imageURI.length ? { uri: imageURI } : emptyImage}
+          <Surface
             style={{
-              width: boardSize / 1.6,
-              height: boardSize / 1.6,
-              alignSelf: "center",
+              padding: 4,
+              alignItems: "center",
+              justifyContent: "center",
+              elevation: 4,
+              borderRadius: theme.roundness,
+              backgroundColor: theme.colors.accent,
             }}
-          />
-          {imageURI.length ? (
-            <Svg
-              width={boardSize / 1.6}
-              height={boardSize / 1.6}
-              style={{ position: "absolute", top: 4, left: 4 }}
+          >
+            <Image
+              source={imageURI.length ? { uri: imageURI } : emptyImage}
+              style={{
+                width: boardSize / 1.6,
+                height: boardSize / 1.6,
+                alignSelf: "center",
+              }}
+            />
+            {imageURI.length ? (
+              <Svg
+                width={boardSize / 1.6}
+                height={boardSize / 1.6}
+                style={{ position: "absolute", top: 4, left: 4 }}
+              >
+                {paths.map((path, ix) => (
+                  <Path key={ix} d={path} stroke="white" strokeWidth="1" />
+                ))}
+              </Svg>
+            ) : null}
+            {imageURI.length ? null : <Headline>Choose an Image</Headline>}
+          </Surface>
+        </View>
+        <Button
+          icon="camera"
+          mode="contained"
+          onPress={() => selectImage(true)}
+          style={{ margin: 10 }}
+        >
+          Camera
+        </Button>
+        <Button
+          icon="folder"
+          mode="contained"
+          onPress={() => selectImage(false)}
+          style={{ margin: 10 }}
+        >
+          Gallery
+        </Button>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-evenly",
+          }}
+        >
+          <Text>Type:</Text>
+          <Surface
+            style={{
+              padding: 8,
+              height: 40,
+              width: 40,
+              alignItems: "center",
+              justifyContent: "center",
+              elevation: 4,
+              borderRadius: theme.roundness,
+              backgroundColor:
+                puzzleType === "jigsaw"
+                  ? theme.colors.surface
+                  : theme.colors.background,
+            }}
+          >
+            <IconButton
+              icon="puzzle"
+              onPress={() => {
+                setPuzzleType("jigsaw");
+              }}
+              disabled={!imageURI.length}
+              animated={false}
+            />
+          </Surface>
+          <Surface
+            style={{
+              padding: 8,
+              height: 40,
+              width: 40,
+              alignItems: "center",
+              justifyContent: "center",
+              elevation: 4,
+              borderRadius: theme.roundness,
+              backgroundColor:
+                puzzleType === "squares"
+                  ? theme.colors.surface
+                  : theme.colors.background,
+            }}
+          >
+            <IconButton
+              icon="view-grid"
+              onPress={() => {
+                setPuzzleType("squares");
+              }}
+              disabled={!imageURI.length}
+              animated={false}
+            />
+          </Surface>
+          <Text>Size:</Text>
+          <Surface
+            style={{
+              alignItems: "center",
+              justifyContent: "center",
+              elevation: 4,
+              borderRadius: theme.roundness,
+              backgroundColor:
+                gridSize === 2 ? theme.colors.surface : theme.colors.background,
+            }}
+          >
+            <Button
+              mode="text"
+              disabled={!imageURI.length}
+              onPress={() => setGridSize(2)}
+              color="white"
+              compact
             >
-              {paths.map((path, ix) => (
-                <Path key={ix} d={path} stroke="white" strokeWidth="1" />
-              ))}
-            </Svg>
-          ) : null}
-          {imageURI.length ? null : <Headline>Choose an Image</Headline>}
-        </Surface>
-      </View>
-      <Button
-        icon="camera"
-        mode="contained"
-        onPress={() => selectImage(true)}
-        style={{ margin: 10 }}
-      >
-        Camera
-      </Button>
-      <Button
-        icon="folder"
-        mode="contained"
-        onPress={() => selectImage(false)}
-        style={{ margin: 10 }}
-      >
-        Gallery
-      </Button>
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-evenly",
-        }}
-      >
-        <Text>Type:</Text>
-        <Surface
-          style={{
-            padding: 8,
-            height: 40,
-            width: 40,
-            alignItems: "center",
-            justifyContent: "center",
-            elevation: 4,
-            borderRadius: theme.roundness,
-            backgroundColor:
-              puzzleType === "jigsaw"
-                ? theme.colors.surface
-                : theme.colors.background,
-          }}
-        >
-          <IconButton
-            icon="puzzle"
-            onPress={() => {
-              setPuzzleType("jigsaw");
+              2
+            </Button>
+          </Surface>
+          <Surface
+            style={{
+              alignItems: "center",
+              justifyContent: "center",
+              elevation: 4,
+              borderRadius: theme.roundness,
+              backgroundColor:
+                gridSize === 3 ? theme.colors.surface : theme.colors.background,
             }}
-            disabled={!imageURI.length}
-            animated={false}
-          />
-        </Surface>
-        <Surface
-          style={{
-            padding: 8,
-            height: 40,
-            width: 40,
-            alignItems: "center",
-            justifyContent: "center",
-            elevation: 4,
-            borderRadius: theme.roundness,
-            backgroundColor:
-              puzzleType === "squares"
-                ? theme.colors.surface
-                : theme.colors.background,
-          }}
-        >
-          <IconButton
-            icon="view-grid"
-            onPress={() => {
-              setPuzzleType("squares");
+          >
+            <Button
+              mode="text"
+              disabled={!imageURI.length}
+              onPress={() => setGridSize(3)}
+              color="white"
+              compact
+            >
+              3
+            </Button>
+          </Surface>
+          <Surface
+            style={{
+              alignItems: "center",
+              justifyContent: "center",
+              elevation: 4,
+              borderRadius: theme.roundness,
+              backgroundColor:
+                gridSize === 4 ? theme.colors.surface : theme.colors.background,
             }}
-            disabled={!imageURI.length}
-            animated={false}
-          />
-        </Surface>
-        <Text>Size:</Text>
-        <Surface
-          style={{
-            alignItems: "center",
-            justifyContent: "center",
-            elevation: 4,
-            borderRadius: theme.roundness,
-            backgroundColor:
-              gridSize === 2 ? theme.colors.surface : theme.colors.background,
-          }}
-        >
-          <Button
-            mode="text"
-            disabled={!imageURI.length}
-            onPress={() => setGridSize(2)}
-            color="white"
-            compact
           >
-            2
-          </Button>
-        </Surface>
-        <Surface
-          style={{
-            alignItems: "center",
-            justifyContent: "center",
-            elevation: 4,
-            borderRadius: theme.roundness,
-            backgroundColor:
-              gridSize === 3 ? theme.colors.surface : theme.colors.background,
-          }}
+            <Button
+              mode="text"
+              disabled={!imageURI.length}
+              onPress={() => setGridSize(4)}
+              color="white"
+              compact
+            >
+              4
+            </Button>
+          </Surface>
+        </View>
+        <TextInput
+          placeholder="Message (optional)"
+          disabled={!imageURI.length}
+          mode="outlined"
+          value={message}
+          onChangeText={(message) => setMessage(message)}
+        />
+        <Button
+          icon="send"
+          mode="contained"
+          onPress={submitToServer}
+          style={{ margin: 10 }}
+          disabled={imageURI.length === 0}
         >
-          <Button
-            mode="text"
-            disabled={!imageURI.length}
-            onPress={() => setGridSize(3)}
-            color="white"
-            compact
-          >
-            3
-          </Button>
-        </Surface>
-        <Surface
-          style={{
-            alignItems: "center",
-            justifyContent: "center",
-            elevation: 4,
-            borderRadius: theme.roundness,
-            backgroundColor:
-              gridSize === 4 ? theme.colors.surface : theme.colors.background,
-          }}
-        >
-          <Button
-            mode="text"
-            disabled={!imageURI.length}
-            onPress={() => setGridSize(4)}
-            color="white"
-            compact
-          >
-            4
-          </Button>
-        </Surface>
-      </View>
-      <TextInput
-        placeholder="Message (optional)"
-        disabled={!imageURI.length}
-        mode="outlined"
-        value={message}
-        onChangeText={(message) => setMessage(message)}
-      />
-      <Button
-        icon="send"
-        mode="contained"
-        onPress={submitToServer}
-        style={{ margin: 10 }}
-        disabled={imageURI.length === 0}
-      >
-        Send
-      </Button>
+          Send
+        </Button>
+    </KeyboardAwareScrollView>
     </AdSafeAreaView>
   );
 };
