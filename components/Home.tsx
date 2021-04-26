@@ -6,7 +6,7 @@ import * as ImagePicker from "expo-image-picker";
 import * as Linking from "expo-linking";
 import * as React from "react";
 import { Image, View, Platform } from "react-native";
-import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scrollview";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import {
   Button,
   IconButton,
@@ -241,7 +241,7 @@ export default ({
       />
       <KeyboardAwareScrollView
         resetScrollToCoords={{ x: 0, y: 0 }}
-        scrollEnabled
+        keyboardShouldPersistTaps="handled"
       >
         <View
           style={{
@@ -431,7 +431,7 @@ export default ({
         >
           Send
         </Button>
-    </KeyboardAwareScrollView>
+      </KeyboardAwareScrollView>
     </AdSafeAreaView>
   );
 };
