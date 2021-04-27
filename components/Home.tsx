@@ -221,7 +221,7 @@ export default ({
           contentContainerStyle={{ alignItems: "center" }}
         >
           {gridSize % 2 ? <Text>Yeah you're working.</Text> : null}
-          <Headline>Building a Pixtery, Buddy!</Headline>
+          <Headline>Building a Pixtery!</Headline>
           {gridSize % 2 ? null : <Text>And choosing so carefully</Text>}
           <ActivityIndicator
             animating
