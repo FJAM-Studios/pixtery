@@ -15,8 +15,8 @@ cors_instructions.txt
 node_modules
 *-debug.log
 .env
-/functions
 ip.ts
+functions/
 
 # macOS
 .DS_Store
