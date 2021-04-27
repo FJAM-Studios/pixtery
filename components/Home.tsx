@@ -6,7 +6,7 @@ import * as ImagePicker from "expo-image-picker";
 import * as Linking from "expo-linking";
 import * as React from "react";
 import { Image, View, Platform } from "react-native";
- import {
+import {
   Button,
   IconButton,
   Text,
@@ -221,7 +221,7 @@ export default ({
           contentContainerStyle={{ alignItems: "center" }}
         >
           {gridSize % 2 ? <Text>Yeah you're working.</Text> : null}
-          <Headline>Building a Pixtery, buddy!</Headline>
+          <Headline>Building a Pixtery!</Headline>
           {gridSize % 2 ? null : <Text>And choosing so carefully</Text>}
           <ActivityIndicator
             animating
