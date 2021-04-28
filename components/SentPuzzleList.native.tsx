@@ -118,7 +118,7 @@ export default ({
           <TouchableOpacity
             onPress={() =>
               navigation.navigate("Puzzle", {
-                publicKey: sentPuzzle.publicKey,
+                pickedPuzzle: sentPuzzle,
               })
             }
             key={ix}
@@ -138,7 +138,7 @@ export default ({
                       icon="puzzle"
                       onPress={() =>
                         navigation.navigate("Puzzle", {
-                          publicKey: sentPuzzle.publicKey,
+                          pickedPuzzle: sentPuzzle,
                         })
                       }
                     />

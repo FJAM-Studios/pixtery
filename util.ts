@@ -2,6 +2,18 @@ import { Share } from "react-native";
 
 import { Piece, Puzzle, GridSections } from "./types";
 
+export const selectPuzzle = (
+  publicKey: string,
+  receivedPuzzles: Puzzle[] = [],
+  sentPuzzles: Puzzle[] = []
+): Puzzle | null => {
+  const matchingPuzzles = [...receivedPuzzles, ...sentPuzzles].filter(
+    (puz) => puz.publicKey === publicKey
+  );
+  if (matchingPuzzles.length) return matchingPuzzles[0];
+  else return null;
+};
+
 export const shuffle = (array: number[], disabledShuffle = true): number[] => {
   if (disabledShuffle) return array;
   let currentIndex = array.length,
@@ -386,6 +398,7 @@ export const getInitialDimensions = (
     solutionY,
   ];
 };
+
 export const shareMessage = async (pixUrl: string): Promise<void> => {
   try {
     const content = {

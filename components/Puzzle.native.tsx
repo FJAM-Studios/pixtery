@@ -24,7 +24,6 @@ export default ({
   theme,
   navigation,
   receivedPuzzles,
-  sentPuzzles,
   route,
   setReceivedPuzzles,
 }: {
@@ -32,12 +31,9 @@ export default ({
   theme: any;
   navigation: any;
   receivedPuzzles: Puzzle[];
-  sentPuzzles: Puzzle[];
   route: any;
   setReceivedPuzzles: (puzzles: Puzzle[]) => void;
 }): JSX.Element => {
-  const { publicKey } = route.params;
-
   const [puzzle, setPuzzle] = useState<Puzzle>();
 
   const [piecePaths, setPiecePaths] = useState<string[]>();
@@ -96,31 +92,26 @@ export default ({
           ? puzzle.message
           : "Congrats! You solved the puzzle!";
       setWinMessage(winMessage);
-      markPuzzleComplete(publicKey);
+      markPuzzleComplete( puzzle.publicKey );
     }
     if (!firstSnap) checkFirstSnap();
   }, [currentBoard]);
 
   useEffect(() => {
-    const matchingPuzzles = [...receivedPuzzles, ...sentPuzzles].filter(
-      (puz) => puz.publicKey === publicKey
-    );
-    if (matchingPuzzles.length) {
-      const pickedPuzzle = matchingPuzzles[0];
-      const { gridSize } = pickedPuzzle;
-      const squareSize = boardSize / gridSize;
-      const numPieces = gridSize * gridSize;
-      setPuzzle(pickedPuzzle);
-      setPiecePaths(generateJigsawPiecePaths(gridSize, squareSize));
-      setGridSections(getGridSections(pickedPuzzle, squareSize));
-      setShuffledPieces(shuffle(fillArray(gridSize), disableShuffle));
-      setCurrentBoard(new Array(numPieces).fill(null));
-      setZIndexes(new Array(numPieces).fill(1));
-      setWinMessage("");
-      setErrorMessage("");
-      setFirstSnap(false);
-    }
-  }, [publicKey]);
+    const { pickedPuzzle } = route.params;
+    const { gridSize } = pickedPuzzle;
+    const squareSize = boardSize / gridSize;
+    const numPieces = gridSize * gridSize;
+    setPuzzle(pickedPuzzle);
+    setPiecePaths(generateJigsawPiecePaths(gridSize, squareSize));
+    setGridSections(getGridSections(pickedPuzzle, squareSize));
+    setShuffledPieces(shuffle(fillArray(gridSize), disableShuffle));
+    setCurrentBoard(new Array(numPieces).fill(null));
+    setZIndexes(new Array(numPieces).fill(1));
+    setWinMessage("");
+    setErrorMessage("");
+    setFirstSnap(false);
+  }, []);
 
   const styleProps = {
     theme,

@@ -12,8 +12,15 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { functions } from "./FirebaseApp";
 import AddPuzzle from "./components/AddPuzzle";
+import CreateProfile from "./components/CreateProfile";
+import DevTest from "./components/DevTest";
+import HomeScreen from "./components/Home";
+import Profile from "./components/Profile";
 import Puzzle from "./components/Puzzle";
-import { Puzzle as PuzzleType } from "./types";
+import PuzzleList from "./components/PuzzleList";
+import SentPuzzleList from "./components/SentPuzzleList";
+import Splash from "./components/Splash";
+import { Puzzle as PuzzleType, Profile as ProfileType } from "./types";
 import { selectPuzzle } from "./util";
 
 //less than ideal, but idk if we have a choice right now. suppresses the firebase timeout warning
@@ -41,7 +48,10 @@ const Stack = createStackNavigator();
 
 const App = (): JSX.Element => {
   const [receivedPuzzles, setReceivedPuzzles] = useState<PuzzleType[]>([]);
+  const [sentPuzzles, setSentPuzzles] = useState<PuzzleType[]>([]);
   const [pickedPuzzle, setPickedPuzzle] = useState<PuzzleType>();
+  const [profile, setProfile] = useState<ProfileType | null>(null);
+  const [initialLoad, setInitialLoad] = useState(false);
   const navigationRef = createRef<NavigationContainerRef>();
 
   const { width, height } = useWindowDimensions();
@@ -52,10 +62,14 @@ const App = (): JSX.Element => {
     let url;
     const getInitialUrl = async () => {
       url = await Linking.getInitialURL();
-      if (url) fetchPuzzle(url);
+      if (url && initialLoad) fetchPuzzle(url);
     };
+    Linking.addEventListener("url", (ev) => {
+      url = ev.url;
+      if (url && initialLoad) fetchPuzzle(url);
+    });
     if (!url) getInitialUrl();
-  }, []);
+  }, [initialLoad, navigationRef]);
 
   const fetchPuzzle = async (url: string): Promise<void> => {
     console.log(url);
@@ -72,7 +86,7 @@ const App = (): JSX.Element => {
         navigationRef.current.dispatch(
           CommonActions.reset({
             index: 0,
-            routes: [{ name: "Puzzle", params: { pickedPuzzle: matchingPuzzle } }],
+            routes: [{ name: "Puzzle", params: { ...matchingPuzzle } }],
           })
         );
       } else {
@@ -113,6 +127,64 @@ const App = (): JSX.Element => {
         <NavigationContainer ref={navigationRef}>
           <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
             <Stack.Navigator headerMode="none">
+              <Stack.Screen name="Splash">
+                {(props) => (
+                  <Splash
+                    {...props}
+                    theme={theme}
+                    setReceivedPuzzles={setReceivedPuzzles}
+                    setSentPuzzles={setSentPuzzles}
+                    profile={profile}
+                    setProfile={setProfile}
+                    initialLoad={initialLoad}
+                    setInitialLoad={setInitialLoad}
+                  />
+                )}
+              </Stack.Screen>
+              <Stack.Screen name="CreateProfile">
+                {(props) => (
+                  <CreateProfile
+                    {...props}
+                    theme={theme}
+                    profile={profile}
+                    setProfile={setProfile}
+                  />
+                )}
+              </Stack.Screen>
+              <Stack.Screen name="Home">
+                {(props) => (
+                  <HomeScreen
+                    {...props}
+                    boardSize={boardSize}
+                    theme={theme}
+                    receivedPuzzles={receivedPuzzles}
+                    profile={profile}
+                    sentPuzzles={sentPuzzles}
+                    setSentPuzzles={setSentPuzzles}
+                  />
+                )}
+              </Stack.Screen>
+              <Stack.Screen name="PuzzleList">
+                {(props) => (
+                  <PuzzleList
+                    {...props}
+                    theme={theme}
+                    receivedPuzzles={receivedPuzzles}
+                    setReceivedPuzzles={setReceivedPuzzles}
+                  />
+                )}
+              </Stack.Screen>
+              <Stack.Screen name="SentPuzzleList">
+                {(props) => (
+                  <SentPuzzleList
+                    {...props}
+                    theme={theme}
+                    receivedPuzzles={receivedPuzzles}
+                    sentPuzzles={sentPuzzles}
+                    setSentPuzzles={setSentPuzzles}
+                  />
+                )}
+              </Stack.Screen>
               <Stack.Screen
                 name="Puzzle"
                 initialParams={{
@@ -140,6 +212,23 @@ const App = (): JSX.Element => {
                     setReceivedPuzzles={setReceivedPuzzles}
                   />
                 )}
+              </Stack.Screen>
+              <Stack.Screen name="Profile">
+                {(props) => (
+                  <Profile
+                    {...props}
+                    theme={theme}
+                    profile={profile}
+                    setProfile={setProfile}
+                    receivedPuzzles={receivedPuzzles}
+                    setSentPuzzles={setSentPuzzles}
+                    sentPuzzles={sentPuzzles}
+                    setReceivedPuzzles={setReceivedPuzzles}
+                  />
+                )}
+              </Stack.Screen>
+              <Stack.Screen name="DevTest">
+                {(props) => <DevTest {...props} theme={theme} />}
               </Stack.Screen>
             </Stack.Navigator>
           </View>

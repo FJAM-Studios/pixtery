@@ -8,7 +8,7 @@ import { Puzzle as PuzzleType, Profile as ProfileType } from "../types";
 import Logo from "./Logo";
 import Title from "./Title";
 
-export default ({
+export default function Splash({
   theme,
   setReceivedPuzzles,
   setSentPuzzles,
@@ -26,7 +26,7 @@ export default ({
   navigation: any;
   initialLoad: boolean;
   setInitialLoad: (initialLoad: boolean) => void;
-}) => {
+}): JSX.Element {
   useEffect(() => {
     const loadProfile = async () => {
       try {
