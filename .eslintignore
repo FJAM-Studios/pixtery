@@ -1,2 +1,14 @@
 tests/*
-node_modules/*
+
+# only lint the src files in the functions folder
+functions
+! functions/src/*
+
+patches
+
+web-build
+
+.expo
+.expo-shared
+.firebase
+.husky

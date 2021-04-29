@@ -13,3 +13,14 @@ web-build/
 
 # macOS
 .DS_Store
+
+tests/*
+
+# only lint the src files in the functions folder
+functions
+! functions/src/*
+
+patches
+.expo-shared
+.firebase
+.husky
