@@ -3,10 +3,11 @@
 import * as functions from "firebase-functions";
 import {Puzzle} from "../../types";
 const admin = require('firebase-admin');
-const serviceAccount = require("C:\\Users\\garbe\\Desktop\\Fullstack\\Camystery\\pixtery\\serviceAccount.json");
+import adminKey from './serviceAccount'
+
 
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
+  credential: admin.credential.cert(adminKey),
   databaseURL: "https://pixstery-7c9b9-default-rtdb.firebaseio.com"
 });
 const db = admin.firestore();

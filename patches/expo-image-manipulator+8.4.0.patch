@@ -1,0 +1,24 @@
+diff --git a/node_modules/expo-image-manipulator/build/ExpoImageManipulator.web.js b/node_modules/expo-image-manipulator/build/ExpoImageManipulator.web.js
+index f0c2fe6..d5389b6 100644
+--- a/node_modules/expo-image-manipulator/build/ExpoImageManipulator.web.js
++++ b/node_modules/expo-image-manipulator/build/ExpoImageManipulator.web.js
+@@ -153,6 +153,7 @@ function getResults(canvas, options) {
+ function loadImageAsync(uri) {
+     return new Promise((resolve, reject) => {
+         const imageSource = new Image();
++        imageSource.crossOrigin= "Anonymous";
+         imageSource.onload = () => resolve(imageSource);
+         imageSource.onerror = () => reject(imageSource);
+         imageSource.src = uri;
+diff --git a/node_modules/expo-image-manipulator/src/ExpoImageManipulator.web.ts b/node_modules/expo-image-manipulator/src/ExpoImageManipulator.web.ts
+index 049ea35..211a9aa 100644
+--- a/node_modules/expo-image-manipulator/src/ExpoImageManipulator.web.ts
++++ b/node_modules/expo-image-manipulator/src/ExpoImageManipulator.web.ts
+@@ -212,6 +212,7 @@ function getResults(canvas: HTMLCanvasElement, options?: SaveOptions): ImageResu
+ function loadImageAsync(uri: string): Promise<HTMLImageElement> {
+   return new Promise((resolve, reject) => {
+     const imageSource = new Image();
++    imageSource.crossOrigin= "Anonymous";
+     imageSource.onload = () => resolve(imageSource);
+     imageSource.onerror = () => reject(imageSource);
+     imageSource.src = uri;
