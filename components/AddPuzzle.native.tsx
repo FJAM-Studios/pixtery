@@ -18,12 +18,14 @@ export default function AddPuzzle({
   receivedPuzzles,
   route,
   setReceivedPuzzles,
+  setSelectedPuzzle
 }: {
   navigation: any;
   theme: any;
   receivedPuzzles: Puzzle[];
   route: any;
   setReceivedPuzzles: (puzzles: Puzzle[]) => void;
+  setSelectedPuzzle: Function;
 }): JSX.Element {
   const newPuzzle: Puzzle = route.params;
   const { imageURI, publicKey } = newPuzzle;
@@ -61,10 +63,11 @@ export default function AddPuzzle({
           JSON.stringify(allPuzzles)
         );
         setReceivedPuzzles(allPuzzles);
+        setSelectedPuzzle(newPuzzle);
         navigation.dispatch(
           CommonActions.reset({
             index: 0,
-            routes: [{ name: "Puzzle", params: { pickedPuzzle: newPuzzle } }],
+            routes: [{ name: "Puzzle" }],
           })
         );
       } catch (e) {

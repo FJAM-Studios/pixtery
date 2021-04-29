@@ -11,19 +11,21 @@ import { shareMessage } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 
-export default ({
+export default function SentPuzzleList({
   navigation,
   theme,
   receivedPuzzles,
   sentPuzzles,
   setSentPuzzles,
+  setSelectedPuzzle
 }: {
   navigation: any;
   theme: any;
   receivedPuzzles: Puzzle[];
   sentPuzzles: Puzzle[];
   setSentPuzzles: (puzzles: Puzzle[]) => void;
-}): JSX.Element => {
+  setSelectedPuzzle: Function;
+}): JSX.Element {
   const [modalVisible, setModalVisible] = React.useState(false);
   const [puzzleToDelete, setPuzzleToDelete] = React.useState<Puzzle | null>(
     null
@@ -116,11 +118,12 @@ export default ({
       <View>
         {sentPuzzles.map((sentPuzzle, ix) => (
           <TouchableOpacity
-            onPress={() =>
+            onPress={() =>{
+              setSelectedPuzzle(sentPuzzle);
               navigation.navigate("Puzzle", {
-                pickedPuzzle: sentPuzzle,
+                publicKey: sentPuzzle.publicKey,
               })
-            }
+            }}
             key={ix}
           >
             <Card
@@ -138,7 +141,7 @@ export default ({
                       icon="puzzle"
                       onPress={() =>
                         navigation.navigate("Puzzle", {
-                          pickedPuzzle: sentPuzzle,
+                          publicKey: sentPuzzle.publicKey,
                         })
                       }
                     />

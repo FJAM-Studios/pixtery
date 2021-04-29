@@ -23,6 +23,7 @@ export default ({
   boardSize,
   theme,
   navigation,
+  puzzle,
   receivedPuzzles,
   route,
   setReceivedPuzzles,
@@ -30,12 +31,11 @@ export default ({
   boardSize: number;
   theme: any;
   navigation: any;
+  puzzle: Puzzle;
   receivedPuzzles: Puzzle[];
   route: any;
   setReceivedPuzzles: (puzzles: Puzzle[]) => void;
 }): JSX.Element => {
-  const [puzzle, setPuzzle] = useState<Puzzle>();
-
   const [piecePaths, setPiecePaths] = useState<string[]>();
 
   const [gridSections, setGridSections] = useState<GridSections>();
@@ -92,26 +92,24 @@ export default ({
           ? puzzle.message
           : "Congrats! You solved the puzzle!";
       setWinMessage(winMessage);
-      markPuzzleComplete( puzzle.publicKey );
+      markPuzzleComplete(puzzle.publicKey);
     }
     if (!firstSnap) checkFirstSnap();
   }, [currentBoard]);
 
   useEffect(() => {
-    const { pickedPuzzle } = route.params;
-    const { gridSize } = pickedPuzzle;
+    const { gridSize } = puzzle;
     const squareSize = boardSize / gridSize;
     const numPieces = gridSize * gridSize;
-    setPuzzle(pickedPuzzle);
     setPiecePaths(generateJigsawPiecePaths(gridSize, squareSize));
-    setGridSections(getGridSections(pickedPuzzle, squareSize));
+    setGridSections(getGridSections(puzzle, squareSize));
     setShuffledPieces(shuffle(fillArray(gridSize), disableShuffle));
     setCurrentBoard(new Array(numPieces).fill(null));
     setZIndexes(new Array(numPieces).fill(1));
     setWinMessage("");
     setErrorMessage("");
     setFirstSnap(false);
-  }, []);
+  }, [puzzle]);
 
   const styleProps = {
     theme,

@@ -49,7 +49,7 @@ const Stack = createStackNavigator();
 const App = (): JSX.Element => {
   const [receivedPuzzles, setReceivedPuzzles] = useState<PuzzleType[]>([]);
   const [sentPuzzles, setSentPuzzles] = useState<PuzzleType[]>([]);
-  const [pickedPuzzle, setPickedPuzzle] = useState<PuzzleType>();
+  const [selectedPuzzle, setSelectedPuzzle] = useState<PuzzleType>();
   const [profile, setProfile] = useState<ProfileType | null>(null);
   const [initialLoad, setInitialLoad] = useState(false);
   const navigationRef = createRef<NavigationContainerRef>();
@@ -80,13 +80,13 @@ const App = (): JSX.Element => {
       const matchingPuzzle = selectPuzzle(publicKey, receivedPuzzles);
 
       //if there's a matching puzzle then
-      if (matchingPuzzle) {
-        setPickedPuzzle(matchingPuzzle);
+      if (matchingPuzzle != null) {
+        setSelectedPuzzle(matchingPuzzle);
         //navigate to that puzzle
         navigationRef.current.dispatch(
           CommonActions.reset({
             index: 0,
-            routes: [{ name: "Puzzle", params: { ...matchingPuzzle } }],
+            routes: [{ name: "Puzzle" }],
           })
         );
       } else {
@@ -171,6 +171,7 @@ const App = (): JSX.Element => {
                     theme={theme}
                     receivedPuzzles={receivedPuzzles}
                     setReceivedPuzzles={setReceivedPuzzles}
+                    setSelectedPuzzle={setSelectedPuzzle}
                   />
                 )}
               </Stack.Screen>
@@ -182,6 +183,7 @@ const App = (): JSX.Element => {
                     receivedPuzzles={receivedPuzzles}
                     sentPuzzles={sentPuzzles}
                     setSentPuzzles={setSentPuzzles}
+                    setSelectedPuzzle={setSelectedPuzzle}
                   />
                 )}
               </Stack.Screen>
@@ -198,6 +200,7 @@ const App = (): JSX.Element => {
                     {...props}
                     boardSize={boardSize}
                     theme={theme}
+                    puzzle={selectedPuzzle}
                     receivedPuzzles={receivedPuzzles}
                     setReceivedPuzzles={setReceivedPuzzles}
                   />
@@ -210,6 +213,7 @@ const App = (): JSX.Element => {
                     theme={theme}
                     receivedPuzzles={receivedPuzzles}
                     setReceivedPuzzles={setReceivedPuzzles}
+                    setSelectedPuzzle={setSelectedPuzzle}
                   />
                 )}
               </Stack.Screen>

@@ -14,11 +14,13 @@ export default function PuzzleList({
   theme,
   receivedPuzzles,
   setReceivedPuzzles,
+  setSelectedPuzzle
 }: {
   navigation: any;
   theme: any;
   receivedPuzzles: Puzzle[];
   setReceivedPuzzles: (puzzles: Puzzle[]) => void;
+  setSelectedPuzzle: Function;
 }): JSX.Element {
   const [modalVisible, setModalVisible] = React.useState(false);
   const [puzzleToDelete, setPuzzleToDelete] = React.useState<Puzzle | null>(
@@ -104,11 +106,10 @@ export default function PuzzleList({
       <View>
         {receivedPuzzles.map((receivedPuzzle, ix) => (
           <TouchableOpacity
-            onPress={() =>
-              navigation.navigate("Puzzle", {
-                pickedPuzzle: receivedPuzzle,
-              })
-            }
+            onPress={() => {
+              setSelectedPuzzle(receivedPuzzle);
+              navigation.navigate("Puzzle");
+            }}
             key={ix}
           >
             <Card
@@ -151,4 +152,4 @@ export default function PuzzleList({
       </View>
     </AdSafeAreaView>
   );
-};
+}
