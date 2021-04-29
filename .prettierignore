@@ -20,3 +20,4 @@ patches
 .expo-shared
 .firebase
 .husky
+functions/lib/*
