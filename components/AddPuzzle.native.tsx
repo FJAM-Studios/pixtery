@@ -18,7 +18,7 @@ export default function AddPuzzle({
   receivedPuzzles,
   route,
   setReceivedPuzzles,
-  setSelectedPuzzle
+  setSelectedPuzzle,
 }: {
   navigation: any;
   theme: any;

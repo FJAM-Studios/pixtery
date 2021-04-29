@@ -9,7 +9,8 @@
     "test": "jest",
     "format": "npx prettier --write *.{ts,tsx,js,json} && npx prettier --write **/*.{ts,tsx,js,json}",
     "lint": "eslint --fix --ext .ts,.tsx,.js.,json ./",
-    "env-fix": "env 2.5.5"
+    "env-fix": "env 2.5.5",
+    "emulate": "expo build:web && firebase emulators:start --only hosting"
   },
   "jest": {
     "preset": "jest-expo",

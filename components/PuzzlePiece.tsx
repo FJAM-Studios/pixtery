@@ -274,7 +274,7 @@ export default ({
         {/* <Path d={piecePath} stroke="white" /> */}
 
         <Image
-          href={croppedImage}
+          href={croppedImage.uri}
           width={widthX}
           height={widthY}
           clipPath={`url(#${puzzleType})`}

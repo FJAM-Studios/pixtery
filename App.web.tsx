@@ -6,7 +6,7 @@ import {
 import { createStackNavigator } from "@react-navigation/stack";
 import * as Linking from "expo-linking";
 import React, { createRef, useEffect, useState } from "react";
-import { View, LogBox, useWindowDimensions } from "react-native";
+import { View, useWindowDimensions } from "react-native";
 import { Provider as PaperProvider, DefaultTheme } from "react-native-paper";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
@@ -15,9 +15,6 @@ import AddPuzzle from "./components/AddPuzzle";
 import Puzzle from "./components/Puzzle";
 import { Puzzle as PuzzleType } from "./types";
 import { selectPuzzle } from "./util";
-
-//less than ideal, but idk if we have a choice right now. suppresses the firebase timeout warning
-LogBox.ignoreLogs(["Setting a timer for a long period of time"]);
 
 const image = require("./assets/earth.jpg");
 
@@ -41,7 +38,7 @@ const Stack = createStackNavigator();
 
 const App = (): JSX.Element => {
   const [receivedPuzzles, setReceivedPuzzles] = useState<PuzzleType[]>([]);
-  const [pickedPuzzle, setPickedPuzzle] = useState<PuzzleType>();
+  const [selectedPuzzle, setSelectedPuzzle] = useState<PuzzleType>();
   const navigationRef = createRef<NavigationContainerRef>();
 
   const { width, height } = useWindowDimensions();
@@ -67,17 +64,18 @@ const App = (): JSX.Element => {
 
       //if there's a matching puzzle then
       if (matchingPuzzle) {
-        setPickedPuzzle(matchingPuzzle);
+        setSelectedPuzzle(matchingPuzzle);
         //navigate to that puzzle
         navigationRef.current.dispatch(
           CommonActions.reset({
             index: 0,
-            routes: [{ name: "Puzzle", params: { pickedPuzzle: matchingPuzzle } }],
+            routes: [{ name: "Puzzle" }],
           })
         );
       } else {
         //otherwise get the puzzle data, which includes the cloud storage reference to the image
         const puzzleData = await queryPuzzle(publicKey);
+        console.log("received", puzzleData);
         //if you have the puzzle, go to the add puzzle component
         if (puzzleData) {
           navigationRef.current.dispatch(
@@ -126,6 +124,7 @@ const App = (): JSX.Element => {
                     {...props}
                     boardSize={boardSize}
                     theme={theme}
+                    puzzle={selectedPuzzle}
                     receivedPuzzles={receivedPuzzles}
                     setReceivedPuzzles={setReceivedPuzzles}
                   />
@@ -138,6 +137,7 @@ const App = (): JSX.Element => {
                     theme={theme}
                     receivedPuzzles={receivedPuzzles}
                     setReceivedPuzzles={setReceivedPuzzles}
+                    setSelectedPuzzle={setSelectedPuzzle}
                   />
                 )}
               </Stack.Screen>

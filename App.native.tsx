@@ -80,7 +80,7 @@ const App = (): JSX.Element => {
       const matchingPuzzle = selectPuzzle(publicKey, receivedPuzzles);
 
       //if there's a matching puzzle then
-      if (matchingPuzzle != null) {
+      if (matchingPuzzle) {
         setSelectedPuzzle(matchingPuzzle);
         //navigate to that puzzle
         navigationRef.current.dispatch(
