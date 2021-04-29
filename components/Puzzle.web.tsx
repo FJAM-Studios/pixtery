@@ -90,9 +90,6 @@ export default ({
           ? puzzle.message
           : "Congrats! You solved the puzzle!";
       setWinMessage(winMessage);
-      if (Platform.OS !== "ios" && Platform.OS !== "android") {
-        markPuzzleComplete(puzzle.publicKey);
-      }
     }
     if (!firstSnap) checkFirstSnap();
   }, [currentBoard]);
@@ -116,19 +113,6 @@ export default ({
   const styleProps = {
     theme,
     boardSize,
-  };
-
-  const markPuzzleComplete = async (key: string) => {
-    const allPuzzles = [
-      ...receivedPuzzles.map((puz) => {
-        return {
-          ...puz,
-          completed: key === puz.publicKey ? true : puz.completed,
-        };
-      }),
-    ];
-    await AsyncStorage.setItem("@pixteryPuzzles", JSON.stringify(allPuzzles));
-    setReceivedPuzzles(allPuzzles);
   };
 
   // need to return dummy component to measure the puzzle area via onLayout
