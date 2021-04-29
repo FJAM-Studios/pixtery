@@ -186,26 +186,28 @@ export default ({
             </View>
           </View>
           {!winMessage ? (
-            shuffledPieces.map((num: number, ix: number) => (
-              <PuzzlePiece
-                key={num}
-                num={num}
-                ix={ix}
-                gridSize={puzzle.gridSize}
-                squareSize={boardSize / puzzle.gridSize}
-                puzzleType={puzzle.puzzleType}
-                imageURI={puzzle.imageURI}
-                piecePath={piecePaths[num]}
-                boardSize={boardSize}
-                gridSections={gridSections}
-                currentBoard={currentBoard}
-                setCurrentBoard={setCurrentBoard}
-                setErrorMessage={setErrorMessage}
-                puzzleAreaDimensions={puzzleAreaDimensions}
-                z={zIndexes[ix]}
-                moveToTop={moveToTop}
-              />
-            ))
+            shuffledPieces
+              .slice(0, 2)
+              .map((num: number, ix: number) => (
+                <PuzzlePiece
+                  key={num}
+                  num={num}
+                  ix={ix}
+                  gridSize={puzzle.gridSize}
+                  squareSize={boardSize / puzzle.gridSize}
+                  puzzleType={puzzle.puzzleType}
+                  imageURI={puzzle.imageURI}
+                  piecePath={piecePaths[num]}
+                  boardSize={boardSize}
+                  gridSections={gridSections}
+                  currentBoard={currentBoard}
+                  setCurrentBoard={setCurrentBoard}
+                  setErrorMessage={setErrorMessage}
+                  puzzleAreaDimensions={puzzleAreaDimensions}
+                  z={zIndexes[ix]}
+                  moveToTop={moveToTop}
+                />
+              ))
           ) : (
             <Image
               source={{ uri: puzzle.imageURI }}
