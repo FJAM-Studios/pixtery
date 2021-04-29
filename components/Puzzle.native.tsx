@@ -86,7 +86,7 @@ export default ({
   };
 
   useEffect(() => {
-    if (puzzle && checkWin()) {
+    if (firstSnap && checkWin()) {
       const winMessage =
         puzzle.message && puzzle.message.length > 0
           ? puzzle.message

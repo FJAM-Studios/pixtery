@@ -34,7 +34,7 @@ export default function AddPuzzle({
     const loadImage = async () => {
       try {
         // for now, giving image a filename based on URL from server, can change later if needed
-        const fileName = imageURI.slice(imageURI.lastIndexOf("/") + 1);
+        const fileName = publicKey;
 
         // create directory for pixtery files if it doesn't exist
         const pixteryDir = FileSystem.cacheDirectory + "pixtery/";

@@ -5,7 +5,7 @@ import {
 } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import * as Linking from "expo-linking";
-import React, { createRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { View, LogBox, useWindowDimensions } from "react-native";
 import { Provider as PaperProvider, DefaultTheme } from "react-native-paper";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -52,7 +52,7 @@ const App = (): JSX.Element => {
   const [selectedPuzzle, setSelectedPuzzle] = useState<PuzzleType>();
   const [profile, setProfile] = useState<ProfileType | null>(null);
   const [initialLoad, setInitialLoad] = useState(false);
-  const navigationRef = createRef<NavigationContainerRef>();
+  const navigationRef = useRef<NavigationContainerRef>();
 
   const { width, height } = useWindowDimensions();
   const boardSize = 0.95 * Math.min(height, width);
@@ -69,19 +69,19 @@ const App = (): JSX.Element => {
       if (url && initialLoad) fetchPuzzle(url);
     });
     if (!url) getInitialUrl();
-  }, [initialLoad, navigationRef]);
+  }, [initialLoad]);
 
   const fetchPuzzle = async (url: string): Promise<void> => {
-    console.log(url);
     const { publicKey }: any = Linking.parse(url).queryParams;
 
     // if the puzzle URL has a public key, find either the matching puzzle locally or online
     if (publicKey && navigationRef.current) {
       const matchingPuzzle = selectPuzzle(publicKey, receivedPuzzles);
-
       //if there's a matching puzzle then
-      if (matchingPuzzle) {
+      if (matchingPuzzle !== null) {
+        console.log("MATCH")
         setSelectedPuzzle(matchingPuzzle);
+
         //navigate to that puzzle
         navigationRef.current.dispatch(
           CommonActions.reset({

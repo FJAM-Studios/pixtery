@@ -30,7 +30,6 @@ export default function AddPuzzle({
         //replace puzzle's partial URI with full URL to remote image
         setReceivedPuzzles([newPuzzle]);
         setSelectedPuzzle(newPuzzle);
-        console.log("set selected puzzle to", newPuzzle);
         navigation.dispatch(
           CommonActions.reset({
             index: 0,

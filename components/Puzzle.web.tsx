@@ -84,7 +84,7 @@ export default ({
   };
 
   useEffect(() => {
-    if (puzzle && checkWin()) {
+    if (firstSnap && checkWin()) {
       const winMessage =
         puzzle.message && puzzle.message.length > 0
           ? puzzle.message
@@ -98,7 +98,6 @@ export default ({
   }, [currentBoard]);
 
   useEffect(() => {
-    console.log("mounting puzzle");
     if (puzzle) {
       const { gridSize } = puzzle;
       const squareSize = boardSize / gridSize;
