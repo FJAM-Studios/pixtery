@@ -22,7 +22,7 @@ export default ({
   setErrorMessage,
   puzzleAreaDimensions,
   z,
-  moveToTop
+  moveToTop,
 }: {
   num: number;
   ix: number;

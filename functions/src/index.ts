@@ -15,31 +15,31 @@ const storage = admin.storage();
 
 
 exports.uploadPuzzleSettings = functions.https.onCall(
-    async (data: { fileName: string; newPuzzle: Puzzle }) => {
-      const {fileName, newPuzzle} = data;
-      console.log("uploading puzzle settings");
-      try {
-        await db.collection("puzzles").doc(fileName).set(newPuzzle);
-        return {result: `successfully uploaded ${fileName}`};
-      } catch (error) {
-        throw new functions.https.HttpsError("unknown", error.message, error);
-      }
+  async (data: { fileName: string; newPuzzle: Puzzle }) => {
+    const { fileName, newPuzzle } = data;
+    console.log("uploading puzzle settings");
+    try {
+      await db.collection("puzzles").doc(fileName).set(newPuzzle);
+      return { result: `successfully uploaded ${fileName}` };
+    } catch (error) {
+      throw new functions.https.HttpsError("unknown", error.message, error);
     }
+  }
 );
 
 // return type set as an generic object bc a JSON is returned (Puzzle type is nested in that)
 exports.queryPuzzle = functions.https.onCall(
-    async (data): Promise<Record<string, any> | void> => {
-      try {
-        const {publicKey} = data;
-        const snapshot = await db
-            .collection("puzzles")
-            .where("publicKey", "==", publicKey)
-            .get();
-        if (snapshot.empty) {
-          console.log("no puzzle found!");
-          throw new functions.https.HttpsError("not-found", "no puzzle found!");
-        } else {
+  async (data): Promise<Record<string, any> | void> => {
+    try {
+      const { publicKey } = data;
+      const snapshot = await db
+        .collection("puzzles")
+        .where("publicKey", "==", publicKey)
+        .get();
+      if (snapshot.empty) {
+        console.log("no puzzle found!");
+        throw new functions.https.HttpsError("not-found", "no puzzle found!");
+      } else {
         // does this do anything? puzzleData is overwritten immediately below
           let puzzleData: Record<string, any> = {
             puzzleType: "",
