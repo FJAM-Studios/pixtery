@@ -14,10 +14,3 @@ web-build/
 
 # macOS
 .DS_Store
-
-tests/*
-patches
-.expo-shared
-.firebase
-.husky
-functions/lib/*
