@@ -7,3 +7,4 @@ web-build
 .expo-shared
 .firebase
 .husky
+*.json
