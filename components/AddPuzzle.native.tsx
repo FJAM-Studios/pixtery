@@ -6,7 +6,6 @@ import { View } from "react-native";
 import { Headline, ActivityIndicator } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { storage } from "../FirebaseApp";
 import { Puzzle } from "../types";
 import Header from "./Header";
 import Logo from "./Logo";
@@ -36,7 +35,6 @@ export default function AddPuzzle({
       try {
         // for now, giving image a filename based on URL from server, can change later if needed
         const fileName = imageURI.slice(imageURI.lastIndexOf("/") + 1);
-        const downloadURL = await storage.ref("/" + imageURI).getDownloadURL();
 
         // create directory for pixtery files if it doesn't exist
         const pixteryDir = FileSystem.cacheDirectory + "pixtery/";
@@ -53,7 +51,7 @@ export default function AddPuzzle({
         if (!fileInfo.exists) {
           console.log("Image doesn't exist, downloading...");
           // download the image from pixtery server and save to pixtery dir
-          await FileSystem.downloadAsync(downloadURL, localURI);
+          await FileSystem.downloadAsync(imageURI, localURI);
         }
         // save puzzle data to localStorage
         newPuzzle.imageURI = localURI;
@@ -116,4 +114,4 @@ export default function AddPuzzle({
       />
     </SafeAreaView>
   );
-};
+}

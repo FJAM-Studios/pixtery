@@ -91,7 +91,6 @@ export default ({
           : "Congrats! You solved the puzzle!";
       setWinMessage(winMessage);
       if (Platform.OS !== "ios" && Platform.OS !== "android") {
-        console.log("WEB")
         markPuzzleComplete(puzzle.publicKey);
       }
     }

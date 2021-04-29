@@ -93,7 +93,7 @@ const App = (): JSX.Element => {
         //otherwise get the puzzle data, which includes the cloud storage reference to the image
         const puzzleData = await queryPuzzle(publicKey);
         //if you have the puzzle, go to the add puzzle component
-        if (puzzleData) {
+        if (puzzleData !== null) {
           navigationRef.current.dispatch(
             CommonActions.reset({
               index: 0,

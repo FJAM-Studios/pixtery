@@ -1,8 +1,18 @@
 /* eslint-disable max-len */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as functions from "firebase-functions";
-import {db} from "../../FirebaseApp";
 import {Puzzle} from "../../types";
+const admin = require('firebase-admin');
+const serviceAccount = require("C:\\Users\\garbe\\Desktop\\Fullstack\\Camystery\\pixtery\\serviceAccount.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://pixstery-7c9b9-default-rtdb.firebaseio.com"
+});
+const db = admin.firestore();
+const storage = admin.storage();
+
+
 
 exports.uploadPuzzleSettings = functions.https.onCall(
     async (data: { fileName: string; newPuzzle: Puzzle }) => {
@@ -46,6 +56,7 @@ exports.queryPuzzle = functions.https.onCall(
             puzzleData = puzzle.data();
             puzzleData.completed = false;
           });
+          puzzleData.imageURI = await fetchImage(puzzleData.imageURI);
           return puzzleData;
         }
       } catch (error) {
@@ -53,3 +64,19 @@ exports.queryPuzzle = functions.https.onCall(
       }
     }
 );
+
+const fetchImage = async (fileName: string): Promise<string | void> =>{
+
+  const options = {
+    version: 'v2', // defaults to 'v2' if missing.
+    action: 'read',
+    expires: Date.now() + 1000 * 60 * 60, // one hour
+  };
+  const file = storage.bucket("pixstery-7c9b9.appspot.com").file(fileName)
+  try{
+    const [url] = await file.getSignedUrl(options);
+    return url;
+  } catch(error){
+    throw new functions.https.HttpsError("unknown", error.message, error);
+  }
+}

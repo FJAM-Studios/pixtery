@@ -3,7 +3,6 @@ import * as React from "react";
 import { View } from "react-native";
 import { Headline, ActivityIndicator } from "react-native-paper";
 
-import { storage } from "../FirebaseApp";
 import { Puzzle } from "../types";
 import Logo from "./Logo";
 import Title from "./Title";
@@ -24,14 +23,11 @@ export default function AddPuzzle({
   setSelectedPuzzle: Function;
 }): JSX.Element {
   const newPuzzle: Puzzle = route.params;
-  const { imageURI, publicKey } = newPuzzle;
 
   React.useEffect(() => {
     const loadImage = async () => {
       try {
         //replace puzzle's partial URI with full URL to remote image
-        const downloadURL = await storage.ref("/" + imageURI).getDownloadURL();
-        newPuzzle.imageURI = downloadURL;
         setReceivedPuzzles([newPuzzle]);
         setSelectedPuzzle(newPuzzle);
         console.log("set selected puzzle to", newPuzzle);
