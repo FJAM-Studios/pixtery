@@ -110,4 +110,4 @@ export default function Splash({
       <ActivityIndicator animating color={theme.colors.text} size="large" />
     </View>
   );
-};
+}

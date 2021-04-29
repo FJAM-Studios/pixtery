@@ -17,7 +17,7 @@ export default function SentPuzzleList({
   receivedPuzzles,
   sentPuzzles,
   setSentPuzzles,
-  setSelectedPuzzle
+  setSelectedPuzzle,
 }: {
   navigation: any;
   theme: any;
@@ -118,11 +118,11 @@ export default function SentPuzzleList({
       <View>
         {sentPuzzles.map((sentPuzzle, ix) => (
           <TouchableOpacity
-            onPress={() =>{
+            onPress={() => {
               setSelectedPuzzle(sentPuzzle);
               navigation.navigate("Puzzle", {
                 publicKey: sentPuzzle.publicKey,
-              })
+              });
             }}
             key={ix}
           >
@@ -174,4 +174,4 @@ export default function SentPuzzleList({
       </View>
     </AdSafeAreaView>
   );
-};
+}

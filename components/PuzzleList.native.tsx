@@ -14,7 +14,7 @@ export default function PuzzleList({
   theme,
   receivedPuzzles,
   setReceivedPuzzles,
-  setSelectedPuzzle
+  setSelectedPuzzle,
 }: {
   navigation: any;
   theme: any;
