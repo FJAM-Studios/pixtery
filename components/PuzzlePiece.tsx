@@ -73,6 +73,12 @@ export default ({
   z: number;
   moveToTop: Function;
 }): JSX.Element | null => {
+  //temporary values
+  const pieceWidth = 150;
+  const pieceHeight = 150;
+  const pieceStartX = 0;
+  const pieceStartY = 0;
+
   // these refs are only relevant if we decide to allow simultaneous drag and rotate,
   // which I feel is somewhat awkward to use
 
@@ -110,7 +116,14 @@ export default ({
       lastOffset.x = Math.max(0, lastOffset.x);
       lastOffset.y = Math.max(0, lastOffset.y);
       //@todo - limit max position based on board size
-
+      lastOffset.x = Math.min(
+        puzzleAreaDimensions.puzzleAreaWidth - pieceWidth,
+        lastOffset.x
+      );
+      lastOffset.y = Math.min(
+        puzzleAreaDimensions.puzzleAreaHeight - pieceHeight,
+        lastOffset.y
+      );
       //snap piece here using lastOffset
 
       pan.setOffset(lastOffset);
@@ -168,12 +181,10 @@ export default ({
       <Animated.View
         style={[
           {
-            borderColor: "black",
-            borderWidth: 1,
-            width: 150,
-            height: 150,
-            top: 0,
-            left: 0,
+            width: pieceWidth,
+            height: pieceHeight,
+            top: pieceStartY,
+            left: pieceStartX,
             position: "absolute",
           },
           {
@@ -192,21 +203,21 @@ export default ({
           onGestureEvent={onRotateGestureEvent}
           onHandlerStateChange={onRotateHandlerStateChange}
         >
-          <AnimatedSvg height={150} width={150}>
+          <AnimatedSvg height={pieceWidth} width={pieceHeight}>
             {/* <Image
                 href={{ uri: imageURI }}
                 width={150}
                 height={150}
                 // clipPath={`url(#${puzzleType})`}
               /> */}
-            <Rect width={150} height={150} fill="rgb(0,0,255)" />
+            <Rect width={pieceWidth} height={pieceHeight} fill="rgb(0,0,255)" />
             <SvgText
               fill="none"
               stroke="white"
               fontSize="60"
               fontWeight="bold"
-              x="75"
-              y="75"
+              x={pieceWidth / 2}
+              y={pieceHeight / 2}
               textAnchor="middle"
             >
               {ix}
