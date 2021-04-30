@@ -187,7 +187,7 @@ export default ({
           </View>
           {!winMessage ? (
             shuffledPieces
-              .slice(0, 2)
+              .slice(0, 1)
               .map((num: number, ix: number) => (
                 <PuzzlePiece
                   key={num}
