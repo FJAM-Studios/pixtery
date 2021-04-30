@@ -11,6 +11,7 @@ import {
 } from "react-native-svg";
 import {
   Animated,
+  Platform,
   View,
   StyleSheet,
   PanResponder,
@@ -35,7 +36,7 @@ import {
   USE_NATIVE_DRIVER,
 } from "../constants";
 import { GridSections } from "../types";
-import { getInitialDimensions } from "../util";
+import { getInitialDimensions, getPointsDistance } from "../util";
 import Draggable from "./CustomDraggable";
 import { black } from "react-native-paper/lib/typescript/styles/colors";
 const AnimatedSvg = Animated.createAnimatedComponent(Svg);
@@ -78,6 +79,17 @@ export default ({
   const pieceHeight = 150;
   const pieceStartX = 0;
   const pieceStartY = 0;
+  const snapPoints = [
+    { x: 0, y: 0 },
+    { x: 150, y: 0 },
+    { x: 300, y: 0 },
+    { x: 0, y: 150 },
+    { x: 150, y: 150 },
+    { x: 300, y: 150 },
+    { x: 0, y: 300 },
+    { x: 150, y: 300 },
+    { x: 300, y: 300 },
+  ];
 
   // these refs are only relevant if we decide to allow simultaneous drag and rotate,
   // which I feel is somewhat awkward to use
@@ -115,7 +127,6 @@ export default ({
       //limit position on board
       lastOffset.x = Math.max(0, lastOffset.x);
       lastOffset.y = Math.max(0, lastOffset.y);
-      //@todo - limit max position based on board size
       lastOffset.x = Math.min(
         puzzleAreaDimensions.puzzleAreaWidth - pieceWidth,
         lastOffset.x
@@ -125,6 +136,14 @@ export default ({
         lastOffset.y
       );
       //snap piece here using lastOffset
+      for (let point of snapPoints) {
+        if (getPointsDistance(point, lastOffset) < SNAP_MARGIN * pieceHeight) {
+          lastOffset.x = point.x;
+          lastOffset.y = point.y;
+          //mark as snapped
+          break;
+        }
+      }
 
       pan.setOffset(lastOffset);
       pan.setValue({ x: 0, y: 0 });
@@ -204,13 +223,13 @@ export default ({
           onHandlerStateChange={onRotateHandlerStateChange}
         >
           <AnimatedSvg height={pieceWidth} width={pieceHeight}>
-            {/* <Image
-                href={{ uri: imageURI }}
-                width={150}
-                height={150}
-                // clipPath={`url(#${puzzleType})`}
-              /> */}
-            <Rect width={pieceWidth} height={pieceHeight} fill="rgb(0,0,255)" />
+            <Image
+              href={{ uri: imageURI }}
+              width={pieceWidth}
+              height={pieceHeight}
+              // clipPath={`url(#${puzzleType})`}
+            />
+            {/* <Rect width={pieceWidth} height={pieceHeight} fill="rgb(0,0,255)" />
             <SvgText
               fill="none"
               stroke="white"
@@ -221,7 +240,7 @@ export default ({
               textAnchor="middle"
             >
               {ix}
-            </SvgText>
+            </SvgText> */}
           </AnimatedSvg>
         </RotationGestureHandler>
       </Animated.View>
