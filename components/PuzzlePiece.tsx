@@ -1,7 +1,22 @@
 import * as ImageManipulator from "expo-image-manipulator";
 import React, { useRef, createRef } from "react";
-import { Svg, Image, Defs, ClipPath, Path, Rect } from "react-native-svg";
-import { Animated, View, StyleSheet, PanResponder, Text } from "react-native";
+import {
+  Svg,
+  Image,
+  Defs,
+  ClipPath,
+  Path,
+  Rect,
+  Text as SvgText,
+} from "react-native-svg";
+import {
+  Animated,
+  View,
+  StyleSheet,
+  PanResponder,
+  Text,
+  NativeSyntheticEvent,
+} from "react-native";
 import {
   PanGestureHandler,
   State,
@@ -9,6 +24,9 @@ import {
   RotationGestureHandler,
   RotationGestureHandlerStateChangeEvent,
   RotationGestureHandlerGestureEvent,
+  GestureHandlerGestureEvent,
+  PanGestureHandlerGestureEvent,
+  PanGestureHandlerEventExtra,
 } from "react-native-gesture-handler";
 
 import {
@@ -19,6 +37,7 @@ import {
 import { GridSections } from "../types";
 import { getInitialDimensions } from "../util";
 import Draggable from "./CustomDraggable";
+import { black } from "react-native-paper/lib/typescript/styles/colors";
 const AnimatedSvg = Animated.createAnimatedComponent(Svg);
 
 export default ({
@@ -72,13 +91,28 @@ export default ({
 
   const onGestureEvent = Animated.event(
     [{ nativeEvent: { translationX: pan.x, translationY: pan.y } }],
-    { useNativeDriver: USE_NATIVE_DRIVER }
+    {
+      useNativeDriver: USE_NATIVE_DRIVER,
+      // not sure if listener is performant; could possibly use this to "live limit" dragging off screen
+      // listener: (ev: NativeSyntheticEvent<PanGestureHandlerEventExtra>) => {
+      //   if (ev.nativeEvent.translationX + lastOffset.x < 0)
+      //
+      // },
+    }
   );
 
   const onHandlerStateChange = (ev: PanGestureHandlerStateChangeEvent) => {
     if (ev.nativeEvent.oldState === State.ACTIVE) {
       lastOffset.x += ev.nativeEvent.translationX;
       lastOffset.y += ev.nativeEvent.translationY;
+
+      //limit position on board
+      lastOffset.x = Math.max(0, lastOffset.x);
+      lastOffset.y = Math.max(0, lastOffset.y);
+      //@todo - limit max position based on board size
+
+      //snap piece here using lastOffset
+
       pan.setOffset(lastOffset);
       pan.setValue({ x: 0, y: 0 });
     }
@@ -125,48 +159,61 @@ export default ({
   };
 
   return (
-    <View style={{ flex: 1 }}>
-      <PanGestureHandler
-        // ref={moveRef}
-        // simultaneousHandlers={rotationRef}
-        onGestureEvent={onGestureEvent}
-        onHandlerStateChange={onHandlerStateChange}
+    <PanGestureHandler
+      // ref={moveRef}
+      // simultaneousHandlers={rotationRef}
+      onGestureEvent={onGestureEvent}
+      onHandlerStateChange={onHandlerStateChange}
+    >
+      <Animated.View
+        style={[
+          {
+            borderColor: "black",
+            borderWidth: 1,
+            width: 150,
+            height: 150,
+            top: 0,
+            left: 0,
+            position: "absolute",
+          },
+          {
+            transform: [
+              { translateX: pan.x },
+              { translateY: pan.y },
+              { rotate: rotateStr },
+              { perspective: 300 },
+            ],
+          },
+        ]}
       >
-        <Animated.View
-          style={[
-            {
-              borderColor: "black",
-              borderWidth: 1,
-              width: 150,
-              height: 150,
-            },
-            {
-              transform: [
-                { translateX: pan.x },
-                { translateY: pan.y },
-                { rotate: rotateStr },
-                { perspective: 300 },
-              ],
-            },
-          ]}
+        <RotationGestureHandler
+          // ref={rotationRef}
+          // simultaneousHandlers={moveRef}
+          onGestureEvent={onRotateGestureEvent}
+          onHandlerStateChange={onRotateHandlerStateChange}
         >
-          <RotationGestureHandler
-            // ref={rotationRef}
-            // simultaneousHandlers={moveRef}
-            onGestureEvent={onRotateGestureEvent}
-            onHandlerStateChange={onRotateHandlerStateChange}
-          >
-            <AnimatedSvg height={150} width={150}>
-              <Image
+          <AnimatedSvg height={150} width={150}>
+            {/* <Image
                 href={{ uri: imageURI }}
                 width={150}
                 height={150}
                 // clipPath={`url(#${puzzleType})`}
-              />
-            </AnimatedSvg>
-          </RotationGestureHandler>
-        </Animated.View>
-      </PanGestureHandler>
-    </View>
+              /> */}
+            <Rect width={150} height={150} fill="rgb(0,0,255)" />
+            <SvgText
+              fill="none"
+              stroke="white"
+              fontSize="60"
+              fontWeight="bold"
+              x="75"
+              y="75"
+              textAnchor="middle"
+            >
+              {ix}
+            </SvgText>
+          </AnimatedSvg>
+        </RotationGestureHandler>
+      </Animated.View>
+    </PanGestureHandler>
   );
 };
