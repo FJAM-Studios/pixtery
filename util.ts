@@ -448,3 +448,12 @@ export const fillArray = (gridSize: number): number[] => {
   }
   return numberArray;
 };
+
+export const getPointsDistance = (
+  pointA: { x: number; y: number },
+  pointB: { x: number; y: number }
+) => {
+  const a = pointA.x - pointB.x;
+  const b = pointA.y - pointB.y;
+  return Math.sqrt(a * a + b * b);
+};
