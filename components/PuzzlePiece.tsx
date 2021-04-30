@@ -207,12 +207,7 @@ export default ({
             position: "absolute",
           },
           {
-            transform: [
-              { translateX: pan.x },
-              { translateY: pan.y },
-              { rotate: rotateStr },
-              { perspective: 300 },
-            ],
+            transform: [{ translateX: pan.x }, { translateY: pan.y }],
           },
         ]}
       >
@@ -222,7 +217,13 @@ export default ({
           onGestureEvent={onRotateGestureEvent}
           onHandlerStateChange={onRotateHandlerStateChange}
         >
-          <AnimatedSvg height={pieceWidth} width={pieceHeight}>
+          <AnimatedSvg
+            height={pieceWidth}
+            width={pieceHeight}
+            style={[
+              { transform: [{ rotate: rotateStr }, { perspective: 300 }] },
+            ]}
+          >
             <Image
               href={{ uri: imageURI }}
               width={pieceWidth}
