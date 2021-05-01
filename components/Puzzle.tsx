@@ -1,16 +1,18 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as ImageManipulator from "expo-image-manipulator";
 import React, { useEffect, useState } from "react";
 import { Text, View, StyleSheet, Image } from "react-native";
 import { ActivityIndicator } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { TESTING_MODE } from "../constants";
-import { Puzzle, GridSections } from "../types";
+import { DEGREE_CONVERSION, TESTING_MODE } from "../constants";
+import { Puzzle, Piece, Point } from "../types";
 import {
   shuffle,
   generateJigsawPiecePaths,
   getGridSections,
   fillArray,
+  getInitialDimensions,
 } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
@@ -39,23 +41,17 @@ export default ({
   const { publicKey } = route.params;
 
   const [puzzle, setPuzzle] = useState<Puzzle>();
-
-  const [piecePaths, setPiecePaths] = useState<string[]>();
-
-  const [gridSections, setGridSections] = useState<GridSections>();
-
-  const [shuffledPieces, setShuffledPieces] = useState<number[]>();
-
-  const [zIndexes, setZIndexes] = useState<number[]>([]);
-
-  const [highestZ, setHighestZ] = useState<number>(1);
-
+  const [pieces, setPieces] = useState<Piece[]>([]);
   const [currentBoard, setCurrentBoard] = useState<number[]>([]);
-
+  const [snapPoints, setSnapPoints] = useState<Point[]>([]);
+  const [winMessage, setWinMessage] = useState<string>("");
+  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [firstSnap, setFirstSnap] = useState(false);
   const [puzzleAreaDimensions, setPuzzleAreaDimensions] = useState({
     puzzleAreaWidth: 0,
     puzzleAreaHeight: 0,
   });
+
   const measurePuzzleArea = (ev: any): void => {
     if (puzzleAreaDimensions.puzzleAreaHeight) return;
     setPuzzleAreaDimensions({
@@ -64,24 +60,12 @@ export default ({
     });
   };
 
-  const [winMessage, setWinMessage] = useState<string>("");
-  const [errorMessage, setErrorMessage] = useState<string>("");
-
-  const moveToTop = (idx: number): void => {
-    const newIndices = [...zIndexes];
-    newIndices[idx] = highestZ + 1;
-    setHighestZ(highestZ + 1);
-    setZIndexes(newIndices);
-  };
-
   const checkWin = (): boolean => {
     for (let i = 0; i < currentBoard.length; i++) {
       if (currentBoard[i] !== i) return false;
     }
     return true;
   };
-
-  const [firstSnap, setFirstSnap] = useState(false);
 
   const checkFirstSnap = (): void => {
     for (let i = 0; i < currentBoard.length; i++) {
@@ -110,17 +94,100 @@ export default ({
       const { gridSize } = pickedPuzzle;
       const squareSize = boardSize / gridSize;
       const numPieces = gridSize * gridSize;
+      const minSandboxY = boardSize * 1.05;
+      const maxSandboxY = puzzleAreaDimensions.puzzleAreaHeight - squareSize;
+
       setPuzzle(pickedPuzzle);
-      setPiecePaths(generateJigsawPiecePaths(gridSize, squareSize));
-      setGridSections(getGridSections(pickedPuzzle, squareSize));
-      setShuffledPieces(shuffle(fillArray(gridSize), disableShuffle));
+
+      const shuffleOrder = shuffle(fillArray(gridSize), disableShuffle);
+
+      const createPieces = async () => {
+        const _pieces: Piece[] = [];
+        const piecePaths =
+          pickedPuzzle.puzzleType === "jigsaw"
+            ? generateJigsawPiecePaths(gridSize, squareSize)
+            : [];
+        // manipulate images in Puzzle component instead to save on renders
+        for (let i = 0; i < numPieces; i++) {
+          const solvedIndex = shuffleOrder[i];
+          const [
+            squareX,
+            squareY,
+            widthY,
+            widthX,
+            initX,
+            initY,
+            viewBoxX,
+            viewBoxY,
+            solutionX,
+            solutionY,
+          ] = getInitialDimensions(
+            pickedPuzzle.puzzleType,
+            minSandboxY,
+            maxSandboxY,
+            solvedIndex,
+            i,
+            gridSize,
+            squareSize
+          );
+
+          const href = await ImageManipulator.manipulateAsync(
+            pickedPuzzle.imageURI,
+            [
+              {
+                resize: {
+                  width: boardSize,
+                  height: boardSize,
+                },
+              },
+              {
+                crop: {
+                  originX: viewBoxX,
+                  originY: viewBoxY,
+                  width: widthX,
+                  height: widthY,
+                },
+              },
+            ],
+            { compress: 1, format: ImageManipulator.SaveFormat.JPEG }
+          );
+
+          const piece: Piece = {
+            href,
+            pieceWidth: widthX,
+            pieceHeight: widthY,
+            piecePath: piecePaths.length ? piecePaths[solvedIndex] : "",
+            initX,
+            initY,
+            initialRotation:
+              Math.floor(Math.random() * 4) * 90 * DEGREE_CONVERSION,
+            solvedIndex,
+          };
+          _pieces.push(piece);
+        }
+        setPieces(_pieces);
+      };
+      createPieces();
+
+      const gridSections = getGridSections(pickedPuzzle, squareSize);
+      const _snapPoints: Point[] = [];
+      for (let i = 0; i < pickedPuzzle.gridSize; i++) {
+        for (let j = 0; j < pickedPuzzle.gridSize; j++) {
+          _snapPoints.push({
+            x: (j + 0.5) * squareSize,
+            y: (i + 0.5) * squareSize,
+          });
+        }
+      }
+      console.log(_snapPoints);
+      console.log(gridSections);
+      setSnapPoints(_snapPoints);
       setCurrentBoard(new Array(numPieces).fill(null));
-      setZIndexes(new Array(numPieces).fill(1));
       setWinMessage("");
       setErrorMessage("");
       setFirstSnap(false);
     }
-  }, [publicKey]);
+  }, [publicKey, puzzleAreaDimensions]);
 
   const styleProps = {
     theme,
@@ -138,6 +205,15 @@ export default ({
     ];
     await AsyncStorage.setItem("@pixteryPuzzles", JSON.stringify(allPuzzles));
     setReceivedPuzzles(allPuzzles);
+  };
+
+  // when a piece is moved, it is given new maxZ through updateZ function below
+  // this ensures no re-rendering which would reset the native animation
+  let maxZ = 0;
+
+  const updateZ = () => {
+    maxZ += 1;
+    return maxZ;
   };
 
   // need to return dummy component to measure the puzzle area via onLayout
@@ -160,7 +236,7 @@ export default ({
         />
       </AdSafeAreaView>
     );
-  if (puzzle && gridSections && piecePaths && shuffledPieces) {
+  if (puzzle && pieces.length) {
     return (
       <AdSafeAreaView style={styles(styleProps).parentContainer}>
         <Header
@@ -180,34 +256,21 @@ export default ({
             <View style={styles(styleProps).messageContainer}>
               {!firstSnap ? (
                 <Text style={styles(styleProps).startText}>
-                  Move pieces onto this board!
+                  Drag and rotate pieces onto this board!
                 </Text>
               ) : null}
             </View>
           </View>
           {!winMessage ? (
-            shuffledPieces
-              // .slice(0, 1)
-              .map((num: number, ix: number) => (
-                <PuzzlePiece
-                  key={num}
-                  num={num}
-                  ix={ix}
-                  gridSize={puzzle.gridSize}
-                  squareSize={boardSize / puzzle.gridSize}
-                  puzzleType={puzzle.puzzleType}
-                  imageURI={puzzle.imageURI}
-                  piecePath={piecePaths[num]}
-                  boardSize={boardSize}
-                  gridSections={gridSections}
-                  currentBoard={currentBoard}
-                  setCurrentBoard={setCurrentBoard}
-                  setErrorMessage={setErrorMessage}
-                  puzzleAreaDimensions={puzzleAreaDimensions}
-                  z={zIndexes[ix]}
-                  moveToTop={moveToTop}
-                />
-              ))
+            pieces.map((piece: Piece, ix: number) => (
+              <PuzzlePiece
+                key={ix}
+                piece={piece}
+                puzzleAreaDimensions={puzzleAreaDimensions}
+                updateZ={updateZ}
+                snapPoints={snapPoints}
+              />
+            ))
           ) : (
             <Image
               source={{ uri: puzzle.imageURI }}

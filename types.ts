@@ -1,4 +1,6 @@
-export class Piece {
+import { ImageSourcePropType } from "react-native";
+
+export class SvgPiece {
   top: Point[] = [];
   bottom: Point[] = [];
   left: Point[] = [];
@@ -29,4 +31,15 @@ export interface Puzzle {
 export interface Profile {
   name: string;
   phone: string;
+}
+
+export interface Piece {
+  href: ImageSourcePropType;
+  pieceWidth: number;
+  pieceHeight: number;
+  piecePath: string;
+  initX: number;
+  initY: number;
+  initialRotation: number;
+  solvedIndex: number;
 }

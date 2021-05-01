@@ -1,33 +1,12 @@
-import * as ImageManipulator from "expo-image-manipulator";
-import React, { useRef, createRef, useState } from "react";
-import {
-  Svg,
-  Image,
-  Defs,
-  ClipPath,
-  Path,
-  Rect,
-  Text as SvgText,
-} from "react-native-svg";
-import {
-  Animated,
-  Platform,
-  View,
-  StyleSheet,
-  PanResponder,
-  Text,
-  NativeSyntheticEvent,
-} from "react-native";
+import React, { useRef } from "react";
+import { Svg, Image, Defs, ClipPath, Path, Rect } from "react-native-svg";
+import { Animated } from "react-native";
 import {
   PanGestureHandler,
   State,
   PanGestureHandlerStateChangeEvent,
   RotationGestureHandler,
   RotationGestureHandlerStateChangeEvent,
-  RotationGestureHandlerGestureEvent,
-  GestureHandlerGestureEvent,
-  PanGestureHandlerGestureEvent,
-  PanGestureHandlerEventExtra,
 } from "react-native-gesture-handler";
 
 import {
@@ -35,62 +14,34 @@ import {
   DEGREE_CONVERSION,
   USE_NATIVE_DRIVER,
 } from "../constants";
-import { GridSections } from "../types";
-import { getInitialDimensions, getPointsDistance } from "../util";
-import Draggable from "./CustomDraggable";
-import { black } from "react-native-paper/lib/typescript/styles/colors";
+import { Point, Piece } from "../types";
+import { getPointsDistance } from "../util";
+
 const AnimatedSvg = Animated.createAnimatedComponent(Svg);
 
 export default ({
-  num,
-  ix,
-  gridSize,
-  squareSize,
-  puzzleType,
-  boardSize,
-  piecePath,
-  imageURI,
-  gridSections,
-  currentBoard,
-  setCurrentBoard,
-  setErrorMessage,
+  piece,
   puzzleAreaDimensions,
-  z,
-  moveToTop,
+  updateZ,
+  snapPoints,
 }: {
-  num: number;
-  ix: number;
-  gridSize: number;
-  squareSize: number;
-  puzzleType: string;
-  boardSize: number;
-  piecePath: string;
-  imageURI: string;
-  gridSections: GridSections;
-  currentBoard: (number | null)[];
-  setCurrentBoard: Function;
-  setErrorMessage: Function;
+  piece: Piece;
   puzzleAreaDimensions: { puzzleAreaWidth: number; puzzleAreaHeight: number };
-  z: number;
-  moveToTop: Function;
+  updateZ: () => number;
+  snapPoints: Point[];
 }): JSX.Element | null => {
-  //temporary values
-  const pieceWidth = squareSize;
-  const pieceHeight = squareSize;
-  const pieceStartX = 0;
-  const pieceStartY = 0;
-  const snapPoints = [
-    { x: 0, y: 0 },
-    { x: squareSize, y: 0 },
-    { x: squareSize * 2, y: 0 },
-    { x: 0, y: squareSize },
-    { x: squareSize, y: squareSize },
-    { x: squareSize * 2, y: squareSize },
-    { x: 0, y: squareSize * 2 },
-    { x: squareSize, y: squareSize * 2 },
-    { x: squareSize * 2, y: squareSize * 2 },
-  ];
+  const {
+    href,
+    pieceWidth,
+    pieceHeight,
+    piecePath,
+    initX,
+    initY,
+    initialRotation,
+    solvedIndex,
+  } = piece;
 
+  const puzzleType = piecePath.length ? "jigsaw" : "squares";
   // these refs are only relevant if we decide to allow simultaneous drag and rotate,
   // which I feel is somewhat awkward to use
 
@@ -101,12 +52,14 @@ export default ({
   const pan = useRef(new Animated.ValueXY()).current;
   const lastOffset = { x: 0, y: 0 };
 
-  const rotate = useRef(new Animated.Value(0)).current;
+  const rotate = useRef(new Animated.Value(initialRotation)).current;
   const rotateStr = rotate.interpolate({
     inputRange: [-100, 100],
     outputRange: ["-100rad", "100rad"],
   });
   let lastRotate = 0;
+
+  let isDragged = false;
 
   const onGestureEvent = Animated.event(
     [
@@ -114,42 +67,54 @@ export default ({
         nativeEvent: {
           translationX: pan.x,
           translationY: pan.y,
-          numberOfPointers: zIndex,
         },
       },
     ],
     {
       useNativeDriver: USE_NATIVE_DRIVER,
       // not sure if listener is performant; could possibly use this to "live limit" dragging off screen
-      // listener: (ev: NativeSyntheticEvent<PanGestureHandlerEventExtra>) => {
-      //   console.log(ev.nativeEvent);
-      // },
+      listener: () => {
+        if (!isDragged) {
+          isDragged = !isDragged;
+          zIndex.setValue(updateZ());
+        }
+      },
     }
   );
 
   const onHandlerStateChange = (ev: PanGestureHandlerStateChangeEvent) => {
     if (ev.nativeEvent.oldState === State.ACTIVE) {
-      zIndex.setValue(0);
+      zIndex.setValue(updateZ());
+      isDragged = !isDragged;
       lastOffset.x += ev.nativeEvent.translationX;
       lastOffset.y += ev.nativeEvent.translationY;
 
       //limit position on board
-      lastOffset.x = Math.max(0, lastOffset.x);
-      lastOffset.y = Math.max(0, lastOffset.y);
+      lastOffset.x = Math.max(0 - initX, lastOffset.x);
+      lastOffset.y = Math.max(0 - initY, lastOffset.y);
       lastOffset.x = Math.min(
-        puzzleAreaDimensions.puzzleAreaWidth - pieceWidth,
+        puzzleAreaDimensions.puzzleAreaWidth - pieceWidth - initX,
         lastOffset.x
       );
       lastOffset.y = Math.min(
-        puzzleAreaDimensions.puzzleAreaHeight - pieceHeight,
+        puzzleAreaDimensions.puzzleAreaHeight - pieceHeight - initY,
         lastOffset.y
       );
-      //snap piece here using lastOffset
+      // snap piece here using lastOffset
       for (let point of snapPoints) {
-        if (getPointsDistance(point, lastOffset) < SNAP_MARGIN * pieceHeight) {
-          lastOffset.x = point.x;
-          lastOffset.y = point.y;
+        const adjustedSnapPoint = { x: point.x - initX, y: point.y - initY };
+        const adjustedPiecePoint = {
+          x: lastOffset.x + pieceWidth / 2,
+          y: lastOffset.y + pieceHeight / 2,
+        };
+        if (
+          getPointsDistance(adjustedSnapPoint, adjustedPiecePoint) <
+          SNAP_MARGIN * Math.min(pieceHeight, pieceWidth)
+        ) {
+          lastOffset.x = adjustedSnapPoint.x - pieceWidth / 2;
+          lastOffset.y = adjustedSnapPoint.y - pieceHeight / 2;
           //mark as snapped
+          console.log("snap");
           break;
         }
       }
@@ -211,8 +176,8 @@ export default ({
           {
             width: pieceWidth,
             height: pieceHeight,
-            top: pieceStartY,
-            left: pieceStartX,
+            left: initX,
+            top: initY,
             position: "absolute",
             zIndex: zIndex,
           },
@@ -231,33 +196,31 @@ export default ({
             height={pieceWidth}
             width={pieceHeight}
             style={[
-              { zIndex },
               { transform: [{ rotate: rotateStr }, { perspective: 300 }] },
             ]}
           >
-            {/* <Image
-              href={{ uri: imageURI }}
+            <Defs>
+              {/* for jigsaws, clip using piecePaths */}
+              <ClipPath id="jigsaw">
+                <Path d={piecePath} fill="white" stroke="white" />
+              </ClipPath>
+              <ClipPath id="squares">
+                <Rect
+                  fill="white"
+                  stroke="white"
+                  x={0}
+                  y={0}
+                  width={pieceWidth}
+                  height={pieceHeight}
+                />
+              </ClipPath>
+            </Defs>
+            <Image
+              href={href}
               width={pieceWidth}
               height={pieceHeight}
-              // clipPath={`url(#${puzzleType})`}
-            /> */}
-            <Rect
-              width={pieceWidth}
-              height={pieceHeight}
-              fill="rgb(0,0,255)"
-              stroke="white"
+              clipPath={`url(#${puzzleType})`}
             />
-            <SvgText
-              fill="none"
-              stroke="white"
-              fontSize="60"
-              fontWeight="bold"
-              x={pieceWidth / 2}
-              y={pieceHeight / 2}
-              textAnchor="middle"
-            >
-              {ix}
-            </SvgText>
           </AnimatedSvg>
         </RotationGestureHandler>
       </Animated.View>
