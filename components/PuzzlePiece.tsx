@@ -1,5 +1,5 @@
 import * as ImageManipulator from "expo-image-manipulator";
-import React, { useRef, createRef } from "react";
+import React, { useRef, createRef, useState } from "react";
 import {
   Svg,
   Image,
@@ -75,20 +75,20 @@ export default ({
   moveToTop: Function;
 }): JSX.Element | null => {
   //temporary values
-  const pieceWidth = 150;
-  const pieceHeight = 150;
+  const pieceWidth = squareSize;
+  const pieceHeight = squareSize;
   const pieceStartX = 0;
   const pieceStartY = 0;
   const snapPoints = [
     { x: 0, y: 0 },
-    { x: 150, y: 0 },
-    { x: 300, y: 0 },
-    { x: 0, y: 150 },
-    { x: 150, y: 150 },
-    { x: 300, y: 150 },
-    { x: 0, y: 300 },
-    { x: 150, y: 300 },
-    { x: 300, y: 300 },
+    { x: squareSize, y: 0 },
+    { x: squareSize * 2, y: 0 },
+    { x: 0, y: squareSize },
+    { x: squareSize, y: squareSize },
+    { x: squareSize * 2, y: squareSize },
+    { x: 0, y: squareSize * 2 },
+    { x: squareSize, y: squareSize * 2 },
+    { x: squareSize * 2, y: squareSize * 2 },
   ];
 
   // these refs are only relevant if we decide to allow simultaneous drag and rotate,
@@ -96,6 +96,7 @@ export default ({
 
   // const moveRef = createRef<PanGestureHandler>();
   // const rotationRef = createRef<RotationGestureHandler>();
+  const zIndex = useRef(new Animated.Value(0)).current;
 
   const pan = useRef(new Animated.ValueXY()).current;
   const lastOffset = { x: 0, y: 0 };
@@ -108,19 +109,27 @@ export default ({
   let lastRotate = 0;
 
   const onGestureEvent = Animated.event(
-    [{ nativeEvent: { translationX: pan.x, translationY: pan.y } }],
+    [
+      {
+        nativeEvent: {
+          translationX: pan.x,
+          translationY: pan.y,
+          numberOfPointers: zIndex,
+        },
+      },
+    ],
     {
       useNativeDriver: USE_NATIVE_DRIVER,
       // not sure if listener is performant; could possibly use this to "live limit" dragging off screen
       // listener: (ev: NativeSyntheticEvent<PanGestureHandlerEventExtra>) => {
-      //   if (ev.nativeEvent.translationX + lastOffset.x < 0)
-      //
+      //   console.log(ev.nativeEvent);
       // },
     }
   );
 
   const onHandlerStateChange = (ev: PanGestureHandlerStateChangeEvent) => {
     if (ev.nativeEvent.oldState === State.ACTIVE) {
+      zIndex.setValue(0);
       lastOffset.x += ev.nativeEvent.translationX;
       lastOffset.y += ev.nativeEvent.translationY;
 
@@ -205,6 +214,7 @@ export default ({
             top: pieceStartY,
             left: pieceStartX,
             position: "absolute",
+            zIndex: zIndex,
           },
           {
             transform: [{ translateX: pan.x }, { translateY: pan.y }],
@@ -221,16 +231,22 @@ export default ({
             height={pieceWidth}
             width={pieceHeight}
             style={[
+              { zIndex },
               { transform: [{ rotate: rotateStr }, { perspective: 300 }] },
             ]}
           >
-            <Image
+            {/* <Image
               href={{ uri: imageURI }}
               width={pieceWidth}
               height={pieceHeight}
               // clipPath={`url(#${puzzleType})`}
+            /> */}
+            <Rect
+              width={pieceWidth}
+              height={pieceHeight}
+              fill="rgb(0,0,255)"
+              stroke="white"
             />
-            {/* <Rect width={pieceWidth} height={pieceHeight} fill="rgb(0,0,255)" />
             <SvgText
               fill="none"
               stroke="white"
@@ -241,7 +257,7 @@ export default ({
               textAnchor="middle"
             >
               {ix}
-            </SvgText> */}
+            </SvgText>
           </AnimatedSvg>
         </RotationGestureHandler>
       </Animated.View>
