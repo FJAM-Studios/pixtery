@@ -110,18 +110,12 @@ export default ({
         // manipulate images in Puzzle component instead to save on renders
         for (let i = 0; i < numPieces; i++) {
           const solvedIndex = shuffleOrder[i];
-          const [
-            squareX,
-            squareY,
-            widthY,
-            widthX,
-            initX,
-            initY,
-            viewBoxX,
-            viewBoxY,
-            solutionX,
-            solutionY,
-          ] = getInitialDimensions(
+          const {
+            pieceDimensions,
+            initialPlacement,
+            viewBox,
+            snapOffset,
+          } = getInitialDimensions(
             pickedPuzzle.puzzleType,
             minSandboxY,
             maxSandboxY,
@@ -141,12 +135,7 @@ export default ({
                 },
               },
               {
-                crop: {
-                  originX: viewBoxX,
-                  originY: viewBoxY,
-                  width: widthX,
-                  height: widthY,
-                },
+                crop: { ...viewBox, ...pieceDimensions },
               },
             ],
             { compress: 1, format: ImageManipulator.SaveFormat.JPEG }
@@ -154,34 +143,20 @@ export default ({
 
           const piece: Piece = {
             href,
-            pieceWidth: widthX,
-            pieceHeight: widthY,
+            pieceDimensions,
             piecePath: piecePaths.length ? piecePaths[solvedIndex] : "",
-            initX,
-            initY,
+            initialPlacement,
             initialRotation:
               Math.floor(Math.random() * 4) * 90 * DEGREE_CONVERSION,
             solvedIndex,
+            snapOffset,
           };
           _pieces.push(piece);
         }
         setPieces(_pieces);
       };
       createPieces();
-
-      const gridSections = getGridSections(pickedPuzzle, squareSize);
-      const _snapPoints: Point[] = [];
-      for (let i = 0; i < pickedPuzzle.gridSize; i++) {
-        for (let j = 0; j < pickedPuzzle.gridSize; j++) {
-          _snapPoints.push({
-            x: (j + 0.5) * squareSize,
-            y: (i + 0.5) * squareSize,
-          });
-        }
-      }
-      console.log(_snapPoints);
-      console.log(gridSections);
-      setSnapPoints(_snapPoints);
+      setSnapPoints(getGridSections(gridSize, squareSize));
       setCurrentBoard(new Array(numPieces).fill(null));
       setWinMessage("");
       setErrorMessage("");
@@ -208,7 +183,7 @@ export default ({
   };
 
   // when a piece is moved, it is given new maxZ through updateZ function below
-  // this ensures no re-rendering which would reset the native animation
+  // this ensures no re-rendering which would interfer w the native animation
   let maxZ = 0;
 
   const updateZ = () => {
