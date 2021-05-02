@@ -12,6 +12,16 @@ export interface Point {
   y: number;
 }
 
+export interface Dimension {
+  width: number;
+  height: number;
+}
+
+export interface Viewbox {
+  originX: number;
+  originY: number;
+}
+
 export interface GridSections {
   rowDividers: number[];
   colDividers: number[];
@@ -35,11 +45,17 @@ export interface Profile {
 
 export interface Piece {
   href: ImageSourcePropType;
-  pieceWidth: number;
-  pieceHeight: number;
+  pieceDimensions: Dimension;
   piecePath: string;
-  initX: number;
-  initY: number;
+  initialPlacement: Point;
   initialRotation: number;
   solvedIndex: number;
+  snapOffset: Point;
+}
+
+export interface PieceConfiguration {
+  pieceDimensions: Dimension;
+  initialPlacement: Point;
+  viewBox: Viewbox;
+  snapOffset: Point;
 }
