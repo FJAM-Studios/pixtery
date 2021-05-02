@@ -1,6 +1,14 @@
 import { Share } from "react-native";
 
-import { SvgPiece, Puzzle, GridSections } from "./types";
+import {
+  SvgPiece,
+  Puzzle,
+  GridSections,
+  Point,
+  Dimension,
+  Viewbox,
+  PieceConfiguration,
+} from "./types";
 
 export const shuffle = (array: number[], disabledShuffle = true): number[] => {
   if (disabledShuffle) return array;
@@ -256,71 +264,57 @@ export const getInitialDimensions = (
   ix: number,
   gridSize: number,
   squareSize: number
-): number[] => {
-  let widthY: number,
-    widthX: number,
-    initX: number,
-    initY: number,
-    viewBoxX: number,
-    viewBoxY: number,
-    solutionX: number,
-    solutionY: number;
-  const squareX = num % gridSize;
-  const squareY = Math.floor(num / gridSize);
+): PieceConfiguration => {
+  const randomFactor = ix % 2 ? squareSize * 0.1 : 0;
+  const scaleSquaresToSandbox = (maxSandboxY - minSandboxY) / minSandboxY;
 
-  if (puzzleType === "squares") {
-    //for square puzzles, everything is aligned to grid
-    widthY = widthX = squareSize;
-    // note Math.random() cannot be used here as it changes initial values at each render
-    const randomFactor = ix % 2 ? squareSize * 0.1 : 0;
-    const scaleSquaresToSandbox = (maxSandboxY - minSandboxY) / minSandboxY;
-    initX = (ix % gridSize) * squareSize - randomFactor;
-    initY =
+  const pieceDimensions: Dimension = { width: squareSize, height: squareSize };
+  const initialPlacement: Point = {
+    x: (ix % gridSize) * squareSize - randomFactor,
+    y:
       minSandboxY +
       Math.floor(ix / gridSize) * squareSize * scaleSquaresToSandbox +
-      randomFactor;
-    solutionX = (num % gridSize) * squareSize;
-    solutionY = Math.floor(num / gridSize) * squareSize;
-    viewBoxX = squareX * squareSize;
-    viewBoxY = squareY * squareSize;
-  } else {
+      randomFactor,
+  };
+  const square: Point = { x: num % gridSize, y: Math.floor(num / gridSize) };
+  const viewBox: Viewbox = {
+    originX: square.x * squareSize,
+    originY: square.y * squareSize,
+  };
+
+  // create offset so that pieces can snap on center
+  const snapOffset: Point = { x: squareSize * 0.5, y: squareSize * 0.5 };
+
+  if (puzzleType === "jigsaw") {
     //for jigsaw puzzles, some pieces must be offset or larger viewbox to account for jigsaw "tabs"
-    widthY =
-      squareY === 0 || squareY === gridSize - 1
+    pieceDimensions.height =
+      square.y === 0 || square.y === gridSize - 1
         ? squareSize * 1.25
         : squareSize * 1.5;
-    widthX =
-      squareX === 0 || squareX === gridSize - 1
+    pieceDimensions.width =
+      square.x === 0 || square.x === gridSize - 1
         ? squareSize * 1.25
         : squareSize * 1.5;
     const scaleJigsawToSandbox =
       (maxSandboxY - squareSize * 0.25 - minSandboxY) / minSandboxY;
-    initX = Math.max(0, (ix % gridSize) * squareSize - squareSize * 0.25);
-    initY =
+    initialPlacement.x = Math.max(
+      0,
+      (ix % gridSize) * squareSize - squareSize * 0.25
+    );
+    initialPlacement.y =
       minSandboxY +
       Math.max(0, Math.floor(ix / gridSize) * squareSize - squareSize * 0.25) *
         scaleJigsawToSandbox;
-    solutionX = Math.max(0, (num % gridSize) * squareSize - squareSize * 0.25);
-    solutionY = Math.max(
-      0,
-      Math.floor(num / gridSize) * squareSize - squareSize * 0.25
-    );
-    viewBoxX = Math.max(0, squareX * squareSize - squareSize * 0.25);
-    viewBoxY = Math.max(0, squareY * squareSize - squareSize * 0.25);
+    viewBox.originX = Math.max(0, square.x * squareSize - squareSize * 0.25);
+    viewBox.originY = Math.max(0, square.y * squareSize - squareSize * 0.25);
+
+    //for pieces not in the first row or column, offset is increased to account for jigsaw tabs
+    if (square.y > 0) snapOffset.y += squareSize * 0.25;
+    if (square.x > 0) snapOffset.x += squareSize * 0.25;
   }
-  return [
-    squareX,
-    squareY,
-    widthY,
-    widthX,
-    initX,
-    initY,
-    viewBoxX,
-    viewBoxY,
-    solutionX,
-    solutionY,
-  ];
+  return { pieceDimensions, initialPlacement, viewBox, snapOffset };
 };
+
 export const shareMessage = async (pixUrl: string): Promise<void> => {
   try {
     const content = {
@@ -350,30 +344,19 @@ export const shareMessage = async (pixUrl: string): Promise<void> => {
 
 // populates X Y coordinates for upper left corner of each grid section
 export const getGridSections = (
-  puz: Puzzle,
+  gridSize: number,
   squareSize: number
-): GridSections => {
-  // separated row and col in case needed for future flexibility
-  const gridSections: GridSections = {
-    rowDividers: [0],
-    colDividers: [0],
-  };
-  for (let i = 1; i < puz.gridSize; i++) {
-    let x: number;
-    let y: number;
-    if (puz.puzzleType === "squares") {
-      x = i * squareSize;
-      y = i * squareSize;
+): Point[] => {
+  const snapPoints: Point[] = [];
+  for (let i = 0; i < gridSize; i++) {
+    for (let j = 0; j < gridSize; j++) {
+      snapPoints.push({
+        x: (j + 0.5) * squareSize,
+        y: (i + 0.5) * squareSize,
+      });
     }
-    //if jigsaw
-    else {
-      x = squareSize * 0.75 + (i - 1) * squareSize;
-      y = squareSize * 0.75 + (i - 1) * squareSize;
-    }
-    gridSections.rowDividers.push(x);
-    gridSections.colDividers.push(y);
   }
-  return gridSections;
+  return snapPoints;
 };
 
 export const fillArray = (gridSize: number): number[] => {

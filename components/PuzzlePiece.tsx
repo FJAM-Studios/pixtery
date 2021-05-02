@@ -1,5 +1,13 @@
 import React, { useRef } from "react";
-import { Svg, Image, Defs, ClipPath, Path, Rect } from "react-native-svg";
+import {
+  Svg,
+  Image,
+  Defs,
+  ClipPath,
+  Path,
+  Rect,
+  Circle,
+} from "react-native-svg";
 import { Animated } from "react-native";
 import {
   PanGestureHandler,
@@ -32,16 +40,16 @@ export default ({
 }): JSX.Element | null => {
   const {
     href,
-    pieceWidth,
-    pieceHeight,
+    pieceDimensions,
     piecePath,
-    initX,
-    initY,
+    initialPlacement,
     initialRotation,
     solvedIndex,
+    snapOffset,
   } = piece;
 
   const puzzleType = piecePath.length ? "jigsaw" : "squares";
+
   // these refs are only relevant if we decide to allow simultaneous drag and rotate,
   // which I feel is somewhat awkward to use
 
@@ -52,8 +60,8 @@ export default ({
   const pan = useRef(new Animated.ValueXY()).current;
   const lastOffset = { x: 0, y: 0 };
 
-  const rotate = useRef(new Animated.Value(initialRotation)).current;
-  const rotateStr = rotate.interpolate({
+  const rotate = useRef(new Animated.Value(0)).current;
+  const rotateStr = Animated.add(rotate, initialRotation).interpolate({
     inputRange: [-100, 100],
     outputRange: ["-100rad", "100rad"],
   });
@@ -90,29 +98,38 @@ export default ({
       lastOffset.y += ev.nativeEvent.translationY;
 
       //limit position on board
-      lastOffset.x = Math.max(0 - initX, lastOffset.x);
-      lastOffset.y = Math.max(0 - initY, lastOffset.y);
+      lastOffset.x = Math.max(0 - initialPlacement.x, lastOffset.x);
+      lastOffset.y = Math.max(0 - initialPlacement.y, lastOffset.y);
       lastOffset.x = Math.min(
-        puzzleAreaDimensions.puzzleAreaWidth - pieceWidth - initX,
+        puzzleAreaDimensions.puzzleAreaWidth -
+          pieceDimensions.width -
+          initialPlacement.x,
         lastOffset.x
       );
       lastOffset.y = Math.min(
-        puzzleAreaDimensions.puzzleAreaHeight - pieceHeight - initY,
+        puzzleAreaDimensions.puzzleAreaHeight -
+          pieceDimensions.height -
+          initialPlacement.y,
         lastOffset.y
       );
       // snap piece here using lastOffset
+      const adjustedPiecePoint = {
+        x: lastOffset.x + snapOffset.x,
+        y: lastOffset.y + snapOffset.y,
+      };
+
       for (let point of snapPoints) {
-        const adjustedSnapPoint = { x: point.x - initX, y: point.y - initY };
-        const adjustedPiecePoint = {
-          x: lastOffset.x + pieceWidth / 2,
-          y: lastOffset.y + pieceHeight / 2,
+        const adjustedSnapPoint = {
+          x: point.x - initialPlacement.x,
+          y: point.y - initialPlacement.y,
         };
+
         if (
           getPointsDistance(adjustedSnapPoint, adjustedPiecePoint) <
-          SNAP_MARGIN * Math.min(pieceHeight, pieceWidth)
+          SNAP_MARGIN * Math.min(pieceDimensions.height, pieceDimensions.width)
         ) {
-          lastOffset.x = adjustedSnapPoint.x - pieceWidth / 2;
-          lastOffset.y = adjustedSnapPoint.y - pieceHeight / 2;
+          lastOffset.x = adjustedSnapPoint.x - snapOffset.x;
+          lastOffset.y = adjustedSnapPoint.y - snapOffset.y;
           //mark as snapped
           console.log("snap");
           break;
@@ -174,10 +191,9 @@ export default ({
       <Animated.View
         style={[
           {
-            width: pieceWidth,
-            height: pieceHeight,
-            left: initX,
-            top: initY,
+            ...pieceDimensions,
+            left: initialPlacement.x,
+            top: initialPlacement.y,
             position: "absolute",
             zIndex: zIndex,
           },
@@ -193,10 +209,12 @@ export default ({
           onHandlerStateChange={onRotateHandlerStateChange}
         >
           <AnimatedSvg
-            height={pieceWidth}
-            width={pieceHeight}
+            height={pieceDimensions.height}
+            width={pieceDimensions.width}
             style={[
-              { transform: [{ rotate: rotateStr }, { perspective: 300 }] },
+              {
+                transform: [{ rotate: rotateStr }, { perspective: 300 }],
+              },
             ]}
           >
             <Defs>
@@ -210,17 +228,18 @@ export default ({
                   stroke="white"
                   x={0}
                   y={0}
-                  width={pieceWidth}
-                  height={pieceHeight}
+                  width={pieceDimensions.width}
+                  height={pieceDimensions.height}
                 />
               </ClipPath>
             </Defs>
             <Image
               href={href}
-              width={pieceWidth}
-              height={pieceHeight}
+              width={pieceDimensions.width}
+              height={pieceDimensions.height}
               clipPath={`url(#${puzzleType})`}
             />
+            {/* <Circle fill="blue" cx={snapOffset.x} cy={snapOffset.y} r={5} /> */}
           </AnimatedSvg>
         </RotationGestureHandler>
       </Animated.View>
