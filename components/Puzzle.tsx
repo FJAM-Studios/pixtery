@@ -6,14 +6,14 @@ import { ActivityIndicator } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { DEGREE_CONVERSION, TESTING_MODE } from "../constants";
-import { Puzzle, Piece, Point } from "../types";
+import { Puzzle, Piece, Point, BoardSpace } from "../types";
 import {
   shuffle,
   generateJigsawPiecePaths,
   getGridSections,
   fillArray,
   getInitialDimensions,
-  checkWin,
+  validateBoard,
 } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
@@ -64,30 +64,18 @@ export default ({
   };
 
   //
-  let currentBoard: number[] = [];
+  let currentBoard: BoardSpace[] = [];
 
-  const updateBoard = ({
-    pointIndex,
-    solvedIndex,
-    rotation,
-  }: {
-    pointIndex: number;
-    solvedIndex: number;
-    rotation: number;
-  }) => {
-    console.log(pointIndex, solvedIndex, rotation);
+  const checkWin = () => {
+    if (puzzle && validateBoard(currentBoard, puzzle.gridSize)) {
+      const winMessage =
+        puzzle.message && puzzle.message.length > 0
+          ? puzzle.message
+          : "Congrats! You solved the puzzle!";
+      setWinMessage(winMessage);
+      markPuzzleComplete(publicKey);
+    }
   };
-
-  // const updateBoard = () => {
-  //   if (puzzle && checkWin(currentBoard)) {
-  //     const winMessage =
-  //       puzzle.message && puzzle.message.length > 0
-  //         ? puzzle.message
-  //         : "Congrats! You solved the puzzle!";
-  //     setWinMessage(winMessage);
-  //     markPuzzleComplete(publicKey);
-  //   }
-  // };
 
   const measurePuzzleArea = (ev: LayoutChangeEvent): void => {
     if (puzzleAreaDimensions.puzzleAreaHeight) return;
@@ -249,7 +237,8 @@ export default ({
                 puzzleAreaDimensions={puzzleAreaDimensions}
                 updateZ={updateZ}
                 snapPoints={snapPoints}
-                updateBoard={updateBoard}
+                currentBoard={currentBoard}
+                checkWin={checkWin}
               />
             ))
           ) : (

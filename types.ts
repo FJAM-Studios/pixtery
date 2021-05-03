@@ -59,3 +59,9 @@ export interface PieceConfiguration {
   viewBox: Viewbox;
   snapOffset: Point;
 }
+
+export interface BoardSpace {
+  pointIndex: number;
+  solvedIndex: number;
+  rotation: number;
+}
