@@ -1,4 +1,5 @@
 import { Share } from "react-native";
+import { DEGREE_CONVERSION } from "./constants";
 
 import {
   SvgPiece,
@@ -260,23 +261,28 @@ export const getInitialDimensions = (
   puzzleType: string,
   minSandboxY: number,
   maxSandboxY: number,
-  num: number,
-  ix: number,
+  solvedIndex: number,
+  shuffledIndex: number,
   gridSize: number,
   squareSize: number
 ): PieceConfiguration => {
-  const randomFactor = ix % 2 ? squareSize * 0.1 : 0;
+  const randomFactor = shuffledIndex % 2 ? squareSize * 0.1 : 0;
   const scaleSquaresToSandbox = (maxSandboxY - minSandboxY) / minSandboxY;
 
   const pieceDimensions: Dimension = { width: squareSize, height: squareSize };
   const initialPlacement: Point = {
-    x: (ix % gridSize) * squareSize - randomFactor,
+    x: (shuffledIndex % gridSize) * squareSize - randomFactor,
     y:
       minSandboxY +
-      Math.floor(ix / gridSize) * squareSize * scaleSquaresToSandbox +
+      Math.floor(shuffledIndex / gridSize) *
+        squareSize *
+        scaleSquaresToSandbox +
       randomFactor,
   };
-  const square: Point = { x: num % gridSize, y: Math.floor(num / gridSize) };
+  const square: Point = {
+    x: solvedIndex % gridSize,
+    y: Math.floor(solvedIndex / gridSize),
+  };
   const viewBox: Viewbox = {
     originX: square.x * squareSize,
     originY: square.y * squareSize,
@@ -299,11 +305,14 @@ export const getInitialDimensions = (
       (maxSandboxY - squareSize * 0.25 - minSandboxY) / minSandboxY;
     initialPlacement.x = Math.max(
       0,
-      (ix % gridSize) * squareSize - squareSize * 0.25
+      (shuffledIndex % gridSize) * squareSize - squareSize * 0.25
     );
     initialPlacement.y =
       minSandboxY +
-      Math.max(0, Math.floor(ix / gridSize) * squareSize - squareSize * 0.25) *
+      Math.max(
+        0,
+        Math.floor(shuffledIndex / gridSize) * squareSize - squareSize * 0.25
+      ) *
         scaleJigsawToSandbox;
     viewBox.originX = Math.max(0, square.x * squareSize - squareSize * 0.25);
     viewBox.originY = Math.max(0, square.y * squareSize - squareSize * 0.25);
@@ -374,4 +383,35 @@ export const getPointsDistance = (
   const a = pointA.x - pointB.x;
   const b = pointA.y - pointB.y;
   return Math.sqrt(a * a + b * b);
+};
+
+export const snapAngle = (angle: number) => {
+  // convert rotation to between 0 and 2 * pi
+  angle = angle % (Math.PI * 2);
+  angle += 2 * Math.PI;
+  angle = angle % (Math.PI * 2);
+  // 'snap' rotation to whichever angle it's closest to
+  if (angle >= 315 * DEGREE_CONVERSION || angle < 45 * DEGREE_CONVERSION) {
+    angle = 0;
+  } else if (
+    angle >= 45 * DEGREE_CONVERSION &&
+    angle < 135 * DEGREE_CONVERSION
+  ) {
+    angle = 90 * DEGREE_CONVERSION;
+  } else if (
+    angle >= 135 * DEGREE_CONVERSION &&
+    angle < 225 * DEGREE_CONVERSION
+  ) {
+    angle = 180 * DEGREE_CONVERSION;
+  } else {
+    angle = 270 * DEGREE_CONVERSION;
+  }
+  return angle;
+};
+
+export const checkWin = (arr: number[]): boolean => {
+  for (let i = 0; i < arr.length; i++) {
+    if (arr[i] !== i) return false;
+  }
+  return true;
 };
