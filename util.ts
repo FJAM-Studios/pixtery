@@ -9,6 +9,7 @@ import {
   Dimension,
   Viewbox,
   PieceConfiguration,
+  BoardSpace,
 } from "./types";
 
 export const shuffle = (array: number[], disabledShuffle = true): number[] => {
@@ -409,9 +410,16 @@ export const snapAngle = (angle: number) => {
   return angle;
 };
 
-export const checkWin = (arr: number[]): boolean => {
-  for (let i = 0; i < arr.length; i++) {
-    if (arr[i] !== i) return false;
-  }
-  return true;
+export const validateBoard = (currentBoard: BoardSpace[], gridSize: number) => {
+  if (currentBoard.length === gridSize * gridSize) {
+    let valid = true;
+    for (let i = 0; i < currentBoard.length; i++) {
+      const { pointIndex, solvedIndex, rotation } = currentBoard[i];
+      if (pointIndex !== solvedIndex || rotation !== 0) {
+        valid = false;
+        break;
+      }
+    }
+    return valid;
+  } else return false;
 };

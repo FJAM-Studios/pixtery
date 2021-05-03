@@ -18,7 +18,7 @@ import {
 } from "react-native-gesture-handler";
 
 import { SNAP_MARGIN, USE_NATIVE_DRIVER } from "../constants";
-import { Point, Piece } from "../types";
+import { Point, Piece, BoardSpace } from "../types";
 import { getPointsDistance, snapAngle } from "../util";
 
 const AnimatedSvg = Animated.createAnimatedComponent(Svg);
@@ -28,21 +28,15 @@ export default ({
   puzzleAreaDimensions,
   updateZ,
   snapPoints,
-  updateBoard,
+  currentBoard,
+  checkWin,
 }: {
   piece: Piece;
   puzzleAreaDimensions: { puzzleAreaWidth: number; puzzleAreaHeight: number };
   updateZ: () => number;
   snapPoints: Point[];
-  updateBoard: ({
-    pointIndex,
-    solvedIndex,
-    rotation,
-  }: {
-    pointIndex: number;
-    solvedIndex: number;
-    rotation: number;
-  }) => void;
+  currentBoard: BoardSpace[];
+  checkWin: () => void;
 }): JSX.Element | null => {
   const {
     href,
@@ -118,14 +112,17 @@ export default ({
           initialPlacement.y,
         lastOffset.y
       );
-      // snap piece here using lastOffset
+      // snap piece here using lastOffset, adjust for centered snapping points
       const adjustedPiecePoint = {
         x: lastOffset.x + snapOffset.x,
         y: lastOffset.y + snapOffset.y,
       };
 
+      let notSnapped = true;
+      // loop through possible snap points
       for (let pointIndex = 0; pointIndex < snapPoints.length; pointIndex++) {
         const point = snapPoints[pointIndex];
+
         const adjustedSnapPoint = {
           x: point.x - initialPlacement.x,
           y: point.y - initialPlacement.y,
@@ -135,22 +132,38 @@ export default ({
           getPointsDistance(adjustedSnapPoint, adjustedPiecePoint) <
           SNAP_MARGIN * Math.min(pieceDimensions.height, pieceDimensions.width)
         ) {
-          //@todo check if snapping is allowed/other piece isn't present
+          // check if there's a different piece on the board at that point index
+          // and, if so, break loop
+          const blockingPieces = currentBoard.filter(
+            (pos) =>
+              pos.pointIndex === pointIndex && pos.solvedIndex !== solvedIndex
+          );
+          if (blockingPieces.length) break;
 
           lastOffset.x = adjustedSnapPoint.x - snapOffset.x;
           lastOffset.y = adjustedSnapPoint.y - snapOffset.y;
 
-          //mark as snapped
+          notSnapped = false;
+          // remove from current board if already snapped elsewhere
+          // must be done w in-place array methods
+          const spliceIx = currentBoard.findIndex(
+            (pos) => pos.solvedIndex === solvedIndex
+          );
+          if (spliceIx > -1) currentBoard.splice(spliceIx, 1);
+          //add to current board at current point index
           const rotation = (lastRotate + initialRotation) % (Math.PI * 2);
-          updateBoard({
-            pointIndex,
-            solvedIndex,
-            rotation,
-          });
+          currentBoard.push({ pointIndex, solvedIndex, rotation });
+          checkWin();
           break;
         }
       }
-
+      //remove from current board if not snapped
+      if (notSnapped) {
+        const spliceIx = currentBoard.findIndex(
+          (pos) => pos.solvedIndex === solvedIndex
+        );
+        if (spliceIx > -1) currentBoard.splice(spliceIx, 1);
+      }
       pan.setOffset(lastOffset);
       pan.setValue({ x: 0, y: 0 });
     }
@@ -169,6 +182,18 @@ export default ({
     if (ev.nativeEvent.oldState === State.ACTIVE) {
       lastRotate += ev.nativeEvent.rotation;
       lastRotate = snapAngle(lastRotate);
+
+      //if it's snapped in, update rotation on the board
+      const matchingPieces = currentBoard.filter(
+        (pos) => pos.solvedIndex === solvedIndex
+      );
+      if (matchingPieces.length) {
+        const matchingPiece = matchingPieces[0];
+        const rotation = (lastRotate + initialRotation) % (Math.PI * 2);
+        matchingPiece.rotation = rotation;
+      }
+
+      checkWin();
       rotate.setOffset(lastRotate);
       rotate.setValue(0);
     }
