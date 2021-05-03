@@ -17,13 +17,9 @@ import {
   RotationGestureHandlerStateChangeEvent,
 } from "react-native-gesture-handler";
 
-import {
-  SNAP_MARGIN,
-  DEGREE_CONVERSION,
-  USE_NATIVE_DRIVER,
-} from "../constants";
+import { SNAP_MARGIN, USE_NATIVE_DRIVER } from "../constants";
 import { Point, Piece } from "../types";
-import { getPointsDistance } from "../util";
+import { getPointsDistance, snapAngle } from "../util";
 
 const AnimatedSvg = Animated.createAnimatedComponent(Svg);
 
@@ -32,11 +28,21 @@ export default ({
   puzzleAreaDimensions,
   updateZ,
   snapPoints,
+  updateBoard,
 }: {
   piece: Piece;
   puzzleAreaDimensions: { puzzleAreaWidth: number; puzzleAreaHeight: number };
   updateZ: () => number;
   snapPoints: Point[];
+  updateBoard: ({
+    pointIndex,
+    solvedIndex,
+    rotation,
+  }: {
+    pointIndex: number;
+    solvedIndex: number;
+    rotation: number;
+  }) => void;
 }): JSX.Element | null => {
   const {
     href,
@@ -118,7 +124,8 @@ export default ({
         y: lastOffset.y + snapOffset.y,
       };
 
-      for (let point of snapPoints) {
+      for (let pointIndex = 0; pointIndex < snapPoints.length; pointIndex++) {
+        const point = snapPoints[pointIndex];
         const adjustedSnapPoint = {
           x: point.x - initialPlacement.x,
           y: point.y - initialPlacement.y,
@@ -128,10 +135,18 @@ export default ({
           getPointsDistance(adjustedSnapPoint, adjustedPiecePoint) <
           SNAP_MARGIN * Math.min(pieceDimensions.height, pieceDimensions.width)
         ) {
+          //@todo check if snapping is allowed/other piece isn't present
+
           lastOffset.x = adjustedSnapPoint.x - snapOffset.x;
           lastOffset.y = adjustedSnapPoint.y - snapOffset.y;
+
           //mark as snapped
-          console.log("snap");
+          const rotation = (lastRotate + initialRotation) % (Math.PI * 2);
+          updateBoard({
+            pointIndex,
+            solvedIndex,
+            rotation,
+          });
           break;
         }
       }
@@ -153,29 +168,7 @@ export default ({
   ) => {
     if (ev.nativeEvent.oldState === State.ACTIVE) {
       lastRotate += ev.nativeEvent.rotation;
-      // convert rotation to between 0 and 2 * pi
-      lastRotate = lastRotate % (Math.PI * 2);
-      lastRotate += 2 * Math.PI;
-      lastRotate = lastRotate % (Math.PI * 2);
-      // 'snap' rotation to whichever angle it's closest to
-      if (
-        lastRotate >= 315 * DEGREE_CONVERSION ||
-        lastRotate < 45 * DEGREE_CONVERSION
-      ) {
-        lastRotate = 0;
-      } else if (
-        lastRotate >= 45 * DEGREE_CONVERSION &&
-        lastRotate < 135 * DEGREE_CONVERSION
-      ) {
-        lastRotate = 90 * DEGREE_CONVERSION;
-      } else if (
-        lastRotate >= 135 * DEGREE_CONVERSION &&
-        lastRotate < 225 * DEGREE_CONVERSION
-      ) {
-        lastRotate = 180 * DEGREE_CONVERSION;
-      } else {
-        lastRotate = 270 * DEGREE_CONVERSION;
-      }
+      lastRotate = snapAngle(lastRotate);
       rotate.setOffset(lastRotate);
       rotate.setValue(0);
     }
