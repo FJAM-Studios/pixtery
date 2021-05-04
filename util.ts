@@ -234,6 +234,69 @@ export const generateJigsawPiecePaths = (
   return piecePaths;
 };
 
+export const generateSquarePiecePaths = (
+  gridSize: number,
+  squareSize: number
+): string[] => {
+  const pieces: SvgPiece[] = new Array(gridSize * gridSize);
+  //fill array with empty pieces
+  for (let z = 0; z < pieces.length; z++) pieces[z] = new SvgPiece();
+  //loop through the pieces
+  for (let y = 0; y < gridSize; y++) {
+    for (let x = 0; x < gridSize; x++) {
+      const ix = x + y * gridSize;
+      const thisPiece = pieces[ix];
+      //set flat top
+      thisPiece.top = [
+        //goes from left to right
+        { x: x * squareSize, y: y * squareSize },
+        { x: (x + 1) * squareSize, y: y * squareSize },
+      ];
+      thisPiece.bottom = [
+        //goes from right to left
+        { x: (x + 1) * squareSize, y: (y + 1) * squareSize },
+        { x: x * squareSize, y: (y + 1) * squareSize },
+      ];
+      thisPiece.left = [
+        //goes from bottom to top
+        { x: x * squareSize, y: (y + 1) * squareSize },
+        { x: x * squareSize, y: y * squareSize },
+      ];
+      thisPiece.right = [
+        //goes from top to bottom
+        { x: (x + 1) * squareSize, y: y * squareSize },
+        { x: (x + 1) * squareSize, y: (y + 1) * squareSize },
+      ];
+    }
+  }
+  //construct SVG path data
+  const piecePaths: string[] = [];
+  for (let i = 0; i < pieces.length; i++) {
+    const piece = pieces[i];
+    //move to top right point
+    let str = `M ${(i % gridSize) * squareSize} ${
+      Math.floor(i / gridSize) * squareSize
+    } `;
+    //idk if this is good typescript
+    const sides = ["top", "right", "bottom", "left"] as const;
+    for (const side of sides) {
+      //if only two points, denote line
+      str += piece[side].length === 2 ? "L " : "";
+      str += piece[side]
+        .map(
+          (coord, ix) =>
+            //3 points denotes curve
+            `${ix % 3 === 0 && piece[side].length > 2 ? "C " : ""}${
+              Math.round(coord.x * 100) / 100
+            } ${Math.round(coord.y * 100) / 100} `
+        )
+        .join("");
+    }
+    piecePaths[i] = str;
+  }
+  return piecePaths;
+};
+
 //convert URI into a blob to transmit to server
 export const createBlob = (localUri: string): Promise<Blob> => {
   //converts the image URI into a blob. there are references to using fetch online,
