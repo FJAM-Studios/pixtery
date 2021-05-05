@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import moment from "moment";
 import * as React from "react";
-import { View, TouchableOpacity } from "react-native";
+import { ScrollView, View, TouchableOpacity } from "react-native";
 import Modal from "react-native-modal";
 import { Text, Card, IconButton, Button, Headline } from "react-native-paper";
 
@@ -9,7 +9,7 @@ import { Puzzle } from "../types";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 
-export default ({
+const PuzzleList = ({
   navigation,
   theme,
   receivedPuzzles,
@@ -19,7 +19,7 @@ export default ({
   theme: any;
   receivedPuzzles: Puzzle[];
   setReceivedPuzzles: (puzzles: Puzzle[]) => void;
-}) => {
+}): JSX.Element => {
   const [modalVisible, setModalVisible] = React.useState(false);
   const [puzzleToDelete, setPuzzleToDelete] = React.useState<Puzzle | null>(
     null
@@ -101,7 +101,7 @@ export default ({
         }
         navigation={navigation}
       />
-      <View>
+      <ScrollView>
         {receivedPuzzles.map((receivedPuzzle, ix) => (
           <TouchableOpacity
             onPress={() =>
@@ -114,6 +114,7 @@ export default ({
             <Card
               style={{
                 margin: 1,
+                width: "90%",
                 backgroundColor: receivedPuzzle.completed
                   ? theme.colors.disabled
                   : theme.colors.surface,
@@ -148,7 +149,9 @@ export default ({
             </Card>
           </TouchableOpacity>
         ))}
-      </View>
+      </ScrollView>
     </AdSafeAreaView>
   );
 };
+
+export default PuzzleList;

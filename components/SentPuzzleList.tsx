@@ -2,7 +2,12 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Linking from "expo-linking";
 import moment from "moment";
 import * as React from "react";
-import { ImageBackground, View, TouchableOpacity } from "react-native";
+import {
+  FlatList,
+  ImageBackground,
+  View,
+  TouchableOpacity,
+} from "react-native";
 import Modal from "react-native-modal";
 import { Card, IconButton, Button, Headline } from "react-native-paper";
 
@@ -11,7 +16,7 @@ import { shareMessage } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 
-export default ({
+const SentPuzzleList = ({
   navigation,
   theme,
   receivedPuzzles,
@@ -54,6 +59,7 @@ export default ({
     setPuzzleToDelete(null);
     setModalVisible(false);
   };
+
   return (
     <AdSafeAreaView
       style={{
@@ -113,15 +119,16 @@ export default ({
         }
         navigation={navigation}
       />
-      <View>
-        {sentPuzzles.map((sentPuzzle, ix) => (
+      <FlatList
+        data={sentPuzzles}
+        renderItem={({ item, index }) => (
           <TouchableOpacity
             onPress={() =>
               navigation.navigate("Puzzle", {
-                publicKey: sentPuzzle.publicKey,
+                publicKey: item.publicKey,
               })
             }
-            key={ix}
+            key={index}
           >
             <Card
               style={{
@@ -130,32 +137,32 @@ export default ({
               }}
             >
               <Card.Title
-                title={sentPuzzle.message || ""}
-                subtitle={moment(sentPuzzle.dateReceived).calendar()}
+                title={item.message || ""}
+                subtitle={moment(item.dateReceived).calendar()}
                 right={() => (
                   <View style={{ flexDirection: "row", alignItems: "center" }}>
                     <IconButton
                       icon="puzzle"
                       onPress={() =>
                         navigation.navigate("Puzzle", {
-                          publicKey: sentPuzzle.publicKey,
+                          publicKey: item.publicKey,
                         })
                       }
                     />
                     <IconButton
                       icon="delete"
-                      onPress={() => showDeleteModal(sentPuzzle)}
+                      onPress={() => showDeleteModal(item)}
                     />
                     <IconButton
                       icon="send"
-                      onPress={() => sendPuzzle(sentPuzzle.publicKey)}
+                      onPress={() => sendPuzzle(item.publicKey)}
                     />
                   </View>
                 )}
                 left={() => (
                   <ImageBackground
                     source={{
-                      uri: sentPuzzle.imageURI,
+                      uri: item.imageURI,
                     }}
                     style={{
                       flex: 1,
@@ -167,8 +174,10 @@ export default ({
               />
             </Card>
           </TouchableOpacity>
-        ))}
-      </View>
+        )}
+      />
     </AdSafeAreaView>
   );
 };
+
+export default SentPuzzleList;
