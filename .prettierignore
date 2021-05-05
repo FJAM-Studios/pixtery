@@ -11,6 +11,6 @@ web-build/
 .vscode
 *.bat
 functions/lib/*
-
+package-lock.json
 # macOS
 .DS_Store
