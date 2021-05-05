@@ -1,1 +1,3 @@
 tests/*
+functions/lib/*
+package-lock.json
