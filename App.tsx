@@ -62,7 +62,7 @@ const App = () => {
       url = await Linking.getInitialURL();
       if (url && initialLoad) fetchPuzzle(url);
     };
-    Linking.addEventListener("url", (ev) => {
+    Linking.addEventListener("url", function getPuzzle(ev) {
       url = ev.url;
       if (url && initialLoad) fetchPuzzle(url);
     });
