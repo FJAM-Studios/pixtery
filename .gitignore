@@ -16,6 +16,7 @@ node_modules
 *-debug.log
 .env
 ip.ts
+serviceAccount.ts
 
 # macOS
 .DS_Store
