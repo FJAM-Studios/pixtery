@@ -1,4 +1,4 @@
-import { ImageSourcePropType } from "react-native";
+import * as ImageManipulator from "expo-image-manipulator"
 
 export class SvgPiece {
   top: Point[] = [];
@@ -44,7 +44,7 @@ export interface Profile {
 }
 
 export interface Piece {
-  href: ImageSourcePropType;
+  href: ImageManipulator.ImageResult;
   pieceDimensions: Dimension;
   piecePath: string;
   initialPlacement: Point;
