@@ -1,4 +1,4 @@
-import * as ImageManipulator from "expo-image-manipulator"
+import * as ImageManipulator from "expo-image-manipulator";
 
 export class SvgPiece {
   top: Point[] = [];
@@ -22,10 +22,6 @@ export interface Viewbox {
   originY: number;
 }
 
-export interface GridSections {
-  rowDividers: number[];
-  colDividers: number[];
-}
 export interface Puzzle {
   puzzleType: string;
   gridSize: number;

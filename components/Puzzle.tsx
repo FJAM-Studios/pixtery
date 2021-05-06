@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImageManipulator from "expo-image-manipulator";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Text, View, StyleSheet, Image, LayoutChangeEvent } from "react-native";
 import { ActivityIndicator } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -10,7 +10,7 @@ import { Puzzle, Piece, Point, BoardSpace } from "../types";
 import {
   shuffle,
   generateJigsawPiecePaths,
-  getGridSections,
+  getSnapPoints,
   fillArray,
   getInitialDimensions,
   validateBoard,
@@ -56,15 +56,15 @@ export default ({
   // for native animations and gesturehandler
 
   // when a piece is moved, it is given new maxZ through updateZ function below
-  let maxZ = 0;
+  let maxZ = useRef(0).current;
 
   const updateZ = () => {
     maxZ += 1;
     return maxZ;
   };
 
-  //
-  let currentBoard: BoardSpace[] = [];
+  // store current pieces snapped to board
+  let currentBoard: BoardSpace[] = useRef([]).current;
 
   const checkWin = () => {
     if (puzzle && validateBoard(currentBoard, puzzle.gridSize)) {
@@ -160,7 +160,7 @@ export default ({
         setPieces(_pieces);
       };
       createPieces();
-      setSnapPoints(getGridSections(gridSize, squareSize));
+      setSnapPoints(getSnapPoints(gridSize, squareSize));
       setWinMessage("");
       setErrorMessage("");
       currentBoard = new Array(numPieces).fill(null);
