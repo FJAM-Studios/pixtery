@@ -67,7 +67,7 @@ const App = () => {
       if (url && initialLoad) fetchPuzzle(url);
     });
     if (!url) getInitialUrl();
-  }, [initialLoad, navigationRef]);
+  }, [initialLoad]);
 
   const fetchPuzzle = async (url: string): Promise<void> => {
     console.log(url);
