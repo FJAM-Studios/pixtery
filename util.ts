@@ -3,8 +3,6 @@ import { DEGREE_CONVERSION } from "./constants";
 
 import {
   SvgPiece,
-  Puzzle,
-  GridSections,
   Point,
   Dimension,
   Viewbox,
@@ -416,7 +414,7 @@ export const shareMessage = async (pixUrl: string): Promise<void> => {
 };
 
 // populates X Y coordinates for upper left corner of each grid section
-export const getGridSections = (
+export const getSnapPoints = (
   gridSize: number,
   squareSize: number
 ): Point[] => {
@@ -475,14 +473,12 @@ export const snapAngle = (angle: number) => {
 
 export const validateBoard = (currentBoard: BoardSpace[], gridSize: number) => {
   if (currentBoard.length === gridSize * gridSize) {
-    let valid = true;
     for (let i = 0; i < currentBoard.length; i++) {
       const { pointIndex, solvedIndex, rotation } = currentBoard[i];
       if (pointIndex !== solvedIndex || rotation !== 0) {
-        valid = false;
-        break;
+        return false;
       }
     }
-    return valid;
+    return true;
   } else return false;
 };
