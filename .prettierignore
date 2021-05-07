@@ -13,5 +13,6 @@ web-build/
 functions/lib/*
 package-lock.json
 patches
+
 # macOS
 .DS_Store
