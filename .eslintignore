@@ -14,5 +14,6 @@ functions/lib/*
 package-lock.json
 tests/
 patches
+
 # macOS
 .DS_Store
