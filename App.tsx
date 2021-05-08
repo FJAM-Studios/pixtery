@@ -5,12 +5,11 @@ import {
 } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import * as Linking from "expo-linking";
-import React, { createRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { View, LogBox, useWindowDimensions } from "react-native";
 import { Provider as PaperProvider, DefaultTheme } from "react-native-paper";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
-import { functions } from "./FirebaseApp";
 import AddPuzzle from "./components/AddPuzzle";
 import CreateProfile from "./components/CreateProfile";
 import DevTest from "./components/DevTest";
@@ -20,6 +19,7 @@ import Puzzle from "./components/Puzzle";
 import PuzzleList from "./components/PuzzleList";
 import SentPuzzleList from "./components/SentPuzzleList";
 import Splash from "./components/Splash";
+import TitleScreen from "./components/TitleScreen";
 import { Puzzle as PuzzleType, Profile as ProfileType } from "./types";
 
 //less than ideal, but idk if we have a choice right now. suppresses the firebase timeout warning
@@ -45,87 +45,49 @@ export const theme = {
 
 const Stack = createStackNavigator();
 
-const App = () => {
+const App = (): JSX.Element => {
   const [receivedPuzzles, setReceivedPuzzles] = useState<PuzzleType[]>([]);
   const [sentPuzzles, setSentPuzzles] = useState<PuzzleType[]>([]);
   const [profile, setProfile] = useState<ProfileType | null>(null);
-  const [initialLoad, setInitialLoad] = useState(false);
-  const navigationRef = createRef<NavigationContainerRef>();
+  const navigationRef = useRef<NavigationContainerRef>();
 
   const { width, height } = useWindowDimensions();
   const boardSize = 0.95 * Math.min(height, width);
 
-  //required to download puzzle if sms opens the open
+  // on url change go to the splash screen, which will stop the user if they aren't logged in
   useEffect(() => {
-    let url;
-    const getInitialUrl = async () => {
-      url = await Linking.getInitialURL();
-      if (url && initialLoad) fetchPuzzle(url);
-    };
-    Linking.addEventListener("url", function getPuzzle(ev) {
-      url = ev.url;
-      if (url && initialLoad) fetchPuzzle(url);
-    });
-    if (!url) getInitialUrl();
-  }, [initialLoad]);
-
-  const fetchPuzzle = async (url: string): Promise<void> => {
-    console.log(url);
-    const { publicKey }: any = Linking.parse(url).queryParams;
-
-    // if the puzzle URL has a public key, find either the matching puzzle locally or online
-    if (publicKey && navigationRef.current) {
-      const matchingPuzzle = receivedPuzzles.filter(
-        (puz) => puz.publicKey === publicKey
-      );
-
-      //if there's a matching puzzle then
-      if (matchingPuzzle.length) {
-        //navigate to that puzzle
+    Linking.addEventListener("url", (ev) => {
+      const url = ev.url;
+      if (url && navigationRef.current)
         navigationRef.current.dispatch(
           CommonActions.reset({
             index: 0,
-            routes: [{ name: "Puzzle", params: { ...matchingPuzzle[0] } }],
+            routes: [{ name: "Splash", params: { url } }],
           })
         );
-      } else {
-        //otherwise get the puzzle data, which includes the cloud storage reference to the image
-        const puzzleData = await queryPuzzle(publicKey);
-        //if you have the puzzle, go to the add puzzle component
-        if (puzzleData) {
-          navigationRef.current.dispatch(
-            CommonActions.reset({
-              index: 0,
-              routes: [{ name: "AddPuzzle", params: { ...puzzleData } }],
-            })
-          );
-        } else {
-          //tell you there's no puzzle bc it wasn't online or local
-          //@todo some error message in the UI
-          console.log("no puzzle found!");
-        }
-      }
-    }
-  };
+    });
+  }, []);
 
-  const queryPuzzle = async (publicKey: string): Promise<PuzzleType | void> => {
-    console.log("query puzzle");
-    const queryPuzzleCallable = functions.httpsCallable("queryPuzzle");
-    let puzzleData;
-    try {
-      puzzleData = await queryPuzzleCallable({ publicKey });
-      return puzzleData.data; // get just nested data from returned JSON
-    } catch (error) {
-      console.error(error);
-    }
+  // to control trigger order and prevent users from skipping the login screen, puzzle querying has been moved to AddPuzzle, which is called from Splash, which is navigated to only after the navigation container loads using the onReady prop
+  const gotoSplash = () => {
+    if (navigationRef.current)
+      navigationRef.current.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{ name: "Splash" }]
+        })
+      );
   };
 
   return (
     <PaperProvider theme={theme}>
       <SafeAreaProvider>
-        <NavigationContainer ref={navigationRef}>
+        <NavigationContainer ref={navigationRef} onReady={gotoSplash}>
           <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
-            <Stack.Navigator headerMode="none">
+            <Stack.Navigator initialRouteName="TitleScreen" headerMode="none">
+              <Stack.Screen name="TitleScreen">
+                {(props) => <TitleScreen {...props} theme={theme} />}
+              </Stack.Screen>
               <Stack.Screen name="Splash">
                 {(props) => (
                   <Splash
@@ -135,8 +97,6 @@ const App = () => {
                     setSentPuzzles={setSentPuzzles}
                     profile={profile}
                     setProfile={setProfile}
-                    initialLoad={initialLoad}
-                    setInitialLoad={setInitialLoad}
                   />
                 )}
               </Stack.Screen>
