@@ -63,9 +63,10 @@ export default ({
   const [puzzleType, setPuzzleType] = React.useState("jigsaw");
   const [gridSize, setGridSize] = React.useState(3);
   const [modalVisible, setModalVisible] = React.useState(false);
+  const [afterCropURI, setAfterCropURI] = React.useState("");
 
   const selectImage = async (camera: boolean) => {
-    const result = camera
+    let result = camera
       ? await ImagePicker.launchCameraAsync({
           mediaTypes: ImagePicker.MediaTypeOptions.Images,
           allowsEditing: true,
@@ -80,8 +81,34 @@ export default ({
         });
 
     if (!result.cancelled) {
+      console.log('before crop', result)
+      if(result.width !== result.height) result = await cropToSquare(result);
+      console.log('after crop', result)
+
       setImageURI(result.uri);
     }
+  };
+
+  const cropToSquare = async (image) => {
+    const { uri, width, height } = image;
+    const lengthOfSquare = Math.min(width, height)
+    const squareImage = await ImageManipulator.manipulateAsync(
+      uri,
+      [
+        {
+          crop: {
+            originX:
+              width > lengthOfSquare ? width / 2 - lengthOfSquare / 2 : 0,
+            originY:
+              height > lengthOfSquare ? height / 2 - lengthOfSquare / 2 : 0,
+            width: lengthOfSquare,
+            height: lengthOfSquare,
+          },
+        },
+      ],
+      { compress: COMPRESSION, format: ImageManipulator.SaveFormat.JPEG }
+    );
+    return squareImage;
   };
 
   const [message, setMessage] = React.useState("");
@@ -123,17 +150,19 @@ export default ({
     await displayPainfulAd();
     const fileName: string = uuid.v4();
     const localURI = await uploadImage(fileName);
-    const newPuzzle = await uploadPuzzleSettings(fileName);
-    if (newPuzzle) {
-      newPuzzle.imageURI = localURI;
-    }
-    setModalVisible(false);
-    if (newPuzzle) {
-      if (newPuzzle.publicKey) {
-        generateLink(newPuzzle.publicKey);
-        addToSent(newPuzzle);
-      }
-    }
+    setAfterCropURI(localURI);
+
+    // const newPuzzle = await uploadPuzzleSettings(fileName);
+    // if (newPuzzle) {
+    //   newPuzzle.imageURI = localURI;
+    // }
+    // setModalVisible(false);
+    // if (newPuzzle) {
+    //   if (newPuzzle.publicKey) {
+    //     generateLink(newPuzzle.publicKey);
+    //     addToSent(newPuzzle);
+    //   }
+    // }
     // need to add else for error handling if uploadPuzzSettings throws error
   };
 
@@ -145,9 +174,11 @@ export default ({
     );
     setSentPuzzles(allPuzzles);
   };
-
+// start here - need to crop first using the below if it's iOS? or if width and height are not equal to each other actually 
+// https://docs.expo.io/versions/latest/sdk/imagemanipulator/
   const uploadImage = async (fileName: string): Promise<string> => {
     //resize and compress the image for upload
+    setAfterCropURI("")
     const resizedCompressedImage = await ImageManipulator.manipulateAsync(
       imageURI,
       [
@@ -157,6 +188,8 @@ export default ({
       ],
       { compress: COMPRESSION, format: ImageManipulator.SaveFormat.JPEG }
     );
+    console.log('resized uri', resizedCompressedImage)
+    // console.log('imageuri', imageURI, 'after crop uri', afterCropURI)
     const blob: Blob = await createBlob(resizedCompressedImage.uri);
     const ref = storage.ref().child(fileName);
     await ref.put(blob);
@@ -203,7 +236,50 @@ export default ({
       await AdMobInterstitial.showAdAsync();
     }
   };
-
+// start here - tryig to console log image
+  if (afterCropURI.length) {
+    console.log('afteruri', afterCropURI)
+    return (
+      <View
+      style={{
+        alignSelf: "center",
+        alignItems: "center",
+      }}
+    >
+      <Surface
+        style={{
+          padding: 4,
+          alignItems: "center",
+          justifyContent: "center",
+          elevation: 4,
+          borderRadius: theme.roundness,
+          backgroundColor: theme.colors.accent,
+        }}
+      >
+        <Image
+          source={afterCropURI.length ? { uri: afterCropURI } : emptyImage}
+          style={{
+            width: boardSize / 1.6,
+            height: boardSize / 1.6,
+            alignSelf: "center",
+          }}
+        />
+        {imageURI.length ? (
+          <Svg
+            width={boardSize / 1.6}
+            height={boardSize / 1.6}
+            style={{ position: "absolute", top: 4, left: 4 }}
+          >
+            {paths.map((path, ix) => (
+              <Path key={ix} d={path} stroke="white" strokeWidth="1" />
+            ))}
+          </Svg>
+        ) : null}
+        {imageURI.length ? null : <Headline>Choose an Image</Headline>}
+      </Surface>
+    </View>
+    );
+          }
   return (
     <AdSafeAreaView
       style={{
@@ -245,26 +321,26 @@ export default ({
       >
         <View
           style={{
-            alignSelf: "center",
-            alignItems: "center",
+            // alignSelf: "center",
+            // alignItems: "center",
           }}
         >
-          <Surface
+          {/* <Surface
             style={{
               padding: 4,
-              alignItems: "center",
-              justifyContent: "center",
+              // alignItems: "center",
+              // justifyContent: "center",
               elevation: 4,
               borderRadius: theme.roundness,
               backgroundColor: theme.colors.accent,
             }}
-          >
+          > */}
             <Image
               source={imageURI.length ? { uri: imageURI } : emptyImage}
               style={{
-                width: boardSize / 1.6,
-                height: boardSize / 1.6,
-                alignSelf: "center",
+                width: "100%",
+                height: "100%",
+                // alignSelf: "center",
               }}
             />
             {imageURI.length ? (
@@ -279,7 +355,7 @@ export default ({
               </Svg>
             ) : null}
             {imageURI.length ? null : <Headline>Choose an Image</Headline>}
-          </Surface>
+          {/* </Surface> */}
         </View>
         <Button
           icon="camera"
