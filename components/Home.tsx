@@ -37,6 +37,7 @@ import {
 } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
+import { ImageInfo } from "expo-image-picker/build/ImagePicker.types";
 
 const emptyImage = require("../assets/blank.jpg");
 
@@ -80,8 +81,34 @@ export default ({
         });
 
     if (!result.cancelled) {
+      if (result.width !== result.height)
+        result.uri = await cropToSquare(result);
       setImageURI(result.uri);
     }
+  };
+
+  const cropToSquare = async (
+    image: { cancelled: false } & ImageInfo
+  ): Promise<string> => {
+    const { uri, width, height } = image;
+    const lengthOfSquare = Math.min(width, height);
+    const squareImage = await ImageManipulator.manipulateAsync(
+      uri,
+      [
+        {
+          crop: {
+            originX:
+              width > lengthOfSquare ? width / 2 - lengthOfSquare / 2 : 0,
+            originY:
+              height > lengthOfSquare ? height / 2 - lengthOfSquare / 2 : 0,
+            width: lengthOfSquare,
+            height: lengthOfSquare,
+          },
+        },
+      ],
+      { compress: COMPRESSION, format: ImageManipulator.SaveFormat.JPEG }
+    );
+    return squareImage.uri;
   };
 
   const [message, setMessage] = React.useState("");
