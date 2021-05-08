@@ -67,7 +67,7 @@ export default function Splash({
       //if you are logged in, load local puzzles, then either navigate to AddPuzzle or Home if there is no url
       if (profile) {
         await loadPuzzles();
-        console.log("params", route.params)
+        console.log("params", route.params);
         if (url)
           navigation.dispatch(
             CommonActions.reset({
@@ -120,4 +120,4 @@ export default function Splash({
       <ActivityIndicator animating color={theme.colors.text} size="large" />
     </View>
   );
-};
+}

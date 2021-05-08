@@ -67,9 +67,9 @@ export default ({
   const [winMessage, setWinMessage] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
 
-  useEffect(()=> {
-    console.log("PUZZLE TIME", publicKey)
-  },[])
+  useEffect(() => {
+    console.log("PUZZLE TIME", publicKey);
+  }, []);
 
   const moveToTop = (idx: number): void => {
     const newIndices = [...zIndexes];
