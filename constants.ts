@@ -24,6 +24,10 @@ const INTERSTITIAL_ID = TEST_INTERSTITIAL_ID;
 // so we don't have to deal w fullscreen ads before sending a test pixtery
 const DISPLAY_PAINFUL_ADS = true;
 
+const DEGREE_CONVERSION = Math.PI / 180;
+
+const USE_NATIVE_DRIVER = true;
+
 export {
   TESTING_MODE,
   SNAP_MARGIN,
@@ -32,4 +36,6 @@ export {
   BANNER_ID,
   INTERSTITIAL_ID,
   DISPLAY_PAINFUL_ADS,
+  DEGREE_CONVERSION,
+  USE_NATIVE_DRIVER,
 };
