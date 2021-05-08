@@ -85,6 +85,7 @@ export default ({
         });
 
     if (!result.cancelled) {
+      // if the resulting image is not a square because user did not zoom to fill image select box
       if (result.width !== result.height)
         result.uri = await cropToSquare(result);
       setImageURI(result.uri);
@@ -101,6 +102,8 @@ export default ({
       [
         {
           crop: {
+            // Origin X / Y are upper left coordinates where cropping begins
+            // if width / height is larger than the square length, calculates coordinate (midpoint - half of the square)
             originX:
               width > lengthOfSquare ? width / 2 - lengthOfSquare / 2 : 0,
             originY:
