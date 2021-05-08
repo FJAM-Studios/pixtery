@@ -3,6 +3,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AdMobInterstitial } from "expo-ads-admob";
 import * as ImageManipulator from "expo-image-manipulator";
 import * as ImagePicker from "expo-image-picker";
+import { ImageInfo } from "expo-image-picker/build/ImagePicker.types";
 import * as Linking from "expo-linking";
 import * as React from "react";
 import { Image, View, Platform } from "react-native";
@@ -37,7 +38,6 @@ import {
 } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
-import { ImageInfo } from "expo-image-picker/build/ImagePicker.types";
 
 const emptyImage = require("../assets/blank.jpg");
 
@@ -64,6 +64,10 @@ export default ({
   const [puzzleType, setPuzzleType] = React.useState("jigsaw");
   const [gridSize, setGridSize] = React.useState(3);
   const [modalVisible, setModalVisible] = React.useState(false);
+  const [message, setMessage] = React.useState("");
+  const [paths, setPaths] = React.useState(
+    generateJigsawPiecePaths(gridSize, boardSize / (1.6 * gridSize), true)
+  );
 
   const selectImage = async (camera: boolean) => {
     const result = camera
@@ -110,40 +114,6 @@ export default ({
     );
     return squareImage.uri;
   };
-
-  const [message, setMessage] = React.useState("");
-  const [paths, setPaths] = React.useState(
-    generateJigsawPiecePaths(gridSize, boardSize / (1.6 * gridSize), true)
-  );
-
-  React.useEffect(() => {
-    if (puzzleType === "squares")
-      setPaths(
-        generateSquarePiecePaths(gridSize, boardSize / (1.6 * gridSize))
-      );
-    else
-      setPaths(
-        generateJigsawPiecePaths(gridSize, boardSize / (1.6 * gridSize), true)
-      );
-  }, [gridSize, puzzleType]);
-
-  React.useEffect(() => {
-    (async () => {
-      if (Platform.OS !== "web") {
-        let response = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        const libraryPermission = response.status;
-        if (libraryPermission !== "granted") {
-          alert("Sorry, we need camera roll permissions to make this work!");
-        } else {
-          response = await ImagePicker.requestCameraPermissionsAsync();
-          const cameraPermission = response.status;
-          if (cameraPermission !== "granted") {
-            alert("Sorry, we need camera permissions to make this work!");
-          }
-        }
-      }
-    })();
-  }, []);
 
   const submitToServer = async (): Promise<void> => {
     setModalVisible(true);
@@ -230,6 +200,35 @@ export default ({
       await AdMobInterstitial.showAdAsync();
     }
   };
+
+  React.useEffect(() => {
+    if (puzzleType === "squares")
+      setPaths(
+        generateSquarePiecePaths(gridSize, boardSize / (1.6 * gridSize))
+      );
+    else
+      setPaths(
+        generateJigsawPiecePaths(gridSize, boardSize / (1.6 * gridSize), true)
+      );
+  }, [gridSize, puzzleType]);
+
+  React.useEffect(() => {
+    (async () => {
+      if (Platform.OS !== "web") {
+        let response = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        const libraryPermission = response.status;
+        if (libraryPermission !== "granted") {
+          alert("Sorry, we need camera roll permissions to make this work!");
+        } else {
+          response = await ImagePicker.requestCameraPermissionsAsync();
+          const cameraPermission = response.status;
+          if (cameraPermission !== "granted") {
+            alert("Sorry, we need camera permissions to make this work!");
+          }
+        }
+      }
+    })();
+  }, []);
 
   return (
     <AdSafeAreaView
