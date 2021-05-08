@@ -1,11 +1,11 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { CommonActions } from "@react-navigation/native";
 import * as Linking from "expo-linking";
 import React, { useEffect } from "react";
 import { View } from "react-native";
 import { ActivityIndicator } from "react-native-paper";
 
 import { Puzzle as PuzzleType, Profile as ProfileType } from "../types";
+import { goToScreen } from "../util";
 import Logo from "./Logo";
 import Title from "./Title";
 
@@ -68,35 +68,16 @@ export default function Splash({
       if (profile) {
         await loadPuzzles();
         console.log("params", route.params);
-        if (url)
-          navigation.dispatch(
-            CommonActions.reset({
-              index: 0,
-              routes: [{ name: "AddPuzzle", params: { url } }],
-            })
-          );
-        else {
-          // navigation.navigate("Home");
-          navigation.dispatch(
-            CommonActions.reset({
-              index: 0,
-              routes: [{ name: "Home" }],
-            })
-          );
-        }
+        if (url) goToScreen(navigation, "AddPuzzle", { url });
+        else goToScreen(navigation, "Home");
       } else {
         //otherwise, load profile from local storage if it exists
         const loadedProfile = await loadProfile();
         if (loadedProfile) {
           setProfile(loadedProfile);
         } else {
-          //or navigate to createprofile if it doesn't exist, pass the url to create profile so it can be forwarded along, and you can go directly to the puzzle after signing in.
-          navigation.dispatch(
-            CommonActions.reset({
-              index: 0,
-              routes: [{ name: "CreateProfile", params: { url } }],
-            })
-          );
+          //or navigate to createprofile if it doesn't exist, passing the url to create profile so it can be forwarded along, and you can go directly to the puzzle after signing in.
+          goToScreen(navigation, "CreateProfile", { url });
         }
       }
     };

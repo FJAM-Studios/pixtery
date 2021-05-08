@@ -28,13 +28,12 @@ import {
   INTERSTITIAL_ID,
   DISPLAY_PAINFUL_ADS,
 } from "../constants";
-import { Puzzle, Profile } from "../types";
 import {
   generateJigsawPiecePaths,
   generateSquarePiecePaths,
-  createBlob,
-  shareMessage,
-} from "../util";
+} from "../puzzleUtils";
+import { Puzzle, Profile } from "../types";
+import { createBlob, shareMessage } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 
@@ -67,17 +66,17 @@ export default ({
   const selectImage = async (camera: boolean) => {
     const result = camera
       ? await ImagePicker.launchCameraAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.Images,
-          allowsEditing: true,
-          aspect: [4, 4],
-          quality: 1,
-        })
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 4],
+        quality: 1,
+      })
       : await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.Images,
-          allowsEditing: true,
-          aspect: [4, 4],
-          quality: 1,
-        });
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 4],
+        quality: 1,
+      });
 
     if (!result.cancelled) {
       setImageURI(result.uri);
