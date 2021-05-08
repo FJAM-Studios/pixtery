@@ -6,7 +6,7 @@ import {
 import { createStackNavigator } from "@react-navigation/stack";
 import * as Linking from "expo-linking";
 import React, { useRef, useEffect, useState } from "react";
-import { View, LogBox, useWindowDimensions } from "react-native";
+import { View, LogBox, Dimensions } from "react-native";
 import { Provider as PaperProvider, DefaultTheme } from "react-native-paper";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
@@ -51,7 +51,7 @@ const App = (): JSX.Element => {
   const [profile, setProfile] = useState<ProfileType | null>(null);
   const navigationRef = useRef<NavigationContainerRef>();
 
-  const { width, height } = useWindowDimensions();
+  const { width, height } = Dimensions.get("screen");
   const boardSize = 0.95 * Math.min(height, width);
 
   // on url change go to the splash screen, which will stop the user if they aren't logged in

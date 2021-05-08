@@ -1,16 +1,19 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import React, { useEffect, useState } from "react";
-import { Text, View, StyleSheet, Image } from "react-native";
+import * as ImageManipulator from "expo-image-manipulator";
+import React, { useEffect, useState, useRef } from "react";
+import { Text, View, StyleSheet, Image, LayoutChangeEvent } from "react-native";
 import { ActivityIndicator } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { TESTING_MODE } from "../constants";
-import { Puzzle, GridSections } from "../types";
+import { DEGREE_CONVERSION, TESTING_MODE } from "../constants";
+import { Puzzle, Piece, Point, BoardSpace } from "../types";
 import {
   shuffle,
   generateJigsawPiecePaths,
-  getGridSections,
+  getSnapPoints,
   fillArray,
+  getInitialDimensions,
+  validateBoard,
 } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
@@ -39,62 +42,32 @@ export default ({
   const { publicKey } = route.params;
 
   const [puzzle, setPuzzle] = useState<Puzzle>();
-
-  const [piecePaths, setPiecePaths] = useState<string[]>();
-
-  const [gridSections, setGridSections] = useState<GridSections>();
-
-  const [shuffledPieces, setShuffledPieces] = useState<number[]>();
-
-  const [zIndexes, setZIndexes] = useState<number[]>([]);
-
-  const [highestZ, setHighestZ] = useState<number>(1);
-
-  const [currentBoard, setCurrentBoard] = useState<number[]>([]);
-
+  const [pieces, setPieces] = useState<Piece[]>([]);
+  const [snapPoints, setSnapPoints] = useState<Point[]>([]);
+  const [winMessage, setWinMessage] = useState<string>("");
+  const [errorMessage, setErrorMessage] = useState<string>("");
   const [puzzleAreaDimensions, setPuzzleAreaDimensions] = useState({
     puzzleAreaWidth: 0,
     puzzleAreaHeight: 0,
   });
-  const measurePuzzleArea = (ev: any): void => {
-    if (puzzleAreaDimensions.puzzleAreaHeight) return;
-    setPuzzleAreaDimensions({
-      puzzleAreaWidth: ev.nativeEvent.layout.width,
-      puzzleAreaHeight: ev.nativeEvent.layout.height,
-    });
+
+  // z index and current board are not handled through react state so that they don't
+  // cause Puzzle/PuzzlePiece re-renders, which would break the positional tracking
+  // for native animations and gesturehandler
+
+  // when a piece is moved, it is given new maxZ through updateZ function below
+  let maxZ = useRef(0).current;
+
+  const updateZ = () => {
+    maxZ += 1;
+    return maxZ;
   };
 
-  const [winMessage, setWinMessage] = useState<string>("");
-  const [errorMessage, setErrorMessage] = useState<string>("");
+  // store current pieces snapped to board
+  let currentBoard: BoardSpace[] = useRef([]).current;
 
-  useEffect(() => {
-    console.log("PUZZLE TIME", publicKey);
-  }, []);
-
-  const moveToTop = (idx: number): void => {
-    const newIndices = [...zIndexes];
-    newIndices[idx] = highestZ + 1;
-    setHighestZ(highestZ + 1);
-    setZIndexes(newIndices);
-  };
-
-  const checkWin = (): boolean => {
-    for (let i = 0; i < currentBoard.length; i++) {
-      if (currentBoard[i] !== i) return false;
-    }
-    return true;
-  };
-
-  const [firstSnap, setFirstSnap] = useState(false);
-
-  const checkFirstSnap = (): void => {
-    for (let i = 0; i < currentBoard.length; i++) {
-      if (currentBoard[i] !== null) setFirstSnap(true);
-    }
-  };
-
-  useEffect(() => {
-    if (puzzle && checkWin()) {
+  const checkWin = () => {
+    if (puzzle && validateBoard(currentBoard, puzzle.gridSize)) {
       const winMessage =
         puzzle.message && puzzle.message.length > 0
           ? puzzle.message
@@ -102,8 +75,15 @@ export default ({
       setWinMessage(winMessage);
       markPuzzleComplete(publicKey);
     }
-    if (!firstSnap) checkFirstSnap();
-  }, [currentBoard]);
+  };
+
+  const measurePuzzleArea = (ev: LayoutChangeEvent): void => {
+    if (puzzleAreaDimensions.puzzleAreaHeight) return;
+    setPuzzleAreaDimensions({
+      puzzleAreaWidth: ev.nativeEvent.layout.width,
+      puzzleAreaHeight: ev.nativeEvent.layout.height,
+    });
+  };
 
   useEffect(() => {
     const matchingPuzzles = [...receivedPuzzles, ...sentPuzzles].filter(
@@ -111,20 +91,82 @@ export default ({
     );
     if (matchingPuzzles.length) {
       const pickedPuzzle = matchingPuzzles[0];
-      const { gridSize } = pickedPuzzle;
+      const { gridSize, puzzleType, imageURI } = pickedPuzzle;
       const squareSize = boardSize / gridSize;
       const numPieces = gridSize * gridSize;
+      const minSandboxY = boardSize * 1.05;
+      const maxSandboxY = puzzleAreaDimensions.puzzleAreaHeight - squareSize;
+
       setPuzzle(pickedPuzzle);
-      setPiecePaths(generateJigsawPiecePaths(gridSize, squareSize));
-      setGridSections(getGridSections(pickedPuzzle, squareSize));
-      setShuffledPieces(shuffle(fillArray(gridSize), disableShuffle));
-      setCurrentBoard(new Array(numPieces).fill(null));
-      setZIndexes(new Array(numPieces).fill(1));
+
+      const shuffleOrder = shuffle(fillArray(gridSize), disableShuffle);
+
+      const createPieces = async () => {
+        const _pieces: Piece[] = [];
+        const piecePaths =
+          puzzleType === "jigsaw"
+            ? generateJigsawPiecePaths(gridSize, squareSize)
+            : [];
+        // manipulate images in Puzzle component instead to save on renders
+        for (
+          let shuffledIndex = 0;
+          shuffledIndex < numPieces;
+          shuffledIndex++
+        ) {
+          const solvedIndex = shuffleOrder[shuffledIndex];
+          const {
+            pieceDimensions,
+            initialPlacement,
+            viewBox,
+            snapOffset,
+          } = getInitialDimensions(
+            puzzleType,
+            minSandboxY,
+            maxSandboxY,
+            solvedIndex,
+            shuffledIndex,
+            gridSize,
+            squareSize
+          );
+
+          const href = await ImageManipulator.manipulateAsync(
+            imageURI,
+            [
+              {
+                resize: {
+                  width: boardSize,
+                  height: boardSize,
+                },
+              },
+              {
+                crop: { ...viewBox, ...pieceDimensions },
+              },
+            ],
+            { compress: 1, format: ImageManipulator.SaveFormat.JPEG }
+          );
+
+          const piece: Piece = {
+            href,
+            pieceDimensions,
+            piecePath: piecePaths.length ? piecePaths[solvedIndex] : "",
+            initialPlacement,
+            initialRotation:
+              Math.floor(Math.random() * 4) * 90 * DEGREE_CONVERSION,
+            solvedIndex,
+            snapOffset,
+          };
+          _pieces.push(piece);
+        }
+        setPieces(_pieces);
+      };
+      createPieces();
+      setSnapPoints(getSnapPoints(gridSize, squareSize));
       setWinMessage("");
       setErrorMessage("");
-      setFirstSnap(false);
+      currentBoard = new Array(numPieces).fill(null);
+      maxZ = 0;
     }
-  }, [publicKey]);
+  }, [publicKey, puzzleAreaDimensions]);
 
   const styleProps = {
     theme,
@@ -164,7 +206,7 @@ export default ({
         />
       </AdSafeAreaView>
     );
-  if (puzzle && gridSections && piecePaths && shuffledPieces) {
+  if (puzzle && pieces.length) {
     return (
       <AdSafeAreaView style={styles(styleProps).parentContainer}>
         <Header
@@ -182,32 +224,21 @@ export default ({
         >
           <View style={styles(styleProps).puzzleArea}>
             <View style={styles(styleProps).messageContainer}>
-              {!firstSnap ? (
-                <Text style={styles(styleProps).startText}>
-                  Move pieces onto this board!
-                </Text>
-              ) : null}
+              <Text style={styles(styleProps).startText}>
+                Drag and rotate pieces onto this board!
+              </Text>
             </View>
           </View>
           {!winMessage ? (
-            shuffledPieces.map((num: number, ix: number) => (
+            pieces.map((piece: Piece, ix: number) => (
               <PuzzlePiece
-                key={num}
-                num={num}
-                ix={ix}
-                gridSize={puzzle.gridSize}
-                squareSize={boardSize / puzzle.gridSize}
-                puzzleType={puzzle.puzzleType}
-                imageURI={puzzle.imageURI}
-                piecePath={piecePaths[num]}
-                boardSize={boardSize}
-                gridSections={gridSections}
-                currentBoard={currentBoard}
-                setCurrentBoard={setCurrentBoard}
-                setErrorMessage={setErrorMessage}
+                key={ix}
+                piece={piece}
                 puzzleAreaDimensions={puzzleAreaDimensions}
-                z={zIndexes[ix]}
-                moveToTop={moveToTop}
+                updateZ={updateZ}
+                snapPoints={snapPoints}
+                currentBoard={currentBoard}
+                checkWin={checkWin}
               />
             ))
           ) : (
