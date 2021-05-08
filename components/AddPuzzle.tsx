@@ -24,8 +24,6 @@ export default function AddPuzzle({
   route?: any;
   setReceivedPuzzles: (puzzles: Puzzle[]) => void;
 }): JSX.Element {
-
-
   const fetchPuzzle = async (publicKey: string): Promise<Puzzle | void> => {
     const queryPuzzleCallable = functions.httpsCallable("queryPuzzle");
     let puzzleData;
