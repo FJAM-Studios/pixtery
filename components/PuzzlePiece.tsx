@@ -18,8 +18,8 @@ import {
 } from "react-native-gesture-handler";
 
 import { SNAP_MARGIN, USE_NATIVE_DRIVER } from "../constants";
+import { getPointsDistance, snapAngle } from "../puzzleUtils";
 import { Point, Piece, BoardSpace } from "../types";
-import { getPointsDistance, snapAngle } from "../util";
 
 const AnimatedSvg = Animated.createAnimatedComponent(Svg);
 
