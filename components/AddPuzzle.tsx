@@ -1,5 +1,4 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { CommonActions } from "@react-navigation/native";
 import * as FileSystem from "expo-file-system";
 import * as Linking from "expo-linking";
 import * as React from "react";
@@ -8,6 +7,7 @@ import { Headline, ActivityIndicator } from "react-native-paper";
 
 import { storage, functions } from "../FirebaseApp";
 import { Puzzle } from "../types";
+import { goToScreen } from "../util";
 import Logo from "./Logo";
 import Title from "./Title";
 
@@ -24,14 +24,7 @@ export default function AddPuzzle({
   route?: any;
   setReceivedPuzzles: (puzzles: Puzzle[]) => void;
 }): JSX.Element {
-  const goToScreen = (screen: string, publicKey = ""): void => {
-    navigation.dispatch(
-      CommonActions.reset({
-        index: 0,
-        routes: [{ name: screen, params: { publicKey } }],
-      })
-    );
-  };
+
 
   const fetchPuzzle = async (publicKey: string): Promise<Puzzle | void> => {
     const queryPuzzleCallable = functions.httpsCallable("queryPuzzle");
@@ -92,15 +85,15 @@ export default function AddPuzzle({
         const { publicKey }: any = Linking.parse(route.params.url).queryParams;
         if (publicKey) {
           const match = searchForLocalMatch(publicKey);
-          if (match) goToScreen("Puzzle", publicKey);
+          if (match) goToScreen(navigation, "Puzzle", { publicKey });
           else {
             const newPuzzle: Puzzle | void = await fetchPuzzle(publicKey);
             if (newPuzzle) {
               await savePuzzle(newPuzzle);
-              goToScreen("Puzzle", publicKey);
+              goToScreen(navigation, "Puzzle", { publicKey });
             }
           }
-        } else goToScreen("Home");
+        } else goToScreen(navigation, "Home");
       } catch (e) {
         console.log(e);
       }

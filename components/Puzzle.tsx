@@ -6,7 +6,6 @@ import { ActivityIndicator } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { DEGREE_CONVERSION, TESTING_MODE } from "../constants";
-import { Puzzle, Piece, Point, BoardSpace } from "../types";
 import {
   shuffle,
   generateJigsawPiecePaths,
@@ -14,7 +13,8 @@ import {
   fillArray,
   getInitialDimensions,
   validateBoard,
-} from "../util";
+} from "../puzzleUtils";
+import { Puzzle, Piece, Point, BoardSpace } from "../types";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 import PuzzlePiece from "./PuzzlePiece";
