@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { CommonActions } from "@react-navigation/native";
+import * as Linking from "expo-linking";
 import React, { useEffect } from "react";
 import { View } from "react-native";
 import { ActivityIndicator } from "react-native-paper";
@@ -8,15 +9,14 @@ import { Puzzle as PuzzleType, Profile as ProfileType } from "../types";
 import Logo from "./Logo";
 import Title from "./Title";
 
-export default ({
+export default function Splash({
   theme,
   setReceivedPuzzles,
   setSentPuzzles,
   profile,
   setProfile,
   navigation,
-  initialLoad,
-  setInitialLoad,
+  route,
 }: {
   theme: any;
   setReceivedPuzzles: (puzzles: PuzzleType[]) => void;
@@ -24,10 +24,14 @@ export default ({
   profile: ProfileType | null;
   setProfile: (profile: ProfileType) => void;
   navigation: any;
-  initialLoad: boolean;
-  setInitialLoad: (initialLoad: boolean) => void;
-}) => {
+  route?: any;
+}): JSX.Element {
   useEffect(() => {
+    const getInitialUrl = async () => {
+      const url = await Linking.getInitialURL();
+      return url;
+    };
+
     const loadProfile = async () => {
       try {
         const jsonValue = await AsyncStorage.getItem("@pixteryProfile");
@@ -55,23 +59,23 @@ export default ({
     };
 
     const loadAppData = async () => {
-      //load the puzzles stored locally
-      await loadPuzzles();
-      //if you have a profile, navigate home
+      //first get the url that was either passed in by the url event listener or by the url used to open the app, this will be sed regardless of whether you have a profile
+      const url =
+        route.params && route.params.url
+          ? route.params.url
+          : await getInitialUrl();
+      //if you are logged in, load local puzzles, then either navigate to AddPuzzle or Home if there is no url
       if (profile) {
-        setInitialLoad(true);
-        // navigation.navigate("Home");
-        navigation.dispatch(
-          CommonActions.reset({
-            index: 0,
-            routes: [{ name: "Home" }],
-          })
-        );
-      } else {
-        //otherwise, load profile from local storage if it exists
-        const loadedProfile = await loadProfile();
-        if (loadedProfile) {
-          setProfile(loadedProfile);
+        await loadPuzzles();
+        console.log("params", route.params)
+        if (url)
+          navigation.dispatch(
+            CommonActions.reset({
+              index: 0,
+              routes: [{ name: "AddPuzzle", params: { url } }],
+            })
+          );
+        else {
           // navigation.navigate("Home");
           navigation.dispatch(
             CommonActions.reset({
@@ -79,12 +83,18 @@ export default ({
               routes: [{ name: "Home" }],
             })
           );
+        }
+      } else {
+        //otherwise, load profile from local storage if it exists
+        const loadedProfile = await loadProfile();
+        if (loadedProfile) {
+          setProfile(loadedProfile);
         } else {
-          //or navigate to createprofile if it doesn't exist
+          //or navigate to createprofile if it doesn't exist, pass the url to create profile so it can be forwarded along, and you can go directly to the puzzle after signing in.
           navigation.dispatch(
             CommonActions.reset({
               index: 0,
-              routes: [{ name: "CreateProfile" }],
+              routes: [{ name: "CreateProfile", params: { url } }],
             })
           );
         }

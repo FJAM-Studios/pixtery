@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { CommonActions } from "@react-navigation/native";
 import * as FirebaseRecaptcha from "expo-firebase-recaptcha";
-import React, { useState, useRef, LegacyRef } from "react";
+import React, { useState, useRef } from "react";
 import { View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Headline, Text, TextInput, Button } from "react-native-paper";
@@ -14,17 +14,19 @@ import Title from "./Title";
 
 const phoneFormat = require("phone");
 
-export default ({
+export default function CreateProfile({
   theme,
   profile,
   setProfile,
   navigation,
+  route,
 }: {
   theme: any;
   profile: ProfileType | null;
   setProfile: (profile: ProfileType) => void;
   navigation: any;
-}) => {
+  route: any
+}): JSX.Element {
   const recaptchaVerifier = useRef<FirebaseRecaptcha.FirebaseRecaptchaVerifierModal>(
     null
   );
@@ -57,8 +59,8 @@ export default ({
           ref={recaptchaVerifier}
           // @ts-ignore
           firebaseConfig={firebaseConfig}
-          // this seems to crash the app, so no luck on easy captcha
-          // attemptInvisibleVerification={true}
+        // this seems to crash the app, so no luck on easy captcha
+        // attemptInvisibleVerification={true}
         />
         <Logo width="100" height="100" />
         <Title width="100" height="35" />
@@ -142,13 +144,26 @@ export default ({
                     );
                     //update app state
                     setProfile({ name, phone });
-                    //send ya on your way
-                    navigation.dispatch(
-                      CommonActions.reset({
-                        index: 0,
-                        routes: [{ name: "Home" }],
-                      })
-                    );
+                    //send ya on your way, either home or to AddPuzzle if you were redirected here to log in first
+                    if (route.params && route.params.url)
+                      navigation.dispatch(
+                        CommonActions.reset({
+                          index: 0,
+                          routes: [
+                            {
+                              name: "Splash",
+                              params: { url: route.params.url },
+                            },
+                          ],
+                        })
+                      );
+                    else
+                      navigation.dispatch(
+                        CommonActions.reset({
+                          index: 0,
+                          routes: [{ name: "Home" }],
+                        })
+                      );
                   }
                 } catch (e) {
                   setErrors(e.message);
@@ -181,4 +196,4 @@ export default ({
       </KeyboardAwareScrollView>
     </SafeAreaView>
   );
-};
+}
