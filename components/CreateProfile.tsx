@@ -9,6 +9,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { phoneProvider, firebaseConfig, verifySms } from "../FirebaseApp";
 import { Profile as ProfileType } from "../types";
+import { goToScreen } from "../util";
 import Logo from "./Logo";
 import Title from "./Title";
 
@@ -59,8 +60,8 @@ export default function CreateProfile({
           ref={recaptchaVerifier}
           // @ts-ignore
           firebaseConfig={firebaseConfig}
-          // this seems to crash the app, so no luck on easy captcha
-          // attemptInvisibleVerification={true}
+        // this seems to crash the app, so no luck on easy captcha
+        // attemptInvisibleVerification={true}
         />
         <Logo width="100" height="100" />
         <Title width="100" height="35" />
@@ -146,24 +147,10 @@ export default function CreateProfile({
                     setProfile({ name, phone });
                     //send ya on your way, either home or to AddPuzzle if you were redirected here to log in first
                     if (route.params && route.params.url)
-                      navigation.dispatch(
-                        CommonActions.reset({
-                          index: 0,
-                          routes: [
-                            {
-                              name: "Splash",
-                              params: { url: route.params.url },
-                            },
-                          ],
-                        })
-                      );
-                    else
-                      navigation.dispatch(
-                        CommonActions.reset({
-                          index: 0,
-                          routes: [{ name: "Home" }],
-                        })
-                      );
+                      goToScreen(navigation, "Splash", {
+                        url: route.params.url,
+                      });
+                    else goToScreen(navigation, "Home");
                   }
                 } catch (e) {
                   setErrors(e.message);
