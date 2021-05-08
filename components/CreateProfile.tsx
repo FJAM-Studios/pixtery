@@ -25,7 +25,7 @@ export default function CreateProfile({
   profile: ProfileType | null;
   setProfile: (profile: ProfileType) => void;
   navigation: any;
-  route: any
+  route: any;
 }): JSX.Element {
   const recaptchaVerifier = useRef<FirebaseRecaptcha.FirebaseRecaptchaVerifierModal>(
     null
@@ -59,8 +59,8 @@ export default function CreateProfile({
           ref={recaptchaVerifier}
           // @ts-ignore
           firebaseConfig={firebaseConfig}
-        // this seems to crash the app, so no luck on easy captcha
-        // attemptInvisibleVerification={true}
+          // this seems to crash the app, so no luck on easy captcha
+          // attemptInvisibleVerification={true}
         />
         <Logo width="100" height="100" />
         <Title width="100" height="35" />
