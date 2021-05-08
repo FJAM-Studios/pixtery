@@ -81,9 +81,9 @@ export default ({
         });
 
     if (!result.cancelled) {
-      console.log('before crop', result)
-      if(result.width !== result.height) result = await cropToSquare(result);
-      console.log('after crop', result)
+      console.log("before crop", result);
+      if (result.width !== result.height) result = await cropToSquare(result);
+      console.log("after crop", result);
 
       setImageURI(result.uri);
     }
@@ -91,7 +91,7 @@ export default ({
 
   const cropToSquare = async (image) => {
     const { uri, width, height } = image;
-    const lengthOfSquare = Math.min(width, height)
+    const lengthOfSquare = Math.min(width, height);
     const squareImage = await ImageManipulator.manipulateAsync(
       uri,
       [
@@ -174,11 +174,11 @@ export default ({
     );
     setSentPuzzles(allPuzzles);
   };
-// start here - need to crop first using the below if it's iOS? or if width and height are not equal to each other actually 
-// https://docs.expo.io/versions/latest/sdk/imagemanipulator/
+  // start here - need to crop first using the below if it's iOS? or if width and height are not equal to each other actually
+  // https://docs.expo.io/versions/latest/sdk/imagemanipulator/
   const uploadImage = async (fileName: string): Promise<string> => {
     //resize and compress the image for upload
-    setAfterCropURI("")
+    setAfterCropURI("");
     const resizedCompressedImage = await ImageManipulator.manipulateAsync(
       imageURI,
       [
@@ -188,7 +188,7 @@ export default ({
       ],
       { compress: COMPRESSION, format: ImageManipulator.SaveFormat.JPEG }
     );
-    console.log('resized uri', resizedCompressedImage)
+    console.log("resized uri", resizedCompressedImage);
     // console.log('imageuri', imageURI, 'after crop uri', afterCropURI)
     const blob: Blob = await createBlob(resizedCompressedImage.uri);
     const ref = storage.ref().child(fileName);
@@ -236,50 +236,50 @@ export default ({
       await AdMobInterstitial.showAdAsync();
     }
   };
-// start here - tryig to console log image
+  // start here - tryig to console log image
   if (afterCropURI.length) {
-    console.log('afteruri', afterCropURI)
+    console.log("afteruri", afterCropURI);
     return (
       <View
-      style={{
-        alignSelf: "center",
-        alignItems: "center",
-      }}
-    >
-      <Surface
         style={{
-          padding: 4,
+          alignSelf: "center",
           alignItems: "center",
-          justifyContent: "center",
-          elevation: 4,
-          borderRadius: theme.roundness,
-          backgroundColor: theme.colors.accent,
         }}
       >
-        <Image
-          source={afterCropURI.length ? { uri: afterCropURI } : emptyImage}
+        <Surface
           style={{
-            width: boardSize / 1.6,
-            height: boardSize / 1.6,
-            alignSelf: "center",
+            padding: 4,
+            alignItems: "center",
+            justifyContent: "center",
+            elevation: 4,
+            borderRadius: theme.roundness,
+            backgroundColor: theme.colors.accent,
           }}
-        />
-        {imageURI.length ? (
-          <Svg
-            width={boardSize / 1.6}
-            height={boardSize / 1.6}
-            style={{ position: "absolute", top: 4, left: 4 }}
-          >
-            {paths.map((path, ix) => (
-              <Path key={ix} d={path} stroke="white" strokeWidth="1" />
-            ))}
-          </Svg>
-        ) : null}
-        {imageURI.length ? null : <Headline>Choose an Image</Headline>}
-      </Surface>
-    </View>
+        >
+          <Image
+            source={afterCropURI.length ? { uri: afterCropURI } : emptyImage}
+            style={{
+              width: boardSize / 1.6,
+              height: boardSize / 1.6,
+              alignSelf: "center",
+            }}
+          />
+          {imageURI.length ? (
+            <Svg
+              width={boardSize / 1.6}
+              height={boardSize / 1.6}
+              style={{ position: "absolute", top: 4, left: 4 }}
+            >
+              {paths.map((path, ix) => (
+                <Path key={ix} d={path} stroke="white" strokeWidth="1" />
+              ))}
+            </Svg>
+          ) : null}
+          {imageURI.length ? null : <Headline>Choose an Image</Headline>}
+        </Surface>
+      </View>
     );
-          }
+  }
   return (
     <AdSafeAreaView
       style={{
@@ -320,10 +320,12 @@ export default ({
         keyboardShouldPersistTaps="handled"
       >
         <View
-          style={{
-            // alignSelf: "center",
-            // alignItems: "center",
-          }}
+          style={
+            {
+              // alignSelf: "center",
+              // alignItems: "center",
+            }
+          }
         >
           {/* <Surface
             style={{
@@ -335,26 +337,26 @@ export default ({
               backgroundColor: theme.colors.accent,
             }}
           > */}
-            <Image
-              source={imageURI.length ? { uri: imageURI } : emptyImage}
-              style={{
-                width: "100%",
-                height: "100%",
-                // alignSelf: "center",
-              }}
-            />
-            {imageURI.length ? (
-              <Svg
-                width={boardSize / 1.6}
-                height={boardSize / 1.6}
-                style={{ position: "absolute", top: 4, left: 4 }}
-              >
-                {paths.map((path, ix) => (
-                  <Path key={ix} d={path} stroke="white" strokeWidth="1" />
-                ))}
-              </Svg>
-            ) : null}
-            {imageURI.length ? null : <Headline>Choose an Image</Headline>}
+          <Image
+            source={imageURI.length ? { uri: imageURI } : emptyImage}
+            style={{
+              width: "100%",
+              height: "100%",
+              // alignSelf: "center",
+            }}
+          />
+          {imageURI.length ? (
+            <Svg
+              width={boardSize / 1.6}
+              height={boardSize / 1.6}
+              style={{ position: "absolute", top: 4, left: 4 }}
+            >
+              {paths.map((path, ix) => (
+                <Path key={ix} d={path} stroke="white" strokeWidth="1" />
+              ))}
+            </Svg>
+          ) : null}
+          {imageURI.length ? null : <Headline>Choose an Image</Headline>}
           {/* </Surface> */}
         </View>
         <Button
