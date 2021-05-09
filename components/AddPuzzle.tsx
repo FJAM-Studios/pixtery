@@ -89,7 +89,7 @@ export default function AddPuzzle({
             if (newPuzzle) {
               await savePuzzle(newPuzzle);
               goToScreen(navigation, "Puzzle", { publicKey });
-            }
+            } else goToScreen(navigation, "Home");
           }
         } else goToScreen(navigation, "Home");
       } catch (e) {
