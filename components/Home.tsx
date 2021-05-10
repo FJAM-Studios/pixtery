@@ -28,13 +28,12 @@ import {
   INTERSTITIAL_ID,
   DISPLAY_PAINFUL_ADS,
 } from "../constants";
-import { Puzzle, Profile } from "../types";
 import {
   generateJigsawPiecePaths,
   generateSquarePiecePaths,
-  createBlob,
-  shareMessage,
-} from "../util";
+} from "../puzzleUtils";
+import { Puzzle, Profile } from "../types";
+import { createBlob, shareMessage } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 
