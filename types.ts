@@ -37,6 +37,7 @@ export interface Puzzle {
 export interface Profile {
   name: string;
   phone: string;
+  rotation?: boolean;
 }
 
 export interface Piece {

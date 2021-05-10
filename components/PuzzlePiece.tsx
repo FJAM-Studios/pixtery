@@ -30,6 +30,7 @@ export default ({
   snapPoints,
   currentBoard,
   checkWin,
+  rotationAllowed,
 }: {
   piece: Piece;
   puzzleAreaDimensions: { puzzleAreaWidth: number; puzzleAreaHeight: number };
@@ -37,6 +38,7 @@ export default ({
   snapPoints: Point[];
   currentBoard: BoardSpace[];
   checkWin: () => void;
+  rotationAllowed: boolean;
 }): JSX.Element | null => {
   const {
     href,
@@ -225,6 +227,7 @@ export default ({
           // simultaneousHandlers={moveRef}
           onGestureEvent={onRotateGestureEvent}
           onHandlerStateChange={onRotateHandlerStateChange}
+          enabled={rotationAllowed}
         >
           <AnimatedSvg
             height={pieceDimensions.height}

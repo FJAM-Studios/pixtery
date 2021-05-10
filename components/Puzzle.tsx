@@ -14,7 +14,7 @@ import {
   getInitialDimensions,
   validateBoard,
 } from "../puzzleUtils";
-import { Puzzle, Piece, Point, BoardSpace } from "../types";
+import { Puzzle, Piece, Point, BoardSpace, Profile } from "../types";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 import PuzzlePiece from "./PuzzlePiece";
@@ -30,6 +30,7 @@ export default ({
   sentPuzzles,
   route,
   setReceivedPuzzles,
+  profile,
 }: {
   boardSize: number;
   theme: any;
@@ -38,6 +39,7 @@ export default ({
   sentPuzzles: Puzzle[];
   route: any;
   setReceivedPuzzles: (puzzles: Puzzle[]) => void;
+  profile: Profile | null;
 }): JSX.Element => {
   const { publicKey } = route.params;
 
@@ -50,7 +52,7 @@ export default ({
     puzzleAreaWidth: 0,
     puzzleAreaHeight: 0,
   });
-
+  const rotationAllowed = (profile && profile.rotation) || false;
   // z index and current board are not handled through react state so that they don't
   // cause Puzzle/PuzzlePiece re-renders, which would break the positional tracking
   // for native animations and gesturehandler
@@ -150,8 +152,9 @@ export default ({
             pieceDimensions,
             piecePath: piecePaths.length ? piecePaths[solvedIndex] : "",
             initialPlacement,
-            initialRotation:
-              Math.floor(Math.random() * 4) * 90 * DEGREE_CONVERSION,
+            initialRotation: rotationAllowed
+              ? Math.floor(Math.random() * 4) * 90 * DEGREE_CONVERSION
+              : 0,
             solvedIndex,
             snapOffset,
           };
@@ -239,6 +242,7 @@ export default ({
                 snapPoints={snapPoints}
                 currentBoard={currentBoard}
                 checkWin={checkWin}
+                rotationAllowed={rotationAllowed}
               />
             ))
           ) : (

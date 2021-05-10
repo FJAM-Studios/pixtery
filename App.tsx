@@ -1,5 +1,4 @@
 import {
-  CommonActions,
   NavigationContainer,
   NavigationContainerRef,
 } from "@react-navigation/native";
@@ -21,12 +20,10 @@ import SentPuzzleList from "./components/SentPuzzleList";
 import Splash from "./components/Splash";
 import TitleScreen from "./components/TitleScreen";
 import { Puzzle as PuzzleType, Profile as ProfileType } from "./types";
-import { goToScreen } from "./util"
+import { goToScreen } from "./util";
 
 //less than ideal, but idk if we have a choice right now. suppresses the firebase timeout warning
 LogBox.ignoreLogs(["Setting a timer for a long period of time"]);
-
-const image = require("./assets/earth.jpg");
 
 export const theme = {
   ...DefaultTheme,
@@ -134,19 +131,13 @@ const App = (): JSX.Element => {
                   />
                 )}
               </Stack.Screen>
-              <Stack.Screen
-                name="Puzzle"
-                initialParams={{
-                  imageURI: image.uri,
-                  puzzleType: "jigsaw",
-                  gridSize: 3,
-                }}
-              >
+              <Stack.Screen name="Puzzle">
                 {(props) => (
                   <Puzzle
                     {...props}
                     boardSize={boardSize}
                     theme={theme}
+                    profile={profile}
                     receivedPuzzles={receivedPuzzles}
                     sentPuzzles={sentPuzzles}
                     setReceivedPuzzles={setReceivedPuzzles}
