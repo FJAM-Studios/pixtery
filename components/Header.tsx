@@ -24,16 +24,18 @@ export default ({
         justifyContent: "space-between",
         alignItems: "center",
         flexDirection: "row",
+        minHeight: "0%",
       }}
     >
       <View
         style={{
           alignItems: "center",
           flexDirection: "row",
+          minHeight: "0%"
         }}
       >
-        <Title width="100" height="25" style={{ marginRight: 10 }} />
-        <Logo width="25" height="25" />
+        <Title width="100" height="25" minHeight={0} style={{ marginRight: 10 }} />
+        <Logo width="25" height="25" minHeight={0} />
       </View>
       <Menu
         visible={visible}

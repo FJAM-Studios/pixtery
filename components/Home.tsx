@@ -50,6 +50,8 @@ export default ({
   profile,
   sentPuzzles,
   setSentPuzzles,
+  width,
+  height,
 }: {
   navigation: any;
   boardSize: number;
@@ -58,6 +60,8 @@ export default ({
   profile: Profile | null;
   sentPuzzles: Puzzle[];
   setSentPuzzles: (puzzles: Puzzle[]) => void;
+  width: number;
+  height: number;
 }): JSX.Element => {
   const [imageURI, setImageURI] = React.useState("");
   const [puzzleType, setPuzzleType] = React.useState("jigsaw");
@@ -231,14 +235,14 @@ export default ({
       }
     })();
   }, []);
-
+console.log('boardsize', boardSize, 'width', width, 'height', height)
   return (
     <AdSafeAreaView
       style={{
         flex: 1,
         minHeight: "0%",
         flexDirection: "column",
-        padding: 10,
+        padding: width * 0.03,
         backgroundColor: theme.colors.background,
         justifyContent: "space-between",
       }}
@@ -272,6 +276,7 @@ export default ({
       <KeyboardAwareScrollView
         resetScrollToCoords={{ x: 0, y: 0 }}
         keyboardShouldPersistTaps="handled"
+        style={{ minHeight: "0%" }}
       >
         <View
           style={{
@@ -318,7 +323,7 @@ export default ({
           icon="camera"
           mode="contained"
           onPress={() => selectImage(true)}
-          style={{ margin: 10, minHeight: "0%" }}
+          style={{ margin: height * 0.01, minHeight: "0%" }}
         >
           Camera
         </Button>
@@ -326,7 +331,7 @@ export default ({
           icon="folder"
           mode="contained"
           onPress={() => selectImage(false)}
-          style={{ margin: 10, minHeight: "0%" }}
+          style={{ margin: height * 0.01, minHeight: "0%" }}
         >
           Gallery
         </Button>
@@ -342,9 +347,9 @@ export default ({
           <Surface
             style={{
               // padding: 8,
-              height: 40,
+              height: height * 0.06,
               minHeight: "0%",
-              width: 40,
+              width: height * 0.06,
               alignItems: "center",
               justifyContent: "center",
               elevation: 4,
@@ -367,9 +372,9 @@ export default ({
           <Surface
             style={{
               // padding: 8,
-              height: 40,
+              height: height * 0.06, // start here, need to make all abslutes relative. also reinstate padding above
               minHeight: "0%",
-              width: 40,
+              width: height * 0.06,
               alignItems: "center",
               justifyContent: "center",
               elevation: 4,
