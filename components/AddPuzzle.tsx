@@ -32,6 +32,8 @@ export default function AddPuzzle({
       return puzzleData.data; // get just nested data from returned JSON
     } catch (error) {
       console.error(error);
+      alert("Could not fetch puzzle. Try again later.");
+      throw new Error(error); //rethrow the error so it can be caught by outer method
     }
   };
 
@@ -73,6 +75,8 @@ export default function AddPuzzle({
       setReceivedPuzzles(allPuzzles);
     } catch (e) {
       console.log(e);
+      alert("Could not save puzzle to your phone");
+      throw new Error(e); //rethrow error for outer method
     }
   };
 
@@ -94,6 +98,7 @@ export default function AddPuzzle({
         } else goToScreen(navigation, "Home");
       } catch (e) {
         console.log(e);
+        goToScreen(navigation, "Home"); //if there is an error in this method or in inner methods, abandon adding the puzzle and go to the home screen
       }
     };
     searchForPuzzle();

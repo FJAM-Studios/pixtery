@@ -71,17 +71,17 @@ export default ({
   const selectImage = async (camera: boolean) => {
     const result = camera
       ? await ImagePicker.launchCameraAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.Images,
-          allowsEditing: true,
-          aspect: [4, 4],
-          quality: 1,
-        })
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 4],
+        quality: 1,
+      })
       : await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.Images,
-          allowsEditing: true,
-          aspect: [4, 4],
-          quality: 1,
-        });
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 4],
+        quality: 1,
+      });
 
     if (!result.cancelled) {
       // if the resulting image is not a square because user did not zoom to fill image select box
@@ -121,17 +121,23 @@ export default ({
     setModalVisible(true);
     await displayPainfulAd();
     const fileName: string = uuid.v4();
-    const localURI = await uploadImage(fileName);
-    const newPuzzle = await uploadPuzzleSettings(fileName);
-    if (newPuzzle) {
-      newPuzzle.imageURI = localURI;
-    }
-    setModalVisible(false);
-    if (newPuzzle) {
-      if (newPuzzle.publicKey) {
-        generateLink(newPuzzle.publicKey);
-        addToSent(newPuzzle);
+    try {
+      const localURI = await uploadImage(fileName);
+      const newPuzzle = await uploadPuzzleSettings(fileName);
+      if (newPuzzle) {
+        newPuzzle.imageURI = localURI;
       }
+      setModalVisible(false);
+      if (newPuzzle) {
+        if (newPuzzle.publicKey) {
+          generateLink(newPuzzle.publicKey);
+          addToSent(newPuzzle);
+        }
+      }
+    } catch (error) {
+      console.log(error);
+      alert("Could not upload puzzle. Check connection and try again later.");
+      setModalVisible(false);
     }
     // need to add else for error handling if uploadPuzzSettings throws error
   };
@@ -187,6 +193,7 @@ export default ({
       return newPuzzle;
     } catch (error) {
       console.error(error);
+      throw new Error(error);
     }
   };
 
