@@ -239,7 +239,7 @@ export default ({
     <AdSafeAreaView
       style={{
         flex: 1,
-        minHeight: "0%",
+        // minHeight: "0%",
         flexDirection: "column",
         padding: height * 0.015,
         backgroundColor: theme.colors.background,
@@ -275,13 +275,13 @@ export default ({
       <KeyboardAwareScrollView
         resetScrollToCoords={{ x: 0, y: 0 }}
         keyboardShouldPersistTaps="handled"
-        style={{ minHeight: "0%" }}
+        // style={{ minHeight: "0%" }}
       >
         <View
           style={{
             alignSelf: "center",
             alignItems: "center",
-            minHeight: "0%",
+            // minHeight: "0%",
           }}
         >
           <Surface
@@ -301,14 +301,14 @@ export default ({
                 width: boardSize / 1.6,
                 height: boardSize / 1.6,
                 alignSelf: "center",
-                minHeight: "0%",
+                // minHeight: "0%",
               }}
             />
             {imageURI.length ? (
               <Svg
                 width={boardSize / 1.6}
                 height={boardSize / 1.6}
-                style={{ position: "absolute", top: 4, left: 4, minHeight: 0 }}
+                style={{ position: "absolute", top: 4, left: 4 }}
               >
                 {paths.map((path, ix) => (
                   <Path key={ix} d={path} stroke="white" strokeWidth="1" />
@@ -322,7 +322,7 @@ export default ({
           icon="camera"
           mode="contained"
           onPress={() => selectImage(true)}
-          style={{ margin: height * 0.01, minHeight: "0%" }}
+          style={{ margin: height * 0.01 }}
         >
           Camera
         </Button>
@@ -330,7 +330,7 @@ export default ({
           icon="folder"
           mode="contained"
           onPress={() => selectImage(false)}
-          style={{ margin: height * 0.01, minHeight: "0%" }}
+          style={{ margin: height * 0.01 }}
         >
           Gallery
         </Button>
@@ -347,7 +347,6 @@ export default ({
             style={{
               padding: height * 0.01,
               height: height * 0.06,
-              minHeight: "0%",
               width: height * 0.06,
               alignItems: "center",
               justifyContent: "center",
@@ -372,7 +371,6 @@ export default ({
             style={{
               padding: height * 0.01,
               height: height * 0.06,
-              minHeight: "0%",
               width: height * 0.06,
               alignItems: "center",
               justifyContent: "center",
@@ -400,7 +398,6 @@ export default ({
               justifyContent: "center",
               elevation: 4,
               borderRadius: theme.roundness,
-              minHeight: "0%",
               backgroundColor:
                 gridSize === 2 ? theme.colors.surface : theme.colors.background,
             }}
@@ -421,7 +418,6 @@ export default ({
               justifyContent: "center",
               elevation: 4,
               borderRadius: theme.roundness,
-              minHeight: "0%",
               backgroundColor:
                 gridSize === 3 ? theme.colors.surface : theme.colors.background,
             }}
@@ -442,7 +438,6 @@ export default ({
               justifyContent: "center",
               elevation: 4,
               borderRadius: theme.roundness,
-              minHeight: "0%",
               backgroundColor:
                 gridSize === 4 ? theme.colors.surface : theme.colors.background,
             }}
@@ -465,7 +460,6 @@ export default ({
           value={message}
           onChangeText={(message) => setMessage(message)}
           style={{
-            minHeight: 0,
             flexShrink: 2,
             paddingTop: 0,
             paddingBottom: 0,
@@ -476,7 +470,7 @@ export default ({
           icon="send"
           mode="contained"
           onPress={submitToServer}
-          style={{ margin: height * 0.01, minHeight: "0%" }}
+          style={{ margin: height * 0.01 }}
           disabled={imageURI.length === 0}
         >
           Send
