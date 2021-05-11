@@ -31,10 +31,15 @@ export default ({
         style={{
           alignItems: "center",
           flexDirection: "row",
-          minHeight: "0%"
+          minHeight: "0%",
         }}
       >
-        <Title width="100" height="25" minHeight={0} style={{ marginRight: 10 }} />
+        <Title
+          width="100"
+          height="25"
+          minHeight={0}
+          style={{ marginRight: 10 }}
+        />
         <Logo width="25" height="25" minHeight={0} />
       </View>
       <Menu
