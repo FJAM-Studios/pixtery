@@ -5,17 +5,17 @@ import { IconButton, Badge, Menu, Divider } from "react-native-paper";
 import Logo from "./Logo";
 import Title from "./Title";
 
-export default ({
+export default function Header({
   navigation,
   notifications,
   theme,
-  height
+  height,
 }: {
   navigation: any;
   notifications: number;
   theme: any;
   height: number;
-}) => {
+}): JSX.Element {
   const [visible, setVisible] = React.useState(false);
   const openMenu = () => setVisible(true);
 
@@ -26,24 +26,17 @@ export default ({
         justifyContent: "space-between",
         alignItems: "center",
         flexDirection: "row",
-        minHeight: "0%",
-        height: height * 0.05
+        height: height * 0.05,
       }}
     >
       <View
         style={{
           alignItems: "center",
           flexDirection: "row",
-          minHeight: "0%",
         }}
       >
-        <Title
-          width="100"
-          height={height * 0.04}
-          minHeight={0}
-          style={{ marginRight: 10 }}
-        />
-        <Logo width="25" height={height * 0.04} minHeight={0} />
+        <Title width="100" height={height * 0.04} style={{ marginRight: 10 }} />
+        <Logo width="25" height={height * 0.04} />
       </View>
       <Menu
         visible={visible}
@@ -114,4 +107,6 @@ export default ({
       </Menu>
     </View>
   );
-};
+}
+
+Header.displayName = "Header";
