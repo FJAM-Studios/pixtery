@@ -67,8 +67,8 @@ export default function Splash({
       //if you are logged in, load local puzzles, then either navigate to AddPuzzle or Home if there is no url
       if (profile) {
         await loadPuzzles();
-        console.log("params", route.params);
-        if (url) goToScreen(navigation, "AddPuzzle", { url });
+        const { publicKey }: any = Linking.parse(url).queryParams;
+        if (publicKey) goToScreen(navigation, "AddPuzzle", { publicKey });
         else goToScreen(navigation, "Home");
       } else {
         //otherwise, load profile from local storage if it exists
