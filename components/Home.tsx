@@ -235,14 +235,13 @@ export default ({
       }
     })();
   }, []);
-  console.log("boardsize", boardSize, "width", width, "height", height);
   return (
     <AdSafeAreaView
       style={{
         flex: 1,
         minHeight: "0%",
         flexDirection: "column",
-        padding: width * 0.03,
+        padding: height * 0.015,
         backgroundColor: theme.colors.background,
         justifyContent: "space-between",
       }}
@@ -271,7 +270,7 @@ export default ({
           receivedPuzzles.filter((puzzle) => !puzzle.completed).length
         }
         navigation={navigation}
-        style={{ minHeight: "0%" }}
+        height={height}
       />
       <KeyboardAwareScrollView
         resetScrollToCoords={{ x: 0, y: 0 }}
@@ -287,13 +286,13 @@ export default ({
         >
           <Surface
             style={{
-              // padding: 4,
+              padding: height * 0.0065,
               alignItems: "center",
               justifyContent: "center",
               elevation: 4,
               borderRadius: theme.roundness,
               backgroundColor: theme.colors.accent,
-              minHeight: "0%",
+              // minHeight: "0%",
             }}
           >
             <Image
@@ -346,7 +345,7 @@ export default ({
           <Text>Type:</Text>
           <Surface
             style={{
-              // padding: 8,
+              padding: height * 0.01,
               height: height * 0.06,
               minHeight: "0%",
               width: height * 0.06,
@@ -371,8 +370,8 @@ export default ({
           </Surface>
           <Surface
             style={{
-              // padding: 8,
-              height: height * 0.06, // start here, need to make all abslutes relative. also reinstate padding above
+              padding: height * 0.01,
+              height: height * 0.06,
               minHeight: "0%",
               width: height * 0.06,
               alignItems: "center",
@@ -468,16 +467,16 @@ export default ({
           style={{
             minHeight: 0,
             flexShrink: 2,
-            paddingVertical: 0,
-            paddingHorizontal: 0,
-            textAlignVertical: "top",
+            paddingTop: 0,
+            paddingBottom: 0,
+            height: height * 0.09,
           }}
         />
         <Button
           icon="send"
           mode="contained"
           onPress={submitToServer}
-          style={{ margin: 10, minHeight: "0%" }}
+          style={{ margin: height * 0.01, minHeight: "0%" }}
           disabled={imageURI.length === 0}
         >
           Send

@@ -9,16 +9,17 @@ export default (props: any) => {
   console.log("props", props.style);
   return (
     <SafeAreaView {...props.style}>
-      <View style={{ minHeight: "0%", overflow: "hidden" }}>
-        {props.children}
+      <View>
+      {props.children}
       </View>
-
-      {/* {props.children.map(child => {return(<View style={{flex: 1}}>{child}</View>)})} */}
+      <View style={{flex: 2, justifyContent: 'space-between'}}>
       <AdMobBanner
         bannerSize="smartBannerPortrait"
         adUnitID={BANNER_ID}
-        style={{ marginTop: "auto", alignSelf: "center", flex: 2 }}
-      />
+        style={{ marginTop: "auto", alignSelf: "center" }}
+      />        
+      </View>
     </SafeAreaView>
   );
 };
+// style={{flex: 2, justifyContent: 'space-between'}}

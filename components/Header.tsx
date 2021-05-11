@@ -9,10 +9,12 @@ export default ({
   navigation,
   notifications,
   theme,
+  height
 }: {
   navigation: any;
   notifications: number;
   theme: any;
+  height: number;
 }) => {
   const [visible, setVisible] = React.useState(false);
   const openMenu = () => setVisible(true);
@@ -25,6 +27,7 @@ export default ({
         alignItems: "center",
         flexDirection: "row",
         minHeight: "0%",
+        height: height * 0.05
       }}
     >
       <View
@@ -36,11 +39,11 @@ export default ({
       >
         <Title
           width="100"
-          height="25"
+          height={height * 0.04}
           minHeight={0}
           style={{ marginRight: 10 }}
         />
-        <Logo width="25" height="25" minHeight={0} />
+        <Logo width="25" height={height * 0.04} minHeight={0} />
       </View>
       <Menu
         visible={visible}
