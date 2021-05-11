@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Audio } from "expo-av";
 import * as ImageManipulator from "expo-image-manipulator";
 import React, { useEffect, useState, useRef } from "react";
 import { Text, View, StyleSheet, Image, LayoutChangeEvent } from "react-native";
@@ -50,6 +51,8 @@ export default ({
     puzzleAreaWidth: 0,
     puzzleAreaHeight: 0,
   });
+  const [sound, setSound] = useState<Audio.Sound>();
+  const [opaque, setOpaque] = useState<boolean>(false);
 
   // z index and current board are not handled through react state so that they don't
   // cause Puzzle/PuzzlePiece re-renders, which would break the positional tracking
@@ -66,13 +69,44 @@ export default ({
   // store current pieces snapped to board
   let currentBoard: BoardSpace[] = useRef([]).current;
 
+  //set up the camera click sound and clean up on unmount
+  useEffect(() => {
+    const initializeSound = async () => {
+      const { sound } = await Audio.Sound.createAsync(
+        require("../assets/camera-click.wav")
+      );
+      setSound(sound);
+    };
+
+    initializeSound();
+  }, []);
+
+  useEffect(() => {
+    return sound
+      ? () => {
+        sound.unloadAsync();
+      }
+      : undefined;
+  }, [sound]);
+
+  const animateWin = async () => {
+    setTimeout(() => {
+      setOpaque(true);
+      setTimeout(() => {
+        const winMessage =
+          puzzle && puzzle.message && puzzle.message.length > 0
+            ? puzzle.message
+            : "Congrats! You solved the puzzle!";
+        setWinMessage(winMessage);
+        setOpaque(false);
+      }, 100);
+      if (sound) sound.playAsync();
+    }, 100);
+  };
+
   const checkWin = () => {
     if (puzzle && validateBoard(currentBoard, puzzle.gridSize)) {
-      const winMessage =
-        puzzle.message && puzzle.message.length > 0
-          ? puzzle.message
-          : "Congrats! You solved the puzzle!";
-      setWinMessage(winMessage);
+      animateWin();
       markPuzzleComplete(publicKey);
     }
   };
@@ -207,7 +241,14 @@ export default ({
       </AdSafeAreaView>
     );
   if (puzzle && pieces.length) {
-    return (
+    return opaque ? (
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: "black",
+        }}
+      />
+    ) : (
       <AdSafeAreaView style={styles(styleProps).parentContainer}>
         <Header
           theme={theme}
@@ -284,7 +325,7 @@ const styles = (props: any) =>
       color: "orange",
     },
     winText: {
-      fontSize: 20,
+      fontSize: 50,
       flexWrap: "wrap",
       textAlign: "center",
       flex: 1,
