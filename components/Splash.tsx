@@ -39,6 +39,8 @@ export default function Splash({
         return loadedProfile;
       } catch (e) {
         console.log(e);
+        alert("Could not load profile.");
+        return null;
       }
     };
     const loadPuzzles = async () => {
@@ -55,6 +57,7 @@ export default function Splash({
         setSentPuzzles(loadedSentPuzzles);
       } catch (e) {
         console.log(e);
+        alert("Could not load saved puzzles.");
       }
     };
 
