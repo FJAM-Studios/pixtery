@@ -235,7 +235,7 @@ export default ({
       }
     })();
   }, []);
-console.log('boardsize', boardSize, 'width', width, 'height', height)
+  console.log("boardsize", boardSize, "width", width, "height", height);
   return (
     <AdSafeAreaView
       style={{
