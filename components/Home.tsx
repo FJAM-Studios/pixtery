@@ -277,7 +277,7 @@ export default ({
           style={{
             alignSelf: "center",
             alignItems: "center",
-            minHeight: "0%"
+            minHeight: "0%",
           }}
         >
           <Surface
@@ -288,7 +288,7 @@ export default ({
               elevation: 4,
               borderRadius: theme.roundness,
               backgroundColor: theme.colors.accent,
-              minHeight: "0%"
+              minHeight: "0%",
             }}
           >
             <Image
@@ -297,7 +297,7 @@ export default ({
                 width: boardSize / 1.6,
                 height: boardSize / 1.6,
                 alignSelf: "center",
-                minHeight: "0%"
+                minHeight: "0%",
               }}
             />
             {imageURI.length ? (
@@ -335,7 +335,7 @@ export default ({
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "space-evenly",
-            minHeight: "0%"
+            minHeight: "0%",
           }}
         >
           <Text>Type:</Text>
@@ -460,7 +460,13 @@ export default ({
           mode="outlined"
           value={message}
           onChangeText={(message) => setMessage(message)}
-          style={{ minHeight: 0, flexShrink: 2, paddingVertical: 0, paddingHorizontal: 0, textAlignVertical: 'top' }}
+          style={{
+            minHeight: 0,
+            flexShrink: 2,
+            paddingVertical: 0,
+            paddingHorizontal: 0,
+            textAlignVertical: "top",
+          }}
         />
         <Button
           icon="send"
