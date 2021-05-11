@@ -236,6 +236,7 @@ export default ({
     <AdSafeAreaView
       style={{
         flex: 1,
+        minHeight: "0%",
         flexDirection: "column",
         padding: 10,
         backgroundColor: theme.colors.background,
@@ -266,6 +267,7 @@ export default ({
           receivedPuzzles.filter((puzzle) => !puzzle.completed).length
         }
         navigation={navigation}
+        style={{ minHeight: "0%" }}
       />
       <KeyboardAwareScrollView
         resetScrollToCoords={{ x: 0, y: 0 }}
@@ -275,16 +277,18 @@ export default ({
           style={{
             alignSelf: "center",
             alignItems: "center",
+            minHeight: "0%"
           }}
         >
           <Surface
             style={{
-              padding: 4,
+              // padding: 4,
               alignItems: "center",
               justifyContent: "center",
               elevation: 4,
               borderRadius: theme.roundness,
               backgroundColor: theme.colors.accent,
+              minHeight: "0%"
             }}
           >
             <Image
@@ -293,13 +297,14 @@ export default ({
                 width: boardSize / 1.6,
                 height: boardSize / 1.6,
                 alignSelf: "center",
+                minHeight: "0%"
               }}
             />
             {imageURI.length ? (
               <Svg
                 width={boardSize / 1.6}
                 height={boardSize / 1.6}
-                style={{ position: "absolute", top: 4, left: 4 }}
+                style={{ position: "absolute", top: 4, left: 4, minHeight: 0 }}
               >
                 {paths.map((path, ix) => (
                   <Path key={ix} d={path} stroke="white" strokeWidth="1" />
@@ -313,7 +318,7 @@ export default ({
           icon="camera"
           mode="contained"
           onPress={() => selectImage(true)}
-          style={{ margin: 10 }}
+          style={{ margin: 10, minHeight: "0%" }}
         >
           Camera
         </Button>
@@ -321,7 +326,7 @@ export default ({
           icon="folder"
           mode="contained"
           onPress={() => selectImage(false)}
-          style={{ margin: 10 }}
+          style={{ margin: 10, minHeight: "0%" }}
         >
           Gallery
         </Button>
@@ -330,13 +335,15 @@ export default ({
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "space-evenly",
+            minHeight: "0%"
           }}
         >
           <Text>Type:</Text>
           <Surface
             style={{
-              padding: 8,
+              // padding: 8,
               height: 40,
+              minHeight: "0%",
               width: 40,
               alignItems: "center",
               justifyContent: "center",
@@ -359,8 +366,9 @@ export default ({
           </Surface>
           <Surface
             style={{
-              padding: 8,
+              // padding: 8,
               height: 40,
+              minHeight: "0%",
               width: 40,
               alignItems: "center",
               justifyContent: "center",
@@ -388,6 +396,7 @@ export default ({
               justifyContent: "center",
               elevation: 4,
               borderRadius: theme.roundness,
+              minHeight: "0%",
               backgroundColor:
                 gridSize === 2 ? theme.colors.surface : theme.colors.background,
             }}
@@ -408,6 +417,7 @@ export default ({
               justifyContent: "center",
               elevation: 4,
               borderRadius: theme.roundness,
+              minHeight: "0%",
               backgroundColor:
                 gridSize === 3 ? theme.colors.surface : theme.colors.background,
             }}
@@ -428,6 +438,7 @@ export default ({
               justifyContent: "center",
               elevation: 4,
               borderRadius: theme.roundness,
+              minHeight: "0%",
               backgroundColor:
                 gridSize === 4 ? theme.colors.surface : theme.colors.background,
             }}
@@ -449,12 +460,13 @@ export default ({
           mode="outlined"
           value={message}
           onChangeText={(message) => setMessage(message)}
+          style={{ minHeight: 0, flexShrink: 2, paddingVertical: 0, paddingHorizontal: 0, textAlignVertical: 'top' }}
         />
         <Button
           icon="send"
           mode="contained"
           onPress={submitToServer}
-          style={{ margin: 10 }}
+          style={{ margin: 10, minHeight: "0%" }}
           disabled={imageURI.length === 0}
         >
           Send
