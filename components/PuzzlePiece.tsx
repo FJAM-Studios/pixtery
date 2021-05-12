@@ -1,13 +1,4 @@
 import React, { useRef } from "react";
-import {
-  Svg,
-  Image,
-  Defs,
-  ClipPath,
-  Path,
-  Rect,
-  Circle,
-} from "react-native-svg";
 import { Animated } from "react-native";
 import {
   PanGestureHandler,
@@ -16,6 +7,7 @@ import {
   RotationGestureHandler,
   RotationGestureHandlerStateChangeEvent,
 } from "react-native-gesture-handler";
+import { Svg, Image, Defs, ClipPath, Path, Rect } from "react-native-svg";
 
 import { SNAP_MARGIN, USE_NATIVE_DRIVER } from "../constants";
 import { getPointsDistance, snapAngle } from "../puzzleUtils";
@@ -23,7 +15,7 @@ import { Point, Piece, BoardSpace } from "../types";
 
 const AnimatedSvg = Animated.createAnimatedComponent(Svg);
 
-export default ({
+export default function PuzzlePiece({
   piece,
   puzzleAreaDimensions,
   updateZ,
@@ -37,7 +29,7 @@ export default ({
   snapPoints: Point[];
   currentBoard: BoardSpace[];
   checkWin: () => void;
-}): JSX.Element | null => {
+}): JSX.Element {
   const {
     href,
     pieceDimensions,
@@ -213,7 +205,7 @@ export default ({
             left: initialPlacement.x,
             top: initialPlacement.y,
             position: "absolute",
-            zIndex: zIndex,
+            zIndex,
           },
           {
             transform: [{ translateX: pan.x }, { translateY: pan.y }],
@@ -257,10 +249,9 @@ export default ({
               height={pieceDimensions.height}
               clipPath={`url(#${puzzleType})`}
             />
-            {/* <Circle fill="blue" cx={snapOffset.x} cy={snapOffset.y} r={5} /> */}
           </AnimatedSvg>
         </RotationGestureHandler>
       </Animated.View>
     </PanGestureHandler>
   );
-};
+}
