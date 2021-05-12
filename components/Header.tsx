@@ -1,5 +1,5 @@
 import React from "react";
-import { View, TouchableWithoutFeedback } from "react-native";
+import { View, TouchableWithoutFeedback, Dimensions } from "react-native";
 import { IconButton, Badge, Menu, Divider } from "react-native-paper";
 
 import Logo from "./Logo";
@@ -9,15 +9,14 @@ export default function Header({
   navigation,
   notifications,
   theme,
-  height,
 }: {
   navigation: any;
   notifications: number;
   theme: any;
-  height: number;
 }): JSX.Element {
   const [visible, setVisible] = React.useState(false);
   const openMenu = () => setVisible(true);
+  const { height } = Dimensions.get("screen");
 
   const closeMenu = () => setVisible(false);
   return (
@@ -108,5 +107,3 @@ export default function Header({
     </View>
   );
 }
-
-Header.displayName = "Header";

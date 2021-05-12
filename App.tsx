@@ -110,7 +110,6 @@ const App = (): JSX.Element => {
                     profile={profile}
                     sentPuzzles={sentPuzzles}
                     setSentPuzzles={setSentPuzzles}
-                    width={width}
                     height={height}
                   />
                 )}

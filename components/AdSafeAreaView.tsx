@@ -19,5 +19,3 @@ export default function AdSafeAreaView(props: any): JSX.Element {
     </SafeAreaView>
   );
 }
-
-AdSafeAreaView.displayName = "AdSafeAreaView";
