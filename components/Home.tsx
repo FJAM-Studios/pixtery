@@ -50,7 +50,6 @@ export default ({
   profile,
   sentPuzzles,
   setSentPuzzles,
-  width,
   height,
 }: {
   navigation: any;
@@ -60,7 +59,6 @@ export default ({
   profile: Profile | null;
   sentPuzzles: Puzzle[];
   setSentPuzzles: (puzzles: Puzzle[]) => void;
-  width: number;
   height: number;
 }): JSX.Element => {
   const [imageURI, setImageURI] = React.useState("");
@@ -239,7 +237,6 @@ export default ({
     <AdSafeAreaView
       style={{
         flex: 1,
-        // minHeight: "0%",
         flexDirection: "column",
         padding: height * 0.015,
         backgroundColor: theme.colors.background,
