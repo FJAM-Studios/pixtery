@@ -5,7 +5,7 @@ import { IconButton, Badge, Menu, Divider } from "react-native-paper";
 import Logo from "./Logo";
 import Title from "./Title";
 
-export default ({
+export default function Header({
   navigation,
   notifications,
   theme,
@@ -13,7 +13,7 @@ export default ({
   navigation: any;
   notifications: number;
   theme: any;
-}) => {
+}): JSX.Element {
   const [visible, setVisible] = React.useState(false);
   const openMenu = () => setVisible(true);
 
@@ -91,15 +91,6 @@ export default ({
           }}
           title="Profile"
           icon="cog"
-        />
-        <Menu.Item
-          onPress={() => {
-            closeMenu();
-            navigation.navigate("DevTest");
-          }}
-          title="DevTest"
-          icon="laptop"
-          style={{ backgroundColor: theme.colors.accent }}
         />
       </Menu>
     </View>
