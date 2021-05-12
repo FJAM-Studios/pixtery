@@ -22,7 +22,7 @@ import PuzzlePiece from "./PuzzlePiece";
 //disable shuffling for testing
 const disableShuffle = TESTING_MODE;
 
-export default ({
+export default function PuzzleComponent({
   boardSize,
   theme,
   navigation,
@@ -38,7 +38,7 @@ export default ({
   sentPuzzles: Puzzle[];
   route: any;
   setReceivedPuzzles: (puzzles: Puzzle[]) => void;
-}): JSX.Element => {
+}): JSX.Element {
   const { publicKey } = route.params;
 
   const [puzzle, setPuzzle] = useState<Puzzle>();

@@ -1,5 +1,4 @@
 import { DEGREE_CONVERSION } from "./constants";
-
 import {
   SvgPiece,
   Point,
@@ -389,13 +388,13 @@ export const fillArray = (gridSize: number): number[] => {
 export const getPointsDistance = (
   pointA: { x: number; y: number },
   pointB: { x: number; y: number }
-) => {
+): number => {
   const a = pointA.x - pointB.x;
   const b = pointA.y - pointB.y;
   return Math.sqrt(a * a + b * b);
 };
 
-export const snapAngle = (angle: number) => {
+export const snapAngle = (angle: number): number => {
   // convert rotation to between 0 and 2 * pi
   angle = angle % (Math.PI * 2);
   angle += 2 * Math.PI;
@@ -419,7 +418,10 @@ export const snapAngle = (angle: number) => {
   return angle;
 };
 
-export const validateBoard = (currentBoard: BoardSpace[], gridSize: number) => {
+export const validateBoard = (
+  currentBoard: BoardSpace[],
+  gridSize: number
+): boolean => {
   if (currentBoard.length === gridSize * gridSize) {
     for (let i = 0; i < currentBoard.length; i++) {
       const { pointIndex, solvedIndex, rotation } = currentBoard[i];

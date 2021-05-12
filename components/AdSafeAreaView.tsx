@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { BANNER_ID } from "../constants";
 
-export default (props: any) => {
+export default function AdSafeAreaView(props: any): JSX.Element {
   return (
     <SafeAreaView {...props.style}>
       {props.children}
