@@ -5,7 +5,11 @@ import { Text, View, StyleSheet, Image, LayoutChangeEvent } from "react-native";
 import { ActivityIndicator } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { DEGREE_CONVERSION, TESTING_MODE } from "../constants";
+import {
+  DEGREE_CONVERSION,
+  ROTATION_ENABLE_DEFAULT,
+  TESTING_MODE,
+} from "../constants";
 import {
   shuffle,
   generateJigsawPiecePaths,
@@ -52,7 +56,10 @@ export default ({
     puzzleAreaWidth: 0,
     puzzleAreaHeight: 0,
   });
-  const rotationAllowed = (profile && profile.rotation) || false;
+  const rotationAllowed =
+    profile && profile.rotation !== undefined
+      ? profile.rotation
+      : ROTATION_ENABLE_DEFAULT;
   // z index and current board are not handled through react state so that they don't
   // cause Puzzle/PuzzlePiece re-renders, which would break the positional tracking
   // for native animations and gesturehandler
@@ -228,7 +235,9 @@ export default ({
           <View style={styles(styleProps).puzzleArea}>
             <View style={styles(styleProps).messageContainer}>
               <Text style={styles(styleProps).startText}>
-                Drag and rotate pieces onto this board!
+                {`Drag${
+                  rotationAllowed ? ` and rotate` : ``
+                } pieces onto this board!`}
               </Text>
             </View>
           </View>

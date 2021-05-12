@@ -1,13 +1,4 @@
 import React, { useRef } from "react";
-import {
-  Svg,
-  Image,
-  Defs,
-  ClipPath,
-  Path,
-  Rect,
-  Circle,
-} from "react-native-svg";
 import { Animated } from "react-native";
 import {
   PanGestureHandler,
@@ -16,6 +7,7 @@ import {
   RotationGestureHandler,
   RotationGestureHandlerStateChangeEvent,
 } from "react-native-gesture-handler";
+import { Svg, Image, Defs, ClipPath, Path, Rect } from "react-native-svg";
 
 import { SNAP_MARGIN, USE_NATIVE_DRIVER } from "../constants";
 import { getPointsDistance, snapAngle } from "../puzzleUtils";

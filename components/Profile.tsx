@@ -4,11 +4,12 @@ import { View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Headline, Text, TextInput, Button, Switch } from "react-native-paper";
 
+import { ROTATION_ENABLE_DEFAULT } from "../constants";
 import { Profile as ProfileType, Puzzle } from "../types";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 
-export default ({
+export default function Profile({
   theme,
   profile,
   setProfile,
@@ -26,13 +27,16 @@ export default ({
   sentPuzzles: Puzzle[];
   setReceivedPuzzles: (puzzles: Puzzle[]) => void;
   setSentPuzzles: (puzzles: Puzzle[]) => void;
-}) => {
+}): JSX.Element {
   const [changeMade, setChangeMade] = useState(false);
   const [name, setName] = useState((profile && profile.name) || "");
   const [phone, setPhone] = useState((profile && profile.phone) || "");
-  const [rotation, setRotation] = useState(
-    (profile && profile.rotation) || false
-  );
+  // allow rotation on by default but handle profiles without rotation defined
+  const defaultRotation =
+    profile && profile.rotation !== undefined
+      ? profile.rotation
+      : ROTATION_ENABLE_DEFAULT;
+  const [rotation, setRotation] = useState<boolean>(defaultRotation);
   const [errors, setErrors] = useState("");
   const changeSwitch = () => {
     setRotation(!rotation);
@@ -162,4 +166,4 @@ export default ({
       </KeyboardAwareScrollView>
     </AdSafeAreaView>
   );
-};
+}
