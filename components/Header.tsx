@@ -16,8 +16,9 @@ export default function Header({
 }): JSX.Element {
   const [visible, setVisible] = React.useState(false);
   const openMenu = () => setVisible(true);
-  const { height } = Dimensions.get("screen");
-
+  // const { height } = Dimensions.get("screen");
+  // const height = 530;
+// start here and see if puzzle loads if i dont use dimensions,get here
   const closeMenu = () => setVisible(false);
   return (
     <View
@@ -25,7 +26,7 @@ export default function Header({
         justifyContent: "space-between",
         alignItems: "center",
         flexDirection: "row",
-        height: height * 0.05,
+        // height: 40,
       }}
     >
       <View
@@ -34,8 +35,13 @@ export default function Header({
           flexDirection: "row",
         }}
       >
-        <Title width="100" height={height * 0.04} style={{ marginRight: 10 }} />
-        <Logo width="25" height={height * 0.04} />
+        {/* <Title style={{ marginRight: 10, width: "100", height: 530 * 0.1 }} />
+        <Logo style={{ width: "25", height: 530 * 0.02 }} /> */}
+
+        {/* <Title width="100" height={530 * 0.04} style={{ marginRight: 10 }} />
+        <Logo width="25" height={530 * 0.04} /> */}
+        <Title width="100" height="25" style={{ marginRight: 10 }} />
+        <Logo width="25" height="25" />
       </View>
       <Menu
         visible={visible}
