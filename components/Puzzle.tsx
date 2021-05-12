@@ -78,6 +78,7 @@ export default ({
   };
 
   const measurePuzzleArea = (ev: LayoutChangeEvent): void => {
+    console.log('puz area height', ev.nativeEvent.layout.height)
     if (puzzleAreaDimensions.puzzleAreaHeight) return;
     setPuzzleAreaDimensions({
       puzzleAreaWidth: ev.nativeEvent.layout.width,
