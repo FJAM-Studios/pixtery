@@ -32,7 +32,6 @@ export default function AddPuzzle({
       return puzzleData.data; // get just nested data from returned JSON
     } catch (error) {
       console.error(error);
-      alert("Could not fetch puzzle. Try again later.");
       throw new Error(error); //rethrow the error so it can be caught by outer method
     }
   };
