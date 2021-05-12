@@ -18,7 +18,7 @@ export default function Header({
   const openMenu = () => setVisible(true);
   // const { height } = Dimensions.get("screen");
   // const height = 530;
-// start here and see if puzzle loads if i dont use dimensions,get here
+  // start here and see if puzzle loads if i dont use dimensions,get here
   const closeMenu = () => setVisible(false);
   return (
     <View
