@@ -1,5 +1,4 @@
 import {
-  CommonActions,
   NavigationContainer,
   NavigationContainerRef,
 } from "@react-navigation/native";
@@ -12,7 +11,6 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import AddPuzzle from "./components/AddPuzzle";
 import CreateProfile from "./components/CreateProfile";
-import DevTest from "./components/DevTest";
 import HomeScreen from "./components/Home";
 import Profile from "./components/Profile";
 import Puzzle from "./components/Puzzle";
@@ -26,7 +24,7 @@ import { goToScreen } from "./util"
 //less than ideal, but idk if we have a choice right now. suppresses the firebase timeout warning
 LogBox.ignoreLogs(["Setting a timer for a long period of time"]);
 
-const image = require("./assets/earth.jpg");
+const image = require("./assets/blank.jpg");
 
 export const theme = {
   ...DefaultTheme,
@@ -176,9 +174,6 @@ const App = (): JSX.Element => {
                     setReceivedPuzzles={setReceivedPuzzles}
                   />
                 )}
-              </Stack.Screen>
-              <Stack.Screen name="DevTest">
-                {(props) => <DevTest {...props} theme={theme} />}
               </Stack.Screen>
             </Stack.Navigator>
           </View>
