@@ -12,6 +12,7 @@ import { goToScreen } from "../util";
 import Logo from "./Logo";
 import Title from "./Title";
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const phoneFormat = require("phone");
 
 export default function CreateProfile({
@@ -31,7 +32,7 @@ export default function CreateProfile({
     null
   );
   const [name, setName] = useState((profile && profile.name) || "");
-  const [phone, setPhone] = useState((profile && profile.phone) || "");
+  const [phone, setPhone] = useState("");
   const [smsCode, setSmsCode] = useState("");
   const [verificationId, setVerificationId] = useState("");
   const [errors, setErrors] = useState("");
@@ -57,6 +58,7 @@ export default function CreateProfile({
         <FirebaseRecaptcha.FirebaseRecaptchaVerifierModal
           // firebase requires recaptcha for SMS verification.
           ref={recaptchaVerifier}
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           firebaseConfig={firebaseConfig}
           // this seems to crash the app, so no luck on easy captcha
@@ -140,10 +142,10 @@ export default function CreateProfile({
                     //save to local storage
                     await AsyncStorage.setItem(
                       "@pixteryProfile",
-                      JSON.stringify({ name, phone })
+                      JSON.stringify({ name })
                     );
                     //update app state
-                    setProfile({ name, phone });
+                    setProfile({ name });
                     //send ya on your way, either home or to AddPuzzle if you were redirected here to log in first
                     if (route.params && route.params.url)
                       goToScreen(navigation, "Splash", {
