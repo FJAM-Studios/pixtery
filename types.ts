@@ -72,7 +72,7 @@ export type StackScreens = {
   PuzzleList: undefined;
   SentPuzzleList: undefined;
   Puzzle: { publicKey: string | undefined };
-  AddPuzzle: { url: string };
+  AddPuzzle: { publicKey: string };
   Profile: undefined;
 };
 
