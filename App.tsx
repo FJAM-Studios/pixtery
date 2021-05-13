@@ -18,13 +18,15 @@ import PuzzleList from "./components/PuzzleList";
 import SentPuzzleList from "./components/SentPuzzleList";
 import Splash from "./components/Splash";
 import TitleScreen from "./components/TitleScreen";
-import { Puzzle as PuzzleType, Profile as ProfileType } from "./types";
-import { goToScreen } from "./util"
+import {
+  Puzzle as PuzzleType,
+  Profile as ProfileType,
+  StackScreens,
+} from "./types";
+import { goToScreen } from "./util";
 
 //less than ideal, but idk if we have a choice right now. suppresses the firebase timeout warning
 LogBox.ignoreLogs(["Setting a timer for a long period of time"]);
-
-const image = require("./assets/blank.jpg");
 
 export const theme = {
   ...DefaultTheme,
@@ -42,13 +44,13 @@ export const theme = {
   },
 };
 
-const Stack = createStackNavigator();
+const Stack = createStackNavigator<StackScreens>();
 
 const App = (): JSX.Element => {
   const [receivedPuzzles, setReceivedPuzzles] = useState<PuzzleType[]>([]);
   const [sentPuzzles, setSentPuzzles] = useState<PuzzleType[]>([]);
   const [profile, setProfile] = useState<ProfileType | null>(null);
-  const navigationRef = useRef<NavigationContainerRef>();
+  const navigationRef = useRef<NavigationContainerRef | null>(null);
 
   const { width, height } = Dimensions.get("screen");
   const boardSize = 0.95 * Math.min(height, width);
@@ -132,14 +134,7 @@ const App = (): JSX.Element => {
                   />
                 )}
               </Stack.Screen>
-              <Stack.Screen
-                name="Puzzle"
-                initialParams={{
-                  imageURI: image.uri,
-                  puzzleType: "jigsaw",
-                  gridSize: 3,
-                }}
-              >
+              <Stack.Screen name="Puzzle">
                 {(props) => (
                   <Puzzle
                     {...props}

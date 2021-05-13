@@ -4,6 +4,7 @@ import * as ImageManipulator from "expo-image-manipulator";
 import React, { useEffect, useState, useRef } from "react";
 import { Text, View, StyleSheet, Image, LayoutChangeEvent } from "react-native";
 import { ActivityIndicator } from "react-native-paper";
+import { Theme } from "react-native-paper/lib/typescript/types";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { DEGREE_CONVERSION, TESTING_MODE } from "../constants";
@@ -15,7 +16,14 @@ import {
   getInitialDimensions,
   validateBoard,
 } from "../puzzleUtils";
-import { Puzzle, Piece, Point, BoardSpace } from "../types";
+import {
+  Puzzle,
+  Piece,
+  Point,
+  BoardSpace,
+  ScreenNavigation,
+  PuzzleRoute,
+} from "../types";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 import PuzzlePiece from "./PuzzlePiece";
@@ -33,11 +41,11 @@ export default function PuzzleComponent({
   setReceivedPuzzles,
 }: {
   boardSize: number;
-  theme: any;
-  navigation: any;
+  theme: Theme;
+  navigation: ScreenNavigation;
   receivedPuzzles: Puzzle[];
   sentPuzzles: Puzzle[];
-  route: any;
+  route: PuzzleRoute;
   setReceivedPuzzles: (puzzles: Puzzle[]) => void;
 }): JSX.Element {
   const { publicKey } = route.params;
@@ -73,6 +81,7 @@ export default function PuzzleComponent({
   useEffect(() => {
     const initializeSound = async () => {
       const { sound } = await Audio.Sound.createAsync(
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
         require("../assets/camera-click.wav")
       );
       setSound(sound);
@@ -84,8 +93,8 @@ export default function PuzzleComponent({
   useEffect(() => {
     return sound
       ? () => {
-        sound.unloadAsync();
-      }
+          sound.unloadAsync();
+        }
       : undefined;
   }, [sound]);
 
@@ -105,7 +114,7 @@ export default function PuzzleComponent({
   };
 
   const checkWin = () => {
-    if (puzzle && validateBoard(currentBoard, puzzle.gridSize)) {
+    if (puzzle && publicKey && validateBoard(currentBoard, puzzle.gridSize)) {
       animateWin();
       markPuzzleComplete(publicKey);
     }
@@ -309,9 +318,9 @@ export default function PuzzleComponent({
       </SafeAreaView>
     );
   }
-};
+}
 
-const styles = (props: any) =>
+const styles = (props: { theme: Theme; boardSize: number }) =>
   StyleSheet.create({
     messageContainer: {
       flexDirection: "row",

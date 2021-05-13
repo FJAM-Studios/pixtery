@@ -1,3 +1,5 @@
+import { RouteProp } from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
 import * as ImageManipulator from "expo-image-manipulator";
 
 export class SvgPiece {
@@ -61,3 +63,22 @@ export interface BoardSpace {
   solvedIndex: number;
   rotation: number;
 }
+
+export type StackScreens = {
+  TitleScreen: undefined;
+  Splash: { url: string | undefined } | undefined;
+  CreateProfile: { url: string | undefined };
+  Home: undefined;
+  PuzzleList: undefined;
+  SentPuzzleList: undefined;
+  Puzzle: { publicKey: string | undefined };
+  AddPuzzle: { url: string };
+  Profile: undefined;
+};
+
+export type ScreenNavigation = StackNavigationProp<StackScreens>;
+
+export type PuzzleRoute = RouteProp<StackScreens, "Puzzle">;
+export type AddPuzzleRoute = RouteProp<StackScreens, "AddPuzzle">;
+export type CreateProfileRoute = RouteProp<StackScreens, "CreateProfile">;
+export type SplashRoute = RouteProp<StackScreens, "Splash">;
