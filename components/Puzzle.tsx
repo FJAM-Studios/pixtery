@@ -124,7 +124,7 @@ export default ({
     const matchingPuzzles = [...receivedPuzzles, ...sentPuzzles].filter(
       (puz) => puz.publicKey === publicKey
     );
-    if (matchingPuzzles.length) {
+    if (matchingPuzzles.length && puzzleAreaDimensions.puzzleAreaWidth > 0) {
       const pickedPuzzle = matchingPuzzles[0];
       const { gridSize, puzzleType, imageURI } = pickedPuzzle;
       const squareSize = boardSize / gridSize;
