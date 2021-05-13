@@ -93,15 +93,6 @@ export default function Header({
           title="Profile"
           icon="cog"
         />
-        <Menu.Item
-          onPress={() => {
-            closeMenu();
-            navigation.navigate("DevTest");
-          }}
-          title="DevTest"
-          icon="laptop"
-          style={{ backgroundColor: theme.colors.accent }}
-        />
       </Menu>
     </View>
   );
