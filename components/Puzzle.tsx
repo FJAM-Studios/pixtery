@@ -73,6 +73,7 @@ export default function PuzzleComponent({
   useEffect(() => {
     const initializeSound = async () => {
       const { sound } = await Audio.Sound.createAsync(
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
         require("../assets/camera-click.wav")
       );
       setSound(sound);
@@ -84,8 +85,8 @@ export default function PuzzleComponent({
   useEffect(() => {
     return sound
       ? () => {
-        sound.unloadAsync();
-      }
+          sound.unloadAsync();
+        }
       : undefined;
   }, [sound]);
 
@@ -266,7 +267,7 @@ export default function PuzzleComponent({
           <View style={styles(styleProps).puzzleArea}>
             <View style={styles(styleProps).messageContainer}>
               <Text style={styles(styleProps).startText}>
-                Drag and rotate pieces onto this board!
+                Drag pieces onto the board! Double tap to rotate!
               </Text>
             </View>
           </View>
@@ -309,7 +310,7 @@ export default function PuzzleComponent({
       </SafeAreaView>
     );
   }
-};
+}
 
 const styles = (props: any) =>
   StyleSheet.create({
