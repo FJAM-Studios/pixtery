@@ -4,9 +4,10 @@ import * as Linking from "expo-linking";
 import * as React from "react";
 import { View } from "react-native";
 import { Headline, ActivityIndicator } from "react-native-paper";
+import { Theme } from "react-native-paper/lib/typescript/types";
 
 import { storage, functions } from "../FirebaseApp";
-import { Puzzle } from "../types";
+import { Puzzle, AddPuzzleRoute, ScreenNavigation } from "../types";
 import { goToScreen } from "../util";
 import Logo from "./Logo";
 import Title from "./Title";
@@ -18,10 +19,10 @@ export default function AddPuzzle({
   route,
   setReceivedPuzzles,
 }: {
-  navigation: any;
-  theme: any;
+  navigation: ScreenNavigation;
+  theme: Theme;
   receivedPuzzles: Puzzle[];
-  route?: any;
+  route: AddPuzzleRoute;
   setReceivedPuzzles: (puzzles: Puzzle[]) => void;
 }): JSX.Element {
   const fetchPuzzle = async (publicKey: string): Promise<Puzzle | void> => {
@@ -83,8 +84,10 @@ export default function AddPuzzle({
     const searchForPuzzle = async () => {
       // all logic determining which screen to navigate to happens here in order to place navigation at the end of every branch. Otherwise the function will continue running after navigating away, which can cause the user to get redirected if there is an uncaught navigation further down the line
       try {
-        const { publicKey }: any = Linking.parse(route.params.url).queryParams;
-        if (publicKey) {
+        // changed this slightly to enforce type checking
+        const { queryParams } = Linking.parse(route.params.url);
+        if (queryParams && queryParams.publicKey) {
+          const { publicKey } = queryParams;
           const match = searchForLocalMatch(publicKey);
           if (match) goToScreen(navigation, "Puzzle", { publicKey });
           else {
