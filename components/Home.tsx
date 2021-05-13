@@ -451,9 +451,6 @@ export default ({
           value={message}
           onChangeText={(message) => setMessage(message)}
           style={{
-            flexShrink: 2,
-            paddingTop: 0,
-            paddingBottom: 0,
             height: height * 0.09,
           }}
         />
