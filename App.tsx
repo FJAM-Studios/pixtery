@@ -19,7 +19,7 @@ import SentPuzzleList from "./components/SentPuzzleList";
 import Splash from "./components/Splash";
 import TitleScreen from "./components/TitleScreen";
 import { Puzzle as PuzzleType, Profile as ProfileType } from "./types";
-import { goToScreen } from "./util"
+import { goToScreen } from "./util";
 
 //less than ideal, but idk if we have a choice right now. suppresses the firebase timeout warning
 LogBox.ignoreLogs(["Setting a timer for a long period of time"]);
@@ -64,7 +64,10 @@ const App = (): JSX.Element => {
 
   // to control trigger order and prevent users from skipping the login screen, puzzle querying has been moved to AddPuzzle, which is called from Splash, which is navigated to only after the navigation container loads using the onReady prop
   const gotoSplash = () => {
-    if (navigationRef.current) goToScreen(navigationRef.current, "Splash");
+    // this timeout is if we want to force users to see the starting screen before moving on.
+    setTimeout(() => {
+      if (navigationRef.current) goToScreen(navigationRef.current, "Splash");
+    }, 1000);
   };
 
   return (
