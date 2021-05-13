@@ -3,8 +3,14 @@ import * as Linking from "expo-linking";
 import React, { useEffect } from "react";
 import { View } from "react-native";
 import { ActivityIndicator } from "react-native-paper";
+import { Theme } from "react-native-paper/lib/typescript/types";
 
-import { Puzzle as PuzzleType, Profile as ProfileType } from "../types";
+import {
+  Puzzle as PuzzleType,
+  Profile as ProfileType,
+  ScreenNavigation,
+  SplashRoute,
+} from "../types";
 import { goToScreen } from "../util";
 import Logo from "./Logo";
 import Title from "./Title";
@@ -18,13 +24,13 @@ export default function Splash({
   navigation,
   route,
 }: {
-  theme: any;
+  theme: Theme;
   setReceivedPuzzles: (puzzles: PuzzleType[]) => void;
   setSentPuzzles: (puzzles: PuzzleType[]) => void;
   profile: ProfileType | null;
   setProfile: (profile: ProfileType) => void;
-  navigation: any;
-  route?: any;
+  navigation: ScreenNavigation;
+  route: SplashRoute;
 }): JSX.Element {
   useEffect(() => {
     const getInitialUrl = async () => {

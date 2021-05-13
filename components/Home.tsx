@@ -19,6 +19,7 @@ import {
   Modal,
   Portal,
 } from "react-native-paper";
+import { Theme } from "react-native-paper/lib/typescript/types";
 import Svg, { Path } from "react-native-svg";
 import uuid from "uuid";
 
@@ -33,11 +34,12 @@ import {
   generateJigsawPiecePaths,
   generateSquarePiecePaths,
 } from "../puzzleUtils";
-import { Puzzle, Profile } from "../types";
+import { Puzzle, Profile, ScreenNavigation } from "../types";
 import { createBlob, shareMessage } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const emptyImage = require("../assets/blank.jpg");
 
 AdMobInterstitial.setAdUnitID(INTERSTITIAL_ID);
@@ -51,9 +53,9 @@ export default ({
   sentPuzzles,
   setSentPuzzles,
 }: {
-  navigation: any;
+  navigation: ScreenNavigation;
   boardSize: number;
-  theme: any;
+  theme: Theme;
   receivedPuzzles: Puzzle[];
   profile: Profile | null;
   sentPuzzles: Puzzle[];
@@ -71,17 +73,17 @@ export default ({
   const selectImage = async (camera: boolean) => {
     const result = camera
       ? await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 4],
-        quality: 1,
-      })
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          allowsEditing: true,
+          aspect: [4, 4],
+          quality: 1,
+        })
       : await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 4],
-        quality: 1,
-      });
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          allowsEditing: true,
+          aspect: [4, 4],
+          quality: 1,
+        });
 
     if (!result.cancelled) {
       // if the resulting image is not a square because user did not zoom to fill image select box
@@ -256,7 +258,7 @@ export default ({
           dismissable={false}
           contentContainerStyle={{ alignItems: "center" }}
         >
-          {gridSize % 2 ? <Text>Yeah you're working.</Text> : null}
+          {gridSize % 2 ? <Text>Yeah you&aposre working.</Text> : null}
           <Headline>Building a Pixtery!</Headline>
           {gridSize % 2 ? null : <Text>And choosing so carefully</Text>}
           <ActivityIndicator
