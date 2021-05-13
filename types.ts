@@ -30,7 +30,7 @@ export interface Puzzle {
   senderName: string;
   senderPhone: string;
   imageURI: string;
-  publicKey?: string;
+  publicKey: string;
   message?: string | null;
   dateReceived?: string;
   completed?: boolean;
@@ -71,7 +71,7 @@ export type StackScreens = {
   Home: undefined;
   PuzzleList: undefined;
   SentPuzzleList: undefined;
-  Puzzle: { publicKey: string | undefined };
+  Puzzle: { publicKey: string };
   AddPuzzle: { publicKey: string };
   Profile: undefined;
 };

@@ -114,7 +114,7 @@ export default function PuzzleComponent({
   };
 
   const checkWin = () => {
-    if (puzzle && publicKey && validateBoard(currentBoard, puzzle.gridSize)) {
+    if (puzzle && validateBoard(currentBoard, puzzle.gridSize)) {
       animateWin();
       markPuzzleComplete(publicKey);
     }
