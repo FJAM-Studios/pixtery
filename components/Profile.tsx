@@ -8,7 +8,7 @@ import { Profile as ProfileType, Puzzle } from "../types";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 
-export default ({
+export default function Profile({
   theme,
   profile,
   setProfile,
@@ -26,7 +26,7 @@ export default ({
   sentPuzzles: Puzzle[];
   setReceivedPuzzles: (puzzles: Puzzle[]) => void;
   setSentPuzzles: (puzzles: Puzzle[]) => void;
-}) => {
+}): JSX.Element {
   const [name, setName] = useState((profile && profile.name) || "");
   const [phone, setPhone] = useState((profile && profile.phone) || "");
   const [errors, setErrors] = useState("");
@@ -134,4 +134,4 @@ export default ({
       </KeyboardAwareScrollView>
     </AdSafeAreaView>
   );
-};
+}

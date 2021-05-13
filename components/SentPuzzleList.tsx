@@ -11,7 +11,7 @@ import { shareMessage } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 
-export default ({
+export default function SentPuzzleList({
   navigation,
   theme,
   receivedPuzzles,
@@ -23,7 +23,7 @@ export default ({
   receivedPuzzles: Puzzle[];
   sentPuzzles: Puzzle[];
   setSentPuzzles: (puzzles: Puzzle[]) => void;
-}): JSX.Element => {
+}): JSX.Element {
   const [modalVisible, setModalVisible] = React.useState(false);
   const [puzzleToDelete, setPuzzleToDelete] = React.useState<Puzzle | null>(
     null
@@ -171,4 +171,4 @@ export default ({
       </View>
     </AdSafeAreaView>
   );
-};
+}

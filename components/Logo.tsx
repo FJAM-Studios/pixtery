@@ -1,7 +1,7 @@
 import * as React from "react";
 import Svg, { SvgProps, Path, G } from "react-native-svg";
 
-function SvgComponent(props: SvgProps) {
+export default function SvgComponent(props: SvgProps): JSX.Element {
   return (
     <Svg viewBox="0 0 455 455" {...props}>
       <G>
@@ -13,5 +13,3 @@ function SvgComponent(props: SvgProps) {
     </Svg>
   );
 }
-
-export default SvgComponent;
