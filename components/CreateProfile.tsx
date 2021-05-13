@@ -1,5 +1,4 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { CommonActions } from "@react-navigation/native";
 import * as FirebaseRecaptcha from "expo-firebase-recaptcha";
 import React, { useState, useRef } from "react";
 import { View } from "react-native";
@@ -8,6 +7,7 @@ import { Headline, Text, TextInput, Button } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { phoneProvider, firebaseConfig, verifySms } from "../FirebaseApp";
+import { MIN_NAME_LENGTH } from "../constants";
 import { Profile as ProfileType } from "../types";
 import { goToScreen } from "../util";
 import Logo from "./Logo";
@@ -37,6 +37,18 @@ export default function CreateProfile({
   const [verificationId, setVerificationId] = useState("");
   const [errors, setErrors] = useState("");
   const [resetAllowed, setResetAllowed] = useState(false);
+
+  const updateName = (name: string) => {
+    setName(name);
+    if (name.length >= MIN_NAME_LENGTH) {
+      setErrors("");
+    } else
+      setErrors(
+        `Must enter at least ${MIN_NAME_LENGTH} character${
+          MIN_NAME_LENGTH > 1 ? "s" : ""
+        }!`
+      );
+  };
 
   return (
     <SafeAreaView
@@ -75,7 +87,7 @@ export default function CreateProfile({
         <TextInput
           placeholder="Terry Pix"
           value={name}
-          onChangeText={(name) => setName(name)}
+          onChangeText={(name) => updateName(name)}
         />
         <Text>Phone Number</Text>
         <TextInput

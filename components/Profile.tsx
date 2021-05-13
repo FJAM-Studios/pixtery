@@ -4,11 +4,12 @@ import { View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Headline, Text, TextInput, Button } from "react-native-paper";
 
+import { MIN_NAME_LENGTH } from "../constants";
 import { Profile as ProfileType, Puzzle } from "../types";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 
-export default ({
+export default function Profile({
   theme,
   profile,
   setProfile,
@@ -26,10 +27,22 @@ export default ({
   sentPuzzles: Puzzle[];
   setReceivedPuzzles: (puzzles: Puzzle[]) => void;
   setSentPuzzles: (puzzles: Puzzle[]) => void;
-}) => {
+}): JSX.Element {
   const [name, setName] = useState((profile && profile.name) || "");
-  const [phone, setPhone] = useState((profile && profile.phone) || "");
   const [errors, setErrors] = useState("");
+  // we can use the same pattern for rotation enable and any other profile features
+  const updateName = (name: string) => {
+    setName(name);
+    if (name.length >= MIN_NAME_LENGTH && profile) {
+      setProfile({ ...profile, name });
+      setErrors("");
+    } else
+      setErrors(
+        `Must enter at least ${MIN_NAME_LENGTH} character${
+          MIN_NAME_LENGTH > 1 ? "s" : ""
+        }!`
+      );
+  };
   return (
     <AdSafeAreaView
       style={{
@@ -61,31 +74,14 @@ export default ({
           <Headline>Change Your Pixtery Profile</Headline>
         </View>
         <Text>Name</Text>
-        <TextInput value={name} onChangeText={(name) => setName(name)} />
-        <Text>Phone Number</Text>
-        <TextInput value={phone} onChangeText={(phone) => setPhone(phone)} />
-        <Button
-          icon="camera-iris"
-          mode="contained"
-          onPress={async () => {
-            //probably want to do some further username error checking, nicer phone # entry, etc.
-            if (name.length && phone.length) {
-              //save to local storage
-              await AsyncStorage.setItem(
-                "@pixteryProfile",
-                JSON.stringify({ name, phone })
-              );
-              //update app state
-              setProfile({ name, phone });
-            } else {
-              setErrors("Must enter name and number!");
-            }
-          }}
-          style={{ margin: 10 }}
-        >
-          Save
-        </Button>
-        {errors.length ? <Text>{errors}</Text> : null}
+        <TextInput value={name} onChangeText={(name) => updateName(name)} />
+        {errors.length ? (
+          <Text
+            style={{ color: "red", fontSize: 20, backgroundColor: "white" }}
+          >
+            {errors}
+          </Text>
+        ) : null}
         <Button
           icon="logout"
           mode="contained"
@@ -134,4 +130,4 @@ export default ({
       </KeyboardAwareScrollView>
     </AdSafeAreaView>
   );
-};
+}
