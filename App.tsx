@@ -66,7 +66,10 @@ const App = (): JSX.Element => {
 
   // to control trigger order and prevent users from skipping the login screen, puzzle querying has been moved to AddPuzzle, which is called from Splash, which is navigated to only after the navigation container loads using the onReady prop
   const gotoSplash = () => {
-    if (navigationRef.current) goToScreen(navigationRef.current, "Splash");
+    // this timeout is if we want to force users to see the starting screen before moving on.
+    setTimeout(() => {
+      if (navigationRef.current) goToScreen(navigationRef.current, "Splash");
+    }, 1000);
   };
 
   return (
