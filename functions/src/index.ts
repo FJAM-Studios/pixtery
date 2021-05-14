@@ -5,7 +5,8 @@ import {db} from "../../FirebaseApp";
 import {Puzzle} from "../../types";
 
 exports.uploadPuzzleSettings = functions.https.onCall(
-    async (data: { fileName: string; newPuzzle: Puzzle }) => {
+    async (data: { fileName: string; newPuzzle: Puzzle }, context) => {
+      console.log('context', context)
       const {fileName, newPuzzle} = data;
       console.log("uploading puzzle settings");
       try {
