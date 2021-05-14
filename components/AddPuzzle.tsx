@@ -4,8 +4,10 @@ import * as Linking from "expo-linking";
 import * as React from "react";
 import { View } from "react-native";
 import { Headline, ActivityIndicator } from "react-native-paper";
+import { useDispatch, useSelector } from "react-redux";
 
 import { storage, functions } from "../FirebaseApp";
+import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
 import { Puzzle } from "../types";
 import { goToScreen } from "../util";
 import Logo from "./Logo";
@@ -14,16 +16,15 @@ import Title from "./Title";
 export default function AddPuzzle({
   navigation,
   theme,
-  receivedPuzzles,
   route,
-  setReceivedPuzzles,
 }: {
   navigation: any;
   theme: any;
-  receivedPuzzles: Puzzle[];
   route?: any;
-  setReceivedPuzzles: (puzzles: Puzzle[]) => void;
 }): JSX.Element {
+  const dispatch = useDispatch();
+  const receivedPuzzles = useSelector(state => state.receivedPuzzles);
+
   const fetchPuzzle = async (publicKey: string): Promise<Puzzle | void> => {
     const queryPuzzleCallable = functions.httpsCallable("queryPuzzle");
     let puzzleData;
@@ -71,7 +72,7 @@ export default function AddPuzzle({
       newPuzzle.imageURI = localURI;
       const allPuzzles = [...receivedPuzzles, newPuzzle];
       await AsyncStorage.setItem("@pixteryPuzzles", JSON.stringify(allPuzzles));
-      setReceivedPuzzles(allPuzzles);
+      dispatch(setReceivedPuzzles(allPuzzles));
     } catch (e) {
       console.log(e);
       alert("Could not save puzzle to your phone");

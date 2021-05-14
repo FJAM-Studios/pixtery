@@ -5,6 +5,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { Text, View, StyleSheet, Image, LayoutChangeEvent } from "react-native";
 import { ActivityIndicator } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useDispatch, useSelector } from "react-redux";
 
 import { DEGREE_CONVERSION, TESTING_MODE } from "../constants";
 import {
@@ -15,6 +16,7 @@ import {
   getInitialDimensions,
   validateBoard,
 } from "../puzzleUtils";
+import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
 import { Puzzle, Piece, Point, BoardSpace } from "../types";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
@@ -24,23 +26,19 @@ import PuzzlePiece from "./PuzzlePiece";
 const disableShuffle = TESTING_MODE;
 
 export default function PuzzleComponent({
-  boardSize,
   theme,
   navigation,
-  receivedPuzzles,
-  sentPuzzles,
   route,
-  setReceivedPuzzles,
 }: {
-  boardSize: number;
   theme: any;
   navigation: any;
-  receivedPuzzles: Puzzle[];
-  sentPuzzles: Puzzle[];
   route: any;
-  setReceivedPuzzles: (puzzles: Puzzle[]) => void;
 }): JSX.Element {
+  const dispatch = useDispatch();
   const { publicKey } = route.params;
+  const { boardSize } = useSelector(state => state.screenHeight);
+  const receivedPuzzles = useSelector(state => state.receivedPuzzles);
+  const sentPuzzles = useSelector(state => state.sentPuzzles);
 
   const [puzzle, setPuzzle] = useState<Puzzle>();
   const [pieces, setPieces] = useState<Piece[]>([]);
@@ -53,6 +51,7 @@ export default function PuzzleComponent({
   });
   const [sound, setSound] = useState<Audio.Sound>();
   const [opaque, setOpaque] = useState<boolean>(false);
+
 
   // z index and current board are not handled through react state so that they don't
   // cause Puzzle/PuzzlePiece re-renders, which would break the positional tracking
@@ -217,7 +216,7 @@ export default function PuzzleComponent({
       }),
     ];
     await AsyncStorage.setItem("@pixteryPuzzles", JSON.stringify(allPuzzles));
-    setReceivedPuzzles(allPuzzles);
+    dispatch(setReceivedPuzzles(allPuzzles));
   };
 
   // need to return dummy component to measure the puzzle area via onLayout

@@ -3,7 +3,10 @@ import React, { useState } from "react";
 import { View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Headline, Text, TextInput, Button } from "react-native-paper";
+import { useDispatch, useSelector } from "react-redux";
 
+import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
+import { setSentPuzzles } from "../store/reducers/sentPuzzles";
 import { Profile as ProfileType, Puzzle } from "../types";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
@@ -13,20 +16,15 @@ export default function Profile({
   profile,
   setProfile,
   navigation,
-  receivedPuzzles,
-  sentPuzzles,
-  setSentPuzzles,
-  setReceivedPuzzles,
 }: {
   theme: any;
   profile: ProfileType | null;
   setProfile: (profile: ProfileType | null) => void;
   navigation: any;
-  receivedPuzzles: Puzzle[];
-  sentPuzzles: Puzzle[];
-  setReceivedPuzzles: (puzzles: Puzzle[]) => void;
-  setSentPuzzles: (puzzles: Puzzle[]) => void;
 }): JSX.Element {
+  const dispatch = useDispatch();
+  const receivedPuzzles = useSelector(state => state.receivedPuzzles);
+  const sentPuzzles = useSelector(state => state.sentPuzzles);
   const [name, setName] = useState((profile && profile.name) || "");
   const [phone, setPhone] = useState((profile && profile.phone) || "");
   const [errors, setErrors] = useState("");
@@ -109,7 +107,7 @@ export default function Profile({
             //delete local storage
             await AsyncStorage.removeItem("@pixteryPuzzles");
             //update app state
-            setReceivedPuzzles([]);
+            dispatch(setReceivedPuzzles([]));
             //send you to splash
           }}
           style={{ margin: 10 }}
@@ -124,7 +122,7 @@ export default function Profile({
             //delete local storage
             await AsyncStorage.removeItem("@pixterySentPuzzles");
             //update app state
-            setSentPuzzles([]);
+            dispatch(setSentPuzzles([]));
             //send you to splash
           }}
           style={{ margin: 10 }}
