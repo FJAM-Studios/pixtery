@@ -8,6 +8,7 @@ import React, { useRef, useEffect, useState } from "react";
 import { View, LogBox, Dimensions } from "react-native";
 import { Provider as PaperProvider, DefaultTheme } from "react-native-paper";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { useDispatch } from "react-redux";
 
 import AddPuzzle from "./components/AddPuzzle";
 import CreateProfile from "./components/CreateProfile";
@@ -18,6 +19,7 @@ import PuzzleList from "./components/PuzzleList";
 import SentPuzzleList from "./components/SentPuzzleList";
 import Splash from "./components/Splash";
 import TitleScreen from "./components/TitleScreen";
+import { setDeviceSize } from "./store/reducers/screenHeight";
 import { Puzzle as PuzzleType, Profile as ProfileType } from "./types";
 import { goToScreen } from "./util";
 
@@ -45,16 +47,16 @@ export const theme = {
 const Stack = createStackNavigator();
 
 const App = (): JSX.Element => {
-  const [receivedPuzzles, setReceivedPuzzles] = useState<PuzzleType[]>([]);
-  const [sentPuzzles, setSentPuzzles] = useState<PuzzleType[]>([]);
+  const dispatch = useDispatch();
   const [profile, setProfile] = useState<ProfileType | null>(null);
   const navigationRef = useRef<NavigationContainerRef>();
 
-  const { width, height } = Dimensions.get("screen");
-  const boardSize = 0.95 * Math.min(height, width);
-
   // on url change go to the splash screen, which will stop the user if they aren't logged in
   useEffect(() => {
+    const { width, height } = Dimensions.get("screen");
+    const boardSize = 0.95 * Math.min(height, width);
+    dispatch(setDeviceSize(height, boardSize));
+
     Linking.addEventListener("url", (ev) => {
       const url = ev.url;
       if (url && navigationRef.current)
@@ -81,8 +83,6 @@ const App = (): JSX.Element => {
                   <Splash
                     {...props}
                     theme={theme}
-                    setReceivedPuzzles={setReceivedPuzzles}
-                    setSentPuzzles={setSentPuzzles}
                     profile={profile}
                     setProfile={setProfile}
                   />
@@ -100,38 +100,14 @@ const App = (): JSX.Element => {
               </Stack.Screen>
               <Stack.Screen name="Home">
                 {(props) => (
-                  <HomeScreen
-                    {...props}
-                    boardSize={boardSize}
-                    theme={theme}
-                    receivedPuzzles={receivedPuzzles}
-                    profile={profile}
-                    sentPuzzles={sentPuzzles}
-                    setSentPuzzles={setSentPuzzles}
-                    height={height}
-                  />
+                  <HomeScreen {...props} theme={theme} profile={profile} />
                 )}
               </Stack.Screen>
               <Stack.Screen name="PuzzleList">
-                {(props) => (
-                  <PuzzleList
-                    {...props}
-                    theme={theme}
-                    receivedPuzzles={receivedPuzzles}
-                    setReceivedPuzzles={setReceivedPuzzles}
-                  />
-                )}
+                {(props) => <PuzzleList {...props} theme={theme} />}
               </Stack.Screen>
               <Stack.Screen name="SentPuzzleList">
-                {(props) => (
-                  <SentPuzzleList
-                    {...props}
-                    theme={theme}
-                    receivedPuzzles={receivedPuzzles}
-                    sentPuzzles={sentPuzzles}
-                    setSentPuzzles={setSentPuzzles}
-                  />
-                )}
+                {(props) => <SentPuzzleList {...props} theme={theme} />}
               </Stack.Screen>
               <Stack.Screen
                 name="Puzzle"
@@ -141,26 +117,10 @@ const App = (): JSX.Element => {
                   gridSize: 3,
                 }}
               >
-                {(props) => (
-                  <Puzzle
-                    {...props}
-                    boardSize={boardSize}
-                    theme={theme}
-                    receivedPuzzles={receivedPuzzles}
-                    sentPuzzles={sentPuzzles}
-                    setReceivedPuzzles={setReceivedPuzzles}
-                  />
-                )}
+                {(props) => <Puzzle {...props} theme={theme} />}
               </Stack.Screen>
               <Stack.Screen name="AddPuzzle">
-                {(props) => (
-                  <AddPuzzle
-                    {...props}
-                    theme={theme}
-                    receivedPuzzles={receivedPuzzles}
-                    setReceivedPuzzles={setReceivedPuzzles}
-                  />
-                )}
+                {(props) => <AddPuzzle {...props} theme={theme} />}
               </Stack.Screen>
               <Stack.Screen name="Profile">
                 {(props) => (
@@ -169,10 +129,6 @@ const App = (): JSX.Element => {
                     theme={theme}
                     profile={profile}
                     setProfile={setProfile}
-                    receivedPuzzles={receivedPuzzles}
-                    setSentPuzzles={setSentPuzzles}
-                    sentPuzzles={sentPuzzles}
-                    setReceivedPuzzles={setReceivedPuzzles}
                   />
                 )}
               </Stack.Screen>

@@ -20,6 +20,7 @@ import {
   Portal,
 } from "react-native-paper";
 import Svg, { Path } from "react-native-svg";
+import { useDispatch, useSelector } from "react-redux";
 import uuid from "uuid";
 
 import { storage, functions } from "../FirebaseApp";
@@ -33,6 +34,7 @@ import {
   generateJigsawPiecePaths,
   generateSquarePiecePaths,
 } from "../puzzleUtils";
+import { setSentPuzzles } from "../store/reducers/sentPuzzles";
 import { Puzzle, Profile } from "../types";
 import { createBlob, shareMessage } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
@@ -44,23 +46,17 @@ AdMobInterstitial.setAdUnitID(INTERSTITIAL_ID);
 
 export default ({
   navigation,
-  boardSize,
   theme,
-  receivedPuzzles,
   profile,
-  sentPuzzles,
-  setSentPuzzles,
-  height,
 }: {
   navigation: any;
-  boardSize: number;
   theme: any;
-  receivedPuzzles: Puzzle[];
   profile: Profile | null;
-  sentPuzzles: Puzzle[];
-  setSentPuzzles: (puzzles: Puzzle[]) => void;
-  height: number;
 }): JSX.Element => {
+  const dispatch = useDispatch();
+  const { height, boardSize } = useSelector(state => state.screenHeight);
+  const receivedPuzzles = useSelector(state => state.receivedPuzzles);
+  const sentPuzzles = useSelector(state => state.sentPuzzles);
   const [imageURI, setImageURI] = React.useState("");
   const [puzzleType, setPuzzleType] = React.useState("jigsaw");
   const [gridSize, setGridSize] = React.useState(3);
@@ -150,7 +146,7 @@ export default ({
       "@pixterySentPuzzles",
       JSON.stringify(allPuzzles)
     );
-    setSentPuzzles(allPuzzles);
+    dispatch(setSentPuzzles(allPuzzles));
   };
 
   const uploadImage = async (fileName: string): Promise<string> => {
