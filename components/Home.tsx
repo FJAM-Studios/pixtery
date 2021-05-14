@@ -452,6 +452,7 @@ export default ({
           onChangeText={(message) => setMessage(message)}
           style={{
             height: height * 0.09,
+            justifyContent: "center",
           }}
         />
         <Button
