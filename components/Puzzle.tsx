@@ -318,7 +318,7 @@ export default function PuzzleComponent({
       </SafeAreaView>
     );
   }
-};
+}
 
 const styles = (props: any) =>
   StyleSheet.create({
