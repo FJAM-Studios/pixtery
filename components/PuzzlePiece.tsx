@@ -4,12 +4,16 @@ import {
   PanGestureHandler,
   State,
   PanGestureHandlerStateChangeEvent,
-  RotationGestureHandler,
-  RotationGestureHandlerStateChangeEvent,
+  TapGestureHandler,
+  TapGestureHandlerStateChangeEvent,
 } from "react-native-gesture-handler";
 import { Svg, Image, Defs, ClipPath, Path, Rect } from "react-native-svg";
 
-import { SNAP_MARGIN, USE_NATIVE_DRIVER } from "../constants";
+import {
+  DEGREE_CONVERSION,
+  SNAP_MARGIN,
+  USE_NATIVE_DRIVER,
+} from "../constants";
 import { getPointsDistance, snapAngle } from "../puzzleUtils";
 import { Point, Piece, BoardSpace } from "../types";
 
@@ -42,11 +46,6 @@ export default function PuzzlePiece({
 
   const puzzleType = piecePath.length ? "jigsaw" : "squares";
 
-  // these refs are only relevant if we decide to allow simultaneous drag and rotate,
-  // which I feel is somewhat awkward to use
-
-  // const moveRef = createRef<PanGestureHandler>();
-  // const rotationRef = createRef<RotationGestureHandler>();
   const zIndex = useRef(new Animated.Value(0)).current;
 
   const pan = useRef(new Animated.ValueXY()).current;
@@ -161,19 +160,17 @@ export default function PuzzlePiece({
     }
   };
 
-  const onRotateGestureEvent = Animated.event(
-    [{ nativeEvent: { rotation: rotate } }],
-    {
-      useNativeDriver: USE_NATIVE_DRIVER,
-    }
-  );
-
-  const onRotateHandlerStateChange = (
-    ev: RotationGestureHandlerStateChangeEvent
-  ) => {
+  const onTapHandlerStateChange = (ev: TapGestureHandlerStateChangeEvent) => {
     if (ev.nativeEvent.oldState === State.ACTIVE) {
-      lastRotate += ev.nativeEvent.rotation;
-      lastRotate = snapAngle(lastRotate);
+      lastRotate += 90 * DEGREE_CONVERSION;
+      Animated.timing(rotate, {
+        toValue: lastRotate,
+        duration: 150,
+        useNativeDriver: USE_NATIVE_DRIVER,
+      }).start(() => {
+        lastRotate = snapAngle(lastRotate);
+        rotate.setValue(lastRotate);
+      });
 
       //if it's snapped in, update rotation on the board
       const matchingPieces = currentBoard.filter(
@@ -186,15 +183,11 @@ export default function PuzzlePiece({
       }
 
       checkWin();
-      rotate.setOffset(lastRotate);
-      rotate.setValue(0);
     }
   };
 
   return (
     <PanGestureHandler
-      // ref={moveRef}
-      // simultaneousHandlers={rotationRef}
       onGestureEvent={onGestureEvent}
       onHandlerStateChange={onHandlerStateChange}
     >
@@ -212,11 +205,9 @@ export default function PuzzlePiece({
           },
         ]}
       >
-        <RotationGestureHandler
-          // ref={rotationRef}
-          // simultaneousHandlers={moveRef}
-          onGestureEvent={onRotateGestureEvent}
-          onHandlerStateChange={onRotateHandlerStateChange}
+        <TapGestureHandler
+          onHandlerStateChange={onTapHandlerStateChange}
+          numberOfTaps={2}
         >
           <AnimatedSvg
             height={pieceDimensions.height}
@@ -250,7 +241,7 @@ export default function PuzzlePiece({
               clipPath={`url(#${puzzleType})`}
             />
           </AnimatedSvg>
-        </RotationGestureHandler>
+        </TapGestureHandler>
       </Animated.View>
     </PanGestureHandler>
   );

@@ -181,7 +181,6 @@ export default ({
       puzzleType,
       gridSize,
       senderName: profile ? profile.name : "No Sender",
-      senderPhone: profile ? profile.phone : "No Sender",
       imageURI: fileName,
       publicKey,
       message,
