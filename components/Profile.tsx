@@ -3,8 +3,9 @@ import React, { useState } from "react";
 import { View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Headline, Text, TextInput, Button } from "react-native-paper";
+import { Theme } from "react-native-paper/lib/typescript/types";
 
-import { Profile as ProfileType, Puzzle } from "../types";
+import { Profile as ProfileType, Puzzle, ScreenNavigation } from "../types";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 
@@ -18,10 +19,10 @@ export default function Profile({
   setSentPuzzles,
   setReceivedPuzzles,
 }: {
-  theme: any;
+  theme: Theme;
   profile: ProfileType | null;
   setProfile: (profile: ProfileType | null) => void;
-  navigation: any;
+  navigation: ScreenNavigation;
   receivedPuzzles: Puzzle[];
   sentPuzzles: Puzzle[];
   setReceivedPuzzles: (puzzles: Puzzle[]) => void;

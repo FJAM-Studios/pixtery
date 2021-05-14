@@ -19,6 +19,7 @@ import {
   Modal,
   Portal,
 } from "react-native-paper";
+import { Theme } from "react-native-paper/lib/typescript/types";
 import Svg, { Path } from "react-native-svg";
 import uuid from "uuid";
 
@@ -33,7 +34,7 @@ import {
   generateJigsawPiecePaths,
   generateSquarePiecePaths,
 } from "../puzzleUtils";
-import { Puzzle, Profile } from "../types";
+import { Puzzle, Profile, ScreenNavigation } from "../types";
 import { createBlob, shareMessage } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
@@ -52,9 +53,9 @@ export default ({
   sentPuzzles,
   setSentPuzzles,
 }: {
-  navigation: any;
+  navigation: ScreenNavigation;
   boardSize: number;
-  theme: any;
+  theme: Theme;
   receivedPuzzles: Puzzle[];
   profile: Profile | null;
   sentPuzzles: Puzzle[];

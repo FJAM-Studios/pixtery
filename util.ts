@@ -1,5 +1,10 @@
-import { CommonActions } from "@react-navigation/native";
+import {
+  CommonActions,
+  NavigationContainerRef,
+} from "@react-navigation/native";
 import { Share } from "react-native";
+
+import { ScreenNavigation } from "./types";
 
 //convert URI into a blob to transmit to server
 export const createBlob = (localUri: string): Promise<Blob> => {
@@ -53,9 +58,12 @@ export const shareMessage = async (pixUrl: string): Promise<void> => {
 };
 
 export const goToScreen = (
-  navigation: any,
+  navigation: ScreenNavigation | NavigationContainerRef,
   screen: string,
-  options: { url?: string; publicKey?: string } = { url: "", publicKey: "" }
+  options: { url?: string | null; publicKey?: string } = {
+    url: "",
+    publicKey: "",
+  }
 ): void => {
   navigation.dispatch(
     CommonActions.reset({

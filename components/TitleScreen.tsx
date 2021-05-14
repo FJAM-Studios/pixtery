@@ -2,11 +2,12 @@
 
 import React from "react";
 import { View } from "react-native";
+import { Theme } from "react-native-paper/lib/typescript/types";
 
 import Logo from "./Logo";
 import Title from "./Title";
 
-export default function TiteScreen({ theme }: { theme: any }): JSX.Element {
+export default function TiteScreen({ theme }: { theme: Theme }): JSX.Element {
   return (
     <View
       style={{
