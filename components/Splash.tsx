@@ -3,7 +3,10 @@ import * as Linking from "expo-linking";
 import React, { useEffect } from "react";
 import { View } from "react-native";
 import { ActivityIndicator } from "react-native-paper";
+import { useDispatch } from "react-redux";
 
+import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
+import { setSentPuzzles } from "../store/reducers/sentPuzzles";
 import { Puzzle as PuzzleType, Profile as ProfileType } from "../types";
 import { goToScreen } from "../util";
 import Logo from "./Logo";
@@ -11,21 +14,19 @@ import Title from "./Title";
 
 export default function Splash({
   theme,
-  setReceivedPuzzles,
-  setSentPuzzles,
   profile,
   setProfile,
   navigation,
   route,
 }: {
   theme: any;
-  setReceivedPuzzles: (puzzles: PuzzleType[]) => void;
-  setSentPuzzles: (puzzles: PuzzleType[]) => void;
   profile: ProfileType | null;
   setProfile: (profile: ProfileType) => void;
   navigation: any;
   route?: any;
 }): JSX.Element {
+  const dispatch = useDispatch();
+
   useEffect(() => {
     const getInitialUrl = async () => {
       const url = await Linking.getInitialURL();
@@ -53,8 +54,8 @@ export default function Splash({
         //should probably do something here to make sure all local puzzles also have local images
         //and, if not, try to get them from server, and if they don't exist there, then delete puzzle
         //or otherwise mark it as invalid somehow
-        setReceivedPuzzles(loadedPuzzles);
-        setSentPuzzles(loadedSentPuzzles);
+        dispatch(setReceivedPuzzles(loadedPuzzles));
+        dispatch(setSentPuzzles(loadedSentPuzzles));
       } catch (e) {
         console.log(e);
         alert("Could not load saved puzzles.");

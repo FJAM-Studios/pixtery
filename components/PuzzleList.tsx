@@ -4,7 +4,9 @@ import * as React from "react";
 import { View, TouchableOpacity } from "react-native";
 import Modal from "react-native-modal";
 import { Text, Card, IconButton, Button, Headline } from "react-native-paper";
+import { useDispatch, useSelector } from "react-redux";
 
+import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
 import { Puzzle } from "../types";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
@@ -12,14 +14,12 @@ import Header from "./Header";
 export default function PuzzleList({
   navigation,
   theme,
-  receivedPuzzles,
-  setReceivedPuzzles,
 }: {
   navigation: any;
   theme: any;
-  receivedPuzzles: Puzzle[];
-  setReceivedPuzzles: (puzzles: Puzzle[]) => void;
 }): JSX.Element {
+  const dispatch = useDispatch();
+  const receivedPuzzles = useSelector(state => state.receivedPuzzles);
   const [modalVisible, setModalVisible] = React.useState(false);
   const [puzzleToDelete, setPuzzleToDelete] = React.useState<Puzzle | null>(
     null
@@ -36,7 +36,7 @@ export default function PuzzleList({
         ...receivedPuzzles.filter((puz) => puz.publicKey !== puzzle.publicKey),
       ];
       await AsyncStorage.setItem("@pixteryPuzzles", JSON.stringify(newPuzzles));
-      setReceivedPuzzles(newPuzzles);
+      dispatch(setReceivedPuzzles(newPuzzles));
     }
     setPuzzleToDelete(null);
     setModalVisible(false);

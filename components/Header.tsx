@@ -1,6 +1,7 @@
 import React from "react";
-import { View, TouchableWithoutFeedback, Dimensions } from "react-native";
+import { View, TouchableWithoutFeedback } from "react-native";
 import { IconButton, Badge, Menu, Divider } from "react-native-paper";
+import { useSelector } from "react-redux";
 
 import Logo from "./Logo";
 import Title from "./Title";
@@ -16,7 +17,7 @@ export default function Header({
 }): JSX.Element {
   const [visible, setVisible] = React.useState(false);
   const openMenu = () => setVisible(true);
-  const { height } = Dimensions.get("screen");
+  const { height } = useSelector(state => state.screenHeight);
   const closeMenu = () => setVisible(false);
   return (
     <View
