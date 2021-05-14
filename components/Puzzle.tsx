@@ -275,7 +275,7 @@ export default function PuzzleComponent({
           <View style={styles(styleProps).puzzleArea}>
             <View style={styles(styleProps).messageContainer}>
               <Text style={styles(styleProps).startText}>
-                Drag and rotate pieces onto this board!
+                Drag pieces onto the board! Double tap to rotate!
               </Text>
             </View>
           </View>
