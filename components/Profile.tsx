@@ -29,7 +29,6 @@ export default function Profile({
   setSentPuzzles: (puzzles: Puzzle[]) => void;
 }): JSX.Element {
   const [name, setName] = useState((profile && profile.name) || "");
-  const [phone, setPhone] = useState((profile && profile.phone) || "");
   const [errors, setErrors] = useState("");
   return (
     <AdSafeAreaView
@@ -63,23 +62,21 @@ export default function Profile({
         </View>
         <Text>Name</Text>
         <TextInput value={name} onChangeText={(name) => setName(name)} />
-        <Text>Phone Number</Text>
-        <TextInput value={phone} onChangeText={(phone) => setPhone(phone)} />
         <Button
           icon="camera-iris"
           mode="contained"
           onPress={async () => {
-            //probably want to do some further username error checking, nicer phone # entry, etc.
-            if (name.length && phone.length) {
+            //probably want to do some further username error checking
+            if (name.length) {
               //save to local storage
               await AsyncStorage.setItem(
                 "@pixteryProfile",
-                JSON.stringify({ name, phone })
+                JSON.stringify({ name })
               );
               //update app state
-              setProfile({ name, phone });
+              setProfile({ name });
             } else {
-              setErrors("Must enter name and number!");
+              setErrors("You must enter a name!");
             }
           }}
           style={{ margin: 10 }}

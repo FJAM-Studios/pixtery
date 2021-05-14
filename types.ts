@@ -28,7 +28,6 @@ export interface Puzzle {
   puzzleType: string;
   gridSize: number;
   senderName: string;
-  senderPhone: string;
   imageURI: string;
   publicKey: string;
   message?: string | null;
@@ -38,7 +37,6 @@ export interface Puzzle {
 
 export interface Profile {
   name: string;
-  phone: string;
 }
 
 export interface Piece {
