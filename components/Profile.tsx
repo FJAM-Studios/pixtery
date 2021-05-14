@@ -75,7 +75,7 @@ export default function Profile({
               //update app state
               setProfile({ name });
             } else {
-              setErrors("Must enter name and number!");
+              setErrors("You must enter a name!");
             }
           }}
           style={{ margin: 10 }}
