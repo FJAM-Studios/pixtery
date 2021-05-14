@@ -1,12 +1,12 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as FileSystem from "expo-file-system";
-import * as Linking from "expo-linking";
 import * as React from "react";
 import { View } from "react-native";
 import { Headline, ActivityIndicator } from "react-native-paper";
+import { Theme } from "react-native-paper/lib/typescript/types";
 
 import { storage, functions } from "../FirebaseApp";
-import { Puzzle } from "../types";
+import { Puzzle, AddPuzzleRoute, ScreenNavigation } from "../types";
 import { goToScreen } from "../util";
 import Logo from "./Logo";
 import Title from "./Title";
@@ -18,10 +18,10 @@ export default function AddPuzzle({
   route,
   setReceivedPuzzles,
 }: {
-  navigation: any;
-  theme: any;
+  navigation: ScreenNavigation;
+  theme: Theme;
   receivedPuzzles: Puzzle[];
-  route?: any;
+  route: AddPuzzleRoute;
   setReceivedPuzzles: (puzzles: Puzzle[]) => void;
 }): JSX.Element {
   const fetchPuzzle = async (publicKey: string): Promise<Puzzle | void> => {
