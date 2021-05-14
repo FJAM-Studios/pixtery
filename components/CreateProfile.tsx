@@ -4,10 +4,15 @@ import React, { useState, useRef } from "react";
 import { View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Headline, Text, TextInput, Button } from "react-native-paper";
+import { Theme } from "react-native-paper/lib/typescript/types";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { phoneProvider, firebaseConfig, verifySms } from "../FirebaseApp";
-import { Profile as ProfileType } from "../types";
+import {
+  CreateProfileRoute,
+  Profile as ProfileType,
+  ScreenNavigation,
+} from "../types";
 import { goToScreen } from "../util";
 import Logo from "./Logo";
 import Title from "./Title";
@@ -22,11 +27,11 @@ export default function CreateProfile({
   navigation,
   route,
 }: {
-  theme: any;
+  theme: Theme;
   profile: ProfileType | null;
   setProfile: (profile: ProfileType) => void;
-  navigation: any;
-  route: any;
+  navigation: ScreenNavigation;
+  route: CreateProfileRoute;
 }): JSX.Element {
   const recaptchaVerifier = useRef<FirebaseRecaptcha.FirebaseRecaptchaVerifierModal>(
     null
@@ -58,8 +63,6 @@ export default function CreateProfile({
         <FirebaseRecaptcha.FirebaseRecaptchaVerifierModal
           // firebase requires recaptcha for SMS verification.
           ref={recaptchaVerifier}
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
           firebaseConfig={firebaseConfig}
           // this seems to crash the app, so no luck on easy captcha
           // attemptInvisibleVerification={true}
