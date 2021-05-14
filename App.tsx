@@ -19,7 +19,7 @@ import SentPuzzleList from "./components/SentPuzzleList";
 import Splash from "./components/Splash";
 import TitleScreen from "./components/TitleScreen";
 import { Puzzle as PuzzleType, Profile as ProfileType } from "./types";
-import { goToScreen } from "./util"
+import { goToScreen } from "./util";
 
 //less than ideal, but idk if we have a choice right now. suppresses the firebase timeout warning
 LogBox.ignoreLogs(["Setting a timer for a long period of time"]);
