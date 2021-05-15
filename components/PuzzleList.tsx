@@ -4,22 +4,23 @@ import * as React from "react";
 import { View, TouchableOpacity } from "react-native";
 import Modal from "react-native-modal";
 import { Text, Card, IconButton, Button, Headline } from "react-native-paper";
+import { Theme } from "react-native-paper/lib/typescript/types";
 
-import { Puzzle } from "../types";
+import { Puzzle, ScreenNavigation } from "../types";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 
-export default ({
+export default function PuzzleList({
   navigation,
   theme,
   receivedPuzzles,
   setReceivedPuzzles,
 }: {
-  navigation: any;
-  theme: any;
+  navigation: ScreenNavigation;
+  theme: Theme;
   receivedPuzzles: Puzzle[];
   setReceivedPuzzles: (puzzles: Puzzle[]) => void;
-}) => {
+}): JSX.Element {
   const [modalVisible, setModalVisible] = React.useState(false);
   const [puzzleToDelete, setPuzzleToDelete] = React.useState<Puzzle | null>(
     null
@@ -151,4 +152,4 @@ export default ({
       </View>
     </AdSafeAreaView>
   );
-};
+}

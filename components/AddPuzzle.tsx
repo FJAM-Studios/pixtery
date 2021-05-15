@@ -1,12 +1,12 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as FileSystem from "expo-file-system";
-import * as Linking from "expo-linking";
 import * as React from "react";
 import { View } from "react-native";
 import { Headline, ActivityIndicator } from "react-native-paper";
+import { Theme } from "react-native-paper/lib/typescript/types";
 
 import { storage, functions } from "../FirebaseApp";
-import { Puzzle } from "../types";
+import { Puzzle, AddPuzzleRoute, ScreenNavigation } from "../types";
 import { goToScreen } from "../util";
 import Logo from "./Logo";
 import Title from "./Title";
@@ -18,10 +18,10 @@ export default function AddPuzzle({
   route,
   setReceivedPuzzles,
 }: {
-  navigation: any;
-  theme: any;
+  navigation: ScreenNavigation;
+  theme: Theme;
   receivedPuzzles: Puzzle[];
-  route?: any;
+  route: AddPuzzleRoute;
   setReceivedPuzzles: (puzzles: Puzzle[]) => void;
 }): JSX.Element {
   const fetchPuzzle = async (publicKey: string): Promise<Puzzle | void> => {
@@ -32,6 +32,7 @@ export default function AddPuzzle({
       return puzzleData.data; // get just nested data from returned JSON
     } catch (error) {
       console.error(error);
+      throw new Error(error); //rethrow the error so it can be caught by outer method
     }
   };
 
@@ -73,6 +74,8 @@ export default function AddPuzzle({
       setReceivedPuzzles(allPuzzles);
     } catch (e) {
       console.log(e);
+      alert("Could not save puzzle to your phone");
+      throw new Error(e); //rethrow error for outer method
     }
   };
 
@@ -80,20 +83,19 @@ export default function AddPuzzle({
     const searchForPuzzle = async () => {
       // all logic determining which screen to navigate to happens here in order to place navigation at the end of every branch. Otherwise the function will continue running after navigating away, which can cause the user to get redirected if there is an uncaught navigation further down the line
       try {
-        const { publicKey }: any = Linking.parse(route.params.url).queryParams;
-        if (publicKey) {
-          const match = searchForLocalMatch(publicKey);
-          if (match) goToScreen(navigation, "Puzzle", { publicKey });
-          else {
-            const newPuzzle: Puzzle | void = await fetchPuzzle(publicKey);
-            if (newPuzzle) {
-              await savePuzzle(newPuzzle);
-              goToScreen(navigation, "Puzzle", { publicKey });
-            } else goToScreen(navigation, "Home");
-          }
-        } else goToScreen(navigation, "Home");
+        const { publicKey } = route.params; //no need to check whether publicKey exists, that is done by Splash before navigating here
+        const match = searchForLocalMatch(publicKey);
+        if (match) goToScreen(navigation, "Puzzle", { publicKey });
+        else {
+          const newPuzzle: Puzzle | void = await fetchPuzzle(publicKey);
+          if (newPuzzle) {
+            await savePuzzle(newPuzzle);
+            goToScreen(navigation, "Puzzle", { publicKey });
+          } else goToScreen(navigation, "Home");
+        }
       } catch (e) {
         console.log(e);
+        goToScreen(navigation, "Home"); //if there is an error in this method or in inner methods, abandon adding the puzzle and go to the home screen
       }
     };
     searchForPuzzle();
