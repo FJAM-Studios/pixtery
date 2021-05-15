@@ -60,7 +60,7 @@ export default function Splash({
     };
 
     const loadAppData = async () => {
-      //first get the url that was either passed in by the url event listener or by the url used to open the app, this will be sed regardless of whether you have a profile
+      //first get the url that was either passed in by the url event listener or by the url used to open the app, this will be used regardless of whether you have a profile
       const url =
         route.params && route.params.url
           ? route.params.url

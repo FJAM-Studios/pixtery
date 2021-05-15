@@ -17,7 +17,7 @@ export default function Header({
   const theme = useSelector((state: RootState) => state.theme);
   const [visible, setVisible] = React.useState(false);
   const openMenu = () => setVisible(true);
-  const { height } = useSelector((state) => state.screenHeight);
+  const { height } = useSelector((state: RootState) => state.screenHeight);
   const closeMenu = () => setVisible(false);
   return (
     <View
