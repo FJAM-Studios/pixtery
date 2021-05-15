@@ -23,7 +23,7 @@ export default function AddPuzzle({
   route?: any;
 }): JSX.Element {
   const dispatch = useDispatch();
-  const receivedPuzzles = useSelector(state => state.receivedPuzzles);
+  const receivedPuzzles = useSelector((state) => state.receivedPuzzles);
 
   const fetchPuzzle = async (publicKey: string): Promise<Puzzle | void> => {
     const queryPuzzleCallable = functions.httpsCallable("queryPuzzle");

@@ -36,9 +36,9 @@ export default function PuzzleComponent({
 }): JSX.Element {
   const dispatch = useDispatch();
   const { publicKey } = route.params;
-  const { boardSize } = useSelector(state => state.screenHeight);
-  const receivedPuzzles = useSelector(state => state.receivedPuzzles);
-  const sentPuzzles = useSelector(state => state.sentPuzzles);
+  const { boardSize } = useSelector((state) => state.screenHeight);
+  const receivedPuzzles = useSelector((state) => state.receivedPuzzles);
+  const sentPuzzles = useSelector((state) => state.sentPuzzles);
 
   const [puzzle, setPuzzle] = useState<Puzzle>();
   const [pieces, setPieces] = useState<Piece[]>([]);
@@ -51,7 +51,6 @@ export default function PuzzleComponent({
   });
   const [sound, setSound] = useState<Audio.Sound>();
   const [opaque, setOpaque] = useState<boolean>(false);
-
 
   // z index and current board are not handled through react state so that they don't
   // cause Puzzle/PuzzlePiece re-renders, which would break the positional tracking
@@ -83,8 +82,8 @@ export default function PuzzleComponent({
   useEffect(() => {
     return sound
       ? () => {
-        sound.unloadAsync();
-      }
+          sound.unloadAsync();
+        }
       : undefined;
   }, [sound]);
 
@@ -308,7 +307,7 @@ export default function PuzzleComponent({
       </SafeAreaView>
     );
   }
-};
+}
 
 const styles = (props: any) =>
   StyleSheet.create({

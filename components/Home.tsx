@@ -54,9 +54,9 @@ export default ({
   profile: Profile | null;
 }): JSX.Element => {
   const dispatch = useDispatch();
-  const { height, boardSize } = useSelector(state => state.screenHeight);
-  const receivedPuzzles = useSelector(state => state.receivedPuzzles);
-  const sentPuzzles = useSelector(state => state.sentPuzzles);
+  const { height, boardSize } = useSelector((state) => state.screenHeight);
+  const receivedPuzzles = useSelector((state) => state.receivedPuzzles);
+  const sentPuzzles = useSelector((state) => state.sentPuzzles);
   const [imageURI, setImageURI] = React.useState("");
   const [puzzleType, setPuzzleType] = React.useState("jigsaw");
   const [gridSize, setGridSize] = React.useState(3);
@@ -69,17 +69,17 @@ export default ({
   const selectImage = async (camera: boolean) => {
     const result = camera
       ? await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 4],
-        quality: 1,
-      })
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          allowsEditing: true,
+          aspect: [4, 4],
+          quality: 1,
+        })
       : await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 4],
-        quality: 1,
-      });
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          allowsEditing: true,
+          aspect: [4, 4],
+          quality: 1,
+        });
 
     if (!result.cancelled) {
       // if the resulting image is not a square because user did not zoom to fill image select box

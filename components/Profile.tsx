@@ -23,8 +23,8 @@ export default function Profile({
   navigation: any;
 }): JSX.Element {
   const dispatch = useDispatch();
-  const receivedPuzzles = useSelector(state => state.receivedPuzzles);
-  const sentPuzzles = useSelector(state => state.sentPuzzles);
+  const receivedPuzzles = useSelector((state) => state.receivedPuzzles);
+  const sentPuzzles = useSelector((state) => state.sentPuzzles);
   const [name, setName] = useState((profile && profile.name) || "");
   const [phone, setPhone] = useState((profile && profile.phone) || "");
   const [errors, setErrors] = useState("");
