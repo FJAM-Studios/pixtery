@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setProfile } from "../store/reducers/profile";
 import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
 import { setSentPuzzles } from "../store/reducers/sentPuzzles";
-import { Puzzle as PuzzleType, Profile as ProfileType } from "../types";
+import { ScreenNavigation, SplashRoute } from "../types";
 import { goToScreen } from "../util";
 import Logo from "./Logo";
 import Title from "./Title";
@@ -17,8 +17,8 @@ export default function Splash({
   navigation,
   route,
 }: {
-  navigation: any;
-  route?: any;
+  navigation: ScreenNavigation;
+  route?: SplashRoute;
 }): JSX.Element {
   const dispatch = useDispatch();
   const theme = useSelector((state) => state.theme);
@@ -66,10 +66,13 @@ export default function Splash({
           ? route.params.url
           : await getInitialUrl();
       //if you are logged in, load local puzzles, then either navigate to AddPuzzle or Home if there is no url
-      if (profile && profile.name) {
+      if (profile && profile.name && url) {
         await loadPuzzles();
-        if (url) goToScreen(navigation, "AddPuzzle", { url });
-        else goToScreen(navigation, "Home");
+        const { queryParams } = Linking.parse(url);
+        if (queryParams && queryParams.publicKey) {
+          const { publicKey } = queryParams;
+          goToScreen(navigation, "AddPuzzle", { publicKey });
+        } else goToScreen(navigation, "Home");
       } else {
         //otherwise, load profile from local storage if it exists
         const loadedProfile = await loadProfile();

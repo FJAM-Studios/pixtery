@@ -4,6 +4,7 @@ import * as ImageManipulator from "expo-image-manipulator";
 import React, { useEffect, useState, useRef } from "react";
 import { Text, View, StyleSheet, Image, LayoutChangeEvent } from "react-native";
 import { ActivityIndicator } from "react-native-paper";
+import { Theme } from "react-native-paper/lib/typescript/types";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -17,7 +18,14 @@ import {
   validateBoard,
 } from "../puzzleUtils";
 import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
-import { Puzzle, Piece, Point, BoardSpace } from "../types";
+import {
+  Puzzle,
+  Piece,
+  Point,
+  BoardSpace,
+  ScreenNavigation,
+  PuzzleRoute,
+} from "../types";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 import PuzzlePiece from "./PuzzlePiece";
@@ -29,8 +37,8 @@ export default function PuzzleComponent({
   navigation,
   route,
 }: {
-  navigation: any;
-  route: any;
+  navigation: ScreenNavigation;
+  route: PuzzleRoute;
 }): JSX.Element {
   const dispatch = useDispatch();
   const { publicKey } = route.params;
@@ -70,6 +78,7 @@ export default function PuzzleComponent({
   useEffect(() => {
     const initializeSound = async () => {
       const { sound } = await Audio.Sound.createAsync(
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
         require("../assets/camera-click.wav")
       );
       setSound(sound);
@@ -120,7 +129,7 @@ export default function PuzzleComponent({
     const matchingPuzzles = [...receivedPuzzles, ...sentPuzzles].filter(
       (puz) => puz.publicKey === publicKey
     );
-    if (matchingPuzzles.length) {
+    if (matchingPuzzles.length && puzzleAreaDimensions.puzzleAreaWidth > 0) {
       const pickedPuzzle = matchingPuzzles[0];
       const { gridSize, puzzleType, imageURI } = pickedPuzzle;
       const squareSize = boardSize / gridSize;
@@ -133,62 +142,70 @@ export default function PuzzleComponent({
       const shuffleOrder = shuffle(fillArray(gridSize), disableShuffle);
 
       const createPieces = async () => {
-        const _pieces: Piece[] = [];
-        const piecePaths =
-          puzzleType === "jigsaw"
-            ? generateJigsawPiecePaths(gridSize, squareSize)
-            : [];
-        // manipulate images in Puzzle component instead to save on renders
-        for (
-          let shuffledIndex = 0;
-          shuffledIndex < numPieces;
-          shuffledIndex++
-        ) {
-          const solvedIndex = shuffleOrder[shuffledIndex];
-          const {
-            pieceDimensions,
-            initialPlacement,
-            viewBox,
-            snapOffset,
-          } = getInitialDimensions(
-            puzzleType,
-            minSandboxY,
-            maxSandboxY,
-            solvedIndex,
-            shuffledIndex,
-            gridSize,
-            squareSize
-          );
+        try {
+          const _pieces: Piece[] = [];
+          const piecePaths =
+            puzzleType === "jigsaw"
+              ? generateJigsawPiecePaths(gridSize, squareSize)
+              : [];
+          // manipulate images in Puzzle component instead to save on renders
+          for (
+            let shuffledIndex = 0;
+            shuffledIndex < numPieces;
+            shuffledIndex++
+          ) {
+            const solvedIndex = shuffleOrder[shuffledIndex];
+            const {
+              pieceDimensions,
+              initialPlacement,
+              viewBox,
+              snapOffset,
+            } = getInitialDimensions(
+              puzzleType,
+              minSandboxY,
+              maxSandboxY,
+              solvedIndex,
+              shuffledIndex,
+              gridSize,
+              squareSize
+            );
 
-          const href = await ImageManipulator.manipulateAsync(
-            imageURI,
-            [
-              {
-                resize: {
-                  width: boardSize,
-                  height: boardSize,
+            const href = await ImageManipulator.manipulateAsync(
+              // testing an invalid imageURI, in case the pic is deleted/corrupted
+              // imageURI + "bogus",
+              imageURI,
+              [
+                {
+                  resize: {
+                    width: boardSize,
+                    height: boardSize,
+                  },
                 },
-              },
-              {
-                crop: { ...viewBox, ...pieceDimensions },
-              },
-            ],
-            { compress: 1, format: ImageManipulator.SaveFormat.JPEG }
-          );
+                {
+                  crop: { ...viewBox, ...pieceDimensions },
+                },
+              ],
+              { compress: 1, format: ImageManipulator.SaveFormat.JPEG }
+            );
 
-          const piece: Piece = {
-            href,
-            pieceDimensions,
-            piecePath: piecePaths.length ? piecePaths[solvedIndex] : "",
-            initialPlacement,
-            initialRotation:
-              Math.floor(Math.random() * 4) * 90 * DEGREE_CONVERSION,
-            solvedIndex,
-            snapOffset,
-          };
-          _pieces.push(piece);
+            const piece: Piece = {
+              href,
+              pieceDimensions,
+              piecePath: piecePaths.length ? piecePaths[solvedIndex] : "",
+              initialPlacement,
+              initialRotation:
+                Math.floor(Math.random() * 4) * 90 * DEGREE_CONVERSION,
+              solvedIndex,
+              snapOffset,
+            };
+            _pieces.push(piece);
+          }
+          setPieces(_pieces);
+        } catch (e) {
+          console.log(e);
+          alert("Could not load puzzle!");
+          navigation.navigate("Home");
         }
-        setPieces(_pieces);
       };
       createPieces();
       setSnapPoints(getSnapPoints(gridSize, squareSize));
@@ -261,7 +278,7 @@ export default function PuzzleComponent({
           <View style={styles(styleProps).puzzleArea}>
             <View style={styles(styleProps).messageContainer}>
               <Text style={styles(styleProps).startText}>
-                Drag and rotate pieces onto this board!
+                Drag pieces onto the board! Double tap to rotate!
               </Text>
             </View>
           </View>
@@ -306,7 +323,7 @@ export default function PuzzleComponent({
   }
 }
 
-const styles = (props: any) =>
+const styles = (props: { theme: Theme; boardSize: number }) =>
   StyleSheet.create({
     messageContainer: {
       flexDirection: "row",

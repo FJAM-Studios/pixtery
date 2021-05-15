@@ -8,7 +8,7 @@ import { Card, IconButton, Button, Headline } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 
 import { setSentPuzzles } from "../store/reducers/sentPuzzles";
-import { Puzzle } from "../types";
+import { Puzzle, ScreenNavigation } from "../types";
 import { shareMessage } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
@@ -16,7 +16,7 @@ import Header from "./Header";
 export default function SentPuzzleList({
   navigation,
 }: {
-  navigation: any;
+  navigation: ScreenNavigation;
 }): JSX.Element {
   const dispatch = useDispatch();
   const theme = useSelector((state) => state.theme);
