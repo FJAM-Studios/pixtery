@@ -8,7 +8,7 @@ import { RootState } from "../types";
 import Logo from "./Logo";
 import Title from "./Title";
 
-export default function TiteScreen(): JSX.Element {
+export default function TitleScreen(): JSX.Element {
   const theme = useSelector((state: RootState) => state.theme);
   return (
     <View

@@ -1,6 +1,8 @@
 // the theme never changes so this is a little overkill but theme is getting passed down through multiple levels of components. Plus if we do decide to let the user switch between theme, e.g. day and night, this will make it easier.
 
 import { DefaultTheme } from "react-native-paper";
+import { Theme } from "react-native-paper/lib/typescript/types";
+import { AnyAction } from "redux";
 
 // action types
 
@@ -8,7 +10,7 @@ const SET_THEME = "SET_THEME";
 
 // action creators
 
-export const setTheme = (theme) => {
+export const setTheme = (theme: Theme): AnyAction => {
   return {
     type: SET_THEME,
     theme,
@@ -17,7 +19,7 @@ export const setTheme = (theme) => {
 
 // reducer
 
-const theme = {
+const theme: Theme = {
   ...DefaultTheme,
   roundness: 10,
   colors: {
@@ -33,9 +35,9 @@ const theme = {
   },
 };
 
-const initialState = theme;
+const initialState: Theme = theme;
 
-function reducer(state = initialState, action) {
+function reducer(state = initialState, action: AnyAction): Theme {
   switch (action.type) {
     case SET_THEME:
       return action.theme;

@@ -25,7 +25,7 @@ import {
   BoardSpace,
   ScreenNavigation,
   PuzzleRoute,
-  RootState
+  RootState,
 } from "../types";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
