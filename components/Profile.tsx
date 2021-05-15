@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setProfile } from "../store/reducers/profile";
 import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
 import { setSentPuzzles } from "../store/reducers/sentPuzzles";
-import { ScreenNavigation } from "../types";
+import { ScreenNavigation, RootState } from "../types";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 
@@ -18,10 +18,12 @@ export default function Profile({
   navigation: ScreenNavigation;
 }): JSX.Element {
   const dispatch = useDispatch();
-  const theme = useSelector((state) => state.theme);
-  const receivedPuzzles = useSelector((state) => state.receivedPuzzles);
-  const sentPuzzles = useSelector((state) => state.sentPuzzles);
-  const profile = useSelector((state) => state.profile);
+  const theme = useSelector((state: RootState) => state.theme);
+  const receivedPuzzles = useSelector(
+    (state: RootState) => state.receivedPuzzles
+  );
+  const sentPuzzles = useSelector((state: RootState) => state.sentPuzzles);
+  const profile = useSelector((state: RootState) => state.profile);
   console.log(profile);
   const [name, setName] = useState((profile && profile.name) || "");
   const [errors, setErrors] = useState("");

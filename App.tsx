@@ -20,7 +20,7 @@ import SentPuzzleList from "./components/SentPuzzleList";
 import Splash from "./components/Splash";
 import TitleScreen from "./components/TitleScreen";
 import { setDeviceSize } from "./store/reducers/screenHeight";
-import { StackScreens } from "./types";
+import { StackScreens, RootState } from "./types";
 import { goToScreen } from "./util";
 
 //less than ideal, but idk if we have a choice right now. suppresses the firebase timeout warning
@@ -31,7 +31,7 @@ const Stack = createStackNavigator<StackScreens>();
 const App = (): JSX.Element => {
   const dispatch = useDispatch();
   const navigationRef = useRef<NavigationContainerRef>();
-  const theme = useSelector((state) => state.theme);
+  const theme = useSelector((state: RootState) => state.theme);
 
   // on url change go to the splash screen, which will stop the user if they aren't logged in
   useEffect(() => {

@@ -7,7 +7,7 @@ import { Text, Card, IconButton, Button, Headline } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 
 import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
-import { Puzzle, ScreenNavigation } from "../types";
+import { Puzzle, ScreenNavigation, RootState } from "../types";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 
@@ -17,8 +17,10 @@ export default function PuzzleList({
   navigation: ScreenNavigation;
 }): JSX.Element {
   const dispatch = useDispatch();
-  const theme = useSelector((state) => state.theme);
-  const receivedPuzzles = useSelector((state) => state.receivedPuzzles);
+  const theme = useSelector((state: RootState) => state.theme);
+  const receivedPuzzles = useSelector(
+    (state: RootState) => state.receivedPuzzles
+  );
   const [modalVisible, setModalVisible] = React.useState(false);
   const [puzzleToDelete, setPuzzleToDelete] = React.useState<Puzzle | null>(
     null
