@@ -4,14 +4,20 @@ import React, { useState, useRef } from "react";
 import { View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Headline, Text, TextInput, Button } from "react-native-paper";
+import { Theme } from "react-native-paper/lib/typescript/types";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { phoneProvider, firebaseConfig, verifySms } from "../FirebaseApp";
-import { Profile as ProfileType } from "../types";
+import {
+  CreateProfileRoute,
+  Profile as ProfileType,
+  ScreenNavigation,
+} from "../types";
 import { goToScreen } from "../util";
 import Logo from "./Logo";
 import Title from "./Title";
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const phoneFormat = require("phone");
 
 export default function CreateProfile({
@@ -21,17 +27,17 @@ export default function CreateProfile({
   navigation,
   route,
 }: {
-  theme: any;
+  theme: Theme;
   profile: ProfileType | null;
   setProfile: (profile: ProfileType) => void;
-  navigation: any;
-  route: any;
+  navigation: ScreenNavigation;
+  route: CreateProfileRoute;
 }): JSX.Element {
   const recaptchaVerifier = useRef<FirebaseRecaptcha.FirebaseRecaptchaVerifierModal>(
     null
   );
   const [name, setName] = useState((profile && profile.name) || "");
-  const [phone, setPhone] = useState((profile && profile.phone) || "");
+  const [phone, setPhone] = useState("");
   const [smsCode, setSmsCode] = useState("");
   const [verificationId, setVerificationId] = useState("");
   const [errors, setErrors] = useState("");
@@ -57,7 +63,6 @@ export default function CreateProfile({
         <FirebaseRecaptcha.FirebaseRecaptchaVerifierModal
           // firebase requires recaptcha for SMS verification.
           ref={recaptchaVerifier}
-          // @ts-ignore
           firebaseConfig={firebaseConfig}
           // this seems to crash the app, so no luck on easy captcha
           // attemptInvisibleVerification={true}
@@ -140,10 +145,10 @@ export default function CreateProfile({
                     //save to local storage
                     await AsyncStorage.setItem(
                       "@pixteryProfile",
-                      JSON.stringify({ name, phone })
+                      JSON.stringify({ name })
                     );
                     //update app state
-                    setProfile({ name, phone });
+                    setProfile({ name });
                     //send ya on your way, either home or to AddPuzzle if you were redirected here to log in first
                     if (route.params && route.params.url)
                       goToScreen(navigation, "Splash", {
