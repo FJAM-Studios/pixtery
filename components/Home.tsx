@@ -22,7 +22,7 @@ import {
 import Svg, { Path } from "react-native-svg";
 import uuid from "uuid";
 
-import { storage, functions } from "../FirebaseApp";
+import { storage, functions, db } from "../FirebaseApp";
 import {
   DEFAULT_IMAGE_SIZE,
   COMPRESSION,
@@ -71,17 +71,17 @@ export default ({
   const selectImage = async (camera: boolean) => {
     const result = camera
       ? await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 4],
-        quality: 1,
-      })
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          allowsEditing: true,
+          aspect: [4, 4],
+          quality: 1,
+        })
       : await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 4],
-        quality: 1,
-      });
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          allowsEditing: true,
+          aspect: [4, 4],
+          quality: 1,
+        });
 
     if (!result.cancelled) {
       // if the resulting image is not a square because user did not zoom to fill image select box
@@ -122,6 +122,11 @@ export default ({
     await displayPainfulAd();
     const fileName: string = uuid.v4();
     try {
+      // const result = test();
+      // console.log('called test3')
+      // return result;
+      // const result = await uploadString("test2", fileName);
+      // console.log('result', result)
       const localURI = await uploadImage(fileName);
       const newPuzzle = await uploadPuzzleSettings(fileName);
       if (newPuzzle) {
@@ -140,6 +145,30 @@ export default ({
       setModalVisible(false);
     }
     // need to add else for error handling if uploadPuzzSettings throws error
+  };
+
+  const uploadString = async (str, fileName) => {
+    console.log("uploading test string");
+    try {
+      await db.collection("puzzles").doc(fileName).set({ str });
+      return { result: `successfully uploaded ${fileName}` };
+    } catch (error) {
+      throw new functions.https.HttpsError("unknown", error.message, error);
+    }
+  };
+
+  const test = () => {
+    
+    const contextTestCallable = functions.httpsCallable("contextTest");
+    try {
+      console.log('called test')
+      const result = contextTestCallable({ firstNumber: 1, secondNumber: 2 });
+      console.log('called test2')
+      return result.data;
+    } catch (error) {
+      console.error(error);
+      throw new Error(error);
+    }
   };
 
   const addToSent = async (puzzle: Puzzle) => {

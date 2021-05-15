@@ -3,7 +3,7 @@ import "firebase/functions";
 import "firebase/firestore";
 import "firebase/storage"; // for jest testing purposes
 
-// import { MY_LAN_IP } from "./ip";
+import { MY_LAN_IP } from "./ip";
 
 const firebaseConfig = {
   apiKey: "***REMOVED***",
@@ -26,13 +26,14 @@ const app = initializeApp();
 const db = app.firestore();
 
 const functions = app.functions();
-// functions.useFunctionsEmulator(`${MY_LAN_IP}:5001`);
+functions.useFunctionsEmulator(`${MY_LAN_IP}:5001`);
 
 const storage = app.storage();
 const phoneProvider = new firebase.auth.PhoneAuthProvider();
 const verifySms = (id: string, code: string) => {
   const credential = firebase.auth.PhoneAuthProvider.credential(id, code);
   const signInResponse = firebase.auth().signInWithCredential(credential);
+  console.log('sign in rsp', signInResponse)
   return signInResponse;
 };
 
