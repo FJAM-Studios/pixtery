@@ -5,8 +5,10 @@ import { View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Headline, Text, TextInput, Button } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useDispatch, useSelector } from "react-redux"
 
 import { phoneProvider, firebaseConfig, verifySms } from "../FirebaseApp";
+import { setProfile } from "../store/reducers/profile";
 import { Profile as ProfileType } from "../types";
 import { goToScreen } from "../util";
 import Logo from "./Logo";
@@ -15,21 +17,18 @@ import Title from "./Title";
 const phoneFormat = require("phone");
 
 export default function CreateProfile({
-  theme,
-  profile,
-  setProfile,
   navigation,
   route,
 }: {
-  theme: any;
-  profile: ProfileType | null;
-  setProfile: (profile: ProfileType) => void;
   navigation: any;
   route: any;
 }): JSX.Element {
+  const dispatch = useDispatch();
   const recaptchaVerifier = useRef<FirebaseRecaptcha.FirebaseRecaptchaVerifierModal>(
     null
   );
+  const theme = useSelector((state) => state.theme);
+  const profile = useSelector(state => state.profile);
   const [name, setName] = useState((profile && profile.name) || "");
   const [phone, setPhone] = useState((profile && profile.phone) || "");
   const [smsCode, setSmsCode] = useState("");
@@ -143,7 +142,7 @@ export default function CreateProfile({
                       JSON.stringify({ name, phone })
                     );
                     //update app state
-                    setProfile({ name, phone });
+                    dispatch(setProfile({ name, phone }));
                     //send ya on your way, either home or to AddPuzzle if you were redirected here to log in first
                     if (route.params && route.params.url)
                       goToScreen(navigation, "Splash", {

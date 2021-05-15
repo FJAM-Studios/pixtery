@@ -26,16 +26,15 @@ import PuzzlePiece from "./PuzzlePiece";
 const disableShuffle = TESTING_MODE;
 
 export default function PuzzleComponent({
-  theme,
   navigation,
   route,
 }: {
-  theme: any;
   navigation: any;
   route: any;
 }): JSX.Element {
   const dispatch = useDispatch();
   const { publicKey } = route.params;
+  const theme = useSelector((state) => state.theme);
   const { boardSize } = useSelector((state) => state.screenHeight);
   const receivedPuzzles = useSelector((state) => state.receivedPuzzles);
   const sentPuzzles = useSelector((state) => state.sentPuzzles);
@@ -223,7 +222,6 @@ export default function PuzzleComponent({
     return (
       <AdSafeAreaView style={styles(styleProps).parentContainer}>
         <Header
-          theme={theme}
           notifications={
             receivedPuzzles.filter((puzzle) => !puzzle.completed).length
           }
@@ -249,7 +247,6 @@ export default function PuzzleComponent({
     ) : (
       <AdSafeAreaView style={styles(styleProps).parentContainer}>
         <Header
-          theme={theme}
           notifications={
             receivedPuzzles.filter((puzzle) => !puzzle.completed).length
           }
