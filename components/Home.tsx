@@ -52,6 +52,7 @@ export default ({
   profile,
   sentPuzzles,
   setSentPuzzles,
+  height,
 }: {
   navigation: ScreenNavigation;
   boardSize: number;
@@ -60,6 +61,7 @@ export default ({
   profile: Profile | null;
   sentPuzzles: Puzzle[];
   setSentPuzzles: (puzzles: Puzzle[]) => void;
+  height: number;
 }): JSX.Element => {
   const [imageURI, setImageURI] = React.useState("");
   const [puzzleType, setPuzzleType] = React.useState("jigsaw");
@@ -239,13 +241,12 @@ export default ({
       }
     })();
   }, []);
-
   return (
     <AdSafeAreaView
       style={{
         flex: 1,
         flexDirection: "column",
-        padding: 10,
+        padding: height * 0.015,
         backgroundColor: theme.colors.background,
         justifyContent: "space-between",
       }}
@@ -287,7 +288,7 @@ export default ({
         >
           <Surface
             style={{
-              padding: 4,
+              padding: height * 0.0065,
               alignItems: "center",
               justifyContent: "center",
               elevation: 4,
@@ -321,7 +322,7 @@ export default ({
           icon="camera"
           mode="contained"
           onPress={() => selectImage(true)}
-          style={{ margin: 10 }}
+          style={{ margin: height * 0.01 }}
         >
           Camera
         </Button>
@@ -329,7 +330,7 @@ export default ({
           icon="folder"
           mode="contained"
           onPress={() => selectImage(false)}
-          style={{ margin: 10 }}
+          style={{ margin: height * 0.01 }}
         >
           Gallery
         </Button>
@@ -343,9 +344,9 @@ export default ({
           <Text>Type:</Text>
           <Surface
             style={{
-              padding: 8,
-              height: 40,
-              width: 40,
+              padding: height * 0.01,
+              height: height * 0.06,
+              width: height * 0.06,
               alignItems: "center",
               justifyContent: "center",
               elevation: 4,
@@ -367,9 +368,9 @@ export default ({
           </Surface>
           <Surface
             style={{
-              padding: 8,
-              height: 40,
-              width: 40,
+              padding: height * 0.01,
+              height: height * 0.06,
+              width: height * 0.06,
               alignItems: "center",
               justifyContent: "center",
               elevation: 4,
@@ -457,12 +458,16 @@ export default ({
           mode="outlined"
           value={message}
           onChangeText={(message) => setMessage(message)}
+          style={{
+            height: height * 0.09,
+            justifyContent: "center",
+          }}
         />
         <Button
           icon="send"
           mode="contained"
           onPress={submitToServer}
-          style={{ margin: 10 }}
+          style={{ margin: height * 0.01 }}
           disabled={imageURI.length === 0}
         >
           Send
