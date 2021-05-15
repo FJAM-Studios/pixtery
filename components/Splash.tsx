@@ -18,7 +18,7 @@ export default function Splash({
   route,
 }: {
   navigation: ScreenNavigation;
-  route?: SplashRoute;
+  route: SplashRoute;
 }): JSX.Element {
   const dispatch = useDispatch();
   const theme = useSelector((state: RootState) => state.theme);

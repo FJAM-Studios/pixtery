@@ -1,10 +1,14 @@
+import { AnyAction } from "redux";
+
+import { Profile } from "../../types";
+
 // action types
 
 const SET_PROFILE = "SET_PROFILE";
 
 // action creators
 
-export const setProfile = (profile) => {
+export const setProfile = (profile: Profile | null): AnyAction => {
   return {
     type: SET_PROFILE,
     profile,
@@ -15,7 +19,10 @@ export const setProfile = (profile) => {
 
 const initialState = null;
 
-function reducer(state = initialState, action) {
+function reducer(
+  state: Profile | null = initialState,
+  action: AnyAction
+): Profile | null {
   switch (action.type) {
     case SET_PROFILE:
       return action.profile;
