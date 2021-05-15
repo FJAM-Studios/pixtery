@@ -8,14 +8,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { setProfile } from "../store/reducers/profile";
 import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
 import { setSentPuzzles } from "../store/reducers/sentPuzzles";
-import { Profile as ProfileType, Puzzle } from "../types";
+import { ScreenNavigation } from "../types";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 
 export default function Profile({
   navigation,
 }: {
-  navigation: any;
+  navigation: ScreenNavigation;
 }): JSX.Element {
   const dispatch = useDispatch();
   const theme = useSelector((state) => state.theme);
@@ -24,7 +24,6 @@ export default function Profile({
   const profile = useSelector((state) => state.profile);
   console.log(profile);
   const [name, setName] = useState((profile && profile.name) || "");
-  const [phone, setPhone] = useState((profile && profile.phone) || "");
   const [errors, setErrors] = useState("");
   return (
     <AdSafeAreaView
@@ -57,23 +56,21 @@ export default function Profile({
         </View>
         <Text>Name</Text>
         <TextInput value={name} onChangeText={(name) => setName(name)} />
-        <Text>Phone Number</Text>
-        <TextInput value={phone} onChangeText={(phone) => setPhone(phone)} />
         <Button
           icon="camera-iris"
           mode="contained"
           onPress={async () => {
-            //probably want to do some further username error checking, nicer phone # entry, etc.
-            if (name.length && phone.length) {
+            //probably want to do some further username error checking
+            if (name.length) {
               //save to local storage
               await AsyncStorage.setItem(
                 "@pixteryProfile",
-                JSON.stringify({ name, phone })
+                JSON.stringify({ name })
               );
               //update app state
-              dispatch(setProfile({ name, phone }));
+              dispatch(setProfile({ name }));
             } else {
-              setErrors("Must enter name and number!");
+              setErrors("You must enter a name!");
             }
           }}
           style={{ margin: 10 }}

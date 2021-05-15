@@ -35,11 +35,12 @@ import {
   generateSquarePiecePaths,
 } from "../puzzleUtils";
 import { setSentPuzzles } from "../store/reducers/sentPuzzles";
-import { Puzzle, Profile } from "../types";
+import { Puzzle, ScreenNavigation } from "../types";
 import { createBlob, shareMessage } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const emptyImage = require("../assets/blank.jpg");
 
 AdMobInterstitial.setAdUnitID(INTERSTITIAL_ID);
@@ -47,7 +48,7 @@ AdMobInterstitial.setAdUnitID(INTERSTITIAL_ID);
 export default ({
   navigation,
 }: {
-  navigation: any;
+  navigation: ScreenNavigation;
 }): JSX.Element => {
   const dispatch = useDispatch();
   const theme = useSelector((state) => state.theme);
@@ -175,7 +176,6 @@ export default ({
       puzzleType,
       gridSize,
       senderName: profile ? profile.name : "No Sender",
-      senderPhone: profile ? profile.phone : "No Sender",
       imageURI: fileName,
       publicKey,
       message,
@@ -251,7 +251,7 @@ export default ({
           dismissable={false}
           contentContainerStyle={{ alignItems: "center" }}
         >
-          {gridSize % 2 ? <Text>Yeah you're working.</Text> : null}
+          {gridSize % 2 ? <Text>Yeah you&aposre working.</Text> : null}
           <Headline>Building a Pixtery!</Headline>
           {gridSize % 2 ? null : <Text>And choosing so carefully</Text>}
           <ActivityIndicator
@@ -452,6 +452,7 @@ export default ({
           onChangeText={(message) => setMessage(message)}
           style={{
             height: height * 0.09,
+            justifyContent: "center",
           }}
         />
         <Button

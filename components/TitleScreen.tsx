@@ -2,7 +2,6 @@
 
 import React from "react";
 import { View } from "react-native";
-import { ActivityIndicator } from "react-native-paper";
 import { useSelector } from "react-redux";
 
 import Logo from "./Logo";
@@ -23,7 +22,6 @@ export default function TiteScreen(): JSX.Element {
     >
       <Logo width="100" height="100" />
       <Title width="100" height="35" />
-      <ActivityIndicator animating color={theme.colors.text} size="large" />
     </View>
   );
 }
