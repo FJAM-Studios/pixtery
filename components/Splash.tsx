@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setProfile } from "../store/reducers/profile";
 import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
 import { setSentPuzzles } from "../store/reducers/sentPuzzles";
-import { ScreenNavigation, SplashRoute } from "../types";
+import { ScreenNavigation, SplashRoute, RootState } from "../types";
 import { goToScreen } from "../util";
 import Logo from "./Logo";
 import Title from "./Title";
@@ -21,8 +21,8 @@ export default function Splash({
   route?: SplashRoute;
 }): JSX.Element {
   const dispatch = useDispatch();
-  const theme = useSelector((state) => state.theme);
-  const profile = useSelector((state) => state.profile);
+  const theme = useSelector((state: RootState) => state.theme);
+  const profile = useSelector((state: RootState) => state.profile);
 
   useEffect(() => {
     const getInitialUrl = async () => {

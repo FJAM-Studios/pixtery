@@ -3,7 +3,7 @@ import { View, TouchableWithoutFeedback } from "react-native";
 import { IconButton, Badge, Menu, Divider } from "react-native-paper";
 import { useSelector } from "react-redux";
 
-import { ScreenNavigation } from "../types";
+import { ScreenNavigation, RootState } from "../types";
 import Logo from "./Logo";
 import Title from "./Title";
 
@@ -14,7 +14,7 @@ export default function Header({
   navigation: ScreenNavigation;
   notifications: number;
 }): JSX.Element {
-  const theme = useSelector((state) => state.theme);
+  const theme = useSelector((state: RootState) => state.theme);
   const [visible, setVisible] = React.useState(false);
   const openMenu = () => setVisible(true);
   const { height } = useSelector((state) => state.screenHeight);

@@ -35,7 +35,7 @@ import {
   generateSquarePiecePaths,
 } from "../puzzleUtils";
 import { setSentPuzzles } from "../store/reducers/sentPuzzles";
-import { Puzzle, ScreenNavigation } from "../types";
+import { Puzzle, ScreenNavigation, RootState } from "../types";
 import { createBlob, shareMessage } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
@@ -51,11 +51,15 @@ export default ({
   navigation: ScreenNavigation;
 }): JSX.Element => {
   const dispatch = useDispatch();
-  const theme = useSelector((state) => state.theme);
-  const { height, boardSize } = useSelector((state) => state.screenHeight);
-  const receivedPuzzles = useSelector((state) => state.receivedPuzzles);
-  const sentPuzzles = useSelector((state) => state.sentPuzzles);
-  const profile = useSelector((state) => state.profile);
+  const theme = useSelector((state: RootState) => state.theme);
+  const { height, boardSize } = useSelector(
+    (state: RootState) => state.screenHeight
+  );
+  const receivedPuzzles = useSelector(
+    (state: RootState) => state.receivedPuzzles
+  );
+  const sentPuzzles = useSelector((state: RootState) => state.sentPuzzles);
+  const profile = useSelector((state: RootState) => state.profile);
   const [imageURI, setImageURI] = React.useState("");
   const [puzzleType, setPuzzleType] = React.useState("jigsaw");
   const [gridSize, setGridSize] = React.useState(3);

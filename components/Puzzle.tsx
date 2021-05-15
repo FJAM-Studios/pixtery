@@ -25,6 +25,7 @@ import {
   BoardSpace,
   ScreenNavigation,
   PuzzleRoute,
+  RootState
 } from "../types";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
@@ -42,10 +43,12 @@ export default function PuzzleComponent({
 }): JSX.Element {
   const dispatch = useDispatch();
   const { publicKey } = route.params;
-  const theme = useSelector((state) => state.theme);
-  const { boardSize } = useSelector((state) => state.screenHeight);
-  const receivedPuzzles = useSelector((state) => state.receivedPuzzles);
-  const sentPuzzles = useSelector((state) => state.sentPuzzles);
+  const theme = useSelector((state: RootState) => state.theme);
+  const { boardSize } = useSelector((state: RootState) => state.screenHeight);
+  const receivedPuzzles = useSelector(
+    (state: RootState) => state.receivedPuzzles
+  );
+  const sentPuzzles = useSelector((state: RootState) => state.sentPuzzles);
 
   const [puzzle, setPuzzle] = useState<Puzzle>();
   const [pieces, setPieces] = useState<Piece[]>([]);

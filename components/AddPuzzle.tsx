@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { storage, functions } from "../FirebaseApp";
 import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
-import { Puzzle, AddPuzzleRoute, ScreenNavigation } from "../types";
+import { Puzzle, AddPuzzleRoute, ScreenNavigation, RootState } from "../types";
 import { goToScreen } from "../util";
 import Logo from "./Logo";
 import Title from "./Title";
@@ -20,8 +20,10 @@ export default function AddPuzzle({
   route: AddPuzzleRoute;
 }): JSX.Element {
   const dispatch = useDispatch();
-  const theme = useSelector((state) => state.theme);
-  const receivedPuzzles = useSelector((state) => state.receivedPuzzles);
+  const theme = useSelector((state: RootState) => state.theme);
+  const receivedPuzzles = useSelector(
+    (state: RootState) => state.receivedPuzzles
+  );
 
   const fetchPuzzle = async (publicKey: string): Promise<Puzzle | void> => {
     const queryPuzzleCallable = functions.httpsCallable("queryPuzzle");

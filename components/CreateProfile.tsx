@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { phoneProvider, firebaseConfig, verifySms } from "../FirebaseApp";
 import { setProfile } from "../store/reducers/profile";
-import { CreateProfileRoute, ScreenNavigation } from "../types";
+import { CreateProfileRoute, ScreenNavigation, RootState } from "../types";
 import { goToScreen } from "../util";
 import Logo from "./Logo";
 import Title from "./Title";
@@ -28,8 +28,8 @@ export default function CreateProfile({
   const recaptchaVerifier = useRef<FirebaseRecaptcha.FirebaseRecaptchaVerifierModal>(
     null
   );
-  const theme = useSelector((state) => state.theme);
-  const profile = useSelector((state) => state.profile);
+  const theme = useSelector((state: RootState) => state.theme);
+  const profile = useSelector((state: RootState) => state.profile);
   const [name, setName] = useState((profile && profile.name) || "");
   const [phone, setPhone] = useState("");
   const [smsCode, setSmsCode] = useState("");
