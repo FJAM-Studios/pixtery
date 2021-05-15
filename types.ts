@@ -83,13 +83,15 @@ export type CreateProfileRoute = RouteProp<StackScreens, "CreateProfile">;
 export type SplashRoute = RouteProp<StackScreens, "Splash">;
 
 //// STORE /////
+export interface ScreenHeight {
+  height: number;
+  boardSize: number;
+}
+
 export interface RootState {
-  profile: object;
+  profile: Profile;
   receivedPuzzles: Puzzle[];
   sentPuzzles: Puzzle[];
-  screenHeight: {
-    height: number;
-    boardSize: number;
-  };
+  screenHeight: ScreenHeight;
   theme: Theme;
 }
