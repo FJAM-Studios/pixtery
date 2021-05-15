@@ -9,11 +9,16 @@ import {Puzzle} from "../../types";
 // create a sec rule for read and see if that throws error
 exports.uploadPuzzleSettings = functions.https.onCall(
     async (data: { fileName: string; newPuzzle: Puzzle }, context) => {
-      // console.log('context', context.auth)
+    // console.log('context', context.auth)
       const {fileName, newPuzzle} = data;
       console.log("uploading puzzle settings");
       try {
-        if (!context.auth) {throw new functions.https.HttpsError("permission-denied", "user not authenticated")}
+        if (!context.auth) {
+          throw new functions.https.HttpsError(
+              "permission-denied",
+              "user not authenticated"
+          );
+        }
         await db.collection("puzzles").doc(fileName).set(newPuzzle);
         return {result: `successfully uploaded ${fileName}`};
       } catch (error) {
@@ -22,15 +27,17 @@ exports.uploadPuzzleSettings = functions.https.onCall(
     }
 );
 // start here - create an onCreate function
-exports.validateUserAuth = functions.firestore.document("/puzzles/{puzzle}").onCreate(async (snapshot, context) => {
-  // const data = snapshot.data()
-  console.log("user auth", context.auth)
-  if (!context.auth) {
-    // Delete the puzzle if user not authenticated
-    console.log("Deleting invalid document for user")
-    await snapshot.ref.delete();
-  }
-});
+exports.validateUserAuth = functions.firestore
+    .document("/puzzles/{puzzle}")
+    .onCreate(async (snapshot, context) => {
+    // const data = snapshot.data()
+      console.log("user auth", context.auth);
+      if (!context.auth) {
+      // Delete the puzzle if user not authenticated
+        console.log("Deleting invalid document for user");
+        await snapshot.ref.delete();
+      }
+    });
 
 // exports.contextTest = functions.https.onCall(
 //      (data, context) => {
@@ -45,24 +52,27 @@ exports.validateUserAuth = functions.firestore.document("/puzzles/{puzzle}").onC
 // );
 
 exports.contextTest = functions.https.onCall((data, context) => {
-  console.log("hi")
-  console.log("context", context)
+  console.log("hi");
+  console.log("context", context);
   // [END addFunctionTrigger]
   // [START readAddData]
   // Numbers passed from the client.
   const firstNumber = data.firstNumber;
   const secondNumber = data.secondNumber;
   // [END readAddData]
-  
+
   // [START addHttpsError]
   // Checking that attributes are present and are numbers.
   if (!Number.isFinite(firstNumber) || !Number.isFinite(secondNumber)) {
     // Throwing an HttpsError so that the client gets the error details.
-    throw new functions.https.HttpsError("invalid-argument", "The function must be called with " +
-          "two arguments \"firstNumber\" and \"secondNumber\" which must both be numbers.");
+    throw new functions.https.HttpsError(
+        "invalid-argument",
+        "The function must be called with " +
+        "two arguments \"firstNumber\" and \"secondNumber\" which must both be numbers."
+    );
   }
   // [END addHttpsError]
-  
+
   // [START returnAddData]
   // returning result.
   return {
@@ -110,7 +120,6 @@ exports.queryPuzzle = functions.https.onCall(
       }
     }
 );
-
 
 // sign in rsp D {
 //   "a": 0,

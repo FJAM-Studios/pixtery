@@ -158,12 +158,11 @@ export default ({
   };
 
   const test = () => {
-    
     const contextTestCallable = functions.httpsCallable("contextTest");
     try {
-      console.log('called test')
+      console.log("called test");
       const result = contextTestCallable({ firstNumber: 1, secondNumber: 2 });
-      console.log('called test2')
+      console.log("called test2");
       return result.data;
     } catch (error) {
       console.error(error);

@@ -84,8 +84,8 @@ export default function PuzzleComponent({
   useEffect(() => {
     return sound
       ? () => {
-        sound.unloadAsync();
-      }
+          sound.unloadAsync();
+        }
       : undefined;
   }, [sound]);
 
@@ -309,7 +309,7 @@ export default function PuzzleComponent({
       </SafeAreaView>
     );
   }
-};
+}
 
 const styles = (props: any) =>
   StyleSheet.create({

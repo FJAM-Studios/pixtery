@@ -33,7 +33,7 @@ const phoneProvider = new firebase.auth.PhoneAuthProvider();
 const verifySms = (id: string, code: string) => {
   const credential = firebase.auth.PhoneAuthProvider.credential(id, code);
   const signInResponse = firebase.auth().signInWithCredential(credential);
-  console.log('sign in rsp', signInResponse)
+  console.log("sign in rsp", signInResponse);
   return signInResponse;
 };
 
