@@ -9,19 +9,20 @@ import { useDispatch, useSelector } from "react-redux"
 
 import { phoneProvider, firebaseConfig, verifySms } from "../FirebaseApp";
 import { setProfile } from "../store/reducers/profile";
-import { Profile as ProfileType } from "../types";
+import { CreateProfileRoute, ScreenNavigation } from "../types";
 import { goToScreen } from "../util";
 import Logo from "./Logo";
 import Title from "./Title";
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const phoneFormat = require("phone");
 
 export default function CreateProfile({
   navigation,
   route,
 }: {
-  navigation: any;
-  route: any;
+  navigation: ScreenNavigation;
+  route: CreateProfileRoute;
 }): JSX.Element {
   const dispatch = useDispatch();
   const recaptchaVerifier = useRef<FirebaseRecaptcha.FirebaseRecaptchaVerifierModal>(
@@ -30,7 +31,7 @@ export default function CreateProfile({
   const theme = useSelector((state) => state.theme);
   const profile = useSelector(state => state.profile);
   const [name, setName] = useState((profile && profile.name) || "");
-  const [phone, setPhone] = useState((profile && profile.phone) || "");
+  const [phone, setPhone] = useState("");
   const [smsCode, setSmsCode] = useState("");
   const [verificationId, setVerificationId] = useState("");
   const [errors, setErrors] = useState("");
@@ -56,7 +57,6 @@ export default function CreateProfile({
         <FirebaseRecaptcha.FirebaseRecaptchaVerifierModal
           // firebase requires recaptcha for SMS verification.
           ref={recaptchaVerifier}
-          // @ts-ignore
           firebaseConfig={firebaseConfig}
           // this seems to crash the app, so no luck on easy captcha
           // attemptInvisibleVerification={true}
@@ -139,10 +139,10 @@ export default function CreateProfile({
                     //save to local storage
                     await AsyncStorage.setItem(
                       "@pixteryProfile",
-                      JSON.stringify({ name, phone })
+                      JSON.stringify({ name })
                     );
                     //update app state
-                    dispatch(setProfile({ name, phone }));
+                    dispatch(setProfile({ name }));
                     //send ya on your way, either home or to AddPuzzle if you were redirected here to log in first
                     if (route.params && route.params.url)
                       goToScreen(navigation, "Splash", {
