@@ -5,7 +5,7 @@ import { View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Headline, Text, TextInput, Button } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useDispatch, useSelector } from "react-redux"
+import { useDispatch, useSelector } from "react-redux";
 
 import { phoneProvider, firebaseConfig, verifySms } from "../FirebaseApp";
 import { setProfile } from "../store/reducers/profile";
@@ -29,7 +29,7 @@ export default function CreateProfile({
     null
   );
   const theme = useSelector((state) => state.theme);
-  const profile = useSelector(state => state.profile);
+  const profile = useSelector((state) => state.profile);
   const [name, setName] = useState((profile && profile.name) || "");
   const [phone, setPhone] = useState("");
   const [smsCode, setSmsCode] = useState("");

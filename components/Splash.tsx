@@ -22,7 +22,7 @@ export default function Splash({
 }): JSX.Element {
   const dispatch = useDispatch();
   const theme = useSelector((state) => state.theme);
-  const profile = useSelector(state => state.profile);
+  const profile = useSelector((state) => state.profile);
 
   useEffect(() => {
     const getInitialUrl = async () => {
