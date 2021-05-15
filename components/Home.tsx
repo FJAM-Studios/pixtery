@@ -219,7 +219,7 @@ export default ({
       setPaths(
         generateJigsawPiecePaths(gridSize, boardSize / (1.6 * gridSize), true)
       );
-  }, [gridSize, puzzleType]);
+  }, [gridSize, puzzleType, boardSize]);
 
   React.useEffect(() => {
     (async () => {
