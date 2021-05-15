@@ -4,6 +4,7 @@ import * as ImageManipulator from "expo-image-manipulator";
 import React, { useEffect, useState, useRef } from "react";
 import { Text, View, StyleSheet, Image, LayoutChangeEvent } from "react-native";
 import { ActivityIndicator } from "react-native-paper";
+import { Theme } from "react-native-paper/lib/typescript/types";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { DEGREE_CONVERSION, TESTING_MODE } from "../constants";
@@ -15,7 +16,14 @@ import {
   getInitialDimensions,
   validateBoard,
 } from "../puzzleUtils";
-import { Puzzle, Piece, Point, BoardSpace } from "../types";
+import {
+  Puzzle,
+  Piece,
+  Point,
+  BoardSpace,
+  ScreenNavigation,
+  PuzzleRoute,
+} from "../types";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 import PuzzlePiece from "./PuzzlePiece";
@@ -33,11 +41,11 @@ export default function PuzzleComponent({
   setReceivedPuzzles,
 }: {
   boardSize: number;
-  theme: any;
-  navigation: any;
+  theme: Theme;
+  navigation: ScreenNavigation;
   receivedPuzzles: Puzzle[];
   sentPuzzles: Puzzle[];
-  route: any;
+  route: PuzzleRoute;
   setReceivedPuzzles: (puzzles: Puzzle[]) => void;
 }): JSX.Element {
   const { publicKey } = route.params;
@@ -275,7 +283,7 @@ export default function PuzzleComponent({
           <View style={styles(styleProps).puzzleArea}>
             <View style={styles(styleProps).messageContainer}>
               <Text style={styles(styleProps).startText}>
-                Drag and rotate pieces onto this board!
+                Drag pieces onto the board! Double tap to rotate!
               </Text>
             </View>
           </View>
@@ -318,9 +326,9 @@ export default function PuzzleComponent({
       </SafeAreaView>
     );
   }
-};
+}
 
-const styles = (props: any) =>
+const styles = (props: { theme: Theme; boardSize: number }) =>
   StyleSheet.create({
     messageContainer: {
       flexDirection: "row",
