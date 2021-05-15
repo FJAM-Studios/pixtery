@@ -15,12 +15,11 @@ import Header from "./Header";
 
 export default function SentPuzzleList({
   navigation,
-  theme,
 }: {
   navigation: any;
-  theme: any;
 }): JSX.Element {
   const dispatch = useDispatch();
+  const theme = useSelector((state) => state.theme);
   const receivedPuzzles = useSelector((state) => state.receivedPuzzles);
   const sentPuzzles = useSelector((state) => state.sentPuzzles);
   const [modalVisible, setModalVisible] = React.useState(false);
@@ -106,7 +105,6 @@ export default function SentPuzzleList({
         </View>
       </Modal>
       <Header
-        theme={theme}
         notifications={
           receivedPuzzles.filter((puzzle) => !puzzle.completed).length
         }

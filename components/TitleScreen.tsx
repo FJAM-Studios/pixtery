@@ -3,11 +3,13 @@
 import React from "react";
 import { View } from "react-native";
 import { ActivityIndicator } from "react-native-paper";
+import { useSelector } from "react-redux";
 
 import Logo from "./Logo";
 import Title from "./Title";
 
-export default function TiteScreen({ theme }: { theme: any }): JSX.Element {
+export default function TiteScreen(): JSX.Element {
+  const theme = useSelector((state) => state.theme);
   return (
     <View
       style={{

@@ -5,6 +5,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import { Headline, Text, TextInput, Button } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 
+import { setProfile } from "../store/reducers/profile";
 import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
 import { setSentPuzzles } from "../store/reducers/sentPuzzles";
 import { Profile as ProfileType, Puzzle } from "../types";
@@ -12,19 +13,16 @@ import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 
 export default function Profile({
-  theme,
-  profile,
-  setProfile,
   navigation,
 }: {
-  theme: any;
-  profile: ProfileType | null;
-  setProfile: (profile: ProfileType | null) => void;
   navigation: any;
 }): JSX.Element {
   const dispatch = useDispatch();
+  const theme = useSelector((state) => state.theme);
   const receivedPuzzles = useSelector((state) => state.receivedPuzzles);
   const sentPuzzles = useSelector((state) => state.sentPuzzles);
+  const profile = useSelector((state) => state.profile);
+  console.log(profile);
   const [name, setName] = useState((profile && profile.name) || "");
   const [phone, setPhone] = useState((profile && profile.phone) || "");
   const [errors, setErrors] = useState("");
@@ -38,7 +36,6 @@ export default function Profile({
       }}
     >
       <Header
-        theme={theme}
         notifications={
           receivedPuzzles.filter((puzzle) => !puzzle.completed).length
         }
@@ -74,7 +71,7 @@ export default function Profile({
                 JSON.stringify({ name, phone })
               );
               //update app state
-              setProfile({ name, phone });
+              dispatch(setProfile({ name, phone }));
             } else {
               setErrors("Must enter name and number!");
             }
@@ -91,7 +88,7 @@ export default function Profile({
             //delete local storage
             await AsyncStorage.removeItem("@pixteryProfile");
             //update app state
-            setProfile(null);
+            dispatch(setProfile(null));
             //send you to splash
             navigation.navigate("Splash");
           }}
