@@ -3,8 +3,9 @@ import React, { useState } from "react";
 import { View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Headline, Text, TextInput, Button } from "react-native-paper";
+import { Theme } from "react-native-paper/lib/typescript/types";
 
-import { Profile as ProfileType, Puzzle } from "../types";
+import { Profile as ProfileType, Puzzle, ScreenNavigation } from "../types";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 
@@ -18,17 +19,16 @@ export default function Profile({
   setSentPuzzles,
   setReceivedPuzzles,
 }: {
-  theme: any;
+  theme: Theme;
   profile: ProfileType | null;
   setProfile: (profile: ProfileType | null) => void;
-  navigation: any;
+  navigation: ScreenNavigation;
   receivedPuzzles: Puzzle[];
   sentPuzzles: Puzzle[];
   setReceivedPuzzles: (puzzles: Puzzle[]) => void;
   setSentPuzzles: (puzzles: Puzzle[]) => void;
 }): JSX.Element {
   const [name, setName] = useState((profile && profile.name) || "");
-  const [phone, setPhone] = useState((profile && profile.phone) || "");
   const [errors, setErrors] = useState("");
   return (
     <AdSafeAreaView
@@ -62,23 +62,21 @@ export default function Profile({
         </View>
         <Text>Name</Text>
         <TextInput value={name} onChangeText={(name) => setName(name)} />
-        <Text>Phone Number</Text>
-        <TextInput value={phone} onChangeText={(phone) => setPhone(phone)} />
         <Button
           icon="camera-iris"
           mode="contained"
           onPress={async () => {
-            //probably want to do some further username error checking, nicer phone # entry, etc.
-            if (name.length && phone.length) {
+            //probably want to do some further username error checking
+            if (name.length) {
               //save to local storage
               await AsyncStorage.setItem(
                 "@pixteryProfile",
-                JSON.stringify({ name, phone })
+                JSON.stringify({ name })
               );
               //update app state
-              setProfile({ name, phone });
+              setProfile({ name });
             } else {
-              setErrors("Must enter name and number!");
+              setErrors("You must enter a name!");
             }
           }}
           style={{ margin: 10 }}
