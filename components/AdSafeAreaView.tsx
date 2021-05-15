@@ -1,10 +1,14 @@
 import { AdMobBanner } from "expo-ads-admob";
 import React from "react";
+import { StyleProp, ViewStyle } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { BANNER_ID } from "../constants";
 
-export default function AdSafeAreaView(props: any): JSX.Element {
+export default function AdSafeAreaView(props: {
+  style: StyleProp<ViewStyle>;
+  children: React.ReactNode;
+}): JSX.Element {
   return (
     <SafeAreaView {...props.style}>
       {props.children}

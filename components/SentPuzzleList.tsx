@@ -5,25 +5,26 @@ import * as React from "react";
 import { ImageBackground, View, TouchableOpacity } from "react-native";
 import Modal from "react-native-modal";
 import { Card, IconButton, Button, Headline } from "react-native-paper";
+import { Theme } from "react-native-paper/lib/typescript/types";
 
-import { Puzzle } from "../types";
+import { Puzzle, ScreenNavigation } from "../types";
 import { shareMessage } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 
-export default ({
+export default function SentPuzzleList({
   navigation,
   theme,
   receivedPuzzles,
   sentPuzzles,
   setSentPuzzles,
 }: {
-  navigation: any;
-  theme: any;
+  navigation: ScreenNavigation;
+  theme: Theme;
   receivedPuzzles: Puzzle[];
   sentPuzzles: Puzzle[];
   setSentPuzzles: (puzzles: Puzzle[]) => void;
-}): JSX.Element => {
+}): JSX.Element {
   const [modalVisible, setModalVisible] = React.useState(false);
   const [puzzleToDelete, setPuzzleToDelete] = React.useState<Puzzle | null>(
     null
@@ -171,4 +172,4 @@ export default ({
       </View>
     </AdSafeAreaView>
   );
-};
+}

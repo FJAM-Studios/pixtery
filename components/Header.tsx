@@ -1,7 +1,9 @@
 import React from "react";
 import { View, TouchableWithoutFeedback, Dimensions } from "react-native";
 import { IconButton, Badge, Menu, Divider } from "react-native-paper";
+import { Theme } from "react-native-paper/lib/typescript/types";
 
+import { ScreenNavigation } from "../types";
 import Logo from "./Logo";
 import Title from "./Title";
 
@@ -10,9 +12,9 @@ export default function Header({
   notifications,
   theme,
 }: {
-  navigation: any;
+  navigation: ScreenNavigation;
   notifications: number;
-  theme: any;
+  theme: Theme;
 }): JSX.Element {
   const [visible, setVisible] = React.useState(false);
   const openMenu = () => setVisible(true);
@@ -92,15 +94,6 @@ export default function Header({
           }}
           title="Profile"
           icon="cog"
-        />
-        <Menu.Item
-          onPress={() => {
-            closeMenu();
-            navigation.navigate("DevTest");
-          }}
-          title="DevTest"
-          icon="laptop"
-          style={{ backgroundColor: theme.colors.accent }}
         />
       </Menu>
     </View>

@@ -3,8 +3,14 @@ import * as Linking from "expo-linking";
 import React, { useEffect } from "react";
 import { View } from "react-native";
 import { ActivityIndicator } from "react-native-paper";
+import { Theme } from "react-native-paper/lib/typescript/types";
 
-import { Puzzle as PuzzleType, Profile as ProfileType } from "../types";
+import {
+  Puzzle as PuzzleType,
+  Profile as ProfileType,
+  ScreenNavigation,
+  SplashRoute,
+} from "../types";
 import { goToScreen } from "../util";
 import Logo from "./Logo";
 import Title from "./Title";
@@ -18,13 +24,13 @@ export default function Splash({
   navigation,
   route,
 }: {
-  theme: any;
+  theme: Theme;
   setReceivedPuzzles: (puzzles: PuzzleType[]) => void;
   setSentPuzzles: (puzzles: PuzzleType[]) => void;
   profile: ProfileType | null;
   setProfile: (profile: ProfileType) => void;
-  navigation: any;
-  route?: any;
+  navigation: ScreenNavigation;
+  route: SplashRoute;
 }): JSX.Element {
   useEffect(() => {
     const getInitialUrl = async () => {
@@ -39,6 +45,8 @@ export default function Splash({
         return loadedProfile;
       } catch (e) {
         console.log(e);
+        alert("Could not load profile.");
+        return null;
       }
     };
     const loadPuzzles = async () => {
@@ -55,6 +63,7 @@ export default function Splash({
         setSentPuzzles(loadedSentPuzzles);
       } catch (e) {
         console.log(e);
+        alert("Could not load saved puzzles.");
       }
     };
 
@@ -65,11 +74,13 @@ export default function Splash({
           ? route.params.url
           : await getInitialUrl();
       //if you are logged in, load local puzzles, then either navigate to AddPuzzle or Home if there is no url
-      if (profile) {
+      if (profile && url) {
         await loadPuzzles();
-        console.log("params", route.params);
-        if (url) goToScreen(navigation, "AddPuzzle", { url });
-        else goToScreen(navigation, "Home");
+        const { queryParams } = Linking.parse(url);
+        if (queryParams && queryParams.publicKey) {
+          const { publicKey } = queryParams;
+          goToScreen(navigation, "AddPuzzle", { publicKey });
+        } else goToScreen(navigation, "Home");
       } else {
         //otherwise, load profile from local storage if it exists
         const loadedProfile = await loadProfile();
