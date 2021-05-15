@@ -1,8 +1,10 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Audio } from "expo-av";
 import * as ImageManipulator from "expo-image-manipulator";
 import React, { useEffect, useState, useRef } from "react";
 import { Text, View, StyleSheet, Image, LayoutChangeEvent } from "react-native";
 import { ActivityIndicator } from "react-native-paper";
+import { Theme } from "react-native-paper/lib/typescript/types";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { DEGREE_CONVERSION, TESTING_MODE } from "../constants";
@@ -14,7 +16,14 @@ import {
   getInitialDimensions,
   validateBoard,
 } from "../puzzleUtils";
-import { Puzzle, Piece, Point, BoardSpace } from "../types";
+import {
+  Puzzle,
+  Piece,
+  Point,
+  BoardSpace,
+  ScreenNavigation,
+  PuzzleRoute,
+} from "../types";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 import PuzzlePiece from "./PuzzlePiece";
@@ -22,7 +31,7 @@ import PuzzlePiece from "./PuzzlePiece";
 //disable shuffling for testing
 const disableShuffle = TESTING_MODE;
 
-export default ({
+export default function PuzzleComponent({
   boardSize,
   theme,
   navigation,
@@ -32,13 +41,13 @@ export default ({
   setReceivedPuzzles,
 }: {
   boardSize: number;
-  theme: any;
-  navigation: any;
+  theme: Theme;
+  navigation: ScreenNavigation;
   receivedPuzzles: Puzzle[];
   sentPuzzles: Puzzle[];
-  route: any;
+  route: PuzzleRoute;
   setReceivedPuzzles: (puzzles: Puzzle[]) => void;
-}): JSX.Element => {
+}): JSX.Element {
   const { publicKey } = route.params;
 
   const [puzzle, setPuzzle] = useState<Puzzle>();
@@ -50,6 +59,8 @@ export default ({
     puzzleAreaWidth: 0,
     puzzleAreaHeight: 0,
   });
+  const [sound, setSound] = useState<Audio.Sound>();
+  const [opaque, setOpaque] = useState<boolean>(false);
 
   // z index and current board are not handled through react state so that they don't
   // cause Puzzle/PuzzlePiece re-renders, which would break the positional tracking
@@ -66,13 +77,45 @@ export default ({
   // store current pieces snapped to board
   let currentBoard: BoardSpace[] = useRef([]).current;
 
+  //set up the camera click sound and clean up on unmount
+  useEffect(() => {
+    const initializeSound = async () => {
+      const { sound } = await Audio.Sound.createAsync(
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        require("../assets/camera-click.wav")
+      );
+      setSound(sound);
+    };
+
+    initializeSound();
+  }, []);
+
+  useEffect(() => {
+    return sound
+      ? () => {
+          sound.unloadAsync();
+        }
+      : undefined;
+  }, [sound]);
+
+  const animateWin = async () => {
+    setTimeout(() => {
+      setOpaque(true);
+      setTimeout(() => {
+        const winMessage =
+          puzzle && puzzle.message && puzzle.message.length > 0
+            ? puzzle.message
+            : "Congrats! You solved the puzzle!";
+        setWinMessage(winMessage);
+        setOpaque(false);
+      }, 100);
+      if (sound) sound.playAsync();
+    }, 100);
+  };
+
   const checkWin = () => {
     if (puzzle && validateBoard(currentBoard, puzzle.gridSize)) {
-      const winMessage =
-        puzzle.message && puzzle.message.length > 0
-          ? puzzle.message
-          : "Congrats! You solved the puzzle!";
-      setWinMessage(winMessage);
+      animateWin();
       markPuzzleComplete(publicKey);
     }
   };
@@ -89,7 +132,7 @@ export default ({
     const matchingPuzzles = [...receivedPuzzles, ...sentPuzzles].filter(
       (puz) => puz.publicKey === publicKey
     );
-    if (matchingPuzzles.length) {
+    if (matchingPuzzles.length && puzzleAreaDimensions.puzzleAreaWidth > 0) {
       const pickedPuzzle = matchingPuzzles[0];
       const { gridSize, puzzleType, imageURI } = pickedPuzzle;
       const squareSize = boardSize / gridSize;
@@ -102,62 +145,70 @@ export default ({
       const shuffleOrder = shuffle(fillArray(gridSize), disableShuffle);
 
       const createPieces = async () => {
-        const _pieces: Piece[] = [];
-        const piecePaths =
-          puzzleType === "jigsaw"
-            ? generateJigsawPiecePaths(gridSize, squareSize)
-            : [];
-        // manipulate images in Puzzle component instead to save on renders
-        for (
-          let shuffledIndex = 0;
-          shuffledIndex < numPieces;
-          shuffledIndex++
-        ) {
-          const solvedIndex = shuffleOrder[shuffledIndex];
-          const {
-            pieceDimensions,
-            initialPlacement,
-            viewBox,
-            snapOffset,
-          } = getInitialDimensions(
-            puzzleType,
-            minSandboxY,
-            maxSandboxY,
-            solvedIndex,
-            shuffledIndex,
-            gridSize,
-            squareSize
-          );
+        try {
+          const _pieces: Piece[] = [];
+          const piecePaths =
+            puzzleType === "jigsaw"
+              ? generateJigsawPiecePaths(gridSize, squareSize)
+              : [];
+          // manipulate images in Puzzle component instead to save on renders
+          for (
+            let shuffledIndex = 0;
+            shuffledIndex < numPieces;
+            shuffledIndex++
+          ) {
+            const solvedIndex = shuffleOrder[shuffledIndex];
+            const {
+              pieceDimensions,
+              initialPlacement,
+              viewBox,
+              snapOffset,
+            } = getInitialDimensions(
+              puzzleType,
+              minSandboxY,
+              maxSandboxY,
+              solvedIndex,
+              shuffledIndex,
+              gridSize,
+              squareSize
+            );
 
-          const href = await ImageManipulator.manipulateAsync(
-            imageURI,
-            [
-              {
-                resize: {
-                  width: boardSize,
-                  height: boardSize,
+            const href = await ImageManipulator.manipulateAsync(
+              // testing an invalid imageURI, in case the pic is deleted/corrupted
+              // imageURI + "bogus",
+              imageURI,
+              [
+                {
+                  resize: {
+                    width: boardSize,
+                    height: boardSize,
+                  },
                 },
-              },
-              {
-                crop: { ...viewBox, ...pieceDimensions },
-              },
-            ],
-            { compress: 1, format: ImageManipulator.SaveFormat.JPEG }
-          );
+                {
+                  crop: { ...viewBox, ...pieceDimensions },
+                },
+              ],
+              { compress: 1, format: ImageManipulator.SaveFormat.JPEG }
+            );
 
-          const piece: Piece = {
-            href,
-            pieceDimensions,
-            piecePath: piecePaths.length ? piecePaths[solvedIndex] : "",
-            initialPlacement,
-            initialRotation:
-              Math.floor(Math.random() * 4) * 90 * DEGREE_CONVERSION,
-            solvedIndex,
-            snapOffset,
-          };
-          _pieces.push(piece);
+            const piece: Piece = {
+              href,
+              pieceDimensions,
+              piecePath: piecePaths.length ? piecePaths[solvedIndex] : "",
+              initialPlacement,
+              initialRotation:
+                Math.floor(Math.random() * 4) * 90 * DEGREE_CONVERSION,
+              solvedIndex,
+              snapOffset,
+            };
+            _pieces.push(piece);
+          }
+          setPieces(_pieces);
+        } catch (e) {
+          console.log(e);
+          alert("Could not load puzzle!");
+          navigation.navigate("Home");
         }
-        setPieces(_pieces);
       };
       createPieces();
       setSnapPoints(getSnapPoints(gridSize, squareSize));
@@ -207,7 +258,14 @@ export default ({
       </AdSafeAreaView>
     );
   if (puzzle && pieces.length) {
-    return (
+    return opaque ? (
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: "black",
+        }}
+      />
+    ) : (
       <AdSafeAreaView style={styles(styleProps).parentContainer}>
         <Header
           theme={theme}
@@ -225,7 +283,7 @@ export default ({
           <View style={styles(styleProps).puzzleArea}>
             <View style={styles(styleProps).messageContainer}>
               <Text style={styles(styleProps).startText}>
-                Drag and rotate pieces onto this board!
+                Drag pieces onto the board! Double tap to rotate!
               </Text>
             </View>
           </View>
@@ -268,9 +326,9 @@ export default ({
       </SafeAreaView>
     );
   }
-};
+}
 
-const styles = (props: any) =>
+const styles = (props: { theme: Theme; boardSize: number }) =>
   StyleSheet.create({
     messageContainer: {
       flexDirection: "row",
@@ -284,7 +342,7 @@ const styles = (props: any) =>
       color: "orange",
     },
     winText: {
-      fontSize: 20,
+      fontSize: 50,
       flexWrap: "wrap",
       textAlign: "center",
       flex: 1,

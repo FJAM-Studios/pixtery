@@ -1,5 +1,4 @@
 import {
-  CommonActions,
   NavigationContainer,
   NavigationContainerRef,
 } from "@react-navigation/native";
@@ -12,7 +11,6 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import AddPuzzle from "./components/AddPuzzle";
 import CreateProfile from "./components/CreateProfile";
-import DevTest from "./components/DevTest";
 import HomeScreen from "./components/Home";
 import Profile from "./components/Profile";
 import Puzzle from "./components/Puzzle";
@@ -20,13 +18,15 @@ import PuzzleList from "./components/PuzzleList";
 import SentPuzzleList from "./components/SentPuzzleList";
 import Splash from "./components/Splash";
 import TitleScreen from "./components/TitleScreen";
-import { Puzzle as PuzzleType, Profile as ProfileType } from "./types";
+import {
+  Puzzle as PuzzleType,
+  Profile as ProfileType,
+  StackScreens,
+} from "./types";
 import { goToScreen } from "./util";
 
 //less than ideal, but idk if we have a choice right now. suppresses the firebase timeout warning
 LogBox.ignoreLogs(["Setting a timer for a long period of time"]);
-
-const image = require("./assets/earth.jpg");
 
 export const theme = {
   ...DefaultTheme,
@@ -44,13 +44,13 @@ export const theme = {
   },
 };
 
-const Stack = createStackNavigator();
+const Stack = createStackNavigator<StackScreens>();
 
 const App = (): JSX.Element => {
   const [receivedPuzzles, setReceivedPuzzles] = useState<PuzzleType[]>([]);
   const [sentPuzzles, setSentPuzzles] = useState<PuzzleType[]>([]);
   const [profile, setProfile] = useState<ProfileType | null>(null);
-  const navigationRef = useRef<NavigationContainerRef>();
+  const navigationRef = useRef<NavigationContainerRef | null>(null);
 
   const { width, height } = Dimensions.get("screen");
   const boardSize = 0.95 * Math.min(height, width);
@@ -66,7 +66,10 @@ const App = (): JSX.Element => {
 
   // to control trigger order and prevent users from skipping the login screen, puzzle querying has been moved to AddPuzzle, which is called from Splash, which is navigated to only after the navigation container loads using the onReady prop
   const gotoSplash = () => {
-    if (navigationRef.current) goToScreen(navigationRef.current, "Splash");
+    // this timeout is if we want to force users to see the starting screen before moving on.
+    setTimeout(() => {
+      if (navigationRef.current) goToScreen(navigationRef.current, "Splash");
+    }, 1000);
   };
 
   return (
@@ -135,14 +138,7 @@ const App = (): JSX.Element => {
                   />
                 )}
               </Stack.Screen>
-              <Stack.Screen
-                name="Puzzle"
-                initialParams={{
-                  imageURI: image.uri,
-                  puzzleType: "jigsaw",
-                  gridSize: 3,
-                }}
-              >
+              <Stack.Screen name="Puzzle">
                 {(props) => (
                   <Puzzle
                     {...props}
@@ -177,9 +173,6 @@ const App = (): JSX.Element => {
                     setReceivedPuzzles={setReceivedPuzzles}
                   />
                 )}
-              </Stack.Screen>
-              <Stack.Screen name="DevTest">
-                {(props) => <DevTest {...props} theme={theme} />}
               </Stack.Screen>
             </Stack.Navigator>
           </View>

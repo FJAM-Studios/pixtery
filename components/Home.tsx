@@ -19,6 +19,7 @@ import {
   Modal,
   Portal,
 } from "react-native-paper";
+import { Theme } from "react-native-paper/lib/typescript/types";
 import Svg, { Path } from "react-native-svg";
 import uuid from "uuid";
 
@@ -33,11 +34,12 @@ import {
   generateJigsawPiecePaths,
   generateSquarePiecePaths,
 } from "../puzzleUtils";
-import { Puzzle, Profile } from "../types";
+import { Puzzle, Profile, ScreenNavigation } from "../types";
 import { createBlob, shareMessage } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const emptyImage = require("../assets/blank.jpg");
 
 AdMobInterstitial.setAdUnitID(INTERSTITIAL_ID);
@@ -52,9 +54,9 @@ export default ({
   setSentPuzzles,
   height,
 }: {
-  navigation: any;
+  navigation: ScreenNavigation;
   boardSize: number;
-  theme: any;
+  theme: Theme;
   receivedPuzzles: Puzzle[];
   profile: Profile | null;
   sentPuzzles: Puzzle[];
@@ -123,17 +125,23 @@ export default ({
     setModalVisible(true);
     await displayPainfulAd();
     const fileName: string = uuid.v4();
-    const localURI = await uploadImage(fileName);
-    const newPuzzle = await uploadPuzzleSettings(fileName);
-    if (newPuzzle) {
-      newPuzzle.imageURI = localURI;
-    }
-    setModalVisible(false);
-    if (newPuzzle) {
-      if (newPuzzle.publicKey) {
-        generateLink(newPuzzle.publicKey);
-        addToSent(newPuzzle);
+    try {
+      const localURI = await uploadImage(fileName);
+      const newPuzzle = await uploadPuzzleSettings(fileName);
+      if (newPuzzle) {
+        newPuzzle.imageURI = localURI;
       }
+      setModalVisible(false);
+      if (newPuzzle) {
+        if (newPuzzle.publicKey) {
+          generateLink(newPuzzle.publicKey);
+          addToSent(newPuzzle);
+        }
+      }
+    } catch (error) {
+      console.log(error);
+      alert("Could not upload puzzle. Check connection and try again later.");
+      setModalVisible(false);
     }
     // need to add else for error handling if uploadPuzzSettings throws error
   };
@@ -175,7 +183,6 @@ export default ({
       puzzleType,
       gridSize,
       senderName: profile ? profile.name : "No Sender",
-      senderPhone: profile ? profile.phone : "No Sender",
       imageURI: fileName,
       publicKey,
       message,
@@ -189,6 +196,7 @@ export default ({
       return newPuzzle;
     } catch (error) {
       console.error(error);
+      throw new Error(error);
     }
   };
 
@@ -250,7 +258,7 @@ export default ({
           dismissable={false}
           contentContainerStyle={{ alignItems: "center" }}
         >
-          {gridSize % 2 ? <Text>Yeah you're working.</Text> : null}
+          {gridSize % 2 ? <Text>Yeah you&aposre working.</Text> : null}
           <Headline>Building a Pixtery!</Headline>
           {gridSize % 2 ? null : <Text>And choosing so carefully</Text>}
           <ActivityIndicator
