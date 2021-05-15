@@ -21,8 +21,8 @@ export default function SentPuzzleList({
   theme: any;
 }): JSX.Element {
   const dispatch = useDispatch();
-  const receivedPuzzles = useSelector(state => state.receivedPuzzles);
-  const sentPuzzles = useSelector(state =>  state.sentPuzzles);
+  const receivedPuzzles = useSelector((state) => state.receivedPuzzles);
+  const sentPuzzles = useSelector((state) => state.sentPuzzles);
   const [modalVisible, setModalVisible] = React.useState(false);
   const [puzzleToDelete, setPuzzleToDelete] = React.useState<Puzzle | null>(
     null

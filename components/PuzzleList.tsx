@@ -19,7 +19,7 @@ export default function PuzzleList({
   theme: any;
 }): JSX.Element {
   const dispatch = useDispatch();
-  const receivedPuzzles = useSelector(state => state.receivedPuzzles);
+  const receivedPuzzles = useSelector((state) => state.receivedPuzzles);
   const [modalVisible, setModalVisible] = React.useState(false);
   const [puzzleToDelete, setPuzzleToDelete] = React.useState<Puzzle | null>(
     null
