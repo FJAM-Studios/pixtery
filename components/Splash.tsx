@@ -3,8 +3,9 @@ import * as Linking from "expo-linking";
 import React, { useEffect } from "react";
 import { View } from "react-native";
 import { ActivityIndicator } from "react-native-paper";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
+import { setProfile } from "../store/reducers/profile";
 import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
 import { setSentPuzzles } from "../store/reducers/sentPuzzles";
 import { Puzzle as PuzzleType, Profile as ProfileType } from "../types";
@@ -13,19 +14,15 @@ import Logo from "./Logo";
 import Title from "./Title";
 
 export default function Splash({
-  theme,
-  profile,
-  setProfile,
   navigation,
   route,
 }: {
-  theme: any;
-  profile: ProfileType | null;
-  setProfile: (profile: ProfileType) => void;
   navigation: any;
   route?: any;
 }): JSX.Element {
   const dispatch = useDispatch();
+  const theme = useSelector((state) => state.theme);
+  const profile = useSelector(state => state.profile);
 
   useEffect(() => {
     const getInitialUrl = async () => {
@@ -69,16 +66,15 @@ export default function Splash({
           ? route.params.url
           : await getInitialUrl();
       //if you are logged in, load local puzzles, then either navigate to AddPuzzle or Home if there is no url
-      if (profile) {
+      if (profile && profile.name) {
         await loadPuzzles();
-        console.log("params", route.params);
         if (url) goToScreen(navigation, "AddPuzzle", { url });
         else goToScreen(navigation, "Home");
       } else {
         //otherwise, load profile from local storage if it exists
         const loadedProfile = await loadProfile();
         if (loadedProfile) {
-          setProfile(loadedProfile);
+          dispatch(setProfile(loadedProfile));
         } else {
           //or navigate to createprofile if it doesn't exist, passing the url to create profile so it can be forwarded along, and you can go directly to the puzzle after signing in.
           goToScreen(navigation, "CreateProfile", { url });

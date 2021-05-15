@@ -46,17 +46,15 @@ AdMobInterstitial.setAdUnitID(INTERSTITIAL_ID);
 
 export default ({
   navigation,
-  theme,
-  profile,
 }: {
   navigation: any;
-  theme: any;
-  profile: Profile | null;
 }): JSX.Element => {
   const dispatch = useDispatch();
+  const theme = useSelector((state) => state.theme);
   const { height, boardSize } = useSelector((state) => state.screenHeight);
   const receivedPuzzles = useSelector((state) => state.receivedPuzzles);
   const sentPuzzles = useSelector((state) => state.sentPuzzles);
+  const profile = useSelector((state) => state.profile);
   const [imageURI, setImageURI] = React.useState("");
   const [puzzleType, setPuzzleType] = React.useState("jigsaw");
   const [gridSize, setGridSize] = React.useState(3);
@@ -265,7 +263,6 @@ export default ({
         </Modal>
       </Portal>
       <Header
-        theme={theme}
         notifications={
           receivedPuzzles.filter((puzzle) => !puzzle.completed).length
         }

@@ -15,14 +15,13 @@ import Title from "./Title";
 
 export default function AddPuzzle({
   navigation,
-  theme,
   route,
 }: {
   navigation: any;
-  theme: any;
   route?: any;
 }): JSX.Element {
   const dispatch = useDispatch();
+  const theme = useSelector((state) => state.theme);
   const receivedPuzzles = useSelector((state) => state.receivedPuzzles);
 
   const fetchPuzzle = async (publicKey: string): Promise<Puzzle | void> => {

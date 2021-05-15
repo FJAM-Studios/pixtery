@@ -9,12 +9,11 @@ import Title from "./Title";
 export default function Header({
   navigation,
   notifications,
-  theme,
 }: {
   navigation: any;
   notifications: number;
-  theme: any;
 }): JSX.Element {
+  const theme = useSelector((state) => state.theme);
   const [visible, setVisible] = React.useState(false);
   const openMenu = () => setVisible(true);
   const { height } = useSelector((state) => state.screenHeight);
