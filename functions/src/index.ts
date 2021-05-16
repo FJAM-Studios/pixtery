@@ -7,6 +7,7 @@ import {Puzzle} from "../../types";
 // https://medium.com/firebase-developers/patterns-for-security-with-firebase-per-user-permissions-for-cloud-firestore-be67ee8edc4a
 // https://medium.com/firebase-developers/patterns-for-security-with-firebase-combine-rules-with-cloud-functions-for-more-flexibility-d03cdc975f50
 // create a sec rule for read and see if that throws error
+
 exports.uploadPuzzleSettings = functions.https.onCall(
     async (data: { fileName: string; newPuzzle: Puzzle }, context) => {
     // console.log('context', context.auth)
@@ -27,8 +28,10 @@ exports.uploadPuzzleSettings = functions.https.onCall(
     }
 );
 // start here - create an onCreate function
+// start here - oncreate not triggering. try running this witrh emulator
+// 
 exports.validateUserAuth = functions.firestore
-    .document("/puzzles/{puzzle}")
+    .document('puzzles/{document=**}')
     .onCreate(async (snapshot, context) => {
     // const data = snapshot.data()
       console.log("user auth", context.auth);

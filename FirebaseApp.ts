@@ -26,7 +26,8 @@ const app = initializeApp();
 const db = app.firestore();
 
 const functions = app.functions();
-functions.useFunctionsEmulator(`${MY_LAN_IP}:5001`);
+// functions.useFunctionsEmulator(`${MY_LAN_IP}:5001`);
+functions.useFunctionsEmulator(`http://172.20.10.3:5001`);
 
 const storage = app.storage();
 const phoneProvider = new firebase.auth.PhoneAuthProvider();
