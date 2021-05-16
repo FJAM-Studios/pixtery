@@ -1,4 +1,3 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import moment from "moment";
 import * as React from "react";
 import { View, TouchableOpacity } from "react-native";
@@ -6,7 +5,7 @@ import Modal from "react-native-modal";
 import { Text, Card, IconButton, Button, Headline } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 
-import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
+import { deleteReceivedPuzzle } from "../store/reducers/receivedPuzzles";
 import { Puzzle, ScreenNavigation, RootState } from "../types";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
@@ -33,11 +32,7 @@ export default function PuzzleList({
 
   const deletePuzzle = async (puzzle: Puzzle | null) => {
     if (puzzle) {
-      const newPuzzles = [
-        ...receivedPuzzles.filter((puz) => puz.publicKey !== puzzle.publicKey),
-      ];
-      await AsyncStorage.setItem("@pixteryPuzzles", JSON.stringify(newPuzzles));
-      dispatch(setReceivedPuzzles(newPuzzles));
+      dispatch(deleteReceivedPuzzle(puzzle.publicKey));
     }
     setPuzzleToDelete(null);
     setModalVisible(false);
