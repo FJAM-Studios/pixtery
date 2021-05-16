@@ -76,9 +76,9 @@ export default function Splash({
       //if you are logged in, load local puzzles, then either navigate to AddPuzzle or Home if there is no url
       if (profile && url) {
         await loadPuzzles();
-        const { queryParams } = Linking.parse(url);
-        if (queryParams && queryParams.publicKey) {
-          const { publicKey } = queryParams;
+        const { path } = Linking.parse(url);
+        if (path && path.length) {
+          const publicKey = path;
           goToScreen(navigation, "AddPuzzle", { publicKey });
         } else goToScreen(navigation, "Home");
       } else {
