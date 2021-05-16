@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import moment from "moment";
 import * as React from "react";
-import { View, TouchableOpacity } from "react-native";
+import { View, ScrollView, TouchableOpacity } from "react-native";
 import Modal from "react-native-modal";
 import { Text, Card, IconButton, Button, Headline } from "react-native-paper";
 import { Theme } from "react-native-paper/lib/typescript/types";
@@ -102,7 +102,7 @@ export default function PuzzleList({
         }
         navigation={navigation}
       />
-      <View>
+      <ScrollView>
         {receivedPuzzles.map((receivedPuzzle, ix) => (
           <TouchableOpacity
             onPress={() =>
@@ -149,7 +149,7 @@ export default function PuzzleList({
             </Card>
           </TouchableOpacity>
         ))}
-      </View>
+      </ScrollView>
     </AdSafeAreaView>
   );
 }
