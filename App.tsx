@@ -113,6 +113,7 @@ const App = (): JSX.Element => {
                     profile={profile}
                     sentPuzzles={sentPuzzles}
                     setSentPuzzles={setSentPuzzles}
+                    height={height}
                   />
                 )}
               </Stack.Screen>

@@ -1,5 +1,5 @@
 import React from "react";
-import { View, TouchableWithoutFeedback } from "react-native";
+import { View, TouchableWithoutFeedback, Dimensions } from "react-native";
 import { IconButton, Badge, Menu, Divider } from "react-native-paper";
 import { Theme } from "react-native-paper/lib/typescript/types";
 
@@ -18,7 +18,7 @@ export default function Header({
 }): JSX.Element {
   const [visible, setVisible] = React.useState(false);
   const openMenu = () => setVisible(true);
-
+  const { height } = Dimensions.get("screen");
   const closeMenu = () => setVisible(false);
   return (
     <View
@@ -26,6 +26,7 @@ export default function Header({
         justifyContent: "space-between",
         alignItems: "center",
         flexDirection: "row",
+        height: height * 0.05,
       }}
     >
       <View
@@ -34,8 +35,8 @@ export default function Header({
           flexDirection: "row",
         }}
       >
-        <Title width="100" height="25" style={{ marginRight: 10 }} />
-        <Logo width="25" height="25" />
+        <Title width="100" height={height * 0.04} style={{ marginRight: 10 }} />
+        <Logo width="25" height={height * 0.04} />
       </View>
       <Menu
         visible={visible}
