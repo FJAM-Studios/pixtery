@@ -1,4 +1,5 @@
-import { combineReducers, createStore } from "redux";
+import { combineReducers, createStore, applyMiddleware } from "redux";
+import thunk from "redux-thunk";
 
 import profile from "./reducers/profile";
 import receivedPuzzles from "./reducers/receivedPuzzles";
@@ -14,4 +15,4 @@ const reducer = combineReducers({
   theme,
 });
 
-export default createStore(reducer);
+export default createStore(reducer, applyMiddleware(thunk));
