@@ -3,27 +3,28 @@ import * as FileSystem from "expo-file-system";
 import * as React from "react";
 import { View } from "react-native";
 import { Headline, ActivityIndicator } from "react-native-paper";
-import { Theme } from "react-native-paper/lib/typescript/types";
+import { useDispatch, useSelector } from "react-redux";
 
 import { storage, functions } from "../FirebaseApp";
-import { Puzzle, AddPuzzleRoute, ScreenNavigation } from "../types";
+import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
+import { Puzzle, AddPuzzleRoute, ScreenNavigation, RootState } from "../types";
 import { goToScreen } from "../util";
 import Logo from "./Logo";
 import Title from "./Title";
 
 export default function AddPuzzle({
   navigation,
-  theme,
-  receivedPuzzles,
   route,
-  setReceivedPuzzles,
 }: {
   navigation: ScreenNavigation;
-  theme: Theme;
-  receivedPuzzles: Puzzle[];
   route: AddPuzzleRoute;
-  setReceivedPuzzles: (puzzles: Puzzle[]) => void;
 }): JSX.Element {
+  const dispatch = useDispatch();
+  const theme = useSelector((state: RootState) => state.theme);
+  const receivedPuzzles = useSelector(
+    (state: RootState) => state.receivedPuzzles
+  );
+
   const fetchPuzzle = async (publicKey: string): Promise<Puzzle | void> => {
     const queryPuzzleCallable = functions.httpsCallable("queryPuzzle");
     let puzzleData;
@@ -71,7 +72,7 @@ export default function AddPuzzle({
       newPuzzle.imageURI = localURI;
       const allPuzzles = [...receivedPuzzles, newPuzzle];
       await AsyncStorage.setItem("@pixteryPuzzles", JSON.stringify(allPuzzles));
-      setReceivedPuzzles(allPuzzles);
+      dispatch(setReceivedPuzzles(allPuzzles));
     } catch (e) {
       console.log(e);
       alert("Could not save puzzle to your phone");

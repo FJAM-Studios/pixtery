@@ -3,35 +3,27 @@ import * as Linking from "expo-linking";
 import React, { useEffect } from "react";
 import { View } from "react-native";
 import { ActivityIndicator } from "react-native-paper";
-import { Theme } from "react-native-paper/lib/typescript/types";
+import { useDispatch, useSelector } from "react-redux";
 
-import {
-  Puzzle as PuzzleType,
-  Profile as ProfileType,
-  ScreenNavigation,
-  SplashRoute,
-} from "../types";
+import { setProfile } from "../store/reducers/profile";
+import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
+import { setSentPuzzles } from "../store/reducers/sentPuzzles";
+import { ScreenNavigation, SplashRoute, RootState } from "../types";
 import { goToScreen } from "../util";
 import Logo from "./Logo";
 import Title from "./Title";
 
 export default function Splash({
-  theme,
-  setReceivedPuzzles,
-  setSentPuzzles,
-  profile,
-  setProfile,
   navigation,
   route,
 }: {
-  theme: Theme;
-  setReceivedPuzzles: (puzzles: PuzzleType[]) => void;
-  setSentPuzzles: (puzzles: PuzzleType[]) => void;
-  profile: ProfileType | null;
-  setProfile: (profile: ProfileType) => void;
   navigation: ScreenNavigation;
   route: SplashRoute;
 }): JSX.Element {
+  const dispatch = useDispatch();
+  const theme = useSelector((state: RootState) => state.theme);
+  const profile = useSelector((state: RootState) => state.profile);
+
   useEffect(() => {
     const getInitialUrl = async () => {
       const url = await Linking.getInitialURL();
@@ -59,8 +51,8 @@ export default function Splash({
         //should probably do something here to make sure all local puzzles also have local images
         //and, if not, try to get them from server, and if they don't exist there, then delete puzzle
         //or otherwise mark it as invalid somehow
-        setReceivedPuzzles(loadedPuzzles);
-        setSentPuzzles(loadedSentPuzzles);
+        dispatch(setReceivedPuzzles(loadedPuzzles));
+        dispatch(setSentPuzzles(loadedSentPuzzles));
       } catch (e) {
         console.log(e);
         alert("Could not load saved puzzles.");
@@ -68,7 +60,7 @@ export default function Splash({
     };
 
     const loadAppData = async () => {
-      //first get the url that was either passed in by the url event listener or by the url used to open the app, this will be sed regardless of whether you have a profile
+      //first get the url that was either passed in by the url event listener or by the url used to open the app, this will be used regardless of whether you have a profile
       const url =
         route.params && route.params.url
           ? route.params.url
@@ -85,7 +77,7 @@ export default function Splash({
         //otherwise, load profile from local storage if it exists
         const loadedProfile = await loadProfile();
         if (loadedProfile) {
-          setProfile(loadedProfile);
+          dispatch(setProfile(loadedProfile));
         } else {
           //or navigate to createprofile if it doesn't exist, passing the url to create profile so it can be forwarded along, and you can go directly to the puzzle after signing in.
           goToScreen(navigation, "CreateProfile", { url });

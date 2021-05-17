@@ -4,23 +4,23 @@ import * as React from "react";
 import { View, TouchableOpacity } from "react-native";
 import Modal from "react-native-modal";
 import { Text, Card, IconButton, Button, Headline } from "react-native-paper";
-import { Theme } from "react-native-paper/lib/typescript/types";
+import { useDispatch, useSelector } from "react-redux";
 
-import { Puzzle, ScreenNavigation } from "../types";
+import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
+import { Puzzle, ScreenNavigation, RootState } from "../types";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 
 export default function PuzzleList({
   navigation,
-  theme,
-  receivedPuzzles,
-  setReceivedPuzzles,
 }: {
   navigation: ScreenNavigation;
-  theme: Theme;
-  receivedPuzzles: Puzzle[];
-  setReceivedPuzzles: (puzzles: Puzzle[]) => void;
 }): JSX.Element {
+  const dispatch = useDispatch();
+  const theme = useSelector((state: RootState) => state.theme);
+  const receivedPuzzles = useSelector(
+    (state: RootState) => state.receivedPuzzles
+  );
   const [modalVisible, setModalVisible] = React.useState(false);
   const [puzzleToDelete, setPuzzleToDelete] = React.useState<Puzzle | null>(
     null
@@ -37,7 +37,7 @@ export default function PuzzleList({
         ...receivedPuzzles.filter((puz) => puz.publicKey !== puzzle.publicKey),
       ];
       await AsyncStorage.setItem("@pixteryPuzzles", JSON.stringify(newPuzzles));
-      setReceivedPuzzles(newPuzzles);
+      dispatch(setReceivedPuzzles(newPuzzles));
     }
     setPuzzleToDelete(null);
     setModalVisible(false);
@@ -96,7 +96,6 @@ export default function PuzzleList({
         </View>
       </Modal>
       <Header
-        theme={theme}
         notifications={
           receivedPuzzles.filter((puzzle) => !puzzle.completed).length
         }
