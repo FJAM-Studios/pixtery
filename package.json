@@ -1,5 +1,5 @@
 {
-  "main": "node_modules/expo/AppEntry.js",
+  "main": "AppWrapper.tsx",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
@@ -60,6 +60,9 @@
     "react-native-svg": "12.1.0",
     "react-native-web": "~0.13.12",
     "react-native-webview": "11.0.0",
+    "react-redux": "^7.2.4",
+    "redux": "^4.1.0",
+    "redux-thunk": "^2.3.0",
     "shortid": "^2.2.16",
     "tslib": "^2.1.0",
     "uuid": "^3.3.2"
