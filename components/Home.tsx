@@ -21,7 +21,9 @@ import {
 } from "react-native-paper";
 import { Theme } from "react-native-paper/lib/typescript/types";
 import Svg, { Path } from "react-native-svg";
+import shortid from "shortid";
 import uuid from "uuid";
+// var shortid = require('shortid');
 
 import { storage, functions } from "../FirebaseApp";
 import {
@@ -44,7 +46,7 @@ const emptyImage = require("../assets/blank.jpg");
 
 AdMobInterstitial.setAdUnitID(INTERSTITIAL_ID);
 
-export default ({
+export default function Home({
   navigation,
   boardSize,
   theme,
@@ -62,7 +64,7 @@ export default ({
   sentPuzzles: Puzzle[];
   setSentPuzzles: (puzzles: Puzzle[]) => void;
   height: number;
-}): JSX.Element => {
+}): JSX.Element {
   const [imageURI, setImageURI] = React.useState("");
   const [puzzleType, setPuzzleType] = React.useState("jigsaw");
   const [gridSize, setGridSize] = React.useState(3);
@@ -175,7 +177,7 @@ export default ({
   const uploadPuzzleSettings = async (
     fileName: string
   ): Promise<Puzzle | undefined> => {
-    const publicKey: string = uuid.v4();
+    const publicKey: string = shortid.generate();
     const uploadPuzzleSettingsCallable = functions.httpsCallable(
       "uploadPuzzleSettings"
     );
@@ -202,7 +204,7 @@ export default ({
 
   const generateLink = (publicKey: string): void => {
     //first param is an empty string to allow Expo to dynamically determine path to app based on runtime environment
-    const deepLink = Linking.createURL("", { queryParams: { publicKey } });
+    const deepLink = Linking.createURL(`/${publicKey}`);
     shareMessage(deepLink);
   };
 
@@ -258,7 +260,7 @@ export default ({
           dismissable={false}
           contentContainerStyle={{ alignItems: "center" }}
         >
-          {gridSize % 2 ? <Text>Yeah you&aposre working.</Text> : null}
+          {gridSize % 2 ? <Text>Yeah you&apos;re working.</Text> : null}
           <Headline>Building a Pixtery!</Headline>
           {gridSize % 2 ? null : <Text>And choosing so carefully</Text>}
           <ActivityIndicator
@@ -475,4 +477,4 @@ export default ({
       </KeyboardAwareScrollView>
     </AdSafeAreaView>
   );
-};
+}
