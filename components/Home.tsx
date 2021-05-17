@@ -21,7 +21,9 @@ import {
 } from "react-native-paper";
 import Svg, { Path } from "react-native-svg";
 import { useDispatch, useSelector } from "react-redux";
+import shortid from "shortid";
 import uuid from "uuid";
+// var shortid = require('shortid');
 
 import { storage, functions } from "../FirebaseApp";
 import {
@@ -45,11 +47,11 @@ const emptyImage = require("../assets/blank.jpg");
 
 AdMobInterstitial.setAdUnitID(INTERSTITIAL_ID);
 
-export default ({
+export default function Home({
   navigation,
 }: {
   navigation: ScreenNavigation;
-}): JSX.Element => {
+}): JSX.Element {
   const dispatch = useDispatch();
   const theme = useSelector((state: RootState) => state.theme);
   const { height, boardSize } = useSelector(
@@ -172,7 +174,7 @@ export default ({
   const uploadPuzzleSettings = async (
     fileName: string
   ): Promise<Puzzle | undefined> => {
-    const publicKey: string = uuid.v4();
+    const publicKey: string = shortid.generate();
     const uploadPuzzleSettingsCallable = functions.httpsCallable(
       "uploadPuzzleSettings"
     );
@@ -199,7 +201,7 @@ export default ({
 
   const generateLink = (publicKey: string): void => {
     //first param is an empty string to allow Expo to dynamically determine path to app based on runtime environment
-    const deepLink = Linking.createURL("", { queryParams: { publicKey } });
+    const deepLink = Linking.createURL(`/${publicKey}`);
     shareMessage(deepLink);
   };
 
@@ -471,4 +473,4 @@ export default ({
       </KeyboardAwareScrollView>
     </AdSafeAreaView>
   );
-};
+}

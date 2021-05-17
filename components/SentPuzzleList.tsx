@@ -35,9 +35,7 @@ export default function SentPuzzleList({
   };
 
   const sendPuzzle = (publicKey: string | undefined) => {
-    const deepLink = Linking.createURL("", {
-      queryParams: { publicKey },
-    });
+    const deepLink = Linking.createURL(`/${publicKey}`);
     shareMessage(deepLink);
   };
   const deletePuzzle = async (puzzle: Puzzle | null) => {

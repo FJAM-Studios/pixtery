@@ -57,6 +57,10 @@ export default function PuzzlePiece({
     outputRange: ["-100rad", "100rad"],
   });
   let lastRotate = 0;
+  const pivot = {
+    x: snapOffset.x / pieceDimensions.width,
+    y: snapOffset.y / pieceDimensions.height,
+  };
 
   let isDragged = false;
 
@@ -89,16 +93,24 @@ export default function PuzzlePiece({
       lastOffset.y += ev.nativeEvent.translationY;
 
       //limit position on board
-      lastOffset.x = Math.max(0 - initialPlacement.x, lastOffset.x);
-      lastOffset.y = Math.max(0 - initialPlacement.y, lastOffset.y);
+      lastOffset.x = Math.max(
+        0 - initialPlacement.x - pieceDimensions.width * 0.5,
+        lastOffset.x
+      );
+      lastOffset.y = Math.max(
+        0 - initialPlacement.y - pieceDimensions.height * 0.5,
+        lastOffset.y
+      );
       lastOffset.x = Math.min(
-        puzzleAreaDimensions.puzzleAreaWidth -
+        pieceDimensions.width * 0.5 +
+          puzzleAreaDimensions.puzzleAreaWidth -
           pieceDimensions.width -
           initialPlacement.x,
         lastOffset.x
       );
       lastOffset.y = Math.min(
-        puzzleAreaDimensions.puzzleAreaHeight -
+        pieceDimensions.height * 0.5 +
+          puzzleAreaDimensions.puzzleAreaHeight -
           pieceDimensions.height -
           initialPlacement.y,
         lastOffset.y
@@ -214,7 +226,14 @@ export default function PuzzlePiece({
             width={pieceDimensions.width}
             style={[
               {
-                transform: [{ rotate: rotateStr }, { perspective: 300 }],
+                transform: [
+                  { perspective: 300 },
+                  { translateY: pieceDimensions.height * (pivot.y - 0.5) },
+                  { translateX: pieceDimensions.width * (pivot.x - 0.5) },
+                  { rotate: rotateStr },
+                  { translateX: pieceDimensions.width * (0.5 - pivot.x) },
+                  { translateY: pieceDimensions.height * (0.5 - pivot.y) },
+                ],
               },
             ]}
           >
