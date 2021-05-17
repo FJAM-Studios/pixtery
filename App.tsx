@@ -30,7 +30,7 @@ const Stack = createStackNavigator<StackScreens>();
 
 const App = (): JSX.Element => {
   const dispatch = useDispatch();
-  const navigationRef = useRef<NavigationContainerRef>();
+  const navigationRef = useRef<NavigationContainerRef | null>(null);
   const theme = useSelector((state: RootState) => state.theme);
 
   // on url change go to the splash screen, which will stop the user if they aren't logged in
@@ -60,9 +60,7 @@ const App = (): JSX.Element => {
         <NavigationContainer ref={navigationRef} onReady={gotoSplash}>
           <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
             <Stack.Navigator initialRouteName="TitleScreen" headerMode="none">
-              <Stack.Screen name="TitleScreen">
-                {(props) => <TitleScreen {...props} />}
-              </Stack.Screen>
+              <Stack.Screen name="TitleScreen" component={TitleScreen} />
               <Stack.Screen name="Splash">
                 {(props) => <Splash {...props} />}
               </Stack.Screen>
