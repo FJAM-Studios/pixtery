@@ -4,15 +4,12 @@ import React, { useState, useRef } from "react";
 import { View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Headline, Text, TextInput, Button } from "react-native-paper";
-import { Theme } from "react-native-paper/lib/typescript/types";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useDispatch, useSelector } from "react-redux";
 
 import { phoneProvider, firebaseConfig, verifySms } from "../FirebaseApp";
-import {
-  CreateProfileRoute,
-  Profile as ProfileType,
-  ScreenNavigation,
-} from "../types";
+import { setProfile } from "../store/reducers/profile";
+import { CreateProfileRoute, ScreenNavigation, RootState } from "../types";
 import { goToScreen } from "../util";
 import Logo from "./Logo";
 import Title from "./Title";
@@ -21,21 +18,18 @@ import Title from "./Title";
 const phoneFormat = require("phone");
 
 export default function CreateProfile({
-  theme,
-  profile,
-  setProfile,
   navigation,
   route,
 }: {
-  theme: Theme;
-  profile: ProfileType | null;
-  setProfile: (profile: ProfileType) => void;
   navigation: ScreenNavigation;
   route: CreateProfileRoute;
 }): JSX.Element {
+  const dispatch = useDispatch();
   const recaptchaVerifier = useRef<FirebaseRecaptcha.FirebaseRecaptchaVerifierModal>(
     null
   );
+  const theme = useSelector((state: RootState) => state.theme);
+  const profile = useSelector((state: RootState) => state.profile);
   const [name, setName] = useState((profile && profile.name) || "");
   const [phone, setPhone] = useState("");
   const [smsCode, setSmsCode] = useState("");
@@ -148,7 +142,7 @@ export default function CreateProfile({
                       JSON.stringify({ name })
                     );
                     //update app state
-                    setProfile({ name });
+                    dispatch(setProfile({ name }));
                     //send ya on your way, either home or to AddPuzzle if you were redirected here to log in first
                     if (route.params && route.params.url)
                       goToScreen(navigation, "Splash", {

@@ -3,31 +3,28 @@ import React, { useState } from "react";
 import { View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Headline, Text, TextInput, Button } from "react-native-paper";
-import { Theme } from "react-native-paper/lib/typescript/types";
+import { useDispatch, useSelector } from "react-redux";
 
-import { Profile as ProfileType, Puzzle, ScreenNavigation } from "../types";
+import { setProfile } from "../store/reducers/profile";
+import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
+import { setSentPuzzles } from "../store/reducers/sentPuzzles";
+import { ScreenNavigation, RootState } from "../types";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 
 export default function Profile({
-  theme,
-  profile,
-  setProfile,
   navigation,
-  receivedPuzzles,
-  sentPuzzles,
-  setSentPuzzles,
-  setReceivedPuzzles,
 }: {
-  theme: Theme;
-  profile: ProfileType | null;
-  setProfile: (profile: ProfileType | null) => void;
   navigation: ScreenNavigation;
-  receivedPuzzles: Puzzle[];
-  sentPuzzles: Puzzle[];
-  setReceivedPuzzles: (puzzles: Puzzle[]) => void;
-  setSentPuzzles: (puzzles: Puzzle[]) => void;
 }): JSX.Element {
+  const dispatch = useDispatch();
+  const theme = useSelector((state: RootState) => state.theme);
+  const receivedPuzzles = useSelector(
+    (state: RootState) => state.receivedPuzzles
+  );
+  const sentPuzzles = useSelector((state: RootState) => state.sentPuzzles);
+  const profile = useSelector((state: RootState) => state.profile);
+  console.log(profile);
   const [name, setName] = useState((profile && profile.name) || "");
   const [errors, setErrors] = useState("");
   return (
@@ -40,7 +37,6 @@ export default function Profile({
       }}
     >
       <Header
-        theme={theme}
         notifications={
           receivedPuzzles.filter((puzzle) => !puzzle.completed).length
         }
@@ -74,7 +70,7 @@ export default function Profile({
                 JSON.stringify({ name })
               );
               //update app state
-              setProfile({ name });
+              dispatch(setProfile({ name }));
             } else {
               setErrors("You must enter a name!");
             }
@@ -91,7 +87,7 @@ export default function Profile({
             //delete local storage
             await AsyncStorage.removeItem("@pixteryProfile");
             //update app state
-            setProfile(null);
+            dispatch(setProfile(null));
             //send you to splash
             navigation.navigate("Splash");
           }}
@@ -107,7 +103,7 @@ export default function Profile({
             //delete local storage
             await AsyncStorage.removeItem("@pixteryPuzzles");
             //update app state
-            setReceivedPuzzles([]);
+            dispatch(setReceivedPuzzles([]));
             //send you to splash
           }}
           style={{ margin: 10 }}
@@ -122,7 +118,7 @@ export default function Profile({
             //delete local storage
             await AsyncStorage.removeItem("@pixterySentPuzzles");
             //update app state
-            setSentPuzzles([]);
+            dispatch(setSentPuzzles([]));
             //send you to splash
           }}
           style={{ margin: 10 }}

@@ -19,8 +19,8 @@ import {
   Modal,
   Portal,
 } from "react-native-paper";
-import { Theme } from "react-native-paper/lib/typescript/types";
 import Svg, { Path } from "react-native-svg";
+import { useDispatch, useSelector } from "react-redux";
 import shortid from "shortid";
 import uuid from "uuid";
 // var shortid = require('shortid');
@@ -36,7 +36,8 @@ import {
   generateJigsawPiecePaths,
   generateSquarePiecePaths,
 } from "../puzzleUtils";
-import { Puzzle, Profile, ScreenNavigation } from "../types";
+import { setSentPuzzles } from "../store/reducers/sentPuzzles";
+import { Puzzle, ScreenNavigation, RootState } from "../types";
 import { createBlob, shareMessage } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
@@ -48,23 +49,19 @@ AdMobInterstitial.setAdUnitID(INTERSTITIAL_ID);
 
 export default function Home({
   navigation,
-  boardSize,
-  theme,
-  receivedPuzzles,
-  profile,
-  sentPuzzles,
-  setSentPuzzles,
-  height,
 }: {
   navigation: ScreenNavigation;
-  boardSize: number;
-  theme: Theme;
-  receivedPuzzles: Puzzle[];
-  profile: Profile | null;
-  sentPuzzles: Puzzle[];
-  setSentPuzzles: (puzzles: Puzzle[]) => void;
-  height: number;
 }): JSX.Element {
+  const dispatch = useDispatch();
+  const theme = useSelector((state: RootState) => state.theme);
+  const { height, boardSize } = useSelector(
+    (state: RootState) => state.screenHeight
+  );
+  const receivedPuzzles = useSelector(
+    (state: RootState) => state.receivedPuzzles
+  );
+  const sentPuzzles = useSelector((state: RootState) => state.sentPuzzles);
+  const profile = useSelector((state: RootState) => state.profile);
   const [imageURI, setImageURI] = React.useState("");
   const [puzzleType, setPuzzleType] = React.useState("jigsaw");
   const [gridSize, setGridSize] = React.useState(3);
@@ -154,7 +151,7 @@ export default function Home({
       "@pixterySentPuzzles",
       JSON.stringify(allPuzzles)
     );
-    setSentPuzzles(allPuzzles);
+    dispatch(setSentPuzzles(allPuzzles));
   };
 
   const uploadImage = async (fileName: string): Promise<string> => {
@@ -224,7 +221,7 @@ export default function Home({
       setPaths(
         generateJigsawPiecePaths(gridSize, boardSize / (1.6 * gridSize), true)
       );
-  }, [gridSize, puzzleType]);
+  }, [gridSize, puzzleType, boardSize]);
 
   React.useEffect(() => {
     (async () => {
@@ -272,7 +269,6 @@ export default function Home({
         </Modal>
       </Portal>
       <Header
-        theme={theme}
         notifications={
           receivedPuzzles.filter((puzzle) => !puzzle.completed).length
         }
