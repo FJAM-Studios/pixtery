@@ -26,14 +26,13 @@ const app = initializeApp();
 const db = app.firestore();
 
 let currentUser: firebase.User | null;
-firebase.auth().onAuthStateChanged(user => {
+firebase.auth().onAuthStateChanged((user) => {
   if (user) {
     currentUser = firebase.auth().currentUser;
+  } else {
+    console.log("no user authorized");
   }
-  else {
-    console.log("no user authorized")
-  }
-})
+});
 
 const functions = app.functions();
 

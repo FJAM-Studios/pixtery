@@ -15,7 +15,6 @@ const db = admin.firestore();
 // import firebase from "firebase";
 // const currentUser = firebase.auth().currentUser;
 
-
 // start here - try pulling thisin at new puzzle?
 
 // const storage = admin.storage();
@@ -24,27 +23,26 @@ const db = admin.firestore();
 // https://medium.com/firebase-developers/patterns-for-security-with-firebase-combine-rules-with-cloud-functions-for-more-flexibility-d03cdc975f50
 // create a sec rule for read and see if that throws error
 
-
 exports.uploadPuzzleSettings = functions.https.onCall(
     async (data: { fileName: string; newPuzzle: Puzzle }, context) => {
-    console.log("context", context.auth);
+      console.log("context", context.auth);
       const {fileName, newPuzzle} = data;
       // testing purposes, if user is not authorized, assigns "unauthorized to uid"
       uid = context.auth?.uid;
-      console.log("uid", uid)
+      console.log("uid", uid);
       newPuzzle.uid = uid ? uid : "unauthorized";
       // uid = context.auth?.uid ? context.auth?.uid : "";
       // newPuzzle.uid = uid;
       console.log("uploading puzzle settings");
       console.log("context.auth when uploading puzzle settings", context.auth);
       try {
-        // throw error if user is not authenticated
-        // if (!context.auth) {
-        //   throw new functions.https.HttpsError(
-        //       "permission-denied",
-        //       "user not authenticated"
-        //   );
-        // }
+      // throw error if user is not authenticated
+      // if (!context.auth) {
+      //   throw new functions.https.HttpsError(
+      //       "permission-denied",
+      //       "user not authenticated"
+      //   );
+      // }
         await db.collection("puzzles").doc(fileName).set(newPuzzle);
         return {result: `successfully uploaded ${fileName}`};
       } catch (error) {
@@ -57,7 +55,7 @@ exports.uploadPuzzleSettings = functions.https.onCall(
 exports.validateUserAuth = functions.firestore
     .document("puzzles/{document=**}")
     .onCreate(async (snapshot, context) => {
-    const uidOnPuzzle = snapshot.data().uid;
+      const uidOnPuzzle = snapshot.data().uid;
       console.log("uidOnPuzzle", uidOnPuzzle, "uid", uid);
       console.log("current user", currentUser);
       if (uidOnPuzzle !== uid) {
