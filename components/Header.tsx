@@ -92,6 +92,15 @@ export default function Header({
           title="Profile"
           icon="cog"
         />
+        <Divider />
+        <Menu.Item
+          onPress={() => {
+            closeMenu();
+            navigation.navigate("CreateProfile");
+          }}
+          title="Create"
+          icon="cog"
+        />
       </Menu>
     </View>
   );

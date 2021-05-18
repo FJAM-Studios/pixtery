@@ -32,6 +32,7 @@ export default function CreateProfile({
   );
   const [name, setName] = useState((profile && profile.name) || "");
   const [phone, setPhone] = useState((profile && profile.phone) || "");
+  const [uid, setUid] = useState((profile && profile.uid) || "");
   const [smsCode, setSmsCode] = useState("");
   const [verificationId, setVerificationId] = useState("");
   const [errors, setErrors] = useState("");
@@ -136,14 +137,16 @@ export default function CreateProfile({
               onPress={async () => {
                 try {
                   const authResult = await verifySms(verificationId, smsCode);
+                  console.log("auth result", authResult);
                   if (authResult) {
+                    const uid = authResult.uid;
                     //save to local storage
                     await AsyncStorage.setItem(
                       "@pixteryProfile",
-                      JSON.stringify({ name, phone })
+                      JSON.stringify({ name, phone, uid })
                     );
                     //update app state
-                    setProfile({ name, phone });
+                    setProfile({ name, phone, uid });
                     //send ya on your way, either home or to AddPuzzle if you were redirected here to log in first
                     if (route.params && route.params.url)
                       goToScreen(navigation, "Splash", {

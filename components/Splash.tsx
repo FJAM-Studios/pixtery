@@ -78,7 +78,9 @@ export default function Splash({
         const loadedProfile = await loadProfile();
         if (loadedProfile) {
           setProfile(loadedProfile);
-        } else {
+        } 
+        // goToScreen(navigation, "Home", { url });
+        else {
           //or navigate to createprofile if it doesn't exist, passing the url to create profile so it can be forwarded along, and you can go directly to the puzzle after signing in.
           goToScreen(navigation, "CreateProfile", { url });
         }

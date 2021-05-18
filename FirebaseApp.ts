@@ -25,18 +25,37 @@ const initializeApp = (): any => {
 const app = initializeApp();
 const db = app.firestore();
 
+let currentUser: firebase.User | null;
+firebase.auth().onAuthStateChanged(user => {
+  if (user) {
+    currentUser = firebase.auth().currentUser;
+  }
+  else {
+    console.log("no user authorized")
+  }
+})
+
 const functions = app.functions();
-// functions.useFunctionsEmulator(`${MY_LAN_IP}:5001`);
-functions.useFunctionsEmulator(`http://172.20.10.3:5001`);
+
+db.settings({ host: "localhost:8080", ssl: false });
+functions.useFunctionsEmulator(`${MY_LAN_IP}:5001`);
+// const auth = firebase.auth();
+// auth.useEmulator(`${MY_LAN_IP}:9099`);
 
 const storage = app.storage();
 const phoneProvider = new firebase.auth.PhoneAuthProvider();
-const verifySms = (id: string, code: string) => {
+const verifySms = (id: string, code: string): firebase.User | null => {
   const credential = firebase.auth.PhoneAuthProvider.credential(id, code);
   const signInResponse = firebase.auth().signInWithCredential(credential);
   console.log("sign in rsp", signInResponse);
-  return signInResponse;
+  const currentUser = firebase.auth().currentUser;
+  console.log("curr user", currentUser);
+  return currentUser;
 };
+
+// const currentUser = firebase.auth().currentUser;
+
+// console.log('AUTH', app.auth().currentUser?.uid);
 
 export {
   app,
@@ -46,4 +65,5 @@ export {
   firebaseConfig,
   verifySms,
   functions,
+  currentUser,
 };

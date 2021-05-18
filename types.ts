@@ -25,6 +25,7 @@ export interface Viewbox {
 export interface Puzzle {
   puzzleType: string;
   gridSize: number;
+  uid: string | undefined;
   senderName: string;
   senderPhone: string;
   imageURI: string;
@@ -37,6 +38,7 @@ export interface Puzzle {
 export interface Profile {
   name: string;
   phone: string;
+  uid: string;
 }
 
 export interface Piece {

@@ -1,25 +1,50 @@
 /* eslint-disable max-len */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as functions from "firebase-functions";
-import {db} from "../../FirebaseApp";
 import {Puzzle} from "../../types";
+const admin = require("firebase-admin");
+import adminKey from "./serviceAccount";
+import {currentUser} from "../../FirebaseApp";
+let uid: string | undefined;
+
+admin.initializeApp({
+  credential: admin.credential.cert(adminKey),
+  databaseURL: "https://pixstery-7c9b9-default-rtdb.firebaseio.com",
+});
+const db = admin.firestore();
+// import firebase from "firebase";
+// const currentUser = firebase.auth().currentUser;
+
+
+// start here - try pulling thisin at new puzzle?
+
+// const storage = admin.storage();
 // start here - try creating a new function to console log context, read these:
 // https://medium.com/firebase-developers/patterns-for-security-with-firebase-per-user-permissions-for-cloud-firestore-be67ee8edc4a
 // https://medium.com/firebase-developers/patterns-for-security-with-firebase-combine-rules-with-cloud-functions-for-more-flexibility-d03cdc975f50
 // create a sec rule for read and see if that throws error
 
+
 exports.uploadPuzzleSettings = functions.https.onCall(
     async (data: { fileName: string; newPuzzle: Puzzle }, context) => {
-    // console.log('context', context.auth)
+    console.log("context", context.auth);
       const {fileName, newPuzzle} = data;
+      // testing purposes, if user is not authorized, assigns "unauthorized to uid"
+      uid = context.auth?.uid;
+      console.log("uid", uid)
+      newPuzzle.uid = uid ? uid : "unauthorized";
+      // uid = context.auth?.uid ? context.auth?.uid : "";
+      // newPuzzle.uid = uid;
       console.log("uploading puzzle settings");
+      console.log("context.auth when uploading puzzle settings", context.auth);
       try {
-        if (!context.auth) {
-          throw new functions.https.HttpsError(
-              "permission-denied",
-              "user not authenticated"
-          );
-        }
+        // throw error if user is not authenticated
+        // if (!context.auth) {
+        //   throw new functions.https.HttpsError(
+        //       "permission-denied",
+        //       "user not authenticated"
+        //   );
+        // }
         await db.collection("puzzles").doc(fileName).set(newPuzzle);
         return {result: `successfully uploaded ${fileName}`};
       } catch (error) {
@@ -27,20 +52,27 @@ exports.uploadPuzzleSettings = functions.https.onCall(
       }
     }
 );
-// start here - create an onCreate function
-// start here - oncreate not triggering. try running this witrh emulator
-// 
+
+// on creation of document, checks if uid of document is the same as the user that created the document from this app
 exports.validateUserAuth = functions.firestore
-    .document('puzzles/{document=**}')
+    .document("puzzles/{document=**}")
     .onCreate(async (snapshot, context) => {
-    // const data = snapshot.data()
-      console.log("user auth", context.auth);
-      if (!context.auth) {
+    const uidOnPuzzle = snapshot.data().uid;
+      console.log("uidOnPuzzle", uidOnPuzzle, "uid", uid);
+      console.log("current user", currentUser);
+      if (uidOnPuzzle !== uid) {
       // Delete the puzzle if user not authenticated
         console.log("Deleting invalid document for user");
         await snapshot.ref.delete();
       }
     });
+
+// const getUid = async () => {
+//   const jsonValue = await AsyncStorage.getItem("@pixteryProfile");
+//   const loadedProfile = jsonValue != null ? JSON.parse(jsonValue) : null;
+//   console.log('loaded profile',)
+//   return loadedProfile;
+// };
 
 // exports.contextTest = functions.https.onCall(
 //      (data, context) => {
@@ -53,39 +85,6 @@ exports.validateUserAuth = functions.firestore
 //       }
 //     }
 // );
-
-exports.contextTest = functions.https.onCall((data, context) => {
-  console.log("hi");
-  console.log("context", context);
-  // [END addFunctionTrigger]
-  // [START readAddData]
-  // Numbers passed from the client.
-  const firstNumber = data.firstNumber;
-  const secondNumber = data.secondNumber;
-  // [END readAddData]
-
-  // [START addHttpsError]
-  // Checking that attributes are present and are numbers.
-  if (!Number.isFinite(firstNumber) || !Number.isFinite(secondNumber)) {
-    // Throwing an HttpsError so that the client gets the error details.
-    throw new functions.https.HttpsError(
-        "invalid-argument",
-        "The function must be called with " +
-        "two arguments \"firstNumber\" and \"secondNumber\" which must both be numbers."
-    );
-  }
-  // [END addHttpsError]
-
-  // [START returnAddData]
-  // returning result.
-  return {
-    firstNumber: firstNumber,
-    secondNumber: secondNumber,
-    operator: "+",
-    operationResult: firstNumber + secondNumber,
-  };
-  // [END returnAddData]
-});
 
 // return type set as an generic object bc a JSON is returned (Puzzle type is nested in that)
 exports.queryPuzzle = functions.https.onCall(
