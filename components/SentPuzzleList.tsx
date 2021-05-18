@@ -2,7 +2,12 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Linking from "expo-linking";
 import moment from "moment";
 import * as React from "react";
-import { ImageBackground, View, TouchableOpacity } from "react-native";
+import {
+  ImageBackground,
+  View,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native";
 import Modal from "react-native-modal";
 import { Card, IconButton, Button, Headline } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
@@ -110,7 +115,7 @@ export default function SentPuzzleList({
         }
         navigation={navigation}
       />
-      <View>
+      <ScrollView>
         {sentPuzzles.map((sentPuzzle, ix) => (
           <TouchableOpacity
             onPress={() =>
@@ -165,7 +170,7 @@ export default function SentPuzzleList({
             </Card>
           </TouchableOpacity>
         ))}
-      </View>
+      </ScrollView>
     </AdSafeAreaView>
   );
 }
