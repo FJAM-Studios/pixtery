@@ -2,12 +2,14 @@
 
 import React from "react";
 import { View } from "react-native";
-import { Theme } from "react-native-paper/lib/typescript/types";
+import { useSelector } from "react-redux";
 
+import { RootState } from "../types";
 import Logo from "./Logo";
 import Title from "./Title";
 
-export default function TiteScreen({ theme }: { theme: Theme }): JSX.Element {
+export default function TitleScreen(): JSX.Element {
+  const theme = useSelector((state: RootState) => state.theme);
   return (
     <View
       style={{

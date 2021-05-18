@@ -5,26 +5,25 @@ import * as React from "react";
 import { ImageBackground, View, TouchableOpacity } from "react-native";
 import Modal from "react-native-modal";
 import { Card, IconButton, Button, Headline } from "react-native-paper";
-import { Theme } from "react-native-paper/lib/typescript/types";
+import { useDispatch, useSelector } from "react-redux";
 
-import { Puzzle, ScreenNavigation } from "../types";
+import { setSentPuzzles } from "../store/reducers/sentPuzzles";
+import { Puzzle, ScreenNavigation, RootState } from "../types";
 import { shareMessage } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 
 export default function SentPuzzleList({
   navigation,
-  theme,
-  receivedPuzzles,
-  sentPuzzles,
-  setSentPuzzles,
 }: {
   navigation: ScreenNavigation;
-  theme: Theme;
-  receivedPuzzles: Puzzle[];
-  sentPuzzles: Puzzle[];
-  setSentPuzzles: (puzzles: Puzzle[]) => void;
 }): JSX.Element {
+  const dispatch = useDispatch();
+  const theme = useSelector((state: RootState) => state.theme);
+  const receivedPuzzles = useSelector(
+    (state: RootState) => state.receivedPuzzles
+  );
+  const sentPuzzles = useSelector((state: RootState) => state.sentPuzzles);
   const [modalVisible, setModalVisible] = React.useState(false);
   const [puzzleToDelete, setPuzzleToDelete] = React.useState<Puzzle | null>(
     null
@@ -36,9 +35,7 @@ export default function SentPuzzleList({
   };
 
   const sendPuzzle = (publicKey: string | undefined) => {
-    const deepLink = Linking.createURL("", {
-      queryParams: { publicKey },
-    });
+    const deepLink = Linking.createURL(`/${publicKey}`);
     shareMessage(deepLink);
   };
   const deletePuzzle = async (puzzle: Puzzle | null) => {
@@ -50,7 +47,7 @@ export default function SentPuzzleList({
         "@pixterySentPuzzles",
         JSON.stringify(newPuzzles)
       );
-      setSentPuzzles(newPuzzles);
+      dispatch(setSentPuzzles(newPuzzles));
     }
     setPuzzleToDelete(null);
     setModalVisible(false);
@@ -108,7 +105,6 @@ export default function SentPuzzleList({
         </View>
       </Modal>
       <Header
-        theme={theme}
         notifications={
           receivedPuzzles.filter((puzzle) => !puzzle.completed).length
         }
