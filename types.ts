@@ -1,6 +1,7 @@
 import { RouteProp } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import * as ImageManipulator from "expo-image-manipulator";
+import { Theme } from "react-native-paper/lib/typescript/types";
 
 export class SvgPiece {
   top: Point[] = [];
@@ -80,3 +81,17 @@ export type PuzzleRoute = RouteProp<StackScreens, "Puzzle">;
 export type AddPuzzleRoute = RouteProp<StackScreens, "AddPuzzle">;
 export type CreateProfileRoute = RouteProp<StackScreens, "CreateProfile">;
 export type SplashRoute = RouteProp<StackScreens, "Splash">;
+
+//// STORE /////
+export interface ScreenHeight {
+  height: number;
+  boardSize: number;
+}
+
+export interface RootState {
+  profile: Profile;
+  receivedPuzzles: Puzzle[];
+  sentPuzzles: Puzzle[];
+  screenHeight: ScreenHeight;
+  theme: Theme;
+}

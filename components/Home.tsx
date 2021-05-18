@@ -19,9 +19,11 @@ import {
   Modal,
   Portal,
 } from "react-native-paper";
-import { Theme } from "react-native-paper/lib/typescript/types";
 import Svg, { Path } from "react-native-svg";
+import { useDispatch, useSelector } from "react-redux";
+import shortid from "shortid";
 import uuid from "uuid";
+// var shortid = require('shortid');
 
 import { storage, functions } from "../FirebaseApp";
 import {
@@ -34,7 +36,8 @@ import {
   generateJigsawPiecePaths,
   generateSquarePiecePaths,
 } from "../puzzleUtils";
-import { Puzzle, Profile, ScreenNavigation } from "../types";
+import { setSentPuzzles } from "../store/reducers/sentPuzzles";
+import { Puzzle, ScreenNavigation, RootState } from "../types";
 import { createBlob, shareMessage } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
@@ -44,25 +47,21 @@ const emptyImage = require("../assets/blank.jpg");
 
 AdMobInterstitial.setAdUnitID(INTERSTITIAL_ID);
 
-export default ({
+export default function Home({
   navigation,
-  boardSize,
-  theme,
-  receivedPuzzles,
-  profile,
-  sentPuzzles,
-  setSentPuzzles,
-  height,
 }: {
   navigation: ScreenNavigation;
-  boardSize: number;
-  theme: Theme;
-  receivedPuzzles: Puzzle[];
-  profile: Profile | null;
-  sentPuzzles: Puzzle[];
-  setSentPuzzles: (puzzles: Puzzle[]) => void;
-  height: number;
-}): JSX.Element => {
+}): JSX.Element {
+  const dispatch = useDispatch();
+  const theme = useSelector((state: RootState) => state.theme);
+  const { height, boardSize } = useSelector(
+    (state: RootState) => state.screenHeight
+  );
+  const receivedPuzzles = useSelector(
+    (state: RootState) => state.receivedPuzzles
+  );
+  const sentPuzzles = useSelector((state: RootState) => state.sentPuzzles);
+  const profile = useSelector((state: RootState) => state.profile);
   const [imageURI, setImageURI] = React.useState("");
   const [puzzleType, setPuzzleType] = React.useState("jigsaw");
   const [gridSize, setGridSize] = React.useState(3);
@@ -152,7 +151,7 @@ export default ({
       "@pixterySentPuzzles",
       JSON.stringify(allPuzzles)
     );
-    setSentPuzzles(allPuzzles);
+    dispatch(setSentPuzzles(allPuzzles));
   };
 
   const uploadImage = async (fileName: string): Promise<string> => {
@@ -175,7 +174,7 @@ export default ({
   const uploadPuzzleSettings = async (
     fileName: string
   ): Promise<Puzzle | undefined> => {
-    const publicKey: string = uuid.v4();
+    const publicKey: string = shortid.generate();
     const uploadPuzzleSettingsCallable = functions.httpsCallable(
       "uploadPuzzleSettings"
     );
@@ -202,7 +201,7 @@ export default ({
 
   const generateLink = (publicKey: string): void => {
     //first param is an empty string to allow Expo to dynamically determine path to app based on runtime environment
-    const deepLink = Linking.createURL("", { queryParams: { publicKey } });
+    const deepLink = Linking.createURL(`/${publicKey}`);
     shareMessage(deepLink);
   };
 
@@ -222,7 +221,7 @@ export default ({
       setPaths(
         generateJigsawPiecePaths(gridSize, boardSize / (1.6 * gridSize), true)
       );
-  }, [gridSize, puzzleType]);
+  }, [gridSize, puzzleType, boardSize]);
 
   React.useEffect(() => {
     (async () => {
@@ -258,7 +257,7 @@ export default ({
           dismissable={false}
           contentContainerStyle={{ alignItems: "center" }}
         >
-          {gridSize % 2 ? <Text>Yeah you&aposre working.</Text> : null}
+          {gridSize % 2 ? <Text>Yeah you&apos;re working.</Text> : null}
           <Headline>Building a Pixtery!</Headline>
           {gridSize % 2 ? null : <Text>And choosing so carefully</Text>}
           <ActivityIndicator
@@ -270,7 +269,6 @@ export default ({
         </Modal>
       </Portal>
       <Header
-        theme={theme}
         notifications={
           receivedPuzzles.filter((puzzle) => !puzzle.completed).length
         }
@@ -475,4 +473,4 @@ export default ({
       </KeyboardAwareScrollView>
     </AdSafeAreaView>
   );
-};
+}
