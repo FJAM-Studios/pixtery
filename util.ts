@@ -43,15 +43,7 @@ export const shareMessage = async (pixUrl: string): Promise<void> => {
     const options = {
       subject: "Someone sent you a Pixtery to solve!",
     };
-    const result = await Share.share(content, options);
-
-    // All of these conditionals are empty. What is supposed to be happening here?
-    // if (result.action === Share.sharedAction) {
-    //   if (result.activityType) {
-    //   } else {
-    //   }
-    // } else if (result.action === Share.dismissedAction) {
-    // }
+    await Share.share(content, options);
   } catch (error) {
     alert(error.message);
   }
