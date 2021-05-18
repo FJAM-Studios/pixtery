@@ -81,7 +81,6 @@ export default function PuzzleComponent({
   useEffect(() => {
     const initializeSound = async () => {
       const { sound } = await Audio.Sound.createAsync(
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
         require("../assets/camera-click.wav")
       );
       setSound(sound);
@@ -340,7 +339,7 @@ const styles = (props: { theme: Theme; boardSize: number }) =>
       color: "orange",
     },
     winText: {
-      fontSize: 50,
+      fontSize: 25,
       flexWrap: "wrap",
       textAlign: "center",
       flex: 1,

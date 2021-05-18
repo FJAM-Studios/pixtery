@@ -137,14 +137,6 @@ export default function SentPuzzleList({
                 right={() => (
                   <View style={{ flexDirection: "row", alignItems: "center" }}>
                     <IconButton
-                      icon="puzzle"
-                      onPress={() =>
-                        navigation.navigate("Puzzle", {
-                          publicKey: sentPuzzle.publicKey,
-                        })
-                      }
-                    />
-                    <IconButton
                       icon="delete"
                       onPress={() => showDeleteModal(sentPuzzle)}
                     />
