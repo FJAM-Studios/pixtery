@@ -6,6 +6,7 @@ import { Text, View, StyleSheet, Image, LayoutChangeEvent } from "react-native";
 import { ActivityIndicator } from "react-native-paper";
 import { Theme } from "react-native-paper/lib/typescript/types";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useDispatch, useSelector } from "react-redux";
 
 import { DEGREE_CONVERSION, TESTING_MODE } from "../constants";
 import {
@@ -16,6 +17,7 @@ import {
   getInitialDimensions,
   validateBoard,
 } from "../puzzleUtils";
+import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
 import {
   Puzzle,
   Piece,
@@ -23,6 +25,7 @@ import {
   BoardSpace,
   ScreenNavigation,
   PuzzleRoute,
+  RootState,
 } from "../types";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
@@ -32,23 +35,20 @@ import PuzzlePiece from "./PuzzlePiece";
 const disableShuffle = TESTING_MODE;
 
 export default function PuzzleComponent({
-  boardSize,
-  theme,
   navigation,
-  receivedPuzzles,
-  sentPuzzles,
   route,
-  setReceivedPuzzles,
 }: {
-  boardSize: number;
-  theme: Theme;
   navigation: ScreenNavigation;
-  receivedPuzzles: Puzzle[];
-  sentPuzzles: Puzzle[];
   route: PuzzleRoute;
-  setReceivedPuzzles: (puzzles: Puzzle[]) => void;
 }): JSX.Element {
+  const dispatch = useDispatch();
   const { publicKey } = route.params;
+  const theme = useSelector((state: RootState) => state.theme);
+  const { boardSize } = useSelector((state: RootState) => state.screenHeight);
+  const receivedPuzzles = useSelector(
+    (state: RootState) => state.receivedPuzzles
+  );
+  const sentPuzzles = useSelector((state: RootState) => state.sentPuzzles);
 
   const [puzzle, setPuzzle] = useState<Puzzle>();
   const [pieces, setPieces] = useState<Piece[]>([]);
@@ -234,7 +234,7 @@ export default function PuzzleComponent({
       }),
     ];
     await AsyncStorage.setItem("@pixteryPuzzles", JSON.stringify(allPuzzles));
-    setReceivedPuzzles(allPuzzles);
+    dispatch(setReceivedPuzzles(allPuzzles));
   };
 
   // need to return dummy component to measure the puzzle area via onLayout
@@ -242,7 +242,6 @@ export default function PuzzleComponent({
     return (
       <AdSafeAreaView style={styles(styleProps).parentContainer}>
         <Header
-          theme={theme}
           notifications={
             receivedPuzzles.filter((puzzle) => !puzzle.completed).length
           }
@@ -268,7 +267,6 @@ export default function PuzzleComponent({
     ) : (
       <AdSafeAreaView style={styles(styleProps).parentContainer}>
         <Header
-          theme={theme}
           notifications={
             receivedPuzzles.filter((puzzle) => !puzzle.completed).length
           }
