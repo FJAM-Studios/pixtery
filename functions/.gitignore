@@ -3,6 +3,7 @@ lib/**/*.js
 lib/**/*.js.map
 *-debug.log
 ip.js
+serviceAccount.ts
 
 # TypeScript v1 declaration files
 typings/
