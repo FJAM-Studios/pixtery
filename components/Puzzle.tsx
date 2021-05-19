@@ -67,15 +67,15 @@ export default function PuzzleComponent({
   // for native animations and gesturehandler
 
   // when a piece is moved, it is given new maxZ through updateZ function below
-  let maxZ = useRef(0).current;
+  const maxZ = useRef(0);
 
   const updateZ = () => {
-    maxZ += 1;
-    return maxZ;
+    maxZ.current += 1;
+    return maxZ.current;
   };
 
   // store current pieces snapped to board
-  let currentBoard: BoardSpace[] = useRef([]).current;
+  const currentBoard = useRef<BoardSpace[]>([]);
 
   //set up the camera click sound and clean up on unmount
   useEffect(() => {
@@ -113,7 +113,7 @@ export default function PuzzleComponent({
   };
 
   const checkWin = () => {
-    if (puzzle && validateBoard(currentBoard, puzzle.gridSize)) {
+    if (puzzle && validateBoard(currentBoard.current, puzzle.gridSize)) {
       animateWin();
       markPuzzleComplete(publicKey);
     }
@@ -213,10 +213,17 @@ export default function PuzzleComponent({
       setSnapPoints(getSnapPoints(gridSize, squareSize));
       setWinMessage("");
       setErrorMessage("");
-      currentBoard = new Array(numPieces).fill(null);
-      maxZ = 0;
+      currentBoard.current = [];
+      maxZ.current = 0;
     }
-  }, [publicKey, puzzleAreaDimensions]);
+  }, [
+    boardSize,
+    navigation,
+    publicKey,
+    puzzleAreaDimensions,
+    receivedPuzzles,
+    sentPuzzles,
+  ]);
 
   const styleProps = {
     theme,
@@ -292,7 +299,7 @@ export default function PuzzleComponent({
                 puzzleAreaDimensions={puzzleAreaDimensions}
                 updateZ={updateZ}
                 snapPoints={snapPoints}
-                currentBoard={currentBoard}
+                currentBoard={currentBoard.current}
                 checkWin={checkWin}
               />
             ))
