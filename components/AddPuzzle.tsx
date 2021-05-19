@@ -100,7 +100,7 @@ export default function AddPuzzle({
       }
     };
     searchForPuzzle();
-  }, []);
+  });
 
   return (
     <View
