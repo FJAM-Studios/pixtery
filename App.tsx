@@ -44,7 +44,7 @@ const App = (): JSX.Element => {
       if (url && navigationRef.current)
         goToScreen(navigationRef.current, "Splash", { url });
     });
-  }, []);
+  });
 
   // to control trigger order and prevent users from skipping the login screen, puzzle querying has been moved to AddPuzzle, which is called from Splash, which is navigated to only after the navigation container loads using the onReady prop
   const gotoSplash = () => {
