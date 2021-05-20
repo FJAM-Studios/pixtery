@@ -25,10 +25,17 @@ interface Puzzle {
 }
 
 exports.uploadPuzzleSettings = functions.https.onCall(
-    async (data: { fileName: string; newPuzzle: Puzzle }) => {
+    async (data: { fileName: string; newPuzzle: Puzzle }, context) => {
       const {fileName, newPuzzle} = data;
       console.log("uploading puzzle settings");
       try {
+        // throw error if user is not authenticated
+        if (!context.auth) {
+          throw new functions.https.HttpsError(
+              "permission-denied",
+              "user not authenticated"
+          );
+        }
         await db.collection("puzzles").doc(fileName).set(newPuzzle);
         return {result: `successfully uploaded ${fileName}`};
       } catch (error) {
