@@ -61,6 +61,7 @@ export default function PuzzleComponent({
   });
   const [sound, setSound] = useState<Audio.Sound>();
   const [opaque, setOpaque] = useState<boolean>(false);
+  const [isReady, setReady] = useState<boolean>(false);
 
   // z index and current board are not handled through react state so that they don't
   // cause Puzzle/PuzzlePiece re-renders, which would break the positional tracking
@@ -128,6 +129,7 @@ export default function PuzzleComponent({
   };
 
   useEffect(() => {
+    setReady(false);
     const matchingPuzzles = [...receivedPuzzles, ...sentPuzzles].filter(
       (puz) => puz.publicKey === publicKey
     );
@@ -203,6 +205,7 @@ export default function PuzzleComponent({
             _pieces.push(piece);
           }
           setPieces(_pieces);
+          setReady(true);
         } catch (e) {
           console.log(e);
           alert("Could not load puzzle!");
@@ -262,7 +265,7 @@ export default function PuzzleComponent({
         />
       </AdSafeAreaView>
     );
-  if (puzzle && pieces.length) {
+  if (isReady && puzzle && pieces.length) {
     return opaque ? (
       <View
         style={{
