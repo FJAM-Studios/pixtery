@@ -24,7 +24,6 @@ export default function Profile({
   );
   const sentPuzzles = useSelector((state: RootState) => state.sentPuzzles);
   const profile = useSelector((state: RootState) => state.profile);
-  console.log(profile);
   const [name, setName] = useState((profile && profile.name) || "");
   const [errors, setErrors] = useState("");
   return (

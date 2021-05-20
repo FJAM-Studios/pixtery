@@ -14,7 +14,6 @@ import { goToScreen } from "../util";
 import Logo from "./Logo";
 import Title from "./Title";
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const phoneFormat = require("phone");
 
 export default function CreateProfile({

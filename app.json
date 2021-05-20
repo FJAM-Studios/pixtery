@@ -1,5 +1,6 @@
 {
   "expo": {
+    "owner": "fjam-studios",
     "name": "pixtery",
     "slug": "pixtery",
     "version": "1.0.0",
