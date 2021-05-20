@@ -69,7 +69,7 @@ export default function Splash({
       if (profile && url) {
         await loadPuzzles();
         const { path } = Linking.parse(url);
-        if (path && path.length) {
+        if (path && path.length === 9) {
           const publicKey = path;
           goToScreen(navigation, "AddPuzzle", { publicKey });
         } else goToScreen(navigation, "Home");
