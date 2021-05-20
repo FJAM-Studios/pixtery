@@ -61,27 +61,27 @@ export default function PuzzleComponent({
   });
   const [sound, setSound] = useState<Audio.Sound>();
   const [opaque, setOpaque] = useState<boolean>(false);
+  const [isReady, setReady] = useState<boolean>(false);
 
   // z index and current board are not handled through react state so that they don't
   // cause Puzzle/PuzzlePiece re-renders, which would break the positional tracking
   // for native animations and gesturehandler
 
   // when a piece is moved, it is given new maxZ through updateZ function below
-  let maxZ = useRef(0).current;
+  const maxZ = useRef(0);
 
   const updateZ = () => {
-    maxZ += 1;
-    return maxZ;
+    maxZ.current += 1;
+    return maxZ.current;
   };
 
   // store current pieces snapped to board
-  let currentBoard: BoardSpace[] = useRef([]).current;
+  const currentBoard = useRef<BoardSpace[]>([]);
 
   //set up the camera click sound and clean up on unmount
   useEffect(() => {
     const initializeSound = async () => {
       const { sound } = await Audio.Sound.createAsync(
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
         require("../assets/camera-click.wav")
       );
       setSound(sound);
@@ -114,7 +114,7 @@ export default function PuzzleComponent({
   };
 
   const checkWin = () => {
-    if (puzzle && validateBoard(currentBoard, puzzle.gridSize)) {
+    if (puzzle && validateBoard(currentBoard.current, puzzle.gridSize)) {
       animateWin();
       markPuzzleComplete(publicKey);
     }
@@ -129,6 +129,7 @@ export default function PuzzleComponent({
   };
 
   useEffect(() => {
+    setReady(false);
     const matchingPuzzles = [...receivedPuzzles, ...sentPuzzles].filter(
       (puz) => puz.publicKey === publicKey
     );
@@ -204,6 +205,7 @@ export default function PuzzleComponent({
             _pieces.push(piece);
           }
           setPieces(_pieces);
+          setReady(true);
         } catch (e) {
           console.log(e);
           alert("Could not load puzzle!");
@@ -214,10 +216,17 @@ export default function PuzzleComponent({
       setSnapPoints(getSnapPoints(gridSize, squareSize));
       setWinMessage("");
       setErrorMessage("");
-      currentBoard = new Array(numPieces).fill(null);
-      maxZ = 0;
+      currentBoard.current = [];
+      maxZ.current = 0;
     }
-  }, [publicKey, puzzleAreaDimensions]);
+  }, [
+    boardSize,
+    navigation,
+    publicKey,
+    puzzleAreaDimensions,
+    receivedPuzzles,
+    sentPuzzles,
+  ]);
 
   const styleProps = {
     theme,
@@ -256,7 +265,7 @@ export default function PuzzleComponent({
         />
       </AdSafeAreaView>
     );
-  if (puzzle && pieces.length) {
+  if (isReady && puzzle && pieces.length) {
     return opaque ? (
       <View
         style={{
@@ -293,7 +302,7 @@ export default function PuzzleComponent({
                 puzzleAreaDimensions={puzzleAreaDimensions}
                 updateZ={updateZ}
                 snapPoints={snapPoints}
-                currentBoard={currentBoard}
+                currentBoard={currentBoard.current}
                 checkWin={checkWin}
               />
             ))
@@ -340,7 +349,7 @@ const styles = (props: { theme: Theme; boardSize: number }) =>
       color: "orange",
     },
     winText: {
-      fontSize: 50,
+      fontSize: 25,
       flexWrap: "wrap",
       textAlign: "center",
       flex: 1,
