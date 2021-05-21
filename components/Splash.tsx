@@ -86,7 +86,7 @@ export default function Splash({
     };
 
     loadAppData();
-  }, [profile]);
+  }, [dispatch, navigation, profile, route.params]);
 
   return (
     <View
