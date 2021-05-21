@@ -139,7 +139,9 @@ export default function PuzzlePiece({
           // and, if so, break loop
           const blockingPieces = currentBoard.filter(
             (pos) =>
-              pos.pointIndex === pointIndex && pos.solvedIndex !== solvedIndex
+              pos &&
+              pos.pointIndex === pointIndex &&
+              pos.solvedIndex !== solvedIndex
           );
           if (blockingPieces.length) break;
 
@@ -150,7 +152,7 @@ export default function PuzzlePiece({
           // remove from current board if already snapped elsewhere
           // must be done w in-place array methods
           const spliceIx = currentBoard.findIndex(
-            (pos) => pos.solvedIndex === solvedIndex
+            (pos) => pos && pos.solvedIndex === solvedIndex
           );
           if (spliceIx > -1) currentBoard.splice(spliceIx, 1);
           //add to current board at current point index
@@ -163,7 +165,7 @@ export default function PuzzlePiece({
       //remove from current board if not snapped
       if (notSnapped) {
         const spliceIx = currentBoard.findIndex(
-          (pos) => pos.solvedIndex === solvedIndex
+          (pos) => pos && pos.solvedIndex === solvedIndex
         );
         if (spliceIx > -1) currentBoard.splice(spliceIx, 1);
       }
@@ -186,7 +188,7 @@ export default function PuzzlePiece({
 
       //if it's snapped in, update rotation on the board
       const matchingPieces = currentBoard.filter(
-        (pos) => pos.solvedIndex === solvedIndex
+        (pos) => pos && pos.solvedIndex === solvedIndex
       );
       if (matchingPieces.length) {
         const matchingPiece = matchingPieces[0];

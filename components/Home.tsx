@@ -23,7 +23,6 @@ import Svg, { Path } from "react-native-svg";
 import { useDispatch, useSelector } from "react-redux";
 import shortid from "shortid";
 import uuid from "uuid";
-// var shortid = require('shortid');
 
 import { storage, functions } from "../FirebaseApp";
 import {
@@ -42,7 +41,6 @@ import { createBlob, shareMessage } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const emptyImage = require("../assets/blank.jpg");
 
 AdMobInterstitial.setAdUnitID(INTERSTITIAL_ID);
