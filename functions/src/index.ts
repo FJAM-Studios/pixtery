@@ -1,8 +1,6 @@
 /* eslint-disable max-len */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as functions from "firebase-functions";
-// import { db } from "../../FirebaseApp";
-// import { Puzzle } from "../../types";
 const admin = require("firebase-admin");
 import adminKey from "./serviceAccount";
 
@@ -29,7 +27,7 @@ exports.uploadPuzzleSettings = functions.https.onCall(
       const {fileName, newPuzzle} = data;
       console.log("uploading puzzle settings");
       try {
-        // throw error if user is not authenticated
+      // throw error if user is not authenticated
         if (!context.auth) {
           throw new functions.https.HttpsError(
               "permission-denied",
