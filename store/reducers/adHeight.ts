@@ -18,7 +18,6 @@ export const setDeviceSize = (height: number, boardSize: number): AnyAction => {
 };
 
 export const setAdHeight = (adHeight: number): AnyAction => {
-  console.log('adheight at reducer', adHeight)
   return {
     type: SET_AD_HEIGHT,
     adHeight,
@@ -27,22 +26,14 @@ export const setAdHeight = (adHeight: number): AnyAction => {
 
 // reducer
 
-const initialState: ScreenHeight = { boardSize: 0, height: 0, adHeight: 0 };
+const initialState: ScreenHeight = { boardSize: 0, height: 0 };
 
 function reducer(state = initialState, action: AnyAction): ScreenHeight {
   switch (action.type) {
     case SET_HEIGHT:
-      return {
-        boardSize: action.boardSize,
-        height: action.height,
-        adHeight: state.adHeight,
-      };
+      return { boardSize: action.boardSize, height: action.height };
     case SET_AD_HEIGHT:
-      return {
-        boardSize: state.boardSize,
-        height: state.height,
-        adHeight: action.adHeight,
-      };
+      return { adHeight: action.adHeight };
     default:
       return state;
   }

@@ -86,6 +86,7 @@ export type SplashRoute = RouteProp<StackScreens, "Splash">;
 export interface ScreenHeight {
   height: number;
   boardSize: number;
+  adHeight: number;
 }
 
 export interface RootState {
