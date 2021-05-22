@@ -5,6 +5,7 @@ import { View } from "react-native";
 import { ActivityIndicator } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 
+import { PUBLIC_KEY_LENGTH } from "../constants";
 import { setProfile } from "../store/reducers/profile";
 import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
 import { setSentPuzzles } from "../store/reducers/sentPuzzles";
@@ -69,7 +70,7 @@ export default function Splash({
       if (profile && url) {
         await loadPuzzles();
         const { path } = Linking.parse(url);
-        if (path && path.length) {
+        if (path && path.length === PUBLIC_KEY_LENGTH) {
           const publicKey = path;
           goToScreen(navigation, "AddPuzzle", { publicKey });
         } else goToScreen(navigation, "Home");
