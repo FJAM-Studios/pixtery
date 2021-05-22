@@ -44,11 +44,13 @@ export default function PuzzleComponent({
   const dispatch = useDispatch();
   const { publicKey } = route.params;
   const theme = useSelector((state: RootState) => state.theme);
-  const { boardSize } = useSelector((state: RootState) => state.screenHeight);
+  const { boardSize, adHeight } = useSelector((state: RootState) => state.screenHeight);
   const receivedPuzzles = useSelector(
     (state: RootState) => state.receivedPuzzles
   );
   const sentPuzzles = useSelector((state: RootState) => state.sentPuzzles);
+  // const { adHeight } = useSelector((state: RootState) => state.screenHeight);
+    console.log('adheight', adHeight, 'boardsize', boardSize)
 
   const [puzzle, setPuzzle] = useState<Puzzle>();
   const [pieces, setPieces] = useState<Piece[]>([]);
@@ -120,10 +122,11 @@ export default function PuzzleComponent({
   };
 
   const measurePuzzleArea = (ev: LayoutChangeEvent): void => {
+    console.log('adhright at mesaure', adHeight)
     if (puzzleAreaDimensions.puzzleAreaHeight) return;
     setPuzzleAreaDimensions({
       puzzleAreaWidth: ev.nativeEvent.layout.width,
-      puzzleAreaHeight: ev.nativeEvent.layout.height,
+      puzzleAreaHeight: ev.nativeEvent.layout.height - adHeight,
     });
   };
 
