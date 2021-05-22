@@ -54,7 +54,6 @@ export default function PuzzleComponent({
   const [pieces, setPieces] = useState<Piece[]>([]);
   const [snapPoints, setSnapPoints] = useState<Point[]>([]);
   const [winMessage, setWinMessage] = useState<string>("");
-  const [errorMessage, setErrorMessage] = useState<string>("");
   const [puzzleAreaDimensions, setPuzzleAreaDimensions] = useState({
     puzzleAreaWidth: 0,
     puzzleAreaHeight: 0,
@@ -215,7 +214,6 @@ export default function PuzzleComponent({
       createPieces();
       setSnapPoints(getSnapPoints(gridSize, squareSize));
       setWinMessage("");
-      setErrorMessage("");
       currentBoard.current = [];
       maxZ.current = 0;
     }
@@ -284,7 +282,9 @@ export default function PuzzleComponent({
         <View
           style={{
             flex: 1,
-            justifyContent: "flex-end",
+            justifyContent: "flex-start",
+            alignSelf: "center",
+            width: boardSize,
           }}
         >
           <View style={styles(styleProps).puzzleArea}>
@@ -312,16 +312,11 @@ export default function PuzzleComponent({
               style={{
                 width: boardSize,
                 height: boardSize,
-                position: "absolute",
-                top: "0%",
               }}
             />
           )}
-          <View style={styles(styleProps).messageContainer}>
+          <View style={styles(styleProps).winContainer}>
             <Text style={styles(styleProps).winText}>{winMessage}</Text>
-          </View>
-          <View style={styles(styleProps).messageContainer}>
-            <Text style={styles(styleProps).errorText}>{errorMessage}</Text>
           </View>
         </View>
       </AdSafeAreaView>
@@ -341,12 +336,9 @@ const styles = (props: { theme: Theme; boardSize: number }) =>
       flexDirection: "row",
       zIndex: -1,
     },
-    errorText: {
-      fontSize: 20,
-      flexWrap: "wrap",
-      textAlign: "center",
-      flex: 1,
-      color: "orange",
+    winContainer: {
+      flexDirection: "row",
+      zIndex: 1,
     },
     winText: {
       fontSize: 25,
