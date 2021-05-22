@@ -19,6 +19,7 @@ import PuzzleList from "./components/PuzzleList";
 import SentPuzzleList from "./components/SentPuzzleList";
 import Splash from "./components/Splash";
 import TitleScreen from "./components/TitleScreen";
+import { MIN_BOTTOM_CLEARANCE } from "./constants";
 import { setDeviceSize } from "./store/reducers/screenHeight";
 import { StackScreens, RootState } from "./types";
 import { goToScreen } from "./util";
@@ -36,7 +37,12 @@ const App = (): JSX.Element => {
   // on url change go to the splash screen, which will stop the user if they aren't logged in
   useEffect(() => {
     const { width, height } = Dimensions.get("screen");
-    const boardSize = 0.95 * Math.min(height, width);
+    const boardSize =
+      0.95 *
+      Math.min(
+        Math.min(height, width),
+        MIN_BOTTOM_CLEARANCE * Math.max(height, width)
+      );
     dispatch(setDeviceSize(height, boardSize));
 
     Linking.addEventListener("url", (ev) => {
