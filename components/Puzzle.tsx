@@ -44,13 +44,14 @@ export default function PuzzleComponent({
   const dispatch = useDispatch();
   const { publicKey } = route.params;
   const theme = useSelector((state: RootState) => state.theme);
-  const { boardSize, adHeight } = useSelector((state: RootState) => state.screenHeight);
+  const { boardSize, adHeight, height } = useSelector(
+    (state: RootState) => state.screenHeight
+  );
   const receivedPuzzles = useSelector(
     (state: RootState) => state.receivedPuzzles
   );
   const sentPuzzles = useSelector((state: RootState) => state.sentPuzzles);
-  // const { adHeight } = useSelector((state: RootState) => state.screenHeight);
-    console.log('adheight', adHeight, 'boardsize', boardSize)
+  console.log("adheight", adHeight, "boardsize", boardSize, 'screen height', height);
 
   const [puzzle, setPuzzle] = useState<Puzzle>();
   const [pieces, setPieces] = useState<Piece[]>([]);
@@ -63,6 +64,10 @@ export default function PuzzleComponent({
   const [sound, setSound] = useState<Audio.Sound>();
   const [opaque, setOpaque] = useState<boolean>(false);
   const [isReady, setReady] = useState<boolean>(false);
+  const styleProps = {
+    theme,
+    boardSize,
+  };
 
   // z index and current board are not handled through react state so that they don't
   // cause Puzzle/PuzzlePiece re-renders, which would break the positional tracking
@@ -122,11 +127,11 @@ export default function PuzzleComponent({
   };
 
   const measurePuzzleArea = (ev: LayoutChangeEvent): void => {
-    console.log('adhright at mesaure', adHeight)
     if (puzzleAreaDimensions.puzzleAreaHeight) return;
     setPuzzleAreaDimensions({
       puzzleAreaWidth: ev.nativeEvent.layout.width,
-      puzzleAreaHeight: ev.nativeEvent.layout.height - adHeight,
+      // puzzleAreaHeight: ev.nativeEvent.layout.height - adHeight,
+      puzzleAreaHeight: ev.nativeEvent.layout.height,
     });
   };
 
@@ -135,13 +140,22 @@ export default function PuzzleComponent({
     const matchingPuzzles = [...receivedPuzzles, ...sentPuzzles].filter(
       (puz) => puz.publicKey === publicKey
     );
-    if (matchingPuzzles.length && puzzleAreaDimensions.puzzleAreaWidth > 0) {
+    if (
+      matchingPuzzles.length &&
+      puzzleAreaDimensions.puzzleAreaWidth > 0
+      // adHeight > 0
+    ) {
+      const parentContainerStyle = StyleSheet.flatten([styles(styleProps).parentContainer])
+      console.log('parentcontainer', parentContainerStyle.padding)
+      const adHeightState = adHeight ? adHeight : 50;
       const pickedPuzzle = matchingPuzzles[0];
       const { gridSize, puzzleType, imageURI } = pickedPuzzle;
       const squareSize = boardSize / gridSize;
       const numPieces = gridSize * gridSize;
-      const minSandboxY = boardSize * 1.05;
-      const maxSandboxY = puzzleAreaDimensions.puzzleAreaHeight - squareSize;
+      const minSandboxY = boardSize * 1.01;
+      // start here - padding gets me close but tiny overlap still
+      const maxSandboxY = puzzleAreaDimensions.puzzleAreaHeight - adHeightState - parentContainerStyle.padding- squareSize;
+      console.log('puzareaheight', puzzleAreaDimensions.puzzleAreaHeight, "adheight at mesaure", adHeight, 'squaresize', squareSize, 'gridSize', gridSize);
 
       setPuzzle(pickedPuzzle);
 
@@ -175,6 +189,8 @@ export default function PuzzleComponent({
               gridSize,
               squareSize
             );
+
+            console.log('initial placement y', initialPlacement.y)
 
             const href = await ImageManipulator.manipulateAsync(
               // testing an invalid imageURI, in case the pic is deleted/corrupted
@@ -228,11 +244,6 @@ export default function PuzzleComponent({
     receivedPuzzles,
     sentPuzzles,
   ]);
-
-  const styleProps = {
-    theme,
-    boardSize,
-  };
 
   const markPuzzleComplete = async (key: string) => {
     const allPuzzles = [

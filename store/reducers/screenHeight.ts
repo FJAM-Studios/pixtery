@@ -18,7 +18,6 @@ export const setDeviceSize = (height: number, boardSize: number): AnyAction => {
 };
 
 export const setAdHeight = (adHeight: number): AnyAction => {
-  console.log('adheight at reducer', adHeight)
   return {
     type: SET_AD_HEIGHT,
     adHeight,
