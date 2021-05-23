@@ -51,7 +51,14 @@ export default function PuzzleComponent({
     (state: RootState) => state.receivedPuzzles
   );
   const sentPuzzles = useSelector((state: RootState) => state.sentPuzzles);
-  console.log("adheight", adHeight, "boardsize", boardSize, 'screen height', height);
+  console.log(
+    "adheight",
+    adHeight,
+    "boardsize",
+    boardSize,
+    "screen height",
+    height
+  );
 
   const [puzzle, setPuzzle] = useState<Puzzle>();
   const [pieces, setPieces] = useState<Piece[]>([]);
@@ -145,8 +152,10 @@ export default function PuzzleComponent({
       puzzleAreaDimensions.puzzleAreaWidth > 0
       // adHeight > 0
     ) {
-      const parentContainerStyle = StyleSheet.flatten([styles(styleProps).parentContainer])
-      console.log('parentcontainer', parentContainerStyle.padding)
+      const parentContainerStyle = StyleSheet.flatten([
+        styles(styleProps).parentContainer,
+      ]);
+      console.log("parentcontainer", parentContainerStyle.padding);
       const adHeightState = adHeight ? adHeight : 50;
       const pickedPuzzle = matchingPuzzles[0];
       const { gridSize, puzzleType, imageURI } = pickedPuzzle;
@@ -154,8 +163,21 @@ export default function PuzzleComponent({
       const numPieces = gridSize * gridSize;
       const minSandboxY = boardSize * 1.01;
       // start here - padding gets me close but tiny overlap still
-      const maxSandboxY = puzzleAreaDimensions.puzzleAreaHeight - adHeightState - parentContainerStyle.padding- squareSize;
-      console.log('puzareaheight', puzzleAreaDimensions.puzzleAreaHeight, "adheight at mesaure", adHeight, 'squaresize', squareSize, 'gridSize', gridSize);
+      const maxSandboxY =
+        puzzleAreaDimensions.puzzleAreaHeight -
+        adHeightState -
+        parentContainerStyle.padding -
+        squareSize;
+      console.log(
+        "puzareaheight",
+        puzzleAreaDimensions.puzzleAreaHeight,
+        "adheight at mesaure",
+        adHeight,
+        "squaresize",
+        squareSize,
+        "gridSize",
+        gridSize
+      );
 
       setPuzzle(pickedPuzzle);
 
@@ -190,7 +212,7 @@ export default function PuzzleComponent({
               squareSize
             );
 
-            console.log('initial placement y', initialPlacement.y)
+            console.log("initial placement y", initialPlacement.y);
 
             const href = await ImageManipulator.manipulateAsync(
               // testing an invalid imageURI, in case the pic is deleted/corrupted
