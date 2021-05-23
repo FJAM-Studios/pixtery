@@ -302,18 +302,21 @@ export const getInitialDimensions = (
   gridSize: number,
   squareSize: number
 ): PieceConfiguration => {
+  console.log("maxSandboxY", maxSandboxY, 'minsandboxy', minSandboxY)
   const randomFactor = shuffledIndex % 2 ? squareSize * 0.1 : 0;
   const scaleSquaresToSandbox = (maxSandboxY - minSandboxY) / minSandboxY;
 
   const pieceDimensions: Dimension = { width: squareSize, height: squareSize };
   const initialPlacement: Point = {
     x: (shuffledIndex % gridSize) * squareSize - randomFactor,
-    y:
+    y: Math.min(
       minSandboxY +
-      Math.floor(shuffledIndex / gridSize) *
-        squareSize *
-        scaleSquaresToSandbox +
-      randomFactor,
+        Math.floor(shuffledIndex / gridSize) *
+          squareSize *
+          scaleSquaresToSandbox +
+        randomFactor,
+      maxSandboxY
+    ),
   };
   const square: Point = {
     x: solvedIndex % gridSize,
