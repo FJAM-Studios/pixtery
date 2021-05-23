@@ -68,6 +68,7 @@ export default function Home({
   const [paths, setPaths] = React.useState(
     generateJigsawPiecePaths(gridSize, boardSize / (1.6 * gridSize), true)
   );
+  const platformHeightAdjust = Platform.OS === "ios" ? 0.02 : 0.2;
 
   const selectImage = async (camera: boolean) => {
     const result = camera
@@ -275,6 +276,8 @@ export default function Home({
       <KeyboardAwareScrollView
         resetScrollToCoords={{ x: 0, y: 0 }}
         keyboardShouldPersistTaps="handled"
+        extraScrollHeight={height * platformHeightAdjust}
+        enableOnAndroid
       >
         <View
           style={{
