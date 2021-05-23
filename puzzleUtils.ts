@@ -302,7 +302,7 @@ export const getInitialDimensions = (
   gridSize: number,
   squareSize: number
 ): PieceConfiguration => {
-  console.log("maxSandboxY", maxSandboxY, 'minsandboxy', minSandboxY)
+  console.log("maxSandboxY", maxSandboxY, "minsandboxy", minSandboxY);
   const randomFactor = shuffledIndex % 2 ? squareSize * 0.1 : 0;
   const scaleSquaresToSandbox = (maxSandboxY - minSandboxY) / minSandboxY;
 
