@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as FirebaseRecaptcha from "expo-firebase-recaptcha";
 import React, { useState, useRef } from "react";
-import { View } from "react-native";
+import { Platform, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Headline, Text, TextInput, Button } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -29,12 +29,15 @@ export default function CreateProfile({
   );
   const theme = useSelector((state: RootState) => state.theme);
   const profile = useSelector((state: RootState) => state.profile);
+  const { height } = useSelector((state: RootState) => state.screenHeight);
   const [name, setName] = useState((profile && profile.name) || "");
   const [phone, setPhone] = useState("");
   const [smsCode, setSmsCode] = useState("");
   const [verificationId, setVerificationId] = useState("");
   const [errors, setErrors] = useState("");
   const [resetAllowed, setResetAllowed] = useState(false);
+  const [verifyFocused, setVerifyFocused] = useState(false);
+  const platformHeightAdjust = Platform.OS === "ios" ? 0.02 : 0.2;
 
   return (
     <SafeAreaView
@@ -67,6 +70,8 @@ export default function CreateProfile({
       <KeyboardAwareScrollView
         resetScrollToCoords={{ x: 0, y: 0 }}
         keyboardShouldPersistTaps="handled"
+        extraScrollHeight={verifyFocused ? height * platformHeightAdjust : 0}
+        enableOnAndroid
       >
         <Text>Name</Text>
         <TextInput
@@ -126,6 +131,8 @@ export default function CreateProfile({
               onChangeText={(verificationCode: string) =>
                 setSmsCode(verificationCode)
               }
+              onFocus={() => setVerifyFocused(true)}
+              onBlur={() => setVerifyFocused(false)}
             />
             <Button
               icon="check-decagram"
