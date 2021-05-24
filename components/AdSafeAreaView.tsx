@@ -1,5 +1,5 @@
 import { AdMobBanner } from "expo-ads-admob";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { StyleProp, ViewStyle, View, LayoutChangeEvent } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch } from "react-redux";
@@ -12,12 +12,18 @@ export default function AdSafeAreaView(props: {
   children: React.ReactNode;
 }): JSX.Element {
   const dispatch = useDispatch();
+  const [adHeightState, setAdHeightState] = useState(0);
   const measureAdArea = (ev: LayoutChangeEvent): void => {
     const adHeight = ev.nativeEvent.layout.height;
-    if (adHeight) dispatch(setAdHeight(adHeight));
+    if (!adHeightState) setAdHeightState(adHeight);
   };
 
-  return (
+  useEffect(() => {
+    console.log('adheight at adview useeffect', adHeightState)
+    if (adHeightState) dispatch(setAdHeight(adHeightState));
+  }, [adHeightState]);
+
+  if(adHeightState) return (
     <SafeAreaView {...props.style}>
       {props.children}
       <View onLayout={(ev) => measureAdArea(ev)}>
