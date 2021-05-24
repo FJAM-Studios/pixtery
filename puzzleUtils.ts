@@ -346,13 +346,16 @@ export const getInitialDimensions = (
       0,
       (shuffledIndex % gridSize) * squareSize - squareSize * 0.25
     );
-    initialPlacement.y =
+    initialPlacement.y = Math.min(
       minSandboxY +
-      Math.max(
-        0,
-        Math.floor(shuffledIndex / gridSize) * squareSize - squareSize * 0.25
-      ) *
-        scaleJigsawToSandbox;
+        Math.max(
+          0,
+          Math.floor(shuffledIndex / gridSize) * squareSize - squareSize * 0.25
+        ) *
+          scaleJigsawToSandbox,
+      maxSandboxY
+    );
+
     viewBox.originX = Math.max(0, square.x * squareSize - squareSize * 0.25);
     viewBox.originY = Math.max(0, square.y * squareSize - squareSize * 0.25);
 
