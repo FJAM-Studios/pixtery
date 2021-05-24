@@ -19,20 +19,21 @@ export default function AdSafeAreaView(props: {
   };
 
   useEffect(() => {
-    console.log('adheight at adview useeffect', adHeightState)
+    console.log("adheight at adview useeffect", adHeightState);
     if (adHeightState) dispatch(setAdHeight(adHeightState));
   }, [adHeightState]);
 
-  if(adHeightState) return (
-    <SafeAreaView {...props.style}>
-      {props.children}
-      <View onLayout={(ev) => measureAdArea(ev)}>
-        <AdMobBanner
-          bannerSize="smartBannerPortrait"
-          adUnitID={BANNER_ID}
-          style={{ marginTop: "auto", alignSelf: "center" }}
-        />
-      </View>
-    </SafeAreaView>
-  );
+  if (adHeightState)
+    return (
+      <SafeAreaView {...props.style}>
+        {props.children}
+        <View onLayout={(ev) => measureAdArea(ev)}>
+          <AdMobBanner
+            bannerSize="smartBannerPortrait"
+            adUnitID={BANNER_ID}
+            style={{ marginTop: "auto", alignSelf: "center" }}
+          />
+        </View>
+      </SafeAreaView>
+    );
 }
