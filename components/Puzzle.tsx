@@ -156,7 +156,7 @@ export default function PuzzleComponent({
         styles(styleProps).parentContainer,
       ]);
       const adHeightState = adHeight ? adHeight : 50;
-      
+
       const pickedPuzzle = matchingPuzzles[0];
       const { gridSize, puzzleType, imageURI } = pickedPuzzle;
       const squareSize = boardSize / gridSize;
@@ -265,7 +265,7 @@ export default function PuzzleComponent({
     puzzleAreaDimensions,
     receivedPuzzles,
     sentPuzzles,
-    adHeight
+    adHeight,
   ]);
 
   const markPuzzleComplete = async (key: string) => {
