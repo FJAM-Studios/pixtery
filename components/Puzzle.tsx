@@ -33,7 +33,7 @@ import PuzzlePiece from "./PuzzlePiece";
 
 //disable shuffling for testing
 const disableShuffle = TESTING_MODE;
-
+// start here - need to force react to get updated adheight state, prob on app component
 export default function PuzzleComponent({
   navigation,
   route,
@@ -149,14 +149,14 @@ export default function PuzzleComponent({
     );
     if (
       matchingPuzzles.length &&
-      puzzleAreaDimensions.puzzleAreaWidth > 0
-      // adHeight > 0
+      puzzleAreaDimensions.puzzleAreaWidth > 0 &&
+      adHeight > 0
     ) {
       const parentContainerStyle = StyleSheet.flatten([
         styles(styleProps).parentContainer,
       ]);
-      console.log("parentcontainer", parentContainerStyle.padding);
       const adHeightState = adHeight ? adHeight : 50;
+      
       const pickedPuzzle = matchingPuzzles[0];
       const { gridSize, puzzleType, imageURI } = pickedPuzzle;
       const squareSize = boardSize / gridSize;
@@ -166,7 +166,7 @@ export default function PuzzleComponent({
       const maxSandboxY =
         puzzleAreaDimensions.puzzleAreaHeight -
         adHeightState -
-        parentContainerStyle.padding -
+        parentContainerStyle.padding * 2 -
         squareSize;
       console.log(
         "puzareaheight",
@@ -265,6 +265,7 @@ export default function PuzzleComponent({
     puzzleAreaDimensions,
     receivedPuzzles,
     sentPuzzles,
+    adHeight
   ]);
 
   const markPuzzleComplete = async (key: string) => {
