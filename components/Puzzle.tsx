@@ -44,22 +44,12 @@ export default function PuzzleComponent({
   const dispatch = useDispatch();
   const { publicKey } = route.params;
   const theme = useSelector((state: RootState) => state.theme);
-  const { boardSize, height } = useSelector(
-    (state: RootState) => state.screenHeight
-  );
+  const { boardSize } = useSelector((state: RootState) => state.screenHeight);
   const receivedPuzzles = useSelector(
     (state: RootState) => state.receivedPuzzles
   );
   const sentPuzzles = useSelector((state: RootState) => state.sentPuzzles);
   const adHeight = useSelector((state: RootState) => state.adHeight);
-  console.log(
-    "adheight",
-    adHeight,
-    "boardsize",
-    boardSize,
-    "screen height",
-    height
-  );
 
   const [puzzle, setPuzzle] = useState<Puzzle>();
   const [pieces, setPieces] = useState<Piece[]>([]);
@@ -147,41 +137,24 @@ export default function PuzzleComponent({
     const matchingPuzzles = [...receivedPuzzles, ...sentPuzzles].filter(
       (puz) => puz.publicKey === publicKey
     );
-    if (
-      matchingPuzzles.length &&
-      puzzleAreaDimensions.puzzleAreaWidth > 0
-      // adHeight > 0
-    ) {
+    if (matchingPuzzles.length && puzzleAreaDimensions.puzzleAreaWidth > 0) {
       const parentContainerStyle = StyleSheet.flatten([
         styles(styleProps).parentContainer,
       ]);
-      // const adHeightState = adHeight ? adHeight : 50;
 
       const pickedPuzzle = matchingPuzzles[0];
       const { gridSize, puzzleType, imageURI } = pickedPuzzle;
       const squareSize = boardSize / gridSize;
       const numPieces = gridSize * gridSize;
-      // start here - padding gets me close but tiny overlap still
       const minSandboxY = boardSize * 1.01;
-      const maxSandboxY =
-      Math.max(
+      // maxSandboxY (upper left max bound of initial piece position)
+      // sometimes depending on screenheight, min is larger than max
+      const maxSandboxY = Math.max(
         puzzleAreaDimensions.puzzleAreaHeight -
-        adHeight -
-        parentContainerStyle.padding * 2 -
-        squareSize,
+          adHeight -
+          parentContainerStyle.padding * 2 -
+          squareSize,
         minSandboxY
-      );
-            console.log(
-        "puzareaheight",
-        puzzleAreaDimensions.puzzleAreaHeight,
-        "adheight at mesaure",
-        adHeight,
-        "squaresize",
-        squareSize,
-        "gridSize",
-        gridSize,
-        'maxsandY',
-        maxSandboxY
       );
 
       setPuzzle(pickedPuzzle);
@@ -214,10 +187,9 @@ export default function PuzzleComponent({
               solvedIndex,
               shuffledIndex,
               gridSize,
-              squareSize
+              squareSize,
+              boardSize,
             );
-
-            console.log("initial placement y", initialPlacement.y);
 
             const href = await ImageManipulator.manipulateAsync(
               // testing an invalid imageURI, in case the pic is deleted/corrupted
