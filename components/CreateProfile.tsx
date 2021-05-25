@@ -35,6 +35,8 @@ export default function CreateProfile({
   const [verificationId, setVerificationId] = useState("");
   const [errors, setErrors] = useState("");
   const [resetAllowed, setResetAllowed] = useState(false);
+  const [verifyFocused, setVerifyFocused] = useState(false);
+  const [buttonHeight, setButtonHeight] = useState(0);
 
   return (
     <SafeAreaView
@@ -67,6 +69,8 @@ export default function CreateProfile({
       <KeyboardAwareScrollView
         resetScrollToCoords={{ x: 0, y: 0 }}
         keyboardShouldPersistTaps="handled"
+        extraScrollHeight={verifyFocused ? buttonHeight + 40 : 0}
+        enableOnAndroid
       >
         <Text>Name</Text>
         <TextInput
@@ -126,11 +130,14 @@ export default function CreateProfile({
               onChangeText={(verificationCode: string) =>
                 setSmsCode(verificationCode)
               }
+              onFocus={() => setVerifyFocused(true)}
+              onBlur={() => setVerifyFocused(false)}
             />
             <Button
               icon="check-decagram"
               mode="contained"
               style={{ margin: 10 }}
+              onLayout={(ev) => setButtonHeight(ev.nativeEvent.layout.height)}
               onPress={async () => {
                 try {
                   const authResult = await verifySms(verificationId, smsCode);
