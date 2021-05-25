@@ -418,6 +418,16 @@ export const snapAngle = (angle: number): number => {
   return angle;
 };
 
+// takes an index, grid size, and rotation and returns the rotated index on grid
+const rotateIndex = (ix: number, size: number, rotation: number): number => {
+  for (let i = 0; i < (2 * rotation) / Math.PI; i++) {
+    const y = Math.floor(ix / size);
+    const x = ix % size;
+    ix = (size - x - 1) * size + y;
+  }
+  return ix;
+};
+
 export const validateBoard = (
   currentBoard: BoardSpace[],
   gridSize: number
@@ -425,7 +435,10 @@ export const validateBoard = (
   if (currentBoard.length === gridSize * gridSize) {
     for (let i = 0; i < currentBoard.length; i++) {
       const { pointIndex, solvedIndex, rotation } = currentBoard[i];
-      if (pointIndex !== solvedIndex || rotation !== 0) {
+      if (
+        // rotated location of piece must match solution location
+        rotateIndex(pointIndex, gridSize, rotation) !== solvedIndex
+      ) {
         return false;
       }
     }
