@@ -68,7 +68,7 @@ export default function Home({
   const [paths, setPaths] = React.useState(
     generateJigsawPiecePaths(gridSize, boardSize / (1.6 * gridSize), true)
   );
-  const platformHeightAdjust = Platform.OS === "ios" ? 0.02 : 0.2;
+  const [buttonHeight, setButtonHeight] = React.useState(0);
 
   const selectImage = async (camera: boolean) => {
     const result = camera
@@ -276,7 +276,9 @@ export default function Home({
       <KeyboardAwareScrollView
         resetScrollToCoords={{ x: 0, y: 0 }}
         keyboardShouldPersistTaps="handled"
-        extraScrollHeight={height * platformHeightAdjust}
+        extraScrollHeight={
+          Platform.OS === "ios" ? 0 : buttonHeight + height * 0.2
+        }
         enableOnAndroid
       >
         <View
@@ -453,7 +455,7 @@ export default function Home({
         </View>
         <TextInput
           placeholder="Message (optional)"
-          disabled={!imageURI.length}
+          // disabled={!imageURI.length}
           mode="outlined"
           value={message}
           onChangeText={(message) => setMessage(message)}
@@ -468,6 +470,7 @@ export default function Home({
           onPress={submitToServer}
           style={{ margin: height * 0.01 }}
           disabled={imageURI.length === 0}
+          onLayout={(ev) => setButtonHeight(ev.nativeEvent.layout.height)}
         >
           Send
         </Button>
