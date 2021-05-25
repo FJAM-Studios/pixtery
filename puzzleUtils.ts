@@ -300,9 +300,9 @@ export const getInitialDimensions = (
   solvedIndex: number,
   shuffledIndex: number,
   gridSize: number,
-  squareSize: number
+  squareSize: number,
+  boardSize: number
 ): PieceConfiguration => {
-  console.log("maxSandboxY", maxSandboxY, "minsandboxy", minSandboxY);
   const randomFactor = shuffledIndex % 2 ? squareSize * 0.1 : 0;
   const scaleSquaresToSandbox = (maxSandboxY - minSandboxY) / minSandboxY;
 
@@ -347,15 +347,19 @@ export const getInitialDimensions = (
       0,
       (shuffledIndex % gridSize) * squareSize - squareSize * 0.25
     );
-    // take min of min Y of sandbox + adjustment based on index, or the maximum Y of sandbox
-    initialPlacement.y = Math.min(
-      minSandboxY +
+    const sandboxCenterY = (minSandboxY + maxSandboxY + squareSize) / 2;
+    // anchors on horiontal center of sandbox, and extrapolates Y by subtracting 1/2 of piece height
+    initialPlacement.y = Math.max(
+      sandboxCenterY +
         Math.max(
           0,
           Math.floor(shuffledIndex / gridSize) * squareSize - squareSize * 0.25
         ) *
-          scaleJigsawToSandbox,
-      maxSandboxY
+          scaleJigsawToSandbox -
+        randomFactor -
+        pieceDimensions.height * 0.5,
+      // limit upper bound of sandbox to half of the jigsaw "tab"
+      boardSize - (squareSize * 0.25) / 2
     );
 
     viewBox.originX = Math.max(0, square.x * squareSize - squareSize * 0.25);

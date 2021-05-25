@@ -15,12 +15,10 @@ export default function AdSafeAreaView(props: {
   const [adHeightState, setAdHeightState] = useState(0);
   const measureAdArea = (ev: LayoutChangeEvent): void => {
     const adHeight = ev.nativeEvent.layout.height;
-    console.log('posY', adHeight)
     if (!adHeightState) setAdHeightState(adHeight);
   };
 
   useEffect(() => {
-    console.log("adheight at adview useeffect", adHeightState);
     if (adHeightState) dispatch(setAdHeight(adHeightState));
   });
 
