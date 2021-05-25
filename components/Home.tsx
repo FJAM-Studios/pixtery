@@ -455,7 +455,7 @@ export default function Home({
         </View>
         <TextInput
           placeholder="Message (optional)"
-          // disabled={!imageURI.length}
+          disabled={!imageURI.length}
           mode="outlined"
           value={message}
           onChangeText={(message) => setMessage(message)}
