@@ -20,3 +20,5 @@ serviceAccount.ts
 
 # macOS
 .DS_Store
+
+public/bundle*
