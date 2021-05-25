@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as FirebaseRecaptcha from "expo-firebase-recaptcha";
 import React, { useState, useRef } from "react";
-import { Platform, View } from "react-native";
+import { View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Headline, Text, TextInput, Button } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -29,7 +29,6 @@ export default function CreateProfile({
   );
   const theme = useSelector((state: RootState) => state.theme);
   const profile = useSelector((state: RootState) => state.profile);
-  const { height } = useSelector((state: RootState) => state.screenHeight);
   const [name, setName] = useState((profile && profile.name) || "");
   const [phone, setPhone] = useState("");
   const [smsCode, setSmsCode] = useState("");
@@ -37,7 +36,7 @@ export default function CreateProfile({
   const [errors, setErrors] = useState("");
   const [resetAllowed, setResetAllowed] = useState(false);
   const [verifyFocused, setVerifyFocused] = useState(false);
-  const platformHeightAdjust = Platform.OS === "ios" ? 0.02 : 0.2;
+  const [buttonHeight, setButtonHeight] = useState(0);
 
   return (
     <SafeAreaView
@@ -70,7 +69,7 @@ export default function CreateProfile({
       <KeyboardAwareScrollView
         resetScrollToCoords={{ x: 0, y: 0 }}
         keyboardShouldPersistTaps="handled"
-        extraScrollHeight={verifyFocused ? height * platformHeightAdjust : 0}
+        extraScrollHeight={verifyFocused ? buttonHeight + 40 : 0}
         enableOnAndroid
       >
         <Text>Name</Text>
@@ -138,6 +137,7 @@ export default function CreateProfile({
               icon="check-decagram"
               mode="contained"
               style={{ margin: 10 }}
+              onLayout={(ev) => setButtonHeight(ev.nativeEvent.layout.height)}
               onPress={async () => {
                 try {
                   const authResult = await verifySms(verificationId, smsCode);
