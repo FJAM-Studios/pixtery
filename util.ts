@@ -2,6 +2,7 @@ import {
   CommonActions,
   NavigationContainerRef,
 } from "@react-navigation/native";
+import * as SplashScreen from "expo-splash-screen";
 import { Share } from "react-native";
 
 import { ScreenNavigation } from "./types";
@@ -63,4 +64,16 @@ export const goToScreen = (
       routes: [{ name: screen, params: options }],
     })
   );
+};
+
+export const closeSplashAndNavigate = async (
+  navigation: ScreenNavigation | NavigationContainerRef,
+  screen: string,
+  options: { url?: string | null; publicKey?: string } = {
+    url: "",
+    publicKey: "",
+  }
+): Promise<void> => {
+  goToScreen(navigation, screen, options);
+  await SplashScreen.hideAsync();
 };
