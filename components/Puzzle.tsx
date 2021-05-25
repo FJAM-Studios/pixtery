@@ -33,7 +33,6 @@ import PuzzlePiece from "./PuzzlePiece";
 
 //disable shuffling for testing
 const disableShuffle = TESTING_MODE;
-// start here - need to force react to get updated adheight state, prob on app component
 export default function PuzzleComponent({
   navigation,
   route,
