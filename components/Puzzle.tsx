@@ -138,6 +138,7 @@ export default function PuzzleComponent({
       (puz) => puz.publicKey === publicKey
     );
     if (matchingPuzzles.length && puzzleAreaDimensions.puzzleAreaWidth > 0) {
+      // this enables us to dynamically reference parent container padding below when we calculate ad banner position
       const parentContainerStyle = StyleSheet.flatten([
         styles(styleProps).parentContainer,
       ]);
@@ -188,7 +189,7 @@ export default function PuzzleComponent({
               shuffledIndex,
               gridSize,
               squareSize,
-              boardSize,
+              boardSize
             );
 
             const href = await ImageManipulator.manipulateAsync(
