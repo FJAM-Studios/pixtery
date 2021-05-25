@@ -290,7 +290,10 @@ export default function PuzzleComponent({
           <View style={styles(styleProps).puzzleArea}>
             <View style={styles(styleProps).messageContainer}>
               <Text style={styles(styleProps).startText}>
-                Drag pieces onto the board! Double tap to rotate!
+                Drag pieces onto the board!
+              </Text>
+              <Text style={styles(styleProps).startText}>
+                Double tap a piece to rotate!
               </Text>
             </View>
           </View>
@@ -333,7 +336,7 @@ export default function PuzzleComponent({
 const styles = (props: { theme: Theme; boardSize: number }) =>
   StyleSheet.create({
     messageContainer: {
-      flexDirection: "row",
+      flexDirection: "column",
       zIndex: -1,
     },
     winContainer: {
@@ -346,12 +349,13 @@ const styles = (props: { theme: Theme; boardSize: number }) =>
       textAlign: "center",
       flex: 1,
       color: "white",
+      marginTop: 20,
     },
     startText: {
       fontSize: 20,
       flexWrap: "wrap",
       textAlign: "center",
-      flex: 1,
+      margin: 10,
       color: "white",
     },
     puzzleArea: {
