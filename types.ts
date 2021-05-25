@@ -86,7 +86,6 @@ export type SplashRoute = RouteProp<StackScreens, "Splash">;
 export interface ScreenHeight {
   height: number;
   boardSize: number;
-  adHeight: number;
 }
 
 export interface RootState {
@@ -95,4 +94,5 @@ export interface RootState {
   sentPuzzles: Puzzle[];
   screenHeight: ScreenHeight;
   theme: Theme;
+  adHeight: number;
 }
