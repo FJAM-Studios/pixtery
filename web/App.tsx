@@ -2,7 +2,7 @@ import * as React from "react";
 import { storage, functions } from "../FirebaseApp";
 
 import { PUBLIC_KEY_LENGTH } from "../constants";
-import { Puzzle, AddPuzzleRoute, ScreenNavigation, RootState } from "../types";
+import { Puzzle } from "../types";
 
 export default function App(): JSX.Element {
   const [loading, setLoading] = React.useState(true);
