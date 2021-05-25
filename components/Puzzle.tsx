@@ -44,13 +44,14 @@ export default function PuzzleComponent({
   const dispatch = useDispatch();
   const { publicKey } = route.params;
   const theme = useSelector((state: RootState) => state.theme);
-  const { boardSize, adHeight, height } = useSelector(
+  const { boardSize, height } = useSelector(
     (state: RootState) => state.screenHeight
   );
   const receivedPuzzles = useSelector(
     (state: RootState) => state.receivedPuzzles
   );
   const sentPuzzles = useSelector((state: RootState) => state.sentPuzzles);
+  const adHeight = useSelector((state: RootState) => state.adHeight);
   console.log(
     "adheight",
     adHeight,
@@ -137,7 +138,6 @@ export default function PuzzleComponent({
     if (puzzleAreaDimensions.puzzleAreaHeight) return;
     setPuzzleAreaDimensions({
       puzzleAreaWidth: ev.nativeEvent.layout.width,
-      // puzzleAreaHeight: ev.nativeEvent.layout.height - adHeight,
       puzzleAreaHeight: ev.nativeEvent.layout.height,
     });
   };
@@ -149,26 +149,29 @@ export default function PuzzleComponent({
     );
     if (
       matchingPuzzles.length &&
-      puzzleAreaDimensions.puzzleAreaWidth > 0 &&
-      adHeight > 0
+      puzzleAreaDimensions.puzzleAreaWidth > 0
+      // adHeight > 0
     ) {
       const parentContainerStyle = StyleSheet.flatten([
         styles(styleProps).parentContainer,
       ]);
-      const adHeightState = adHeight ? adHeight : 50;
+      // const adHeightState = adHeight ? adHeight : 50;
 
       const pickedPuzzle = matchingPuzzles[0];
       const { gridSize, puzzleType, imageURI } = pickedPuzzle;
       const squareSize = boardSize / gridSize;
       const numPieces = gridSize * gridSize;
-      const minSandboxY = boardSize * 1.01;
       // start here - padding gets me close but tiny overlap still
+      const minSandboxY = boardSize * 1.01;
       const maxSandboxY =
+      Math.max(
         puzzleAreaDimensions.puzzleAreaHeight -
-        adHeightState -
+        adHeight -
         parentContainerStyle.padding * 2 -
-        squareSize;
-      console.log(
+        squareSize,
+        minSandboxY
+      );
+            console.log(
         "puzareaheight",
         puzzleAreaDimensions.puzzleAreaHeight,
         "adheight at mesaure",
@@ -176,7 +179,9 @@ export default function PuzzleComponent({
         "squaresize",
         squareSize,
         "gridSize",
-        gridSize
+        gridSize,
+        'maxsandY',
+        maxSandboxY
       );
 
       setPuzzle(pickedPuzzle);

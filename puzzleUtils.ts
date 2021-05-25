@@ -309,6 +309,7 @@ export const getInitialDimensions = (
   const pieceDimensions: Dimension = { width: squareSize, height: squareSize };
   const initialPlacement: Point = {
     x: (shuffledIndex % gridSize) * squareSize - randomFactor,
+    // take min of min Y of sandbox + adjustment based on index, or the maximum Y of sandbox
     y: Math.min(
       minSandboxY +
         Math.floor(shuffledIndex / gridSize) *
@@ -341,11 +342,12 @@ export const getInitialDimensions = (
         ? squareSize * 1.25
         : squareSize * 1.5;
     const scaleJigsawToSandbox =
-      (maxSandboxY - squareSize * 0.25 - minSandboxY) / minSandboxY;
+      Math.max(0, maxSandboxY - squareSize * 0.25 - minSandboxY) / minSandboxY;
     initialPlacement.x = Math.max(
       0,
       (shuffledIndex % gridSize) * squareSize - squareSize * 0.25
     );
+    // take min of min Y of sandbox + adjustment based on index, or the maximum Y of sandbox
     initialPlacement.y = Math.min(
       minSandboxY +
         Math.max(
