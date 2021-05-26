@@ -1,19 +1,20 @@
 import * as React from "react";
-import { storage, functions } from "../FirebaseApp";
 
+import { storage, functions } from "../FirebaseApp";
 import { PUBLIC_KEY_LENGTH } from "../constants";
-import { Puzzle } from "../types";
+import { Puzzle as PuzzleType } from "../types";
+import Puzzle from "./Puzzle";
 
 export default function App(): JSX.Element {
   const [loading, setLoading] = React.useState(true);
-  const [puzzle, setPuzzle] = React.useState<Puzzle>();
+  const [puzzle, setPuzzle] = React.useState<PuzzleType>();
 
   React.useEffect(() => {
     const path = window.location.pathname.slice(1);
     fetchPuzzle(path);
-  });
+  }, []);
 
-  const fetchPuzzle = async (publicKey: string): Promise<Puzzle | void> => {
+  const fetchPuzzle = async (publicKey: string): Promise<PuzzleType | void> => {
     const queryPuzzleCallable = functions.httpsCallable("queryPuzzle");
     if (publicKey.length === PUBLIC_KEY_LENGTH) {
       try {
@@ -39,8 +40,7 @@ export default function App(): JSX.Element {
   if (puzzle) {
     return (
       <div id="app">
-        {/* pass puzzle to a Puzzle component built for the web*/}
-        <img src={puzzle.imageURI} alt="Pixtery!" />
+        <Puzzle puzzle={puzzle} />
       </div>
     );
   }
