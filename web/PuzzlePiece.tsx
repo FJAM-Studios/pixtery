@@ -10,9 +10,24 @@ export default function PuzzlePiece({
   piece: Piece;
   scaleFactor: number;
 }): JSX.Element {
-  const { viewBox, pieceDimensions, piecePath, solvedIndex } = piece;
+  const {
+    viewBox,
+    pieceDimensions,
+    piecePath,
+    solvedIndex,
+    initialPlacement,
+    initialRotation,
+    snapOffset,
+  } = piece;
   const href = piece.href as string;
-  console.log(scaleFactor);
+
+  const [rotation, setRotation] = React.useState(initialRotation);
+
+  const pivot = {
+    x: snapOffset.x / pieceDimensions.width,
+    y: snapOffset.y / pieceDimensions.height,
+  };
+
   if (viewBox)
     return (
       <svg
@@ -24,6 +39,18 @@ export default function PuzzlePiece({
         ${pieceDimensions.width}
         ${pieceDimensions.height}
         `}
+        onDoubleClick={() => {
+          setRotation(rotation + Math.PI / 2);
+        }}
+        style={{
+          position: "absolute",
+          top: initialPlacement.y,
+          left: initialPlacement.x,
+          transformOrigin: `${pieceDimensions.width * pivot.x}px ${
+            pieceDimensions.height * pivot.y
+          }px`,
+          transform: `rotate(${rotation}rad)`,
+        }}
       >
         <clipPath id={`jigsaw${solvedIndex}`}>
           <path d={piecePath} />
