@@ -24,7 +24,7 @@ export default function Puzzle({
 
   React.useEffect(() => {
     const boardSize =
-      0.95 * Math.min(window.innerWidth, window.innerHeight * 0.7);
+      0.95 * Math.min(window.innerWidth, window.innerHeight * 0.5);
     setHeight(boardSize);
     const { gridSize, puzzleType, imageURI } = puzzle;
     const squareSize = boardSize / gridSize;
@@ -70,14 +70,37 @@ export default function Puzzle({
         snapOffset,
         viewBox,
       };
+
+      piece.initialPlacement.x += (window.innerWidth - boardSize) / 2;
       _pieces.push(piece);
     }
     setPieces(_pieces);
   }, [puzzle]);
 
   return (
-    <div id="game">
-      <div id="board" style={{ width: height, height }} />
+    <div id="game" style={{ height: 0.95 * window.innerHeight }}>
+      <div id="banner" style={{ width: height }}>
+        <img src="pixtery.svg" style={{ width: height / 3 }} alt="Pixtery!" />
+        <img
+          src="app-store.svg"
+          style={{
+            marginLeft: "auto",
+            height: height / 12,
+          }}
+          alt="Pixtery!"
+        />
+        <img
+          src="play-store.svg"
+          style={{
+            height: height / 12,
+          }}
+          alt="Pixtery!"
+        />
+      </div>
+      <div id="board" style={{ width: height, height }}>
+        <h3>Drag pieces onto the board!</h3>
+        <h3>Double tap a piece to rotate!</h3>
+      </div>
       {pieces.length
         ? pieces.map((piece, ix) => (
             <PuzzlePiece key={ix} piece={piece} scaleFactor={height / 1080} />
