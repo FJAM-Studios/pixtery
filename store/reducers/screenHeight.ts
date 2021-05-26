@@ -23,7 +23,10 @@ const initialState: ScreenHeight = { boardSize: 0, height: 0 };
 function reducer(state = initialState, action: AnyAction): ScreenHeight {
   switch (action.type) {
     case SET_HEIGHT:
-      return { boardSize: action.boardSize, height: action.height };
+      return {
+        boardSize: action.boardSize,
+        height: action.height,
+      };
     default:
       return state;
   }

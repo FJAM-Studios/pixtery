@@ -33,7 +33,6 @@ import PuzzlePiece from "./PuzzlePiece";
 
 //disable shuffling for testing
 const disableShuffle = TESTING_MODE;
-
 export default function PuzzleComponent({
   navigation,
   route,
@@ -49,6 +48,7 @@ export default function PuzzleComponent({
     (state: RootState) => state.receivedPuzzles
   );
   const sentPuzzles = useSelector((state: RootState) => state.sentPuzzles);
+  const adHeight = useSelector((state: RootState) => state.adHeight);
 
   const [puzzle, setPuzzle] = useState<Puzzle>();
   const [pieces, setPieces] = useState<Piece[]>([]);
@@ -61,6 +61,10 @@ export default function PuzzleComponent({
   const [sound, setSound] = useState<Audio.Sound>();
   const [opaque, setOpaque] = useState<boolean>(false);
   const [isReady, setReady] = useState<boolean>(false);
+  const styleProps = {
+    theme,
+    boardSize,
+  };
 
   // z index and current board are not handled through react state so that they don't
   // cause Puzzle/PuzzlePiece re-renders, which would break the positional tracking
@@ -133,12 +137,25 @@ export default function PuzzleComponent({
       (puz) => puz.publicKey === publicKey
     );
     if (matchingPuzzles.length && puzzleAreaDimensions.puzzleAreaWidth > 0) {
+      // this enables us to dynamically reference parent container padding below when we calculate ad banner position
+      const parentContainerStyle = StyleSheet.flatten([
+        styles(styleProps).parentContainer,
+      ]);
+
       const pickedPuzzle = matchingPuzzles[0];
       const { gridSize, puzzleType, imageURI } = pickedPuzzle;
       const squareSize = boardSize / gridSize;
       const numPieces = gridSize * gridSize;
-      const minSandboxY = boardSize * 1.05;
-      const maxSandboxY = puzzleAreaDimensions.puzzleAreaHeight - squareSize;
+      const minSandboxY = boardSize * 1.01;
+      // maxSandboxY (upper left max bound of initial piece position)
+      // sometimes depending on screenheight, min is larger than max
+      const maxSandboxY = Math.max(
+        puzzleAreaDimensions.puzzleAreaHeight -
+          adHeight -
+          parentContainerStyle.padding * 2 -
+          squareSize,
+        minSandboxY
+      );
 
       setPuzzle(pickedPuzzle);
 
@@ -170,7 +187,8 @@ export default function PuzzleComponent({
               solvedIndex,
               shuffledIndex,
               gridSize,
-              squareSize
+              squareSize,
+              boardSize
             );
 
             const href = await ImageManipulator.manipulateAsync(
@@ -224,12 +242,8 @@ export default function PuzzleComponent({
     puzzleAreaDimensions,
     receivedPuzzles,
     sentPuzzles,
+    adHeight,
   ]);
-
-  const styleProps = {
-    theme,
-    boardSize,
-  };
 
   const markPuzzleComplete = async (key: string) => {
     const allPuzzles = [
