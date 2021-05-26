@@ -1,86 +1,100 @@
-import React, { useState } from "react";
-import { View, useWindowDimensions } from "react-native";
-import { NavigationContainer } from "@react-navigation/native";
+import {
+  NavigationContainer,
+  NavigationContainerRef,
+} from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import { Provider as PaperProvider, DefaultTheme } from "react-native-paper";
+import * as Linking from "expo-linking";
+import * as SplashScreen from "expo-splash-screen";
+import React, { useRef, useEffect } from "react";
+import { View, LogBox, Dimensions } from "react-native";
+import { Provider as PaperProvider } from "react-native-paper";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { dummyPuzzles } from "./dummyData";
+import { useDispatch, useSelector } from "react-redux";
 
-import Puzzle from "./Puzzle";
-import HomeScreen from "./Home";
-import PuzzleList from "./PuzzleList";
+import AddPuzzle from "./components/AddPuzzle";
+import CreateProfile from "./components/CreateProfile";
+import HomeScreen from "./components/Home";
+import Profile from "./components/Profile";
+import Puzzle from "./components/Puzzle";
+import PuzzleList from "./components/PuzzleList";
+import SentPuzzleList from "./components/SentPuzzleList";
+import Splash from "./components/Splash";
+import TitleScreen from "./components/TitleScreen";
+import { MIN_BOTTOM_CLEARANCE } from "./constants";
+import { setDeviceSize } from "./store/reducers/screenHeight";
+import { StackScreens, RootState } from "./types";
+import { goToScreen } from "./util";
 
-const image = require("./assets/earth.jpg");
+//less than ideal, but idk if we have a choice right now. suppresses the firebase timeout warning
+LogBox.ignoreLogs(["Setting a timer for a long period of time"]);
 
-export const theme = {
-  ...DefaultTheme,
-  roundness: 10,
-  colors: {
-    ...DefaultTheme.colors,
-    primary: "#7D8CC4",
-    accent: "#B8336A",
-    background: "#C490D1",
-    surface: "#A0D2DB",
-    text: "#f8f8ff",
-    disabled: "#808080",
-    placeholder: "#726DA8",
-    backdrop: "#726DA8",
-  },
-};
+const Stack = createStackNavigator<StackScreens>();
 
-const Stack = createStackNavigator();
+const App = (): JSX.Element => {
+  const dispatch = useDispatch();
+  const navigationRef = useRef<NavigationContainerRef | null>(null);
+  const theme = useSelector((state: RootState) => state.theme);
 
-const App = () => {
-  const [receivedPuzzles, setReceivedPuzzles] = useState(dummyPuzzles);
+  // on url change go to the splash screen, which will stop the user if they aren't logged in
+  useEffect(() => {
+    async function showLoading() {
+      await SplashScreen.preventAutoHideAsync();
+    }
+    showLoading();
+    const { width, height } = Dimensions.get("screen");
+    const boardSize =
+      0.95 *
+      Math.min(
+        Math.min(height, width),
+        MIN_BOTTOM_CLEARANCE * Math.max(height, width)
+      );
+    dispatch(setDeviceSize(height, boardSize));
 
-  const { width, height } = useWindowDimensions();
-  const boardSize = 0.95 * Math.min(height, width);
+    Linking.addEventListener("url", (ev) => {
+      const url = ev.url;
+      if (url && navigationRef.current)
+        goToScreen(navigationRef.current, "Splash", { url });
+    });
+  });
+
+  // to control trigger order and prevent users from skipping the login screen, puzzle querying has been moved to AddPuzzle, which is called from Splash, which is navigated to only after the navigation container loads using the onReady prop
+  const gotoSplash = () => {
+    // this timeout is if we want to force users to see the starting screen before moving on.
+    if (navigationRef.current) {
+      goToScreen(navigationRef.current, "Splash");
+    }
+  };
 
   return (
     <PaperProvider theme={theme}>
       <SafeAreaProvider>
-        <NavigationContainer>
+        <NavigationContainer ref={navigationRef} onReady={gotoSplash}>
           <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
-            <Stack.Navigator headerMode="none">
+            <Stack.Navigator initialRouteName="TitleScreen" headerMode="none">
+              <Stack.Screen name="TitleScreen" component={TitleScreen} />
+              <Stack.Screen name="Splash">
+                {(props) => <Splash {...props} />}
+              </Stack.Screen>
+              <Stack.Screen name="CreateProfile">
+                {(props) => <CreateProfile {...props} />}
+              </Stack.Screen>
               <Stack.Screen name="Home">
-                {(props) => (
-                  <HomeScreen
-                    {...props}
-                    boardSize={boardSize}
-                    theme={theme}
-                    receivedPuzzles={receivedPuzzles}
-                  />
-                )}
+                {(props) => <HomeScreen {...props} />}
               </Stack.Screen>
               <Stack.Screen name="PuzzleList">
-                {(props) => (
-                  <PuzzleList
-                    {...props}
-                    theme={theme}
-                    receivedPuzzles={receivedPuzzles}
-                  />
-                )}
+                {(props) => <PuzzleList {...props} />}
               </Stack.Screen>
-              <Stack.Screen
-                name="Puzzle"
-                initialParams={{
-                  imageURI: image.uri,
-                  puzzleType: "jigsaw",
-                  gridSize: 3,
-                }}
-              >
-                {(props) => (
-                  <Puzzle
-                    {...props}
-                    boardSize={boardSize}
-                    theme={theme}
-                    receivedPuzzles={receivedPuzzles}
-
-                    // imageURI={image.uri}
-                    // puzzleType={"jigsaw"}
-                    // gridSize={3}
-                  />
-                )}
+              <Stack.Screen name="SentPuzzleList">
+                {(props) => <SentPuzzleList {...props} />}
+              </Stack.Screen>
+              <Stack.Screen name="Puzzle">
+                {(props) => <Puzzle {...props} />}
+              </Stack.Screen>
+              <Stack.Screen name="AddPuzzle">
+                {(props) => <AddPuzzle {...props} />}
+              </Stack.Screen>
+              <Stack.Screen name="Profile">
+                {(props) => <Profile {...props} />}
               </Stack.Screen>
             </Stack.Navigator>
           </View>
