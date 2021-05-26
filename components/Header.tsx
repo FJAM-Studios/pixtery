@@ -1,21 +1,23 @@
 import React from "react";
 import { View, TouchableWithoutFeedback } from "react-native";
 import { IconButton, Badge, Menu, Divider } from "react-native-paper";
+import { useSelector } from "react-redux";
+
+import { ScreenNavigation, RootState } from "../types";
 import Logo from "./Logo";
 import Title from "./Title";
 
-export default ({
+export default function Header({
   navigation,
   notifications,
-  theme,
 }: {
-  navigation: any;
+  navigation: ScreenNavigation;
   notifications: number;
-  theme: any;
-}) => {
+}): JSX.Element {
+  const theme = useSelector((state: RootState) => state.theme);
   const [visible, setVisible] = React.useState(false);
   const openMenu = () => setVisible(true);
-
+  const { height } = useSelector((state: RootState) => state.screenHeight);
   const closeMenu = () => setVisible(false);
   return (
     <View
@@ -23,6 +25,7 @@ export default ({
         justifyContent: "space-between",
         alignItems: "center",
         flexDirection: "row",
+        height: height * 0.05,
       }}
     >
       <View
@@ -31,8 +34,8 @@ export default ({
           flexDirection: "row",
         }}
       >
-        <Title width="100" height="25" style={{ marginRight: 10 }} />
-        <Logo width="25" height="25" />
+        <Title width="100" height={height * 0.04} style={{ marginRight: 10 }} />
+        <Logo width="25" height={height * 0.04} />
       </View>
       <Menu
         visible={visible}
@@ -62,7 +65,7 @@ export default ({
             navigation.navigate("Home");
           }}
           title="Make"
-          icon="send"
+          icon="camera-iris"
         />
         <Divider />
         <Menu.Item
@@ -77,14 +80,21 @@ export default ({
         <Menu.Item
           onPress={() => {
             closeMenu();
-            // navigation.navigate("Squares");
+            navigation.navigate("SentPuzzleList");
           }}
-          title="Friends"
-          icon="account-multiple"
+          title="Sent"
+          icon="send"
         />
         <Divider />
-        <Menu.Item onPress={() => {}} title="Profile" icon="cog" />
+        <Menu.Item
+          onPress={() => {
+            closeMenu();
+            navigation.navigate("Profile");
+          }}
+          title="Profile"
+          icon="cog"
+        />
       </Menu>
     </View>
   );
-};
+}

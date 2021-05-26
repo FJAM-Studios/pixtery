@@ -1,0 +1,27 @@
+body {
+  background-color: #c490d1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: "Shrikhand";
+}
+
+body > * {
+  margin: 1em;
+  color: #b8336a;
+}
+
+.logo {
+  width: 175px;
+  max-width: 175px;
+}
+
+.title {
+  max-width: 350px;
+}
+
+.studio {
+  color: #726da8;
+  position: absolute;
+  bottom: 0;
+}
