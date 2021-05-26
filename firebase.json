@@ -8,8 +8,8 @@
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "rewrites": [
       {
-        "source": "/m/*",
-        "dynamicLinks": true
+        "source": "**",
+        "destination": "/index.html"
       }
     ],
     "headers": [

@@ -1,6 +1,14 @@
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
 body {
   background-color: #c490d1;
   font-family: "Shrikhand";
+  overflow: "hidden";
 }
 
 #app {
@@ -31,11 +39,24 @@ body {
 
 #game {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: center;
   flex-wrap: wrap;
 }
 
 #board {
   border: solid 2px white;
+  display: flex;
+  align-content: center;
+  flex-direction: column;
+  justify-content: center;
+}
+
+#board > h3 {
+  text-align: center;
+}
+
+#banner {
+  display: flex;
+  justify-content: flex-start;
 }
