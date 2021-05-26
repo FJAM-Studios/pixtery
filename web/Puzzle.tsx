@@ -25,7 +25,6 @@ export default function Puzzle({
   React.useEffect(() => {
     const boardSize =
       0.95 * Math.min(window.innerWidth, window.innerHeight * 0.7);
-    console.log(boardSize);
     setHeight(boardSize);
     const { gridSize, puzzleType, imageURI } = puzzle;
     const squareSize = boardSize / gridSize;
@@ -55,7 +54,8 @@ export default function Puzzle({
         solvedIndex,
         shuffledIndex,
         gridSize,
-        squareSize
+        squareSize,
+        boardSize
       );
 
       const href = imageURI;
