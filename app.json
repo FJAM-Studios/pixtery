@@ -53,8 +53,9 @@
           "autoVerify": true,
           "action": "VIEW",
           "data": {
-            "scheme": "pixtery",
-            "host": "*.pixtery.io"
+            "scheme": "https",
+            "host": "*.pixtery.io",
+            "pathPrefix": "/m/"
           },
           "category": ["BROWSABLE", "DEFAULT"]
         }
