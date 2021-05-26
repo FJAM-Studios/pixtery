@@ -28,3 +28,14 @@ body {
   position: absolute;
   bottom: 0;
 }
+
+#game {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+#board {
+  border: solid 2px white;
+}
