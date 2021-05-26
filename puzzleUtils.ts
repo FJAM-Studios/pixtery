@@ -300,7 +300,8 @@ export const getInitialDimensions = (
   solvedIndex: number,
   shuffledIndex: number,
   gridSize: number,
-  squareSize: number
+  squareSize: number,
+  boardSize: number
 ): PieceConfiguration => {
   const randomFactor = shuffledIndex % 2 ? squareSize * 0.1 : 0;
   const scaleSquaresToSandbox = (maxSandboxY - minSandboxY) / minSandboxY;
@@ -308,12 +309,15 @@ export const getInitialDimensions = (
   const pieceDimensions: Dimension = { width: squareSize, height: squareSize };
   const initialPlacement: Point = {
     x: (shuffledIndex % gridSize) * squareSize - randomFactor,
-    y:
+    // take min of min Y of sandbox + adjustment based on index, or the maximum Y of sandbox
+    y: Math.min(
       minSandboxY +
-      Math.floor(shuffledIndex / gridSize) *
-        squareSize *
-        scaleSquaresToSandbox +
-      randomFactor,
+        Math.floor(shuffledIndex / gridSize) *
+          squareSize *
+          scaleSquaresToSandbox +
+        randomFactor,
+      maxSandboxY
+    ),
   };
   const square: Point = {
     x: solvedIndex % gridSize,
@@ -338,18 +342,26 @@ export const getInitialDimensions = (
         ? squareSize * 1.25
         : squareSize * 1.5;
     const scaleJigsawToSandbox =
-      (maxSandboxY - squareSize * 0.25 - minSandboxY) / minSandboxY;
+      Math.max(0, maxSandboxY - squareSize * 0.25 - minSandboxY) / minSandboxY;
     initialPlacement.x = Math.max(
       0,
       (shuffledIndex % gridSize) * squareSize - squareSize * 0.25
     );
-    initialPlacement.y =
-      minSandboxY +
-      Math.max(
-        0,
-        Math.floor(shuffledIndex / gridSize) * squareSize - squareSize * 0.25
-      ) *
-        scaleJigsawToSandbox;
+    const sandboxCenterY = (minSandboxY + maxSandboxY + squareSize) / 2;
+    // anchors on horiontal center of sandbox, and extrapolates Y by subtracting 1/2 of piece height
+    initialPlacement.y = Math.max(
+      sandboxCenterY +
+        Math.max(
+          0,
+          Math.floor(shuffledIndex / gridSize) * squareSize - squareSize * 0.25
+        ) *
+          scaleJigsawToSandbox -
+        randomFactor -
+        pieceDimensions.height * 0.5,
+      // limit upper bound of sandbox to half of the jigsaw "tab"
+      boardSize - (squareSize * 0.25) / 2
+    );
+
     viewBox.originX = Math.max(0, square.x * squareSize - squareSize * 0.25);
     viewBox.originY = Math.max(0, square.y * squareSize - squareSize * 0.25);
 
