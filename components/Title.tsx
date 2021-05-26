@@ -2,7 +2,7 @@ import * as React from "react";
 import Svg, { SvgProps, Defs, Path, G } from "react-native-svg";
 /* SVGR has dropped some elements not supported by react-native-svg: style */
 
-function SvgComponent(props: SvgProps) {
+export default function SvgComponent(props: SvgProps): JSX.Element {
   return (
     <Svg
       width={160.978}
@@ -49,5 +49,3 @@ function SvgComponent(props: SvgProps) {
     </Svg>
   );
 }
-
-export default SvgComponent;
