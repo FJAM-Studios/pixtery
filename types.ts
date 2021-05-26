@@ -94,4 +94,5 @@ export interface RootState {
   sentPuzzles: Puzzle[];
   screenHeight: ScreenHeight;
   theme: Theme;
+  adHeight: number;
 }
