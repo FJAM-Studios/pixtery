@@ -10,7 +10,7 @@ import { setProfile } from "../store/reducers/profile";
 import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
 import { setSentPuzzles } from "../store/reducers/sentPuzzles";
 import { ScreenNavigation, SplashRoute, RootState } from "../types";
-import { goToScreen } from "../util";
+import { closeSplashAndNavigate } from "../util";
 import Logo from "./Logo";
 import Title from "./Title";
 
@@ -72,8 +72,8 @@ export default function Splash({
         const { path } = Linking.parse(url);
         if (path && path.length === PUBLIC_KEY_LENGTH) {
           const publicKey = path;
-          goToScreen(navigation, "AddPuzzle", { publicKey });
-        } else goToScreen(navigation, "Home");
+          closeSplashAndNavigate(navigation, "AddPuzzle", { publicKey });
+        } else closeSplashAndNavigate(navigation, "Home");
       } else {
         //otherwise, load profile from local storage if it exists
         const loadedProfile = await loadProfile();
@@ -81,7 +81,7 @@ export default function Splash({
           dispatch(setProfile(loadedProfile));
         } else {
           //or navigate to createprofile if it doesn't exist, passing the url to create profile so it can be forwarded along, and you can go directly to the puzzle after signing in.
-          goToScreen(navigation, "CreateProfile", { url });
+          closeSplashAndNavigate(navigation, "CreateProfile", { url });
         }
       }
     };
