@@ -1,38 +1,70 @@
 {
   "expo": {
     "owner": "fjam-studios",
-    "name": "pixtery",
+    "name": "Pixtery",
+    "description": "A fun app that lets you turn your own pictures into jigsaw puzzles and share them with friends!",
     "slug": "pixtery",
+    "privacy": "unlisted",
+    "sdkVersion": "40.0.0",
     "version": "1.0.0",
+    "platforms": ["android", "ios"],
     "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "backgroundColor": "#C490D1",
+    "primaryColor": "#7D8CC4",
     "icon": "./assets/icon.png",
+    "developmentClient": { "silentLaunch": true },
     "scheme": "pixtery",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#C490D1"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": ["assets/*"],
     "ios": {
+      "bundleIdentifier": "com.fjamstudios.pixtery",
+      "buildNumber": "1.0.0",
       "supportsTablet": true,
       "config": {
         "googleMobileAdsAppId": "ca-app-pub-5028593996211038~8814734724"
-      }
+      },
+      "associatedDomains": ["applinks:pixtery.io"]
     },
     "android": {
+      "package": "com.fjamstudios.pixtery",
+      "versionCode": 1,
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#FFFFFF"
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#C490D1"
       },
       "config": {
         "googleMobileAdsAppId": "ca-app-pub-5028593996211038~3568139299"
-      }
+      },
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ],
+      "intentFilters": [
+        {
+          "autoVerify": true,
+          "action": "VIEW",
+          "data": {
+            "scheme": "https",
+            "host": "*.pixtery.io",
+            "pathPrefix": "/m/"
+          },
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ]
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "name": "Pixtery",
+      "shortName": "Pixtery"
     }
   }
 }

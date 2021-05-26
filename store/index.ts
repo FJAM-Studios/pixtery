@@ -1,6 +1,7 @@
 import { combineReducers, createStore, applyMiddleware } from "redux";
 import thunk from "redux-thunk";
 
+import adHeight from "./reducers/adHeight";
 import profile from "./reducers/profile";
 import receivedPuzzles from "./reducers/receivedPuzzles";
 import screenHeight from "./reducers/screenHeight";
@@ -13,6 +14,7 @@ const reducer = combineReducers({
   sentPuzzles,
   profile,
   theme,
+  adHeight,
 });
 
 export default createStore(reducer, applyMiddleware(thunk));

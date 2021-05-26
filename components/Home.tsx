@@ -65,9 +65,12 @@ export default function Home({
   const [gridSize, setGridSize] = React.useState(3);
   const [modalVisible, setModalVisible] = React.useState(false);
   const [message, setMessage] = React.useState("");
+  const messageLimit = 70;
   const [paths, setPaths] = React.useState(
     generateJigsawPiecePaths(gridSize, boardSize / (1.6 * gridSize), true)
   );
+  const [buttonHeight, setButtonHeight] = React.useState(0);
+  const [textFocus, setTextFocus] = React.useState(false);
 
   const selectImage = async (camera: boolean) => {
     const result = camera
@@ -275,6 +278,10 @@ export default function Home({
       <KeyboardAwareScrollView
         resetScrollToCoords={{ x: 0, y: 0 }}
         keyboardShouldPersistTaps="handled"
+        extraScrollHeight={
+          Platform.OS === "ios" ? 0 : buttonHeight + height * 0.2
+        }
+        enableOnAndroid
       >
         <View
           style={{
@@ -449,22 +456,32 @@ export default function Home({
           </Surface>
         </View>
         <TextInput
-          placeholder="Message (optional)"
+          placeholder="Message (optional, shows when solved)"
+          multiline={textFocus}
+          maxLength={messageLimit}
           disabled={!imageURI.length}
           mode="outlined"
           value={message}
           onChangeText={(message) => setMessage(message)}
+          onFocus={() => setTextFocus(true)}
+          onBlur={() => setTextFocus(false)}
           style={{
-            height: height * 0.09,
+            minHeight: height * 0.09,
             justifyContent: "center",
           }}
         />
+        {textFocus ? (
+          <Text style={{ textAlign: "right" }}>
+            {message.length}/{messageLimit} characters
+          </Text>
+        ) : null}
         <Button
           icon="send"
           mode="contained"
           onPress={submitToServer}
           style={{ margin: height * 0.01 }}
           disabled={imageURI.length === 0}
+          onLayout={(ev) => setButtonHeight(ev.nativeEvent.layout.height)}
         >
           Send
         </Button>
