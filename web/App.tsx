@@ -11,7 +11,6 @@ export default function App(): JSX.Element {
 
   React.useEffect(() => {
     const path = window.location.pathname.slice(1);
-    console.log(path);
     fetchPuzzle(path);
   }, []);
 
