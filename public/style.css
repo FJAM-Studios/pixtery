@@ -52,6 +52,8 @@ body {
   justify-content: center;
 }
 
+#board > h1,
+#board > h2,
 #board > h3 {
   text-align: center;
 }

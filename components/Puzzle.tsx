@@ -235,6 +235,7 @@ export default function PuzzleComponent({
       currentBoard.current = [];
       maxZ.current = 0;
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     boardSize,
     navigation,
