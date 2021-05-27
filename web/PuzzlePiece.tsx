@@ -1,14 +1,25 @@
 import * as React from "react";
 
-import { DEFAULT_IMAGE_SIZE } from "../constants";
-import { Piece } from "../types";
+import { DEFAULT_IMAGE_SIZE, SNAP_MARGIN } from "../constants";
+import { getPointsDistance, snapAngle } from "../puzzleUtils";
+import { BoardSpace, Piece, Point } from "../types";
 
 export default function PuzzlePiece({
   piece,
   scaleFactor,
+  updateZ,
+  snapPoints,
+  currentBoard,
+  checkWin,
+  boardRef,
 }: {
   piece: Piece;
   scaleFactor: number;
+  updateZ: () => number;
+  snapPoints: Point[];
+  currentBoard: BoardSpace[];
+  checkWin: () => void;
+  boardRef: HTMLDivElement | null;
 }): JSX.Element {
   const {
     viewBox,
@@ -28,46 +39,134 @@ export default function PuzzlePiece({
     y: snapOffset.y / pieceDimensions.height,
   };
 
-  const svgRef = React.useRef<HTMLDivElement | null>(null);
-  const dragStart = React.useRef({
-    x: 0,
-    y: 0,
+  const pieceRef = React.useRef<HTMLDivElement | null>(null);
+  const position = React.useRef({
+    _x: 0,
+    _y: 0,
     left: initialPlacement.x,
     top: initialPlacement.y,
   });
+  const zIndex = React.useRef(0);
 
   const startDrag = (event: React.PointerEvent) => {
-    if (svgRef.current) {
-      const { target, clientX, clientY } = event;
-      const { left, top } = svgRef.current.getBoundingClientRect();
-      console.log(target);
-      console.log("init", dragStart.current);
-      dragStart.current.left = left - initialPlacement.x;
-      dragStart.current.top = top - initialPlacement.y;
-      dragStart.current.x = clientX;
-      dragStart.current.y = clientY;
+    if (pieceRef.current) {
+      const { clientX, clientY } = event;
+      const { left, top } = pieceRef.current.getBoundingClientRect();
+      position.current.left = left - initialPlacement.x;
+      position.current.top = top - initialPlacement.y;
+      position.current._x = clientX;
+      position.current._y = clientY;
+      zIndex.current = updateZ();
+      pieceRef.current.style.zIndex = "" + zIndex.current;
       window.addEventListener("pointermove", drag, false);
       window.addEventListener("pointerup", stopDrag, false);
     }
   };
 
   const drag = ({ clientX, clientY }: { clientX: number; clientY: number }) => {
-    if (svgRef.current) {
-      svgRef.current.style.transform = `translate(${
-        dragStart.current.left + clientX - dragStart.current.x
-      }px, ${dragStart.current.top + clientY - dragStart.current.y}px)`;
+    if (pieceRef.current) {
+      pieceRef.current.style.transform = `translate(${
+        position.current.left + clientX - position.current._x
+      }px, ${position.current.top + clientY - position.current._y}px)`;
     }
   };
 
-  const stopDrag = () => {
-    window.removeEventListener("pointermove", drag, false);
-    window.removeEventListener("pointerup", stopDrag, false);
+  const stopDrag = ({
+    clientX,
+    clientY,
+  }: {
+    clientX: number;
+    clientY: number;
+  }) => {
+    if (pieceRef.current && boardRef) {
+      const { left, top } = pieceRef.current.getBoundingClientRect();
+      position.current.left = left - initialPlacement.x;
+      position.current.top = top - initialPlacement.y;
+      position.current._x = clientX;
+      position.current._y = clientY;
+
+      const adjustedPiecePoint = {
+        x: initialPlacement.x + position.current.left + snapOffset.x,
+        y: initialPlacement.y + position.current.top + snapOffset.y,
+      };
+
+      let notSnapped = true;
+      //check for snap
+      for (let pointIndex = 0; pointIndex < snapPoints.length; pointIndex++) {
+        const point = snapPoints[pointIndex];
+
+        const adjustedSnapPoint = {
+          x: point.x + boardRef.offsetLeft,
+          y: point.y + boardRef.offsetTop,
+        };
+        if (
+          getPointsDistance(adjustedSnapPoint, adjustedPiecePoint) <
+          SNAP_MARGIN * Math.min(pieceDimensions.height, pieceDimensions.width)
+        ) {
+          const blockingPieces = currentBoard.filter(
+            (pos) =>
+              pos &&
+              pos.pointIndex === pointIndex &&
+              pos.solvedIndex !== solvedIndex
+          );
+          if (blockingPieces.length) break;
+
+          position.current.left +=
+            adjustedSnapPoint.x - adjustedPiecePoint.x + 2;
+          position.current.top +=
+            adjustedSnapPoint.y - adjustedPiecePoint.y + 2;
+          pieceRef.current.style.transform = `translate(${
+            position.current.left + clientX - position.current._x
+          }px, ${position.current.top + clientY - position.current._y}px)`;
+
+          notSnapped = false;
+
+          const spliceIx = currentBoard.findIndex(
+            (pos) => pos && pos.solvedIndex === solvedIndex
+          );
+          if (spliceIx > -1) currentBoard.splice(spliceIx, 1);
+          //add to current board at current point index
+          currentBoard.push({
+            pointIndex,
+            solvedIndex,
+            rotation,
+          });
+          checkWin();
+          break;
+        }
+
+        //remove from current board if not snapped
+        if (notSnapped) {
+          const spliceIx = currentBoard.findIndex(
+            (pos) => pos && pos.solvedIndex === solvedIndex
+          );
+          if (spliceIx > -1) currentBoard.splice(spliceIx, 1);
+        }
+      }
+      window.removeEventListener("pointermove", drag, false);
+      window.removeEventListener("pointerup", stopDrag, false);
+    }
+  };
+
+  const rotatePiece = () => {
+    const newAngle = snapAngle(rotation + Math.PI / 2);
+    setRotation(newAngle);
+    //if it's snapped in, update rotation on the board
+    const matchingPieces = currentBoard.filter(
+      (pos) => pos && pos.solvedIndex === solvedIndex
+    );
+    if (matchingPieces.length) {
+      const matchingPiece = matchingPieces[0];
+      matchingPiece.rotation = newAngle;
+    }
+
+    checkWin();
   };
 
   if (viewBox)
     return (
       <div
-        ref={svgRef}
+        ref={pieceRef}
         onPointerDown={(ev) => startDrag(ev)}
         style={{
           width: pieceDimensions.width,
@@ -76,6 +175,7 @@ export default function PuzzlePiece({
           top: initialPlacement.y,
           left: initialPlacement.x,
           touchAction: "none",
+          zIndex: zIndex.current,
         }}
       >
         <svg
@@ -87,9 +187,7 @@ export default function PuzzlePiece({
         ${pieceDimensions.width}
         ${pieceDimensions.height}
         `}
-          onDoubleClick={() => {
-            setRotation(rotation + Math.PI / 2);
-          }}
+          onDoubleClick={rotatePiece}
           style={{
             transformOrigin: `${pieceDimensions.width * pivot.x}px ${
               pieceDimensions.height * pivot.y

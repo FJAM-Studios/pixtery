@@ -5,9 +5,11 @@ import {
   fillArray,
   generateJigsawPiecePaths,
   getInitialDimensions,
+  getSnapPoints,
   shuffle,
+  validateBoard,
 } from "../puzzleUtils";
-import { Puzzle as PuzzleType, Piece } from "../types";
+import { Puzzle as PuzzleType, Piece, Point, BoardSpace } from "../types";
 import PuzzlePiece from "./PuzzlePiece";
 
 //disable shuffling for testing
@@ -21,6 +23,25 @@ export default function Puzzle({
   const [height, setHeight] = React.useState(0);
   const [solved, setSolved] = React.useState(false);
   const [pieces, setPieces] = React.useState<Piece[]>([]);
+  const [snapPoints, setSnapPoints] = React.useState<Point[]>([]);
+  const boardRef = React.useRef<HTMLDivElement | null>(null);
+  // when a piece is moved, it is given new maxZ through updateZ function below
+  const maxZ = React.useRef(0);
+
+  const updateZ = () => {
+    maxZ.current += 1;
+    return maxZ.current;
+  };
+
+  // store current pieces snapped to board
+  const currentBoard = React.useRef<BoardSpace[]>([]);
+
+  const checkWin = () => {
+    console.log(currentBoard.current);
+    if (validateBoard(currentBoard.current, puzzle.gridSize)) {
+      setSolved(true);
+    }
+  };
 
   React.useEffect(() => {
     const boardSize =
@@ -75,6 +96,7 @@ export default function Puzzle({
       _pieces.push(piece);
     }
     setPieces(_pieces);
+    setSnapPoints(getSnapPoints(gridSize, squareSize));
   }, [puzzle]);
 
   return (
@@ -97,16 +119,50 @@ export default function Puzzle({
           alt="Pixtery!"
         />
       </div>
-      <div id="board" style={{ width: height, height }}>
-        <h3>Drag pieces onto the board!</h3>
-        <h3>Double tap a piece to rotate!</h3>
-      </div>
-      {pieces.length
-        ? pieces.map((piece, ix) => (
-            <PuzzlePiece key={ix} piece={piece} scaleFactor={height / 1080} />
-          ))
-        : null}
-      {solved ? <h1>{puzzle.message}</h1> : null}
+      {solved ? (
+        <div
+          id="board"
+          style={{
+            width: height,
+            height,
+            backgroundImage: `url(${puzzle.imageURI})`,
+            backgroundSize: `${height}px ${height}px`,
+          }}
+        >
+          <h2 style={{ color: "white", backgroundColor: "black" }}>
+            Congrats! You solved the puzzle!
+          </h2>
+          <h2 style={{ backgroundColor: "white" }}>
+            See the secret message on the Pixtery app.
+          </h2>
+          <h2 style={{ color: "white", backgroundColor: "black" }}>
+            Download the Pixtery app to send your own!
+          </h2>
+        </div>
+      ) : (
+        <>
+          <div id="board" style={{ width: height, height }} ref={boardRef}>
+            <h3>Drag pieces onto the board!</h3>
+            <h3>Double tap a piece to rotate!</h3>
+          </div>
+          {pieces.length
+            ? pieces
+                // .slice(0, 1)
+                .map((piece, ix) => (
+                  <PuzzlePiece
+                    key={ix}
+                    piece={piece}
+                    scaleFactor={height / 1080}
+                    updateZ={updateZ}
+                    snapPoints={snapPoints}
+                    currentBoard={currentBoard.current}
+                    checkWin={checkWin}
+                    boardRef={boardRef.current}
+                  />
+                ))
+            : null}
+        </>
+      )}
     </div>
   );
 }
