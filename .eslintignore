@@ -16,3 +16,4 @@ tests/
 patches
 # macOS
 .DS_Store
+public/*

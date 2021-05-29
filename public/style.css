@@ -1,12 +1,23 @@
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
 body {
   background-color: #c490d1;
+  font-family: "Shrikhand";
+  overflow: "hidden";
+}
+
+#app {
   display: flex;
   flex-direction: column;
   align-items: center;
-  font-family: "Shrikhand";
 }
 
-body > * {
+#app > * {
   margin: 1em;
   color: #b8336a;
 }
@@ -24,4 +35,30 @@ body > * {
   color: #726da8;
   position: absolute;
   bottom: 0;
+}
+
+#game {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+#board {
+  border: solid 2px white;
+  display: flex;
+  align-content: center;
+  flex-direction: column;
+  justify-content: center;
+}
+
+#board > h1,
+#board > h2,
+#board > h3 {
+  text-align: center;
+}
+
+#banner {
+  display: flex;
+  justify-content: flex-start;
 }
