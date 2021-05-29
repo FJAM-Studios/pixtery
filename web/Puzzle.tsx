@@ -21,7 +21,7 @@ export default function Puzzle({
   puzzle: PuzzleType;
 }): JSX.Element {
   const [height, setHeight] = React.useState(0);
-  const [solved, setSolved] = React.useState(false);
+  const [solved, setSolved] = React.useState(true);
   const [pieces, setPieces] = React.useState<Piece[]>([]);
   const [snapPoints, setSnapPoints] = React.useState<Point[]>([]);
   const boardRef = React.useRef<HTMLDivElement | null>(null);
@@ -120,25 +120,25 @@ export default function Puzzle({
         />
       </div>
       {solved ? (
-        <div
-          id="board"
-          style={{
-            width: height,
-            height,
-            backgroundImage: `url(${puzzle.imageURI})`,
-            backgroundSize: `${height}px ${height}px`,
-          }}
-        >
+        <>
+          <div
+            id="board"
+            style={{
+              width: height,
+              height,
+              backgroundImage: `url(${puzzle.imageURI})`,
+              backgroundSize: `${height}px ${height}px`,
+            }}
+          />
           <h2 style={{ color: "white", backgroundColor: "black" }}>
-            Congrats! You solved the puzzle!
+            {puzzle.message && puzzle.message.length
+              ? puzzle.message
+              : "Congrats! You solved the puzzle!"}
           </h2>
           <h2 style={{ backgroundColor: "white" }}>
-            See the secret message on the Pixtery app.
+            Download the Pixtery app to send your own puzzle!
           </h2>
-          <h2 style={{ color: "white", backgroundColor: "black" }}>
-            Download the Pixtery app to send your own!
-          </h2>
-        </div>
+        </>
       ) : (
         <>
           <div id="board" style={{ width: height, height }} ref={boardRef}>
