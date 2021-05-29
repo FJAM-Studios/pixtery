@@ -445,11 +445,17 @@ export const validateBoard = (
   gridSize: number
 ): boolean => {
   if (currentBoard.length === gridSize * gridSize) {
+    // set orientation as top left corner piece rotation
+    const orientation = currentBoard.filter(
+      (piece) => piece.pointIndex === 0
+    )[0].rotation;
     for (let i = 0; i < currentBoard.length; i++) {
       const { pointIndex, solvedIndex, rotation } = currentBoard[i];
       if (
         // rotated location of piece must match solution location
-        rotateIndex(pointIndex, gridSize, rotation) !== solvedIndex
+        rotateIndex(pointIndex, gridSize, rotation) !== solvedIndex ||
+        // ensure all pieces oriented same direction
+        orientation !== rotation
       ) {
         return false;
       }
