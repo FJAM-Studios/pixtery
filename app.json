@@ -14,7 +14,7 @@
     "primaryColor": "#7D8CC4",
     "icon": "./assets/icon.png",
     "developmentClient": { "silentLaunch": true },
-    "scheme": "pixtery",
+    "scheme": "https",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -54,8 +54,7 @@
           "action": "VIEW",
           "data": {
             "scheme": "https",
-            "host": "*.pixtery.io",
-            "pathPrefix": "/m/"
+            "host": "pixtery.io"
           },
           "category": ["BROWSABLE", "DEFAULT"]
         }
