@@ -1,5 +1,5 @@
 [{
   "relation": ["delegate_permission/common.handle_all_urls"],
   "target" : { "namespace": "android_app", "package_name": "com.fjamstudios.pixtery",
-               "sha256_cert_fingerprints": ["84:90:12:A0:61:85:0D:DF:1B:A9:FC:93:54:44:1F:A9:49:1D:5A:2F:2E:71:03:73:36:CD:3A:A1:97:14:A2:45"] }
+               "sha256_cert_fingerprints": ["84:90:12:A0:61:85:0D:DF:1B:A9:FC:93:54:44:1F:A9:49:1D:5A:2F:2E:71:03:73:36:CD:3A:A1:97:14:A2:45", "3A:EC:A3:C4:E2:AA:5D:FA:39:15:88:3D:C7:F6:A9:1F:F9:9F:C2:33:78:B8:92:17:E0:71:D3:16:79:42:F5:70"] }
 }]
