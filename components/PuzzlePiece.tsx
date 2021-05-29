@@ -1,3 +1,4 @@
+import * as ImageManipulator from "expo-image-manipulator";
 import React, { useRef } from "react";
 import { Animated } from "react-native";
 import {
@@ -35,7 +36,6 @@ export default function PuzzlePiece({
   checkWin: () => void;
 }): JSX.Element {
   const {
-    href,
     pieceDimensions,
     piecePath,
     initialPlacement,
@@ -43,7 +43,7 @@ export default function PuzzlePiece({
     solvedIndex,
     snapOffset,
   } = piece;
-
+  const href = piece.href as ImageManipulator.ImageResult;
   const puzzleType = piecePath.length ? "jigsaw" : "squares";
 
   const zIndex = useRef(new Animated.Value(0)).current;
