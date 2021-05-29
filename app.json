@@ -14,7 +14,7 @@
     "primaryColor": "#7D8CC4",
     "icon": "./assets/icon.png",
     "developmentClient": { "silentLaunch": true },
-    "scheme": "https",
+    "scheme": "pixtery",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
