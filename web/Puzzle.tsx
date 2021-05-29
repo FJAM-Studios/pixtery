@@ -21,7 +21,7 @@ export default function Puzzle({
   puzzle: PuzzleType;
 }): JSX.Element {
   const [height, setHeight] = React.useState(0);
-  const [solved, setSolved] = React.useState(true);
+  const [solved, setSolved] = React.useState(false);
   const [pieces, setPieces] = React.useState<Piece[]>([]);
   const [snapPoints, setSnapPoints] = React.useState<Point[]>([]);
   const boardRef = React.useRef<HTMLDivElement | null>(null);
