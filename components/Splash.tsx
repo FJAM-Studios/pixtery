@@ -70,8 +70,8 @@ export default function Splash({
       if (profile && url) {
         await loadPuzzles();
         const { path } = Linking.parse(url);
-        if (path && path.length === PUBLIC_KEY_LENGTH) {
-          const publicKey = path;
+        const publicKey = path?.substring(path.lastIndexOf("/") + 1);
+        if (publicKey && publicKey.length === PUBLIC_KEY_LENGTH) {
           closeSplashAndNavigate(navigation, "AddPuzzle", { publicKey });
         } else closeSplashAndNavigate(navigation, "Home");
       } else {

@@ -40,7 +40,7 @@ export default function SentPuzzleList({
   };
 
   const sendPuzzle = (publicKey: string | undefined) => {
-    const deepLink = Linking.createURL(`pixtery.io/${publicKey}`, {
+    const deepLink = Linking.createURL(`pixtery.io/p/${publicKey}`, {
       scheme: "https",
     });
     shareMessage(deepLink);
