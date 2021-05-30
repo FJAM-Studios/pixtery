@@ -8,7 +8,7 @@ body {
 body {
   background-color: #c490d1;
   font-family: "Shrikhand";
-  overflow: "hidden";
+  overflow: scroll;
 }
 
 #app {
@@ -33,7 +33,7 @@ body {
 
 .studio {
   color: #726da8;
-  position: absolute;
+  /* position: absolute; */
   bottom: 0;
 }
 
