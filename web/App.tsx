@@ -51,6 +51,10 @@ export default function App(): JSX.Element {
       <h1>Coming Soon!</h1>
       <img src="app-store.svg" className="logo" alt="Pixtery!" />
       <img src="play-store.svg" className="logo" alt="Pixtery!" />
+      <p>
+        Questions or issues?&nbsp;
+        <a href="mailto:contact@pixtery.io">contact@pixtery.io</a>
+      </p>
       <h5 className="studio">© 2021 FJAM Studios</h5>
     </div>
   );
