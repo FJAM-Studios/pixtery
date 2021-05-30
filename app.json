@@ -54,7 +54,8 @@
           "action": "VIEW",
           "data": {
             "scheme": "https",
-            "host": "pixtery.io"
+            "host": "pixtery.io",
+            "pathPrefix": "/p"
           },
           "category": ["BROWSABLE", "DEFAULT"]
         }

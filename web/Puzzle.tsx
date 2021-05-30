@@ -102,9 +102,9 @@ export default function Puzzle({
   return (
     <div id="game" style={{ height: 0.95 * window.innerHeight }}>
       <div id="banner" style={{ width: height }}>
-        <img src="pixtery.svg" style={{ width: height / 3 }} alt="Pixtery!" />
+        <img src="/pixtery.svg" style={{ width: height / 3 }} alt="Pixtery!" />
         <img
-          src="app-store.svg"
+          src="/app-store.svg"
           style={{
             marginLeft: "auto",
             height: height / 12,
@@ -112,7 +112,7 @@ export default function Puzzle({
           alt="Pixtery!"
         />
         <img
-          src="play-store.svg"
+          src="/play-store.svg"
           style={{
             height: height / 12,
           }}
