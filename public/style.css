@@ -8,7 +8,8 @@ body {
 body {
   background-color: #c490d1;
   font-family: "Shrikhand";
-  overflow: scroll;
+  overflow-x: hidden;
+  overflow-y: scroll;
 }
 
 #app {
@@ -60,4 +61,8 @@ body {
 #banner {
   display: flex;
   justify-content: flex-start;
+}
+
+.dot {
+  color: #726da8;
 }
