@@ -202,7 +202,9 @@ export default function Home({
 
   const generateLink = (publicKey: string): void => {
     //first param is an empty string to allow Expo to dynamically determine path to app based on runtime environment
-    const deepLink = Linking.createURL(`/${publicKey}`);
+    const deepLink = Linking.createURL(`pixtery.io/p/${publicKey}`, {
+      scheme: "https",
+    });
     shareMessage(deepLink);
   };
 
