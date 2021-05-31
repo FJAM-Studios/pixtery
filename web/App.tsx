@@ -10,8 +10,9 @@ export default function App(): JSX.Element {
   const [puzzle, setPuzzle] = React.useState<PuzzleType>();
 
   React.useEffect(() => {
-    const path = window.location.pathname.slice(1);
-    fetchPuzzle(path);
+    const path = window.location.pathname;
+    const publicKey = path.substring(path.lastIndexOf("/") + 1);
+    fetchPuzzle(publicKey);
   }, []);
 
   const fetchPuzzle = async (publicKey: string): Promise<PuzzleType | void> => {
@@ -46,11 +47,11 @@ export default function App(): JSX.Element {
   }
   return (
     <div id="app">
-      <img src="logo.svg" className="logo" alt="Pixtery!" />
-      <img src="pixtery.svg" className="title" alt="Pixtery!" />
+      <img src="/logo.svg" className="logo" alt="Pixtery!" />
+      <img src="/pixtery.svg" className="title" alt="Pixtery!" />
       <h1>Coming Soon!</h1>
-      <img src="app-store.svg" className="logo" alt="Pixtery!" />
-      <img src="play-store.svg" className="logo" alt="Pixtery!" />
+      <img src="/app-store.svg" className="logo" alt="Pixtery!" />
+      <img src="/play-store.svg" className="logo" alt="Pixtery!" />
       <div id="web-footer">
         <div id="web-footer-contents">
           <a href="https://pixtery.io/privacy.html">Privacy policy</a>
