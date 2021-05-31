@@ -12,10 +12,15 @@ body {
   overflow-y: scroll;
 }
 
+#root {
+  height: 100%;
+}
+
 #app {
   display: flex;
   flex-direction: column;
   align-items: center;
+  height: 100%;
 }
 
 #app > * {
@@ -65,4 +70,8 @@ body {
 
 .dot {
   color: #726da8;
+}
+
+#web-footer {
+  margin-top: auto;
 }
