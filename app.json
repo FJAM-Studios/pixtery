@@ -31,7 +31,11 @@
       "config": {
         "googleMobileAdsAppId": "ca-app-pub-5028593996211038~8814734724"
       },
-      "associatedDomains": ["applinks:pixtery.io"]
+      "associatedDomains": ["applinks:pixtery.io"],
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app uses the camera to enable users to take pictures on their camera to send as puzzles to other users.",
+        "NSPhotoLibraryUsageDescription": "This app accesses the device photo library to enable users to select existing images to send as puzzles to other users."
+      }
     },
     "android": {
       "package": "com.fjamstudios.pixtery",
@@ -54,8 +58,8 @@
           "action": "VIEW",
           "data": {
             "scheme": "https",
-            "host": "*.pixtery.io",
-            "pathPrefix": "/m/"
+            "host": "pixtery.io",
+            "pathPrefix": "/p"
           },
           "category": ["BROWSABLE", "DEFAULT"]
         }
