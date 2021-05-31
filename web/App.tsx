@@ -49,7 +49,7 @@ export default function App(): JSX.Element {
     <div id="app">
       <img src="/logo.svg" className="logo" alt="Pixtery!" />
       <img src="/pixtery.svg" className="title" alt="Pixtery!" />
-      <h1>Coming Soon!</h1>
+      <h1 id="coming-soon">Coming Soon!</h1>
       <img src="/app-store.svg" className="logo" alt="Pixtery!" />
       <img src="/play-store.svg" className="logo" alt="Pixtery!" />
       <div id="web-footer">
