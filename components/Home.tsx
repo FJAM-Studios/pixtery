@@ -210,8 +210,12 @@ export default function Home({
 
   const displayPainfulAd = async () => {
     if (DISPLAY_PAINFUL_ADS) {
-      await AdMobInterstitial.requestAdAsync();
-      await AdMobInterstitial.showAdAsync();
+      try {
+        await AdMobInterstitial.requestAdAsync();
+        await AdMobInterstitial.showAdAsync();
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
 
