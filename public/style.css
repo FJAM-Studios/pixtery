@@ -8,8 +8,6 @@ body {
 body {
   background-color: #c490d1;
   font-family: "Shrikhand";
-  /* overflow-x: hidden; */
-  /* overflow-y: scroll; */
   overflow: hidden;
 }
 
@@ -77,8 +75,8 @@ body {
   margin-top: auto;
 }
 
+/* For mobile phones: */
 @media only screen and (max-width: 320px) {
-  /* For mobile phones: */
   #coming-soon {
     font-size: 20px;
   }
@@ -92,9 +90,8 @@ body {
     width: 0px;
   }
 }
-/* start here - adjust width and heights for iphone 8 (currently SE) */
+
 @media only screen and (min-width: 321px) and (max-width: 560px) {
-  /* For mobile phones: */
   #web-footer-contents {
     display: flex;
     flex-direction: column;
@@ -107,7 +104,6 @@ body {
 }
 
 @media only screen and (max-height: 570px) {
-  /* For mobile phones: */
   .logo {
     width: 100px;
   }
