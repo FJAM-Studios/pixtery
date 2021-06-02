@@ -202,14 +202,20 @@ export default function Home({
 
   const generateLink = (publicKey: string): void => {
     //first param is an empty string to allow Expo to dynamically determine path to app based on runtime environment
-    const deepLink = Linking.createURL(`/${publicKey}`);
+    const deepLink = Linking.createURL(`pixtery.io/p/${publicKey}`, {
+      scheme: "https",
+    });
     shareMessage(deepLink);
   };
 
   const displayPainfulAd = async () => {
     if (DISPLAY_PAINFUL_ADS) {
-      await AdMobInterstitial.requestAdAsync();
-      await AdMobInterstitial.showAdAsync();
+      try {
+        await AdMobInterstitial.requestAdAsync();
+        await AdMobInterstitial.showAdAsync();
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
 
@@ -457,7 +463,7 @@ export default function Home({
         </View>
         <TextInput
           placeholder="Message (optional, shows when solved)"
-          multiline={textFocus}
+          multiline
           maxLength={messageLimit}
           disabled={!imageURI.length}
           mode="outlined"
