@@ -103,21 +103,35 @@ export default function Puzzle({
     <div id="game" style={{ height: 0.95 * window.innerHeight }}>
       <div id="banner" style={{ width: height }}>
         <img src="/pixtery.svg" style={{ width: height / 3 }} alt="Pixtery!" />
-        <img
-          src="/app-store.svg"
+        <a
+          href="https://apps.apple.com/us/app/pixtery/id1569991739"
+          target="_blank"
+          rel="noreferrer"
           style={{
             marginLeft: "auto",
-            height: height / 12,
           }}
-          alt="Pixtery!"
-        />
-        <img
-          src="/play-store.svg"
-          style={{
-            height: height / 12,
-          }}
-          alt="Pixtery!"
-        />
+        >
+          <img
+            src="/app-store.svg"
+            alt="Pixtery!"
+            style={{
+              height: height / 12,
+            }}
+          />
+        </a>
+        <a
+          href="https://play.google.com/store/apps/details?id=com.fjamstudios.pixtery"
+          target="_blank"
+          rel="noreferrer"
+        >
+          <img
+            src="/play-store.svg"
+            alt="Pixtery!"
+            style={{
+              height: height / 12,
+            }}
+          />
+        </a>
       </div>
       {solved ? (
         <>
