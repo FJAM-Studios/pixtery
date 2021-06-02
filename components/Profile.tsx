@@ -5,6 +5,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import { Headline, Text, TextInput, Button } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 
+import { VERSION_NUMBER } from "../constants";
 import { setProfile } from "../store/reducers/profile";
 import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
 import { setSentPuzzles } from "../store/reducers/sentPuzzles";
@@ -124,6 +125,7 @@ export default function Profile({
         >
           Delete Sent Puzzles
         </Button>
+        <Text>v{VERSION_NUMBER}</Text>
       </KeyboardAwareScrollView>
     </AdSafeAreaView>
   );
