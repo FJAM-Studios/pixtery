@@ -1,12 +1,28 @@
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
 body {
   background-color: #c490d1;
+  font-family: "Shrikhand";
+  overflow: hidden;
+}
+
+#root {
+  height: 100%;
+}
+
+#app {
   display: flex;
   flex-direction: column;
   align-items: center;
-  font-family: "Shrikhand";
+  height: 100%;
 }
 
-body > * {
+#app > * {
   margin: 1em;
   color: #b8336a;
 }
@@ -22,6 +38,77 @@ body > * {
 
 .studio {
   color: #726da8;
-  position: absolute;
   bottom: 0;
+}
+
+#game {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+#board {
+  border: solid 2px white;
+  display: flex;
+  align-content: center;
+  flex-direction: column;
+  justify-content: center;
+}
+
+#board > h1,
+#board > h2,
+#board > h3 {
+  text-align: center;
+}
+
+#banner {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.dot {
+  color: #726da8;
+}
+
+#web-footer {
+  margin-top: auto;
+}
+
+/* For mobile phones: */
+@media only screen and (max-width: 320px) {
+  #coming-soon {
+    font-size: 20px;
+  }
+  #web-footer-contents {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .dot {
+    height: 0px;
+    width: 0px;
+  }
+}
+
+@media only screen and (min-width: 321px) and (max-width: 560px) {
+  #web-footer-contents {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .dot {
+    height: 0px;
+    width: 0px;
+  }
+}
+
+@media only screen and (max-height: 570px) {
+  .logo {
+    width: 100px;
+  }
+  #coming-soon {
+    font-size: 20px;
+    margin: 0px;
+  }
 }
