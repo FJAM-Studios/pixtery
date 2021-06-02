@@ -8,8 +8,8 @@
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "rewrites": [
       {
-        "source": "/m/*",
-        "dynamicLinks": true
+        "source": "/p/**",
+        "destination": "/index.html"
       }
     ],
     "headers": [
@@ -51,7 +51,8 @@
       "port": 9000
     },
     "hosting": {
-      "port": 5000
+      "port": 5000,
+      "host": "0.0.0.0"
     },
     "ui": {
       "enabled": true

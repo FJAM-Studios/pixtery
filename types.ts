@@ -41,13 +41,14 @@ export interface Profile {
 }
 
 export interface Piece {
-  href: ImageManipulator.ImageResult;
+  href: ImageManipulator.ImageResult | string;
   pieceDimensions: Dimension;
   piecePath: string;
   initialPlacement: Point;
   initialRotation: number;
   solvedIndex: number;
   snapOffset: Point;
+  viewBox?: Viewbox;
 }
 
 export interface PieceConfiguration {
