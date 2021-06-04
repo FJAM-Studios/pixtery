@@ -5,6 +5,7 @@ import {
 import { createStackNavigator } from "@react-navigation/stack";
 import * as Linking from "expo-linking";
 import * as SplashScreen from "expo-splash-screen";
+import { requestTrackingPermissionsAsync } from "expo-tracking-transparency";
 import React, { useRef, useEffect } from "react";
 import { View, LogBox, Dimensions } from "react-native";
 import { Provider as PaperProvider } from "react-native-paper";
@@ -56,6 +57,14 @@ const App = (): JSX.Element => {
         goToScreen(navigationRef.current, "Splash", { url });
     });
   });
+
+  useEffect(() => {
+    async function requestTrackingPermissions() {
+      const { status } = await requestTrackingPermissionsAsync();
+      alert(`status${status}`);
+    }
+    requestTrackingPermissions();
+  }, []);
 
   // to control trigger order and prevent users from skipping the login screen, puzzle querying has been moved to AddPuzzle, which is called from Splash, which is navigated to only after the navigation container loads using the onReady prop
   const gotoSplash = () => {
