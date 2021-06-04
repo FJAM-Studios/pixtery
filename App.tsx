@@ -38,25 +38,25 @@ const App = (): JSX.Element => {
 
   // on url change go to the splash screen, which will stop the user if they aren't logged in
   useEffect(() => {
-    // async function showLoading() {
-    //   try {
-    //     // await SplashScreen.preventAutoHideAsync();
-    //     // const { status } = await requestTrackingPermissionsAsync();
-    //     // alert(`status${status}`);
-    //   } catch (error) {
-    //     alert(error);
-    //   }
-    // }
-    // showLoading();
-    // async function requestTrackingPermissions() {
-    //   try {
-    //     const { status } = await requestTrackingPermissionsAsync();
-    //     alert(`status${status}`);
-    //   } catch (error) {
-    //     alert(error);
-    //   }
-    // }
-    // requestTrackingPermissions();
+    async function showLoading() {
+      try {
+        await SplashScreen.preventAutoHideAsync();
+        // const { status } = await requestTrackingPermissionsAsync();
+        // alert(`status${status}`);
+      } catch (error) {
+        alert(`loadingErr${error}`);
+      }
+    }
+    showLoading();
+    async function requestTrackingPermissions() {
+      try {
+        const { status } = await requestTrackingPermissionsAsync();
+        alert(`status${status}`);
+      } catch (error) {
+        alert(`trackingErr${error}`);
+      }
+    }
+    requestTrackingPermissions();
     const { width, height } = Dimensions.get("screen");
     const boardSize =
       0.95 *
