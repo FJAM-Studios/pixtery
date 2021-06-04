@@ -38,10 +38,25 @@ const App = (): JSX.Element => {
 
   // on url change go to the splash screen, which will stop the user if they aren't logged in
   useEffect(() => {
-    async function showLoading() {
-      await SplashScreen.preventAutoHideAsync();
-    }
-    showLoading();
+    // async function showLoading() {
+    //   try {
+    //     // await SplashScreen.preventAutoHideAsync();
+    //     // const { status } = await requestTrackingPermissionsAsync();
+    //     // alert(`status${status}`);
+    //   } catch (error) {
+    //     alert(error);
+    //   }
+    // }
+    // showLoading();
+    // async function requestTrackingPermissions() {
+    //   try {
+    //     const { status } = await requestTrackingPermissionsAsync();
+    //     alert(`status${status}`);
+    //   } catch (error) {
+    //     alert(error);
+    //   }
+    // }
+    // requestTrackingPermissions();
     const { width, height } = Dimensions.get("screen");
     const boardSize =
       0.95 *
@@ -56,15 +71,15 @@ const App = (): JSX.Element => {
       if (url && navigationRef.current)
         goToScreen(navigationRef.current, "Splash", { url });
     });
-  });
-
-  useEffect(() => {
-    async function requestTrackingPermissions() {
-      const { status } = await requestTrackingPermissionsAsync();
-      alert(`status${status}`);
-    }
-    requestTrackingPermissions();
   }, []);
+
+  // useEffect(() => {
+  //   async function requestTrackingPermissions() {
+  //     const { status } = await requestTrackingPermissionsAsync();
+  //     alert(`status${status}`);
+  //   }
+  //   requestTrackingPermissions();
+  // }, []);
 
   // to control trigger order and prevent users from skipping the login screen, puzzle querying has been moved to AddPuzzle, which is called from Splash, which is navigated to only after the navigation container loads using the onReady prop
   const gotoSplash = () => {

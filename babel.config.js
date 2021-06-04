@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 module.exports = function (api) {
   api.cache(true);
   return {
@@ -8,7 +9,11 @@ module.exports = function (api) {
     ],
     env: {
       production: {
-        plugins: ["react-native-paper/babel"],
+        plugins: [
+          ["react-native-paper/babel"],
+          ["@babel/plugin-proposal-private-methods", { "loose": true }],
+          ["@babel/plugin-proposal-class-properties", { "loose": true }],
+        ],
       },
     },
   };
