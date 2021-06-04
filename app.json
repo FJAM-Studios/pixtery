@@ -6,10 +6,7 @@
     "slug": "pixtery",
     "privacy": "unlisted",
     "version": "1.0.0",
-    "platforms": [
-      "android",
-      "ios"
-    ],
+    "platforms": ["android", "ios"],
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
     "backgroundColor": "#C490D1",
@@ -27,9 +24,7 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "assets/*"
-    ],
+    "assetBundlePatterns": ["assets/*"],
     "ios": {
       "bundleIdentifier": "com.fjamstudios.pixtery",
       "buildNumber": "1.0.0",
@@ -37,9 +32,7 @@
       "config": {
         "googleMobileAdsAppId": "***REMOVED***"
       },
-      "associatedDomains": [
-        "applinks:pixtery.io"
-      ],
+      "associatedDomains": ["applinks:pixtery.io"],
       "infoPlist": {
         "NSCameraUsageDescription": "This app uses the camera to enable users to take pictures on their camera to send as puzzles to other users.",
         "NSPhotoLibraryUsageDescription": "This app accesses the device photo library to enable users to select existing images to send as puzzles to other users.",
@@ -70,10 +63,7 @@
             "host": "pixtery.io",
             "pathPrefix": "/p"
           },
-          "category": [
-            "BROWSABLE",
-            "DEFAULT"
-          ]
+          "category": ["BROWSABLE", "DEFAULT"]
         }
       ]
     },
