@@ -66,7 +66,8 @@ export default function AddPuzzle({
       if (!fileInfo.exists) {
         console.log("Image doesn't exist, downloading...");
         // download the image from pixtery server and save to pixtery dir
-        await FileSystem.downloadAsync(downloadURL, localURI);
+        const test  = await FileSystem.downloadAsync(downloadURL, localURI, {md5: true});
+        console.log('test', test)
       }
       // save puzzle data to localStorage
       newPuzzle.imageURI = localURI;
