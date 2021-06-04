@@ -3,7 +3,12 @@
     "apps": [],
     "details": [{
       "appID": "69JHPGDUB6.com.fjamstudios.pixtery",
-      "paths": ["/p/*"]
+      "paths": ["/p/*"],
+      "components": [
+        {
+          "/": "/p/*"
+        }
+      ]
     }]
   }
 }

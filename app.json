@@ -34,7 +34,8 @@
       "associatedDomains": ["applinks:pixtery.io"],
       "infoPlist": {
         "NSCameraUsageDescription": "This app uses the camera to enable users to take pictures on their camera to send as puzzles to other users.",
-        "NSPhotoLibraryUsageDescription": "This app accesses the device photo library to enable users to select existing images to send as puzzles to other users."
+        "NSPhotoLibraryUsageDescription": "This app accesses the device photo library to enable users to select existing images to send as puzzles to other users.",
+        "NSUserTrackingUsageDescription": "This app uses AdMob SDK; by nature of Expo code, inactive code for other SDKs that access IDFA are also included in the base code."
       }
     },
     "android": {
