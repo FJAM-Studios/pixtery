@@ -463,7 +463,7 @@ export default function Home({
         </View>
         <TextInput
           placeholder="Message (optional, shows when solved)"
-          multiline={textFocus}
+          multiline
           maxLength={messageLimit}
           disabled={!imageURI.length}
           mode="outlined"
