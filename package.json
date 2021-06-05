@@ -17,7 +17,8 @@
     "apply-patches": "patch-package",
     "build-watch": "webpack -w",
     "build": "webpack",
-    "emulate-host": "firebase emulators:start --only hosting"
+    "emulate-host": "firebase emulators:start --only hosting",
+    "web-dev": "npm run build && npm run emulate-host"
   },
   "jest": {
     "preset": "jest-expo",
