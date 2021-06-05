@@ -31,6 +31,8 @@ LogBox.ignoreLogs(["Setting a timer for a long period of time"]);
 
 const Stack = createStackNavigator<StackScreens>();
 
+SplashScreen.preventAutoHideAsync().catch();
+
 const App = (): JSX.Element => {
   const dispatch = useDispatch();
   const navigationRef = useRef<NavigationContainerRef | null>(null);
@@ -38,20 +40,9 @@ const App = (): JSX.Element => {
 
   // on url change go to the splash screen, which will stop the user if they aren't logged in
   useEffect(() => {
-    async function showLoading() {
-      try {
-        await SplashScreen.preventAutoHideAsync();
-        // const { status } = await requestTrackingPermissionsAsync();
-        // alert(`status${status}`);
-      } catch (error) {
-        alert(`loadingErr${error}`);
-      }
-    }
-    showLoading();
     async function requestTrackingPermissions() {
       try {
-        const { status } = await requestTrackingPermissionsAsync();
-        alert(`status${status}`);
+        await requestTrackingPermissionsAsync();
       } catch (error) {
         alert(`trackingErr${error}`);
       }
@@ -72,14 +63,6 @@ const App = (): JSX.Element => {
         goToScreen(navigationRef.current, "Splash", { url });
     });
   }, []);
-
-  // useEffect(() => {
-  //   async function requestTrackingPermissions() {
-  //     const { status } = await requestTrackingPermissionsAsync();
-  //     alert(`status${status}`);
-  //   }
-  //   requestTrackingPermissions();
-  // }, []);
 
   // to control trigger order and prevent users from skipping the login screen, puzzle querying has been moved to AddPuzzle, which is called from Splash, which is navigated to only after the navigation container loads using the onReady prop
   const gotoSplash = () => {

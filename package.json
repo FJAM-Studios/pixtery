@@ -45,7 +45,7 @@
     "expo-image-manipulator": "~9.1.0",
     "expo-image-picker": "~10.1.4",
     "expo-linking": "~2.2.3",
-    "expo-splash-screen": "^0.8.1",
+    "expo-splash-screen": "~0.10.2",
     "expo-status-bar": "~1.0.4",
     "expo-tracking-transparency": "^1.0.0",
     "firebase": "8.2.3",
