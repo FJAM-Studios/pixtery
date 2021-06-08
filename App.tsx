@@ -38,7 +38,6 @@ const App = (): JSX.Element => {
   const navigationRef = useRef<NavigationContainerRef | null>(null);
   const theme = useSelector((state: RootState) => state.theme);
 
-  // on url change go to the splash screen, which will stop the user if they aren't logged in
   useEffect(() => {
     async function requestTrackingPermissions() {
       try {
@@ -57,6 +56,7 @@ const App = (): JSX.Element => {
       );
     dispatch(setDeviceSize(height, boardSize));
 
+    // on url change go to the splash screen, which will stop the user if they aren't logged in
     Linking.addEventListener("url", (ev) => {
       const url = ev.url;
       if (url && navigationRef.current)
