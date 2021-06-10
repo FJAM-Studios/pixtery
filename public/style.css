@@ -7,7 +7,7 @@ body {
 
 body {
   background-color: #c490d1;
-  font-family: "Shrikhand";
+  font-family: "Arial";
   overflow: hidden;
 }
 
@@ -64,7 +64,22 @@ body {
 
 #banner {
   display: flex;
-  justify-content: flex-start;
+  justify-content: space-between;
+}
+
+.links:not(#banner>.links){
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#board *, #banner * {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+   -khtml-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
 }
 
 .dot {
