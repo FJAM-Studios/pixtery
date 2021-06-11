@@ -56,10 +56,14 @@ body {
   justify-content: center;
 }
 
-#board > h1,
-#board > h2,
-#board > h3 {
+#game h1,
+#game h2,
+#game h3 {
   text-align: center;
+}
+
+#callToAction h2{
+  color: black;
 }
 
 #banner {
@@ -101,8 +105,7 @@ body {
     align-items: center;
   }
   .dot {
-    height: 0px;
-    width: 0px;
+    visibility: hidden;
   }
 }
 
@@ -113,8 +116,7 @@ body {
     align-items: center;
   }
   .dot {
-    height: 0px;
-    width: 0px;
+    visibility: hidden;
   }
 }
 
@@ -122,8 +124,15 @@ body {
   .logo {
     width: 100px;
   }
+
   #coming-soon {
     font-size: 20px;
     margin: 0px;
   }
+}
+
+@media only screen and (max-height: 823px) {
+#callToAction .logo {
+  width: 100px;
+}
 }
