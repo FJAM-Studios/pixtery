@@ -117,23 +117,16 @@ export default function Puzzle({
               backgroundSize: `${height}px ${height}px`,
             }}
           />
-          <h2 style={{ color: "black" }}>
-            {puzzle.message && puzzle.message.length
-              ? puzzle.message
-              : "Congrats! You solved the puzzle!"}
-          </h2>
           <div
             id="callToAction"
             style={{ marginLeft: "auto", marginRight: "auto", width: height }}
           >
-            <h2
-              style={{
-                color: "black",
-                textAlign: "center",
-              }}
-            >
-              Download the Pixtery app to send your own puzzle!
+            <h2>
+              {puzzle.message && puzzle.message.length
+                ? puzzle.message
+                : "Congrats! You solved the puzzle!"}
             </h2>
+            <h2>Download the Pixtery app to send your own puzzle!</h2>
             <StoreLinks />
           </div>
         </>

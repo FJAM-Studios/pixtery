@@ -35,7 +35,7 @@ export default function App(): JSX.Element {
   if (loading) {
     return (
       <div id="app">
-        <h1>Loading...</h1>
+        <h1 style={{ fontFamily: "Shrikhand" }}>Loading...</h1>
       </div>
     );
   }
