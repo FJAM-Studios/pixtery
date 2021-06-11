@@ -5,6 +5,7 @@ import {
 import { createStackNavigator } from "@react-navigation/stack";
 import * as Linking from "expo-linking";
 import * as SplashScreen from "expo-splash-screen";
+import { requestTrackingPermissionsAsync } from "expo-tracking-transparency";
 import React, { useRef, useEffect } from "react";
 import { View, LogBox, Dimensions } from "react-native";
 import { Provider as PaperProvider } from "react-native-paper";
@@ -30,17 +31,22 @@ LogBox.ignoreLogs(["Setting a timer for a long period of time"]);
 
 const Stack = createStackNavigator<StackScreens>();
 
+SplashScreen.preventAutoHideAsync().catch();
+
 const App = (): JSX.Element => {
   const dispatch = useDispatch();
   const navigationRef = useRef<NavigationContainerRef | null>(null);
   const theme = useSelector((state: RootState) => state.theme);
 
-  // on url change go to the splash screen, which will stop the user if they aren't logged in
   useEffect(() => {
-    async function showLoading() {
-      await SplashScreen.preventAutoHideAsync();
+    async function requestTrackingPermissions() {
+      try {
+        await requestTrackingPermissionsAsync();
+      } catch (error) {
+        alert(`trackingErr${error}`);
+      }
     }
-    showLoading();
+    requestTrackingPermissions();
     const { width, height } = Dimensions.get("screen");
     const boardSize =
       0.95 *
@@ -50,12 +56,13 @@ const App = (): JSX.Element => {
       );
     dispatch(setDeviceSize(height, boardSize));
 
+    // on url change go to the splash screen, which will stop the user if they aren't logged in
     Linking.addEventListener("url", (ev) => {
       const url = ev.url;
       if (url && navigationRef.current)
         goToScreen(navigationRef.current, "Splash", { url });
     });
-  });
+  }, []);
 
   // to control trigger order and prevent users from skipping the login screen, puzzle querying has been moved to AddPuzzle, which is called from Splash, which is navigated to only after the navigation container loads using the onReady prop
   const gotoSplash = () => {
