@@ -5,15 +5,17 @@
     "description": "A fun app that lets you turn your own pictures into jigsaw puzzles and share them with friends!",
     "slug": "pixtery",
     "privacy": "unlisted",
-    "sdkVersion": "40.0.0",
-    "version": "1.0.3",
+    "sdkVersion": "41.0.0",
+    "version": "1.0.5",
     "platforms": ["android", "ios"],
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
     "backgroundColor": "#C490D1",
     "primaryColor": "#7D8CC4",
     "icon": "./assets/icon.png",
-    "developmentClient": { "silentLaunch": true },
+    "developmentClient": {
+      "silentLaunch": true
+    },
     "scheme": "pixtery",
     "splash": {
       "image": "./assets/splash.png",
@@ -26,15 +28,16 @@
     "assetBundlePatterns": ["assets/*"],
     "ios": {
       "bundleIdentifier": "com.fjamstudios.pixtery",
-      "buildNumber": "1.0.3",
+      "buildNumber": "1.0.5",
       "supportsTablet": true,
       "config": {
         "googleMobileAdsAppId": "ca-app-pub-5028593996211038~8814734724"
       },
       "associatedDomains": ["applinks:pixtery.io"],
       "infoPlist": {
-        "NSCameraUsageDescription": "This app uses the camera to enable users to take pictures on their camera to send as puzzles to other users.",
-        "NSPhotoLibraryUsageDescription": "This app accesses the device photo library to enable users to select existing images to send as puzzles to other users."
+        "NSCameraUsageDescription": "This app accesses your device camera so that you can take pictures with your camera to send as puzzles to others.",
+        "NSPhotoLibraryUsageDescription": "This app accesses your device photo library so that you can select existing photos on your device to send as puzzles to others.",
+        "NSUserTrackingUsageDescription": "Apple requires us to ask this because we show ads. Pixtery does NOT track your activity. You can safely click no and will still receive the full experience."
       }
     },
     "android": {
