@@ -62,8 +62,8 @@ body {
   text-align: center;
 }
 
-#callToAction h2{
-  color: black;
+#callToAction-text {
+  font-style: italic;
 }
 
 #banner {
@@ -94,6 +94,20 @@ body {
   margin-top: auto;
 }
 
+#web-win-message {
+  color: white;
+  word-wrap: break-word;
+}
+
+.links:not(#banner>.links){
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+  /* flex-direction: column;
+  align-items: center; */
+}
+
 /* For mobile phones: */
 @media only screen and (max-width: 320px) {
   #coming-soon {
@@ -109,6 +123,7 @@ body {
   }
 }
 
+/* for very small screen widths e.g. iPhone SE */
 @media only screen and (min-width: 321px) and (max-width: 560px) {
   #web-footer-contents {
     display: flex;
@@ -120,19 +135,25 @@ body {
   }
 }
 
-@media only screen and (max-height: 570px) {
+/* for very small screen heights e.g. iPhone SE */
+@media only screen and (max-height: 650px) {
   .logo {
     width: 100px;
   }
-
   #coming-soon {
     font-size: 20px;
     margin: 0px;
   }
+  #callToAction-text {
+    font-size: 15px;
+  }
+  #web-win-message {
+    font-size: 18px
+  }
 }
 
 @media only screen and (max-height: 823px) {
-#callToAction .logo {
-  width: 100px;
-}
+  #callToAction .logo {
+    width: 100px;
+  }
 }
