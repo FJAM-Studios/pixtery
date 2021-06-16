@@ -121,12 +121,14 @@ export default function Puzzle({
             id="callToAction"
             style={{ marginLeft: "auto", marginRight: "auto", width: height }}
           >
-            <h2>
+            <h2 id="web-win-message">
               {puzzle.message && puzzle.message.length
                 ? puzzle.message
                 : "Congrats! You solved the puzzle!"}
             </h2>
-            <h2>Download the Pixtery app to send your own puzzle!</h2>
+            <h3 id="callToAction-text">
+              Download the Pixtery app to send your own puzzle!
+            </h3>
             <StoreLinks />
           </div>
         </>
