@@ -37,7 +37,6 @@ const App = (): JSX.Element => {
   const dispatch = useDispatch();
   const navigationRef = useRef<NavigationContainerRef | null>(null);
   const theme = useSelector((state: RootState) => state.theme);
-
   useEffect(() => {
     async function requestTrackingPermissions() {
       try {
@@ -48,6 +47,8 @@ const App = (): JSX.Element => {
     }
     requestTrackingPermissions();
     const { width, height } = Dimensions.get("screen");
+    console.log('height', height)
+
     const boardSize =
       0.95 *
       Math.min(
