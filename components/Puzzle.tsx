@@ -5,7 +5,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { Text, View, StyleSheet, Image, LayoutChangeEvent } from "react-native";
 import { ActivityIndicator } from "react-native-paper";
 import { Theme } from "react-native-paper/lib/typescript/types";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 
 import { DEGREE_CONVERSION, TESTING_MODE } from "../constants";
@@ -65,6 +65,7 @@ export default function PuzzleComponent({
     theme,
     boardSize,
   };
+  const safeAreaViewinsets = useSafeAreaInsets();
 
   // z index and current board are not handled through react state so that they don't
   // cause Puzzle/PuzzlePiece re-renders, which would break the positional tracking
@@ -153,7 +154,8 @@ export default function PuzzleComponent({
         puzzleAreaDimensions.puzzleAreaHeight -
           adHeight -
           parentContainerStyle.padding * 2 -
-          squareSize,
+          squareSize -
+          safeAreaViewinsets.bottom,
         minSandboxY
       );
 
@@ -190,6 +192,8 @@ export default function PuzzleComponent({
               squareSize,
               boardSize
             );
+
+            console.log('adheght', adHeight, 'maxsandboxY', maxSandboxY)
 
             const href = await ImageManipulator.manipulateAsync(
               // testing an invalid imageURI, in case the pic is deleted/corrupted
