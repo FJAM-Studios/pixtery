@@ -348,20 +348,32 @@ export const getInitialDimensions = (
       (shuffledIndex % gridSize) * squareSize - squareSize * 0.25
     );
     const sandboxCenterY = (minSandboxY + maxSandboxY + squareSize) / 2;
+    // const sandboxCenterY = 0;
     // anchors on horiontal center of sandbox, and extrapolates Y by subtracting 1/2 of piece height
+    // initialPlacement.y = Math.max(
+    //   sandboxCenterY +
+    //     Math.max(
+    //       0,
+    //       Math.floor(shuffledIndex / gridSize) * squareSize - squareSize * 0.25
+    //     ) *
+    //       scaleJigsawToSandbox -
+    //     randomFactor -
+    //     pieceDimensions.height * 0.5,
+    //   // limit upper bound of sandbox so that up to half of the jigsaw "tab" sticks into board
+    //   boardSize - (squareSize * 0.25) / 2
+    // );
+
     initialPlacement.y = Math.max(
-      sandboxCenterY +
+      minSandboxY +
         Math.max(
           0,
           Math.floor(shuffledIndex / gridSize) * squareSize - squareSize * 0.25
         ) *
           scaleJigsawToSandbox -
-        randomFactor -
-        pieceDimensions.height * 0.5,
-      // limit upper bound of sandbox to half of the jigsaw "tab"
+        randomFactor,
+      // limit upper bound of sandbox so that up to half of the jigsaw "tab" sticks into board
       boardSize - (squareSize * 0.25) / 2
     );
-
     viewBox.originX = Math.max(0, square.x * squareSize - squareSize * 0.25);
     viewBox.originY = Math.max(0, square.y * squareSize - squareSize * 0.25);
 
