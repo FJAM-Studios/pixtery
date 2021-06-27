@@ -346,10 +346,8 @@ export const getInitialDimensions = (
       (shuffledIndex % gridSize) * squareSize - squareSize * 0.25
     );
 
-    // store initial Y value if puzzle is square
-    const initialYIfSquarePuzzle = initialPlacement.y;
-    // calc piece vertical center off of the square puzzle Y but factoring in larger height for the jigsaw piece
-    const pieceVerticalCenter = initialYIfSquarePuzzle + squareSize / 2;
+    // calc piece's vertical center off of the square puzzle Y (initialPlacement.y)
+    const pieceVerticalCenter = initialPlacement.y + squareSize / 2;
     // update Y initial placement for jigsaw as the piece's vertical center minus half of puzzle piece height
     initialPlacement.y = pieceVerticalCenter - pieceDimensions.height / 2;
 
