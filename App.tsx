@@ -47,7 +47,6 @@ const App = (): JSX.Element => {
     }
     requestTrackingPermissions();
     const { width, height } = Dimensions.get("screen");
-    console.log('height', height)
 
     const boardSize =
       0.95 *

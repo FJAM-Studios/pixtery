@@ -341,39 +341,18 @@ export const getInitialDimensions = (
       square.x === 0 || square.x === gridSize - 1
         ? squareSize * 1.25
         : squareSize * 1.5;
-    const scaleJigsawToSandbox =
-      Math.max(0, maxSandboxY - squareSize * 0.25 - minSandboxY) / minSandboxY;
     initialPlacement.x = Math.max(
       0,
       (shuffledIndex % gridSize) * squareSize - squareSize * 0.25
     );
-    const sandboxCenterY = (minSandboxY + maxSandboxY + squareSize) / 2;
-    // const sandboxCenterY = 0;
-    // anchors on horiontal center of sandbox, and extrapolates Y by subtracting 1/2 of piece height
-    // initialPlacement.y = Math.max(
-    //   sandboxCenterY +
-    //     Math.max(
-    //       0,
-    //       Math.floor(shuffledIndex / gridSize) * squareSize - squareSize * 0.25
-    //     ) *
-    //       scaleJigsawToSandbox -
-    //     randomFactor -
-    //     pieceDimensions.height * 0.5,
-    //   // limit upper bound of sandbox so that up to half of the jigsaw "tab" sticks into board
-    //   boardSize - (squareSize * 0.25) / 2
-    // );
 
-    initialPlacement.y = Math.max(
-      minSandboxY +
-        Math.max(
-          0,
-          Math.floor(shuffledIndex / gridSize) * squareSize - squareSize * 0.25
-        ) *
-          scaleJigsawToSandbox -
-        randomFactor,
-      // limit upper bound of sandbox so that up to half of the jigsaw "tab" sticks into board
-      boardSize - (squareSize * 0.25) / 2
-    );
+    // store initial Y value if puzzle is square
+    const initialYIfSquarePuzzle = initialPlacement.y;
+    // calc piece vertical center off of the square puzzle Y but factoring in larger height for the jigsaw piece
+    const pieceVerticalCenter = initialYIfSquarePuzzle + squareSize / 2;
+    // update Y initial placement for jigsaw as the piece's vertical center minus half of puzzle piece height
+    initialPlacement.y = pieceVerticalCenter - pieceDimensions.height / 2;
+
     viewBox.originX = Math.max(0, square.x * squareSize - squareSize * 0.25);
     viewBox.originY = Math.max(0, square.y * squareSize - squareSize * 0.25);
 
