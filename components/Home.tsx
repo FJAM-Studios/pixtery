@@ -1,12 +1,14 @@
 import "firebase/functions";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AdMobInterstitial } from "expo-ads-admob";
+import Constants from "expo-constants";
 import * as ImageManipulator from "expo-image-manipulator";
 import * as ImagePicker from "expo-image-picker";
 import { ImageInfo } from "expo-image-picker/build/ImagePicker.types";
+import * as IntentLauncher from "expo-intent-launcher";
 import * as Linking from "expo-linking";
 import * as React from "react";
-import { Image, View, Platform } from "react-native";
+import { Image, View, Platform, Alert } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import {
   Button,
@@ -72,24 +74,51 @@ export default function Home({
   const [buttonHeight, setButtonHeight] = React.useState(0);
   const [textFocus, setTextFocus] = React.useState(false);
 
-  const checkPermission = async (camera: boolean, retry: boolean) => {
+  const checkPermission = async (camera: boolean) => {
     let permission = camera
       ? await ImagePicker.getCameraPermissionsAsync()
       : await ImagePicker.getMediaLibraryPermissionsAsync();
 
     if (permission.status === "granted") selectImage(camera);
-    else if (!retry) {
+    else if (permission.status === "denied") {
+      //if iOS show alert about changing settings in setting. link to settings with Linking.openURL('app-settings:')
+      Alert.alert(
+        `Sorry, we need to access your ${
+          camera ? "camera" : "photo library"
+        } to make this work!`,
+        "Please go to your phone's settings to grant permission",
+        [
+          {
+            text: "Cancel",
+            style: "cancel",
+          },
+          {
+            text: "Go to Settings",
+            onPress: () => {
+              //ANDROID USERS: if this doesn't bring you to the device's app settings, delete line 102 and uncomment the next block. there are two new packages so don't forget to install.
+
+              Linking.openSettings();
+
+              // if(Platform.OS = "ios") Linking.openSettings()
+              // else {
+              //   const pkg = Constants.manifest.releaseChannel
+              //     ? Constants.manifest.android.package  // When published, considered as using standalone build
+              //     : "host.exp.exponent"; // In expo client mode
+              //   IntentLauncher.startActivityAsync(
+              //     IntentLauncher.ACTION_APPLICATION_DETAILS_SETTINGS,
+              //     { data: "package:" + pkg }
+              //   );
+              // }
+            },
+          },
+        ]
+      );
+    } else {
       permission = camera
         ? await ImagePicker.requestCameraPermissionsAsync()
         : await ImagePicker.requestMediaLibraryPermissionsAsync();
 
-      checkPermission(camera, true);
-    } else {
-      alert(
-        `Sorry, we need camera ${
-          camera ? "roll" : null
-        } permissions to make this work!`
-      );
+      checkPermission(camera);
     }
   };
 
@@ -334,7 +363,7 @@ export default function Home({
         <Button
           icon="camera"
           mode="contained"
-          onPress={() => checkPermission(true, false)}
+          onPress={() => checkPermission(true)}
           style={{ margin: height * 0.01 }}
         >
           Camera
@@ -342,7 +371,7 @@ export default function Home({
         <Button
           icon="folder"
           mode="contained"
-          onPress={() => checkPermission(false, false)}
+          onPress={() => checkPermission(false)}
           style={{ margin: height * 0.01 }}
         >
           Gallery
