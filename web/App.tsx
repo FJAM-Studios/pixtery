@@ -4,6 +4,7 @@ import { storage, functions } from "../FirebaseApp";
 import { PUBLIC_KEY_LENGTH } from "../constants";
 import { Puzzle as PuzzleType } from "../types";
 import Puzzle from "./Puzzle";
+import StoreLinks from "./StoreLinks";
 
 export default function App(): JSX.Element {
   const [loading, setLoading] = React.useState(true);
@@ -34,7 +35,7 @@ export default function App(): JSX.Element {
   if (loading) {
     return (
       <div id="app">
-        <h1>Loading...</h1>
+        <h1 style={{ fontFamily: "Shrikhand" }}>Loading...</h1>
       </div>
     );
   }
@@ -49,9 +50,7 @@ export default function App(): JSX.Element {
     <div id="app">
       <img src="/logo.svg" className="logo" alt="Pixtery!" />
       <img src="/pixtery.svg" className="title" alt="Pixtery!" />
-      <h1 id="coming-soon">Coming Soon!</h1>
-      <img src="/app-store.svg" className="logo" alt="Pixtery!" />
-      <img src="/play-store.svg" className="logo" alt="Pixtery!" />
+      <StoreLinks />
       <div id="web-footer">
         <div id="web-footer-contents">
           <a href="https://pixtery.io/privacy.html">Privacy policy</a>
