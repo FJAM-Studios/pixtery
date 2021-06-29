@@ -37,6 +37,15 @@ const MIN_BOTTOM_CLEARANCE = 0.7;
 
 const VERSION_NUMBER = "1.0.5";
 
+const ARGUABLY_CLEVER_PHRASES = [
+  "Please wait!",
+  "One moment...",
+  "Hang on. Or don't.",
+  "Give it a sec.",
+  "Uploading puzzle data.",
+  "So pixterious!",
+];
+
 export {
   TESTING_MODE,
   SNAP_MARGIN,
@@ -50,4 +59,5 @@ export {
   PUBLIC_KEY_LENGTH,
   MIN_BOTTOM_CLEARANCE,
   VERSION_NUMBER,
+  ARGUABLY_CLEVER_PHRASES,
 };
