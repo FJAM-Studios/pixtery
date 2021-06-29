@@ -70,7 +70,7 @@ export default function AddPuzzle({
       }
       // save puzzle data to localStorage
       newPuzzle.imageURI = localURI;
-      const allPuzzles = [...receivedPuzzles, newPuzzle];
+      const allPuzzles = [newPuzzle, ...receivedPuzzles];
       await AsyncStorage.setItem("@pixteryPuzzles", JSON.stringify(allPuzzles));
       dispatch(setReceivedPuzzles(allPuzzles));
     } catch (e) {
