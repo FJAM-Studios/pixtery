@@ -122,8 +122,8 @@ export default function Home({
   };
 
   const submitToServer = async (): Promise<void> => {
-    setModalVisible(true);
-    await displayPainfulAd();
+    AdMobInterstitial.removeAllListeners();
+    AdMobInterstitial.requestAdAsync();
     const fileName: string = uuid.v4();
     try {
       const localURI = await uploadImage(fileName);
@@ -210,11 +210,18 @@ export default function Home({
 
   const displayPainfulAd = async () => {
     if (DISPLAY_PAINFUL_ADS) {
+      AdMobInterstitial.addEventListener("interstitialDidClose", () => {
+        submitToServer();
+      });
+      AdMobInterstitial.addEventListener("interstitialDidFailToLoad", () => {
+        submitToServer();
+      });
       try {
-        await AdMobInterstitial.requestAdAsync();
         await AdMobInterstitial.showAdAsync();
+        setModalVisible(true);
       } catch (error) {
         console.log(error);
+        submitToServer();
       }
     }
   };
@@ -233,6 +240,7 @@ export default function Home({
   React.useEffect(() => {
     (async () => {
       if (Platform.OS !== "web") {
+        AdMobInterstitial.requestAdAsync();
         let response = await ImagePicker.requestMediaLibraryPermissionsAsync();
         const libraryPermission = response.status;
         if (libraryPermission !== "granted") {
@@ -484,7 +492,7 @@ export default function Home({
         <Button
           icon="send"
           mode="contained"
-          onPress={submitToServer}
+          onPress={displayPainfulAd}
           style={{ margin: height * 0.01 }}
           disabled={imageURI.length === 0}
           onLayout={(ev) => setButtonHeight(ev.nativeEvent.layout.height)}
