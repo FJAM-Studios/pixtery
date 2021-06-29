@@ -28,6 +28,8 @@ export default function SentPuzzleList({
   const receivedPuzzles = useSelector(
     (state: RootState) => state.receivedPuzzles
   );
+  const { height } = useSelector((state: RootState) => state.screenHeight);
+
   const sentPuzzles = useSelector((state: RootState) => state.sentPuzzles);
   const [modalVisible, setModalVisible] = React.useState(false);
   const [puzzleToDelete, setPuzzleToDelete] = React.useState<Puzzle | null>(
@@ -118,52 +120,72 @@ export default function SentPuzzleList({
         navigation={navigation}
       />
       <ScrollView>
-        {sentPuzzles.map((sentPuzzle, ix) => (
-          <TouchableOpacity
-            onPress={() =>
-              navigation.navigate("Puzzle", {
-                publicKey: sentPuzzle.publicKey,
-              })
-            }
-            key={ix}
-          >
-            <Card
+        <>
+          {sentPuzzles.length ? (
+            sentPuzzles.map((sentPuzzle, ix) => (
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate("Puzzle", {
+                    publicKey: sentPuzzle.publicKey,
+                  })
+                }
+                key={ix}
+              >
+                <Card
+                  style={{
+                    margin: 1,
+                    backgroundColor: theme.colors.surface,
+                  }}
+                >
+                  <Card.Title
+                    title={sentPuzzle.message || ""}
+                    subtitle={moment(sentPuzzle.dateReceived).calendar()}
+                    right={() => (
+                      <View
+                        style={{ flexDirection: "row", alignItems: "center" }}
+                      >
+                        <IconButton
+                          icon="delete"
+                          onPress={() => showDeleteModal(sentPuzzle)}
+                        />
+                        <IconButton
+                          icon="send"
+                          onPress={() => sendPuzzle(sentPuzzle.publicKey)}
+                        />
+                      </View>
+                    )}
+                    left={() => (
+                      <ImageBackground
+                        source={{
+                          uri: sentPuzzle.imageURI,
+                        }}
+                        style={{
+                          flex: 1,
+                          justifyContent: "space-around",
+                          padding: 1,
+                        }}
+                      />
+                    )}
+                  />
+                </Card>
+              </TouchableOpacity>
+            ))
+          ) : (
+            <View
               style={{
-                margin: 1,
-                backgroundColor: theme.colors.surface,
+                alignItems: "center",
               }}
             >
-              <Card.Title
-                title={sentPuzzle.message || ""}
-                subtitle={moment(sentPuzzle.dateReceived).calendar()}
-                right={() => (
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <IconButton
-                      icon="delete"
-                      onPress={() => showDeleteModal(sentPuzzle)}
-                    />
-                    <IconButton
-                      icon="send"
-                      onPress={() => sendPuzzle(sentPuzzle.publicKey)}
-                    />
-                  </View>
-                )}
-                left={() => (
-                  <ImageBackground
-                    source={{
-                      uri: sentPuzzle.imageURI,
-                    }}
-                    style={{
-                      flex: 1,
-                      justifyContent: "space-around",
-                      padding: 1,
-                    }}
-                  />
-                )}
-              />
-            </Card>
-          </TouchableOpacity>
-        ))}
+              <Headline
+                style={{
+                  marginTop: height * 0.3,
+                }}
+              >
+                You haven&apos;t sent any puzzles!
+              </Headline>
+            </View>
+          )}
+        </>
       </ScrollView>
     </AdSafeAreaView>
   );
