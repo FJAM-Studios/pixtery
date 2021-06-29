@@ -72,6 +72,27 @@ export default function Home({
   const [buttonHeight, setButtonHeight] = React.useState(0);
   const [textFocus, setTextFocus] = React.useState(false);
 
+  const checkPermission = async (camera: boolean, retry: boolean) => {
+    let permission = camera
+      ? await ImagePicker.getCameraPermissionsAsync()
+      : await ImagePicker.getMediaLibraryPermissionsAsync();
+
+    if (permission.status === "granted") selectImage(camera);
+    else if (!retry) {
+      permission = camera
+        ? await ImagePicker.requestCameraPermissionsAsync()
+        : await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+      checkPermission(camera, true);
+    } else {
+      alert(
+        `Sorry, we need camera ${
+          camera ? "roll" : null
+        } permissions to make this work!`
+      );
+    }
+  };
+
   const selectImage = async (camera: boolean) => {
     const result = camera
       ? await ImagePicker.launchCameraAsync({
@@ -230,23 +251,6 @@ export default function Home({
       );
   }, [gridSize, puzzleType, boardSize]);
 
-  React.useEffect(() => {
-    (async () => {
-      if (Platform.OS !== "web") {
-        let response = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        const libraryPermission = response.status;
-        if (libraryPermission !== "granted") {
-          alert("Sorry, we need camera roll permissions to make this work!");
-        } else {
-          response = await ImagePicker.requestCameraPermissionsAsync();
-          const cameraPermission = response.status;
-          if (cameraPermission !== "granted") {
-            alert("Sorry, we need camera permissions to make this work!");
-          }
-        }
-      }
-    })();
-  }, []);
   return (
     <AdSafeAreaView
       style={{
@@ -330,7 +334,7 @@ export default function Home({
         <Button
           icon="camera"
           mode="contained"
-          onPress={() => selectImage(true)}
+          onPress={() => checkPermission(true, false)}
           style={{ margin: height * 0.01 }}
         >
           Camera
@@ -338,7 +342,7 @@ export default function Home({
         <Button
           icon="folder"
           mode="contained"
-          onPress={() => selectImage(false)}
+          onPress={() => checkPermission(false, false)}
           style={{ margin: height * 0.01 }}
         >
           Gallery
