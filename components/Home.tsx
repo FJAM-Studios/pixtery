@@ -81,7 +81,6 @@ export default function Home({
 
     if (permission.status === "granted") selectImage(camera);
     else if (permission.status === "denied") {
-      //if iOS show alert about changing settings in setting. link to settings with Linking.openURL('app-settings:')
       Alert.alert(
         `Sorry, we need to access your ${
           camera ? "camera" : "photo library"
@@ -93,9 +92,9 @@ export default function Home({
             style: "cancel",
           },
           {
-            text: "Go to Settings",
+            text: "Settings",
             onPress: () => {
-              //ANDROID USERS: if this doesn't bring you to the device's app settings, delete line 102 and uncomment the next block. there are two new packages so don't forget to install.
+              //ANDROID USERS: if this doesn't bring you to the device's app settings, delete line 99 and uncomment the next block. there are two new packages so don't forget to install.
 
               Linking.openSettings();
 
