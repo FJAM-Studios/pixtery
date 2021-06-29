@@ -210,6 +210,7 @@ export default function Home({
 
   const displayPainfulAd = async () => {
     if (DISPLAY_PAINFUL_ADS) {
+      //I tried adding the event listeners in the useEffect but that caused the filename passed to the image manipulator to be blank so instead they're created here and then cleaned up in the submitToServer so it doesn't trigger repeatedly when making more than one puzzle
       AdMobInterstitial.addEventListener("interstitialDidClose", () => {
         submitToServer();
       });
