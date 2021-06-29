@@ -11,6 +11,7 @@ import {
 } from "../puzzleUtils";
 import { Puzzle as PuzzleType, Piece, Point, BoardSpace } from "../types";
 import PuzzlePiece from "./PuzzlePiece";
+import StoreLinks from "./StoreLinks";
 
 //disable shuffling for testing
 const disableShuffle = TESTING_MODE;
@@ -103,21 +104,7 @@ export default function Puzzle({
     <div id="game" style={{ height: 0.95 * window.innerHeight }}>
       <div id="banner" style={{ width: height }}>
         <img src="/pixtery.svg" style={{ width: height / 3 }} alt="Pixtery!" />
-        <img
-          src="/app-store.svg"
-          style={{
-            marginLeft: "auto",
-            height: height / 12,
-          }}
-          alt="Pixtery!"
-        />
-        <img
-          src="/play-store.svg"
-          style={{
-            height: height / 12,
-          }}
-          alt="Pixtery!"
-        />
+        <StoreLinks height={height} />
       </div>
       {solved ? (
         <>
@@ -130,14 +117,20 @@ export default function Puzzle({
               backgroundSize: `${height}px ${height}px`,
             }}
           />
-          <h2 style={{ color: "white", backgroundColor: "black" }}>
-            {puzzle.message && puzzle.message.length
-              ? puzzle.message
-              : "Congrats! You solved the puzzle!"}
-          </h2>
-          <h2 style={{ backgroundColor: "white" }}>
-            Download the Pixtery app to send your own puzzle!
-          </h2>
+          <div
+            id="callToAction"
+            style={{ marginLeft: "auto", marginRight: "auto", width: height }}
+          >
+            <h2 id="web-win-message">
+              {puzzle.message && puzzle.message.length
+                ? puzzle.message
+                : "Congrats! You solved the puzzle!"}
+            </h2>
+            <h3 id="callToAction-text">
+              Download the Pixtery app to send your own puzzle!
+            </h3>
+            <StoreLinks />
+          </div>
         </>
       ) : (
         <>
