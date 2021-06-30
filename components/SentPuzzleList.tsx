@@ -14,7 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { setSentPuzzles } from "../store/reducers/sentPuzzles";
 import { Puzzle, ScreenNavigation, RootState } from "../types";
-import { shareMessage } from "../util";
+import { saveToLibrary, shareMessage } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 
@@ -138,6 +138,10 @@ export default function SentPuzzleList({
                 subtitle={moment(sentPuzzle.dateReceived).calendar()}
                 right={() => (
                   <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <IconButton
+                      icon="download-circle"
+                      onPress={() => saveToLibrary(sentPuzzle.imageURI)}
+                    />
                     <IconButton
                       icon="delete"
                       onPress={() => showDeleteModal(sentPuzzle)}
