@@ -40,7 +40,6 @@ const VERSION_NUMBER = "1.0.5";
 const ARGUABLY_CLEVER_PHRASES = [
   "Please wait!",
   "One moment...",
-  "Hang on. Or don't.",
   "Give it a sec.",
   "Uploading puzzle data.",
   "So pixterious!",
