@@ -79,5 +79,10 @@ export const closeSplashAndNavigate = async (
   await SplashScreen.hideAsync();
 };
 
-export const saveToLibrary = async (imageURI: string): Promise<void> =>
-  MediaLibrary.saveToLibraryAsync(imageURI)
+export const saveToLibrary = async (imageURI: string): Promise<void> => {
+  // files must have an extension to be saved but, prior to this update downloaded puzzles weren't given an extension. so in order to remain backwards compatible we're checking for an extension and give the user a warning if not found. only puzzles downloaded prior to this update should cause the alert.
+
+  const extension = imageURI.slice(-4);
+  if (extension === ".jpg") MediaLibrary.saveToLibraryAsync(imageURI);
+  else alert("Cannot save image. Please take a screenshot.");
+};
