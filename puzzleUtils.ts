@@ -474,7 +474,7 @@ export const sortPuzzles = (
   for (let i = 1; i < puzzleList.length; i++) {
     const currPuzzle = puzzleList[i];
     const currValToSortBy = currPuzzle[sortBy];
-    console.log('currvaltosort', currValToSortBy)
+    console.log("currvaltosort", currValToSortBy);
     for (
       let j = i - 1;
       j >= 0 && puzzleList[j][sortBy] > currValToSortBy;
@@ -484,7 +484,7 @@ export const sortPuzzles = (
     }
     puzzleList[j + 1] = currPuzzle;
   }
-  console.log('puzzlelst', puzzleList)
+  console.log("puzzlelst", puzzleList);
   return puzzleList;
 };
 
