@@ -1,8 +1,16 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Audio } from "expo-av";
 import * as ImageManipulator from "expo-image-manipulator";
+import * as MediaLibrary from 'expo-media-library';
 import React, { useEffect, useState, useRef } from "react";
-import { Text, View, StyleSheet, Image, LayoutChangeEvent } from "react-native";
+import {
+  Text,
+  View,
+  StyleSheet,
+  Image,
+  LayoutChangeEvent,
+  Button,
+} from "react-native";
 import { ActivityIndicator } from "react-native-paper";
 import { Theme } from "react-native-paper/lib/typescript/types";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -335,6 +343,10 @@ export default function PuzzleComponent({
           )}
           <View style={styles(styleProps).winContainer}>
             <Text style={styles(styleProps).winText}>{winMessage}</Text>
+            <Button
+              title="Save Image"
+              onPress={() => MediaLibrary.saveToLibraryAsync(puzzle.imageURI)}
+            />
           </View>
         </View>
       </AdSafeAreaView>
