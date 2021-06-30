@@ -403,7 +403,6 @@ export default function Home({
               onPress={() => {
                 setPuzzleType("jigsaw");
               }}
-              disabled={!imageURI.length}
               animated={false}
             />
           </Surface>
@@ -427,7 +426,6 @@ export default function Home({
               onPress={() => {
                 setPuzzleType("squares");
               }}
-              disabled={!imageURI.length}
               animated={false}
             />
           </Surface>
@@ -444,7 +442,6 @@ export default function Home({
           >
             <Button
               mode="text"
-              disabled={!imageURI.length}
               onPress={() => setGridSize(2)}
               color="white"
               compact
@@ -464,7 +461,6 @@ export default function Home({
           >
             <Button
               mode="text"
-              disabled={!imageURI.length}
               onPress={() => setGridSize(3)}
               color="white"
               compact
@@ -484,7 +480,6 @@ export default function Home({
           >
             <Button
               mode="text"
-              disabled={!imageURI.length}
               onPress={() => setGridSize(4)}
               color="white"
               compact
@@ -497,7 +492,6 @@ export default function Home({
           placeholder="Message (optional, shows when solved)"
           multiline
           maxLength={messageLimit}
-          disabled={!imageURI.length}
           mode="outlined"
           value={message}
           onChangeText={(message) => setMessage(message)}
