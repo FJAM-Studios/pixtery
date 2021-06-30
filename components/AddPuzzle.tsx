@@ -11,6 +11,7 @@ import { Puzzle, AddPuzzleRoute, ScreenNavigation, RootState } from "../types";
 import { goToScreen } from "../util";
 import Logo from "./Logo";
 import Title from "./Title";
+import { sortPuzzles } from "../puzzleUtils";
 
 export default function AddPuzzle({
   navigation,
@@ -70,7 +71,12 @@ export default function AddPuzzle({
       }
       // save puzzle data to localStorage
       newPuzzle.imageURI = localURI;
-      const allPuzzles = [newPuzzle, ...receivedPuzzles];
+      console.log("new puzzle", newPuzzle);
+      // const allPuzzles = [newPuzzle, ...receivedPuzzles];
+      const allPuzzles = sortPuzzles("dateReceived", "desc", [
+        newPuzzle,
+        ...receivedPuzzles,
+      ]);
       await AsyncStorage.setItem("@pixteryPuzzles", JSON.stringify(allPuzzles));
       dispatch(setReceivedPuzzles(allPuzzles));
     } catch (e) {
