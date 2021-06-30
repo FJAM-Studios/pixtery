@@ -30,6 +30,7 @@ import {
   COMPRESSION,
   INTERSTITIAL_ID,
   DISPLAY_PAINFUL_ADS,
+  ARGUABLY_CLEVER_PHRASES,
 } from "../constants";
 import {
   generateJigsawPiecePaths,
@@ -264,9 +265,14 @@ export default function Home({
           dismissable={false}
           contentContainerStyle={{ alignItems: "center" }}
         >
-          {gridSize % 2 ? <Text>Yeah you&apos;re working.</Text> : null}
           <Headline>Building a Pixtery!</Headline>
-          {gridSize % 2 ? null : <Text>And choosing so carefully</Text>}
+          <Text>
+            {
+              ARGUABLY_CLEVER_PHRASES[
+                Math.floor(ARGUABLY_CLEVER_PHRASES.length * Math.random())
+              ]
+            }
+          </Text>
           <ActivityIndicator
             animating
             color={theme.colors.text}
