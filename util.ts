@@ -87,13 +87,13 @@ export const saveToLibrary = async (imageURI: string): Promise<void> => {
   if (extension === ".jpg") {
     try {
       await MediaLibrary.saveToLibraryAsync(imageURI);
-      Toast.show("Image Saved!", {
+      Toast.show("Image saved!", {
         duration: Toast.durations.SHORT,
       });
     } catch (e) {
-      Toast.show("Image Could Not Be Saved", {
+      Toast.show("Image could not be saved", {
         duration: Toast.durations.LONG,
       });
     }
-  } else alert("Cannot save image. Please take a screenshot.");
+  } else alert("Cannot save image. Please take a screenshot instead.");
 };
