@@ -6,6 +6,7 @@ import {
   Viewbox,
   PieceConfiguration,
   BoardSpace,
+  Puzzle,
 } from "./types";
 
 export const shuffle = (array: number[], disabledShuffle = true): number[] => {
@@ -462,4 +463,37 @@ export const validateBoard = (
     }
     return true;
   } else return false;
+};
+
+// used insertion sort assuming that it's more likely that users will reload based on same sortBy selection as before
+export const sortPuzzles = (
+  sortBy: string,
+  order: string,
+  puzzleList: Puzzle[]
+): Puzzle[] => {
+  for (let i = 1; i < puzzleList.length; i++) {
+    const currPuzzle = puzzleList[i];
+    const currValToSortBy = currPuzzle[sortBy];
+    console.log('currvaltosort', currValToSortBy)
+    for (
+      let j = i - 1;
+      j >= 0 && puzzleList[j][sortBy] > currValToSortBy;
+      j--
+    ) {
+      puzzleList[j + 1] = puzzleList[j];
+    }
+    puzzleList[j + 1] = currPuzzle;
+  }
+  console.log('puzzlelst', puzzleList)
+  return puzzleList;
+};
+
+const insertionSort = (arr) => {
+  for (let i = 1; i < arr.length; i++) {
+    const currVal = arr[i];
+    for (let j = i - 1; j >= 0 && arr[j] > currVal; j--) {
+      arr[j + 1] = arr[j];
+    }
+    arr[j + 1] = currVal;
+  }
 };
