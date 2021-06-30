@@ -483,7 +483,7 @@ export default function Home({
           disabled={imageURI.length === 0}
           onLayout={(ev) => setButtonHeight(ev.nativeEvent.layout.height)}
         >
-          Create Puzzle
+          Send
         </Button>
       </KeyboardAwareScrollView>
     </AdSafeAreaView>
