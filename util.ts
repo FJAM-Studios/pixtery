@@ -84,5 +84,5 @@ export const saveToLibrary = async (imageURI: string): Promise<void> => {
 
   const extension = imageURI.slice(-4);
   if (extension === ".jpg") MediaLibrary.saveToLibraryAsync(imageURI);
-  else alert("Cannot save image. Please take a screenshot.");
+  else alert("Cannot save image. Please take a screenshot instead.");
 };
