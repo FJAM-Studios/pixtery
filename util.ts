@@ -2,6 +2,7 @@ import {
   CommonActions,
   NavigationContainerRef,
 } from "@react-navigation/native";
+import * as MediaLibrary from "expo-media-library";
 import * as SplashScreen from "expo-splash-screen";
 import { Share } from "react-native";
 
@@ -77,3 +78,6 @@ export const closeSplashAndNavigate = async (
   goToScreen(navigation, screen, options);
   await SplashScreen.hideAsync();
 };
+
+export const saveToLibrary = async (imageURI: string): Promise<void> =>
+  MediaLibrary.saveToLibraryAsync(imageURI)

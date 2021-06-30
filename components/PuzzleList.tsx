@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
 import { Puzzle, ScreenNavigation, RootState } from "../types";
+import { saveToLibrary } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 
@@ -138,6 +139,12 @@ export default function PuzzleList({
                           : "view-grid"
                       }
                     />
+                    {receivedPuzzle.completed ? (
+                      <IconButton
+                        icon="download-circle"
+                        onPress={() => saveToLibrary(receivedPuzzle.imageURI)}
+                      />
+                    ) : null}
                     <IconButton
                       icon="delete"
                       onPress={() => showDeleteModal(receivedPuzzle)}
