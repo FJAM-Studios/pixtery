@@ -123,8 +123,10 @@ export default function Home({
   };
 
   const submitToServer = async (): Promise<void> => {
-    setModalVisible(true);
-    await displayPainfulAd();
+    if (DISPLAY_PAINFUL_ADS) {
+      AdMobInterstitial.removeAllListeners();
+      AdMobInterstitial.requestAdAsync();
+    }
     const fileName: string = uuid.v4();
     try {
       const localURI = await uploadImage(fileName);
@@ -211,12 +213,23 @@ export default function Home({
 
   const displayPainfulAd = async () => {
     if (DISPLAY_PAINFUL_ADS) {
+      //I tried adding the event listeners in the useEffect but that caused the filename passed to the image manipulator to be blank so instead they're created here and then cleaned up in the submitToServer so it doesn't trigger repeatedly when making more than one puzzle
+      AdMobInterstitial.addEventListener("interstitialDidClose", () => {
+        submitToServer();
+      });
+      AdMobInterstitial.addEventListener("interstitialDidFailToLoad", () => {
+        submitToServer();
+      });
       try {
-        await AdMobInterstitial.requestAdAsync();
         await AdMobInterstitial.showAdAsync();
+        setModalVisible(true);
       } catch (error) {
         console.log(error);
+        submitToServer();
       }
+    } else {
+      setModalVisible(true);
+      submitToServer();
     }
   };
 
@@ -234,6 +247,7 @@ export default function Home({
   React.useEffect(() => {
     (async () => {
       if (Platform.OS !== "web") {
+        if (DISPLAY_PAINFUL_ADS) AdMobInterstitial.requestAdAsync();
         let response = await ImagePicker.requestMediaLibraryPermissionsAsync();
         const libraryPermission = response.status;
         if (libraryPermission !== "granted") {
@@ -484,7 +498,7 @@ export default function Home({
         <Button
           icon="send"
           mode="contained"
-          onPress={submitToServer}
+          onPress={displayPainfulAd}
           style={{ margin: height * 0.01 }}
           disabled={imageURI.length === 0}
           onLayout={(ev) => setButtonHeight(ev.nativeEvent.layout.height)}
