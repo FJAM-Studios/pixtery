@@ -71,12 +71,7 @@ export default function AddPuzzle({
       }
       // save puzzle data to localStorage
       newPuzzle.imageURI = localURI;
-      console.log("new puzzle", newPuzzle);
-      // const allPuzzles = [newPuzzle, ...receivedPuzzles];
-      const allPuzzles = sortPuzzles("dateReceived", "desc", [
-        newPuzzle,
-        ...receivedPuzzles,
-      ]);
+      const allPuzzles = [newPuzzle, ...receivedPuzzles];
       await AsyncStorage.setItem("@pixteryPuzzles", JSON.stringify(allPuzzles));
       dispatch(setReceivedPuzzles(allPuzzles));
     } catch (e) {

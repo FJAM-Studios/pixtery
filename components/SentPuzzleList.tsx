@@ -69,10 +69,6 @@ export default function SentPuzzleList({
     setModalVisible(false);
   };
 
-  // useEffect(() => {
-  //   const sentPuzzles = sortPuzzles("dateReceived", "desc", sentPuzzles);
-  // });
-
   return (
     <AdSafeAreaView
       style={{
