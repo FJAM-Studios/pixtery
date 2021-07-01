@@ -49,6 +49,7 @@ export default function PuzzleComponent({
   );
   const sentPuzzles = useSelector((state: RootState) => state.sentPuzzles);
   const adHeight = useSelector((state: RootState) => state.adHeight);
+  const [lowerBound, setLowerBound] = useState<number>(0);
 
   const [puzzle, setPuzzle] = useState<Puzzle>();
   const [pieces, setPieces] = useState<Piece[]>([]);
@@ -156,6 +157,8 @@ export default function PuzzleComponent({
           squareSize,
         minSandboxY
       );
+
+      setLowerBound(maxSandboxY);
 
       setPuzzle(pickedPuzzle);
 
@@ -322,6 +325,7 @@ export default function PuzzleComponent({
                 snapPoints={snapPoints}
                 currentBoard={currentBoard.current}
                 checkWin={checkWin}
+                lowerBound={lowerBound}
               />
             ))
           ) : (
