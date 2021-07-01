@@ -6,12 +6,12 @@ import { Headline, ActivityIndicator } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 
 import { storage, functions } from "../FirebaseApp";
+import { sortPuzzles } from "../puzzleUtils";
 import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
 import { Puzzle, AddPuzzleRoute, ScreenNavigation, RootState } from "../types";
 import { goToScreen } from "../util";
 import Logo from "./Logo";
 import Title from "./Title";
-import { sortPuzzles } from "../puzzleUtils";
 
 export default function AddPuzzle({
   navigation,
