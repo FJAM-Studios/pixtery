@@ -149,6 +149,10 @@ export default function Home({
 
   const addToSent = async (puzzle: Puzzle) => {
     const allPuzzles = [puzzle, ...sentPuzzles];
+    // const allPuzzles = sortPuzzles("dateReceived", "desc", [
+    //   puzzle,
+    //   ...sentPuzzles,
+    // ]);
     await AsyncStorage.setItem(
       "@pixterySentPuzzles",
       JSON.stringify(allPuzzles)
