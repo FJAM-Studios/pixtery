@@ -11,7 +11,6 @@ import {
 import Modal from "react-native-modal";
 import { Card, IconButton, Button, Headline } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect } from "../public/bundle";
 
 import { sortPuzzles } from "../puzzleUtils";
 import { setSentPuzzles } from "../store/reducers/sentPuzzles";
@@ -37,13 +36,12 @@ export default function SentPuzzleList({
   const [puzzleToDelete, setPuzzleToDelete] = React.useState<Puzzle | null>(
     null
   );
+  // the sortBy/sortOrder options are currently unused, but set up for future sort optionality
   const [sortBy, setSortBy] = React.useState("dateReceived");
   const [sortOrder, setSortOrder] = React.useState("desc");
   const [sentPuzzlesSorted, setSentPuzzlesSorted] = React.useState(
     sortPuzzles("dateReceived", "desc", sentPuzzles)
   );
-
-  // start here - put sentpuzz sorted below
 
   const showDeleteModal = (puzzle: Puzzle) => {
     setModalVisible(true);

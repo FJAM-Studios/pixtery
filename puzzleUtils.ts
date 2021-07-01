@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+import { AnyIfEmpty } from "react-redux";
 import { DEGREE_CONVERSION } from "./constants";
 import {
   SvgPiece,
@@ -465,35 +467,34 @@ export const validateBoard = (
   } else return false;
 };
 
-// used insertion sort assuming that it's more likely that users will reload based on same sortBy selection as before
+// used insertion sort, which is efficient for almost sorted lists, assuming that for now it's more likely that users will reload a nearly sorted list based on default sort of dateReceived
+// could potentially use a different sorting algo for specific user-selected sorting
 export const sortPuzzles = (
-  sortBy: string,
+  sortBy: keyof Puzzle,
   order: string,
   puzzleList: Puzzle[]
 ): Puzzle[] => {
-  for (let i = 1; i < puzzleList.length; i++) {
-    const currPuzzle = puzzleList[i];
+  let currPuzzle: Puzzle;
+  let i = 1;
+  while (i < puzzleList.length) {
+    currPuzzle = puzzleList[i];
     const currValToSortBy = currPuzzle[sortBy];
-    console.log("currvaltosort", currValToSortBy);
-    for (
-      let j = i - 1;
-      j >= 0 && puzzleList[j][sortBy] > currValToSortBy;
-      j--
-    ) {
-      puzzleList[j + 1] = puzzleList[j];
+    let j = i - 1;
+    if (order === "desc") {
+      // assert here that the val to sort by is non null for now (given based on dateReceived); may need to be updated if we sort on optional fields
+      while (j >= 0 && puzzleList[j][sortBy]! < currValToSortBy!) {
+        puzzleList[j + 1] = puzzleList[j];
+        j--;
+      }
+    }
+    if (order === "asc") {
+      while (j >= 0 && puzzleList[j][sortBy]! > currValToSortBy!) {
+        puzzleList[j + 1] = puzzleList[j];
+        j--;
+      }
     }
     puzzleList[j + 1] = currPuzzle;
+    i++;
   }
-  console.log("puzzlelst", puzzleList);
   return puzzleList;
-};
-
-const insertionSort = (arr) => {
-  for (let i = 1; i < arr.length; i++) {
-    const currVal = arr[i];
-    for (let j = i - 1; j >= 0 && arr[j] > currVal; j--) {
-      arr[j + 1] = arr[j];
-    }
-    arr[j + 1] = currVal;
-  }
 };
