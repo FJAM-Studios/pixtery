@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
 import { Puzzle, ScreenNavigation, RootState } from "../types";
-import { saveToLibrary } from "../util";
+import { saveToLibrary, safelyDeletePuzzleImage } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 
@@ -22,6 +22,7 @@ export default function PuzzleList({
   const receivedPuzzles = useSelector(
     (state: RootState) => state.receivedPuzzles
   );
+  const sentPuzzles = useSelector((state: RootState) => state.sentPuzzles);
   const [modalVisible, setModalVisible] = React.useState(false);
   const [puzzleToDelete, setPuzzleToDelete] = React.useState<Puzzle | null>(
     null
@@ -38,6 +39,8 @@ export default function PuzzleList({
         ...receivedPuzzles.filter((puz) => puz.publicKey !== puzzle.publicKey),
       ];
       await AsyncStorage.setItem("@pixteryPuzzles", JSON.stringify(newPuzzles));
+      //delete local image
+      await safelyDeletePuzzleImage(puzzle.imageURI, sentPuzzles);
       dispatch(setReceivedPuzzles(newPuzzles));
     }
     setPuzzleToDelete(null);
