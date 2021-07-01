@@ -11,6 +11,7 @@ import {
 import Modal from "react-native-modal";
 import { Card, IconButton, Button, Headline } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "../public/bundle";
 
 import { sortPuzzles } from "../puzzleUtils";
 import { setSentPuzzles } from "../store/reducers/sentPuzzles";
@@ -36,11 +37,11 @@ export default function SentPuzzleList({
   const [puzzleToDelete, setPuzzleToDelete] = React.useState<Puzzle | null>(
     null
   );
-  const sentPuzzlesSorted = sortPuzzles("dateReceived", "desc", sentPuzzles);
+  const [sortBy, setSortBy] = React.useState("dateReceived");
+  const [sortOrder, setSortOrder] = React.useState("desc");
+  const [sentPuzzlesSorted, setSentPuzzlesSorted] = React.useState(sortPuzzles("dateReceived", "desc", sentPuzzles));
 
-  // qs
-  // user sends a puzzle - does it get integrated in the list at the top, or in accordance with their sorting pref
-  // i was thinking of sort every time a user addsa a puzzle, or an onChange in the sort pref inputs. downside is that existing users just by opening the app wll not see things sorted
+// start here - put sentpuzz sorted below
 
   const showDeleteModal = (puzzle: Puzzle) => {
     setModalVisible(true);
@@ -67,6 +68,11 @@ export default function SentPuzzleList({
     setPuzzleToDelete(null);
     setModalVisible(false);
   };
+
+  // useEffect(() => {
+  //   const sentPuzzles = sortPuzzles("dateReceived", "desc", sentPuzzles);
+  // });
+
   return (
     <AdSafeAreaView
       style={{
@@ -127,8 +133,8 @@ export default function SentPuzzleList({
       />
       <ScrollView>
         <>
-          {sentPuzzles.length ? (
-            sentPuzzles.map((sentPuzzle, ix) => (
+          {sentPuzzlesSorted.length ? (
+            sentPuzzlesSorted.map((sentPuzzle, ix) => (
               <TouchableOpacity
                 onPress={() =>
                   navigation.navigate("Puzzle", {
