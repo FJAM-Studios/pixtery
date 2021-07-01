@@ -1,14 +1,12 @@
 import "firebase/functions";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AdMobInterstitial } from "expo-ads-admob";
-import Constants from "expo-constants";
 import * as ImageManipulator from "expo-image-manipulator";
 import * as ImagePicker from "expo-image-picker";
 import { ImageInfo } from "expo-image-picker/build/ImagePicker.types";
-import * as IntentLauncher from "expo-intent-launcher";
 import * as Linking from "expo-linking";
 import * as React from "react";
-import { Image, View, Platform, Alert } from "react-native";
+import { Image, View, Platform } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import {
   Button,
@@ -32,6 +30,7 @@ import {
   COMPRESSION,
   INTERSTITIAL_ID,
   DISPLAY_PAINFUL_ADS,
+  ARGUABLY_CLEVER_PHRASES,
 } from "../constants";
 import {
   generateJigsawPiecePaths,
@@ -39,7 +38,7 @@ import {
 } from "../puzzleUtils";
 import { setSentPuzzles } from "../store/reducers/sentPuzzles";
 import { Puzzle, ScreenNavigation, RootState } from "../types";
-import { createBlob, shareMessage } from "../util";
+import { checkPermission, createBlob, shareMessage } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 
@@ -74,73 +73,29 @@ export default function Home({
   const [buttonHeight, setButtonHeight] = React.useState(0);
   const [textFocus, setTextFocus] = React.useState(false);
 
-  const checkPermission = async (camera: boolean) => {
-    let permission = camera
-      ? await ImagePicker.getCameraPermissionsAsync()
-      : await ImagePicker.getMediaLibraryPermissionsAsync();
-
-    if (permission.status === "granted") selectImage(camera);
-    else if (permission.status === "denied") {
-      Alert.alert(
-        `Sorry, we need to access your ${
-          camera ? "camera" : "photo library"
-        } to make this work!`,
-        "Please go to your phone's settings to grant permission",
-        [
-          {
-            text: "Cancel",
-            style: "cancel",
-          },
-          {
-            text: "Settings",
-            onPress: () => {
-              //ANDROID USERS: if this doesn't bring you to the device's app settings, delete line 99 and uncomment the next block. there are two new packages so don't forget to install.
-
-              Linking.openSettings();
-
-              // if(Platform.OS = "ios") Linking.openSettings()
-              // else {
-              //   const pkg = Constants.manifest.releaseChannel
-              //     ? Constants.manifest.android.package  // When published, considered as using standalone build
-              //     : "host.exp.exponent"; // In expo client mode
-              //   IntentLauncher.startActivityAsync(
-              //     IntentLauncher.ACTION_APPLICATION_DETAILS_SETTINGS,
-              //     { data: "package:" + pkg }
-              //   );
-              // }
-            },
-          },
-        ]
-      );
-    } else {
-      permission = camera
-        ? await ImagePicker.requestCameraPermissionsAsync()
-        : await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-      checkPermission(camera);
-    }
-  };
-
   const selectImage = async (camera: boolean) => {
-    const result = camera
-      ? await ImagePicker.launchCameraAsync({
+    const permission = await checkPermission(camera);
+    if (permission === "granted") {
+      const result = camera
+        ? await ImagePicker.launchCameraAsync({
           mediaTypes: ImagePicker.MediaTypeOptions.Images,
           allowsEditing: true,
           aspect: [4, 4],
           quality: 1,
-        })
-      : await ImagePicker.launchImageLibraryAsync({
+          })
+        : await ImagePicker.launchImageLibraryAsync({
           mediaTypes: ImagePicker.MediaTypeOptions.Images,
           allowsEditing: true,
           aspect: [4, 4],
           quality: 1,
-        });
+          });
 
-    if (!result.cancelled) {
+      if (!result.cancelled) {
       // if the resulting image is not a square because user did not zoom to fill image select box
       if (result.width !== result.height)
         result.uri = await cropToSquare(result);
       setImageURI(result.uri);
+      }
     }
   };
 
@@ -171,8 +126,10 @@ export default function Home({
   };
 
   const submitToServer = async (): Promise<void> => {
-    setModalVisible(true);
-    await displayPainfulAd();
+    if (DISPLAY_PAINFUL_ADS) {
+      AdMobInterstitial.removeAllListeners();
+      AdMobInterstitial.requestAdAsync();
+    }
     const fileName: string = uuid.v4();
     try {
       const localURI = await uploadImage(fileName);
@@ -259,12 +216,23 @@ export default function Home({
 
   const displayPainfulAd = async () => {
     if (DISPLAY_PAINFUL_ADS) {
+      //I tried adding the event listeners in the useEffect but that caused the filename passed to the image manipulator to be blank so instead they're created here and then cleaned up in the submitToServer so it doesn't trigger repeatedly when making more than one puzzle
+      AdMobInterstitial.addEventListener("interstitialDidClose", () => {
+        submitToServer();
+      });
+      AdMobInterstitial.addEventListener("interstitialDidFailToLoad", () => {
+        submitToServer();
+      });
       try {
-        await AdMobInterstitial.requestAdAsync();
         await AdMobInterstitial.showAdAsync();
+        setModalVisible(true);
       } catch (error) {
         console.log(error);
+        submitToServer();
       }
+    } else {
+      setModalVisible(true);
+      submitToServer();
     }
   };
 
@@ -296,9 +264,14 @@ export default function Home({
           dismissable={false}
           contentContainerStyle={{ alignItems: "center" }}
         >
-          {gridSize % 2 ? <Text>Yeah you&apos;re working.</Text> : null}
           <Headline>Building a Pixtery!</Headline>
-          {gridSize % 2 ? null : <Text>And choosing so carefully</Text>}
+          <Text>
+            {
+              ARGUABLY_CLEVER_PHRASES[
+                Math.floor(ARGUABLY_CLEVER_PHRASES.length * Math.random())
+              ]
+            }
+          </Text>
           <ActivityIndicator
             animating
             color={theme.colors.text}
@@ -362,7 +335,7 @@ export default function Home({
         <Button
           icon="camera"
           mode="contained"
-          onPress={() => checkPermission(true)}
+          onPress={() => selectImage(true)}
           style={{ margin: height * 0.01 }}
         >
           Camera
@@ -370,7 +343,7 @@ export default function Home({
         <Button
           icon="folder"
           mode="contained"
-          onPress={() => checkPermission(false)}
+          onPress={() => selectImage(false)}
           style={{ margin: height * 0.01 }}
         >
           Gallery
@@ -510,7 +483,7 @@ export default function Home({
         <Button
           icon="send"
           mode="contained"
-          onPress={submitToServer}
+          onPress={displayPainfulAd}
           style={{ margin: height * 0.01 }}
           disabled={imageURI.length === 0}
           onLayout={(ev) => setButtonHeight(ev.nativeEvent.layout.height)}

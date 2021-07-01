@@ -1,5 +1,5 @@
 import { AdMobBanner } from "expo-ads-admob";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { StyleProp, ViewStyle, View, LayoutChangeEvent } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
