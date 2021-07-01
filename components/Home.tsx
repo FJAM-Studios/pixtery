@@ -123,8 +123,10 @@ export default function Home({
   };
 
   const submitToServer = async (): Promise<void> => {
-    AdMobInterstitial.removeAllListeners();
-    AdMobInterstitial.requestAdAsync();
+    if (DISPLAY_PAINFUL_ADS) {
+      AdMobInterstitial.removeAllListeners();
+      AdMobInterstitial.requestAdAsync();
+    }
     const fileName: string = uuid.v4();
     try {
       const localURI = await uploadImage(fileName);
@@ -225,6 +227,9 @@ export default function Home({
         console.log(error);
         submitToServer();
       }
+    } else {
+      setModalVisible(true);
+      submitToServer();
     }
   };
 
@@ -242,7 +247,7 @@ export default function Home({
   React.useEffect(() => {
     (async () => {
       if (Platform.OS !== "web") {
-        AdMobInterstitial.requestAdAsync();
+        if (DISPLAY_PAINFUL_ADS) AdMobInterstitial.requestAdAsync();
         let response = await ImagePicker.requestMediaLibraryPermissionsAsync();
         const libraryPermission = response.status;
         if (libraryPermission !== "granted") {
