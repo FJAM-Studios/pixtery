@@ -39,9 +39,11 @@ export default function SentPuzzleList({
   );
   const [sortBy, setSortBy] = React.useState("dateReceived");
   const [sortOrder, setSortOrder] = React.useState("desc");
-  const [sentPuzzlesSorted, setSentPuzzlesSorted] = React.useState(sortPuzzles("dateReceived", "desc", sentPuzzles));
+  const [sentPuzzlesSorted, setSentPuzzlesSorted] = React.useState(
+    sortPuzzles("dateReceived", "desc", sentPuzzles)
+  );
 
-// start here - put sentpuzz sorted below
+  // start here - put sentpuzz sorted below
 
   const showDeleteModal = (puzzle: Puzzle) => {
     setModalVisible(true);
