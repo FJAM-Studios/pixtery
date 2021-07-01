@@ -60,7 +60,7 @@ export default function AddPuzzle({
           intermediates: true,
         });
       }
-      const localURI = pixteryDir + fileName;
+      const localURI = pixteryDir + fileName + ".jpg"; // adding an extension so the photo can be saved to the device's library later
       // if you already have this image, don't download it
       const fileInfo = await FileSystem.getInfoAsync(localURI);
       if (!fileInfo.exists) {
