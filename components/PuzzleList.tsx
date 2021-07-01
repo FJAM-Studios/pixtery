@@ -6,6 +6,7 @@ import Modal from "react-native-modal";
 import { Text, Card, IconButton, Button, Headline } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 
+import { sortPuzzles } from "../puzzleUtils";
 import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
 import { Puzzle, ScreenNavigation, RootState } from "../types";
 import AdSafeAreaView from "./AdSafeAreaView";
@@ -25,6 +26,12 @@ export default function PuzzleList({
   const [modalVisible, setModalVisible] = React.useState(false);
   const [puzzleToDelete, setPuzzleToDelete] = React.useState<Puzzle | null>(
     null
+  );
+  // the sortBy/sortOrder options are currently unused, but set up for future sort optionality
+  const [sortBy, setSortBy] = React.useState("dateReceived");
+  const [sortOrder, setSortOrder] = React.useState("desc");
+  const [receivedPuzzlesSorted, setReceivedPuzzlesSorted] = React.useState(
+    sortPuzzles("dateReceived", "desc", receivedPuzzles)
   );
 
   const showDeleteModal = (puzzle: Puzzle) => {
@@ -104,8 +111,8 @@ export default function PuzzleList({
       />
       <ScrollView>
         <>
-          {receivedPuzzles.length ? (
-            receivedPuzzles.map((receivedPuzzle, ix) => (
+          {receivedPuzzlesSorted.length ? (
+            receivedPuzzlesSorted.map((receivedPuzzle, ix) => (
               <TouchableOpacity
                 onPress={() =>
                   navigation.navigate("Puzzle", {
