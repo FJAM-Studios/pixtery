@@ -2,12 +2,13 @@ import {
   CommonActions,
   NavigationContainerRef,
 } from "@react-navigation/native";
+import * as FileSystem from "expo-file-system";
 import * as MediaLibrary from "expo-media-library";
 import * as SplashScreen from "expo-splash-screen";
 import { Share } from "react-native";
 import Toast from "react-native-root-toast";
 
-import { ScreenNavigation } from "./types";
+import { Puzzle, ScreenNavigation } from "./types";
 
 //convert URI into a blob to transmit to server
 export const createBlob = (localUri: string): Promise<Blob> => {
@@ -96,4 +97,15 @@ export const saveToLibrary = async (imageURI: string): Promise<void> => {
       });
     }
   } else alert("Cannot save image. Please take a screenshot instead.");
+};
+
+//a sent puzzle image could be in the received list and vice versa
+//so we check before deleting
+
+export const safelyDeletePuzzleImage = async (
+  imageURI: string, //image to delete
+  keeperList: Puzzle[] //list to check against
+): Promise<void> => {
+  if (!keeperList.map((puzzle) => puzzle.imageURI).includes(imageURI))
+    await FileSystem.deleteAsync(imageURI);
 };
