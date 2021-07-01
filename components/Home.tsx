@@ -1,6 +1,7 @@
 import "firebase/functions";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AdMobInterstitial } from "expo-ads-admob";
+import * as FileSystem from "expo-file-system";
 import * as ImageManipulator from "expo-image-manipulator";
 import * as ImagePicker from "expo-image-picker";
 import { ImageInfo } from "expo-image-picker/build/ImagePicker.types";
@@ -129,11 +130,8 @@ export default function Home({
     }
     const fileName: string = uuid.v4();
     try {
-      const localURI = await uploadImage(fileName);
+      await uploadImage(fileName);
       const newPuzzle = await uploadPuzzleSettings(fileName);
-      if (newPuzzle) {
-        newPuzzle.imageURI = localURI;
-      }
       setModalVisible(false);
       if (newPuzzle) {
         if (newPuzzle.publicKey) {
@@ -158,7 +156,7 @@ export default function Home({
     dispatch(setSentPuzzles(allPuzzles));
   };
 
-  const uploadImage = async (fileName: string): Promise<string> => {
+  const uploadImage = async (fileName: string): Promise<void> => {
     //resize and compress the image for upload
     const resizedCompressedImage = await ImageManipulator.manipulateAsync(
       imageURI,
@@ -169,10 +167,15 @@ export default function Home({
       ],
       { compress: COMPRESSION, format: ImageManipulator.SaveFormat.JPEG }
     );
-    const blob: Blob = await createBlob(resizedCompressedImage.uri);
+    //move to document directory
+    const localURI = FileSystem.documentDirectory + fileName;
+    await FileSystem.moveAsync({
+      from: resizedCompressedImage.uri,
+      to: localURI,
+    });
+    const blob: Blob = await createBlob(localURI);
     const ref = storage.ref().child(fileName);
     await ref.put(blob);
-    return resizedCompressedImage.uri;
   };
 
   const uploadPuzzleSettings = async (
