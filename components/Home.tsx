@@ -30,6 +30,7 @@ import {
   COMPRESSION,
   INTERSTITIAL_ID,
   DISPLAY_PAINFUL_ADS,
+  ARGUABLY_CLEVER_PHRASES,
 } from "../constants";
 import {
   generateJigsawPiecePaths,
@@ -122,8 +123,10 @@ export default function Home({
   };
 
   const submitToServer = async (): Promise<void> => {
-    setModalVisible(true);
-    await displayPainfulAd();
+    if (DISPLAY_PAINFUL_ADS) {
+      AdMobInterstitial.removeAllListeners();
+      AdMobInterstitial.requestAdAsync();
+    }
     const fileName: string = uuid.v4();
     try {
       const localURI = await uploadImage(fileName);
@@ -210,12 +213,23 @@ export default function Home({
 
   const displayPainfulAd = async () => {
     if (DISPLAY_PAINFUL_ADS) {
+      //I tried adding the event listeners in the useEffect but that caused the filename passed to the image manipulator to be blank so instead they're created here and then cleaned up in the submitToServer so it doesn't trigger repeatedly when making more than one puzzle
+      AdMobInterstitial.addEventListener("interstitialDidClose", () => {
+        submitToServer();
+      });
+      AdMobInterstitial.addEventListener("interstitialDidFailToLoad", () => {
+        submitToServer();
+      });
       try {
-        await AdMobInterstitial.requestAdAsync();
         await AdMobInterstitial.showAdAsync();
+        setModalVisible(true);
       } catch (error) {
         console.log(error);
+        submitToServer();
       }
+    } else {
+      setModalVisible(true);
+      submitToServer();
     }
   };
 
@@ -233,6 +247,7 @@ export default function Home({
   React.useEffect(() => {
     (async () => {
       if (Platform.OS !== "web") {
+        if (DISPLAY_PAINFUL_ADS) AdMobInterstitial.requestAdAsync();
         let response = await ImagePicker.requestMediaLibraryPermissionsAsync();
         const libraryPermission = response.status;
         if (libraryPermission !== "granted") {
@@ -264,9 +279,14 @@ export default function Home({
           dismissable={false}
           contentContainerStyle={{ alignItems: "center" }}
         >
-          {gridSize % 2 ? <Text>Yeah you&apos;re working.</Text> : null}
           <Headline>Building a Pixtery!</Headline>
-          {gridSize % 2 ? null : <Text>And choosing so carefully</Text>}
+          <Text>
+            {
+              ARGUABLY_CLEVER_PHRASES[
+                Math.floor(ARGUABLY_CLEVER_PHRASES.length * Math.random())
+              ]
+            }
+          </Text>
           <ActivityIndicator
             animating
             color={theme.colors.text}
@@ -371,7 +391,6 @@ export default function Home({
               onPress={() => {
                 setPuzzleType("jigsaw");
               }}
-              disabled={!imageURI.length}
               animated={false}
             />
           </Surface>
@@ -395,7 +414,6 @@ export default function Home({
               onPress={() => {
                 setPuzzleType("squares");
               }}
-              disabled={!imageURI.length}
               animated={false}
             />
           </Surface>
@@ -412,7 +430,6 @@ export default function Home({
           >
             <Button
               mode="text"
-              disabled={!imageURI.length}
               onPress={() => setGridSize(2)}
               color="white"
               compact
@@ -432,7 +449,6 @@ export default function Home({
           >
             <Button
               mode="text"
-              disabled={!imageURI.length}
               onPress={() => setGridSize(3)}
               color="white"
               compact
@@ -452,7 +468,6 @@ export default function Home({
           >
             <Button
               mode="text"
-              disabled={!imageURI.length}
               onPress={() => setGridSize(4)}
               color="white"
               compact
@@ -465,7 +480,6 @@ export default function Home({
           placeholder="Message (optional, shows when solved)"
           multiline
           maxLength={messageLimit}
-          disabled={!imageURI.length}
           mode="outlined"
           value={message}
           onChangeText={(message) => setMessage(message)}
@@ -484,7 +498,7 @@ export default function Home({
         <Button
           icon="send"
           mode="contained"
-          onPress={submitToServer}
+          onPress={displayPainfulAd}
           style={{ margin: height * 0.01 }}
           disabled={imageURI.length === 0}
           onLayout={(ev) => setButtonHeight(ev.nativeEvent.layout.height)}
