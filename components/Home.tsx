@@ -130,8 +130,16 @@ export default function Home({
     }
     const fileName: string = uuid.v4();
     try {
-      await uploadImage(fileName);
+      const localURI = await uploadImage(fileName);
       const newPuzzle = await uploadPuzzleSettings(fileName);
+      if (newPuzzle) {
+        //move to document directory
+        const permanentURI = FileSystem.documentDirectory + fileName;
+        await FileSystem.moveAsync({
+          from: localURI,
+          to: permanentURI,
+        });
+      }
       setModalVisible(false);
       if (newPuzzle) {
         if (newPuzzle.publicKey) {
@@ -156,7 +164,7 @@ export default function Home({
     dispatch(setSentPuzzles(allPuzzles));
   };
 
-  const uploadImage = async (fileName: string): Promise<void> => {
+  const uploadImage = async (fileName: string): Promise<string> => {
     //resize and compress the image for upload
     const resizedCompressedImage = await ImageManipulator.manipulateAsync(
       imageURI,
@@ -167,15 +175,10 @@ export default function Home({
       ],
       { compress: COMPRESSION, format: ImageManipulator.SaveFormat.JPEG }
     );
-    //move to document directory
-    const localURI = FileSystem.documentDirectory + fileName;
-    await FileSystem.moveAsync({
-      from: resizedCompressedImage.uri,
-      to: localURI,
-    });
-    const blob: Blob = await createBlob(localURI);
+    const blob: Blob = await createBlob(resizedCompressedImage.uri);
     const ref = storage.ref().child(fileName);
     await ref.put(blob);
+    return resizedCompressedImage.uri;
   };
 
   const uploadPuzzleSettings = async (
