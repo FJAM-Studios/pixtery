@@ -14,7 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { setSentPuzzles } from "../store/reducers/sentPuzzles";
 import { Puzzle, ScreenNavigation, RootState } from "../types";
-import { saveToLibrary, shareMessage } from "../util";
+import { saveToLibrary, safelyDeletePuzzleImage, shareMessage } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 
@@ -54,6 +54,7 @@ export default function SentPuzzleList({
         "@pixterySentPuzzles",
         JSON.stringify(newPuzzles)
       );
+      await safelyDeletePuzzleImage(puzzle.imageURI, receivedPuzzles);
       dispatch(setSentPuzzles(newPuzzles));
     }
     setPuzzleToDelete(null);
