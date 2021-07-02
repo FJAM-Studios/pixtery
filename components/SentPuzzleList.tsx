@@ -15,7 +15,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { sortPuzzles } from "../puzzleUtils";
 import { setSentPuzzles } from "../store/reducers/sentPuzzles";
 import { Puzzle, ScreenNavigation, RootState } from "../types";
-import { shareMessage } from "../util";
+import { saveToLibrary, safelyDeletePuzzleImage, shareMessage } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 
@@ -63,6 +63,7 @@ export default function SentPuzzleList({
         "@pixterySentPuzzles",
         JSON.stringify(newPuzzles)
       );
+      await safelyDeletePuzzleImage(puzzle.imageURI, receivedPuzzles);
       dispatch(setSentPuzzles(newPuzzles));
     }
     setPuzzleToDelete(null);
@@ -153,6 +154,10 @@ export default function SentPuzzleList({
                         style={{ flexDirection: "row", alignItems: "center" }}
                       >
                         <IconButton
+                          icon="download-circle"
+                          onPress={() => saveToLibrary(sentPuzzle.imageURI)}
+                        />
+                        <IconButton
                           icon="delete"
                           onPress={() => showDeleteModal(sentPuzzle)}
                         />
@@ -198,3 +203,22 @@ export default function SentPuzzleList({
     </AdSafeAreaView>
   );
 }
+
+// ) : (
+//   <View
+//     style={{
+//       alignItems: "center",
+//     }}
+//   >
+// <<<<<<< HEAD
+//     <Headline
+//       style={{
+//         marginTop: height * 0.3,
+//       }}
+//     >
+//       You haven&apos;t sent any puzzles!
+//     </Headline>
+//   </View>
+// )}
+// </>
+// =======

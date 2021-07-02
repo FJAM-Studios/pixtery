@@ -27,6 +27,7 @@ export default function PuzzlePiece({
   snapPoints,
   currentBoard,
   checkWin,
+  lowerBound,
 }: {
   piece: Piece;
   puzzleAreaDimensions: { puzzleAreaWidth: number; puzzleAreaHeight: number };
@@ -34,6 +35,7 @@ export default function PuzzlePiece({
   snapPoints: Point[];
   currentBoard: BoardSpace[];
   checkWin: () => void;
+  lowerBound: number;
 }): JSX.Element {
   const {
     pieceDimensions,
@@ -109,10 +111,7 @@ export default function PuzzlePiece({
         lastOffset.x
       );
       lastOffset.y = Math.min(
-        pieceDimensions.height * 0.5 +
-          puzzleAreaDimensions.puzzleAreaHeight -
-          pieceDimensions.height -
-          initialPlacement.y,
+        lowerBound - pieceDimensions.height * 0.5 - initialPlacement.y,
         lastOffset.y
       );
       // snap piece here using lastOffset, adjust for centered snapping points
