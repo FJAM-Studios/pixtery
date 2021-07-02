@@ -31,22 +31,5 @@ const functions = app.functions();
 // functions.useFunctionsEmulator(`${MY_LAN_IP}:5001`);
 
 const storage = app.storage();
-const phoneProvider = new firebase.auth.PhoneAuthProvider();
-const verifySms = (
-  id: string,
-  code: string
-): Promise<firebase.auth.UserCredential> => {
-  const credential = firebase.auth.PhoneAuthProvider.credential(id, code);
-  const signInResponse = firebase.auth().signInWithCredential(credential);
-  return signInResponse;
-};
 
-export {
-  app,
-  db,
-  storage,
-  phoneProvider,
-  firebaseConfig,
-  verifySms,
-  functions,
-};
+export { app, db, storage, firebaseConfig, functions };
