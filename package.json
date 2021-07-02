@@ -52,7 +52,6 @@
     "expo-tracking-transparency": "^1.0.0",
     "firebase": "8.2.3",
     "moment": "^2.29.1",
-    "npm": "^7.19.1",
     "phone": "^2.4.21",
     "react": "16.13.1",
     "react-dom": "16.13.1",

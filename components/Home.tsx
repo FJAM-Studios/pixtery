@@ -39,7 +39,7 @@ import {
 } from "../puzzleUtils";
 import { setSentPuzzles } from "../store/reducers/sentPuzzles";
 import { Puzzle, ScreenNavigation, RootState } from "../types";
-import { createBlob, shareMessage, goToScreen } from "../util";
+import { createBlob, shareMessage, goToScreen, checkPermission } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 
@@ -75,25 +75,28 @@ export default function Home({
   const [textFocus, setTextFocus] = React.useState(false);
 
   const selectImage = async (camera: boolean) => {
-    const result = camera
-      ? await ImagePicker.launchCameraAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.Images,
-          allowsEditing: true,
-          aspect: [4, 4],
-          quality: 1,
-        })
-      : await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.Images,
-          allowsEditing: true,
-          aspect: [4, 4],
-          quality: 1,
-        });
+    const permission = await checkPermission(camera);
+    if (permission === "granted") {
+      const result = camera
+        ? await ImagePicker.launchCameraAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [4, 4],
+            quality: 1,
+          })
+        : await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [4, 4],
+            quality: 1,
+          });
 
-    if (!result.cancelled) {
-      // if the resulting image is not a square because user did not zoom to fill image select box
-      if (result.width !== result.height)
-        result.uri = await cropToSquare(result);
-      setImageURI(result.uri);
+      if (!result.cancelled) {
+        // if the resulting image is not a square because user did not zoom to fill image select box
+        if (result.width !== result.height)
+          result.uri = await cropToSquare(result);
+        setImageURI(result.uri);
+      }
     }
   };
 
@@ -251,24 +254,6 @@ export default function Home({
       );
   }, [gridSize, puzzleType, boardSize]);
 
-  React.useEffect(() => {
-    (async () => {
-      if (Platform.OS !== "web") {
-        if (DISPLAY_PAINFUL_ADS) AdMobInterstitial.requestAdAsync();
-        let response = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        const libraryPermission = response.status;
-        if (libraryPermission !== "granted") {
-          alert("Sorry, we need camera roll permissions to make this work!");
-        } else {
-          response = await ImagePicker.requestCameraPermissionsAsync();
-          const cameraPermission = response.status;
-          if (cameraPermission !== "granted") {
-            alert("Sorry, we need camera permissions to make this work!");
-          }
-        }
-      }
-    })();
-  }, []);
   return (
     <AdSafeAreaView
       style={{
