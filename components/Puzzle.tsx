@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Audio } from "expo-av";
+import * as FileSystem from "expo-file-system";
 import * as ImageManipulator from "expo-image-manipulator";
 import React, { useEffect, useState, useRef } from "react";
 import { Text, View, StyleSheet, Image, LayoutChangeEvent } from "react-native";
@@ -196,9 +197,7 @@ export default function PuzzleComponent({
             );
 
             const href = await ImageManipulator.manipulateAsync(
-              // testing an invalid imageURI, in case the pic is deleted/corrupted
-              // imageURI + "bogus",
-              imageURI,
+              FileSystem.documentDirectory + imageURI,
               [
                 {
                   resize: {
@@ -332,7 +331,7 @@ export default function PuzzleComponent({
           ) : (
             <>
               <Image
-                source={{ uri: puzzle.imageURI }}
+                source={{ uri: FileSystem.documentDirectory + puzzle.imageURI }}
                 style={{
                   width: boardSize,
                   height: boardSize,

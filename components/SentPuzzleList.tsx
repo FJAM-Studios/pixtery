@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as FileSystem from "expo-file-system";
 import * as Linking from "expo-linking";
 import moment from "moment";
 import * as React from "react";
@@ -170,7 +171,8 @@ export default function SentPuzzleList({
                     left={() => (
                       <ImageBackground
                         source={{
-                          uri: sentPuzzle.imageURI,
+                          uri:
+                            FileSystem.documentDirectory + sentPuzzle.imageURI,
                         }}
                         style={{
                           flex: 1,
