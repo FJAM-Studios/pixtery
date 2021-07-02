@@ -203,22 +203,3 @@ export default function SentPuzzleList({
     </AdSafeAreaView>
   );
 }
-
-// ) : (
-//   <View
-//     style={{
-//       alignItems: "center",
-//     }}
-//   >
-// <<<<<<< HEAD
-//     <Headline
-//       style={{
-//         marginTop: height * 0.3,
-//       }}
-//     >
-//       You haven&apos;t sent any puzzles!
-//     </Headline>
-//   </View>
-// )}
-// </>
-// =======
