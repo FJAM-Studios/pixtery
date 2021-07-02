@@ -331,7 +331,7 @@ export default function PuzzleComponent({
           ) : (
             <>
               <Image
-                source={{ uri: puzzle.imageURI }}
+                source={{ uri: FileSystem.documentDirectory + puzzle.imageURI }}
                 style={{
                   width: boardSize,
                   height: boardSize,
