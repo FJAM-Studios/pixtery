@@ -87,7 +87,9 @@ export const saveToLibrary = async (imageURI: string): Promise<void> => {
   const extension = imageURI.slice(-4);
   if (extension === ".jpg") {
     try {
-      await MediaLibrary.saveToLibraryAsync(imageURI);
+      await MediaLibrary.saveToLibraryAsync(
+        FileSystem.documentDirectory + imageURI
+      );
       Toast.show("Image saved!", {
         duration: Toast.durations.SHORT,
       });
