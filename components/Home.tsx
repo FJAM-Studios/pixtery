@@ -79,23 +79,23 @@ export default function Home({
     if (permission === "granted") {
       const result = camera
         ? await ImagePicker.launchCameraAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.Images,
-          allowsEditing: true,
-          aspect: [4, 4],
-          quality: 1,
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [4, 4],
+            quality: 1,
           })
         : await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.Images,
-          allowsEditing: true,
-          aspect: [4, 4],
-          quality: 1,
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [4, 4],
+            quality: 1,
           });
 
       if (!result.cancelled) {
-      // if the resulting image is not a square because user did not zoom to fill image select box
-      if (result.width !== result.height)
-        result.uri = await cropToSquare(result);
-      setImageURI(result.uri);
+        // if the resulting image is not a square because user did not zoom to fill image select box
+        if (result.width !== result.height)
+          result.uri = await cropToSquare(result);
+        setImageURI(result.uri);
       }
     }
   };
