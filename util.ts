@@ -3,9 +3,11 @@ import {
   NavigationContainerRef,
 } from "@react-navigation/native";
 import * as FileSystem from "expo-file-system";
+import * as ImagePicker from "expo-image-picker";
+import * as Linking from "expo-linking";
 import * as MediaLibrary from "expo-media-library";
 import * as SplashScreen from "expo-splash-screen";
-import { Share } from "react-native";
+import { Alert, Share } from "react-native";
 import Toast from "react-native-root-toast";
 
 import { Puzzle, ScreenNavigation } from "./types";
@@ -82,23 +84,25 @@ export const closeSplashAndNavigate = async (
 };
 
 export const saveToLibrary = async (imageURI: string): Promise<void> => {
+  const permission = await checkPermission(false);
   // files must have an extension to be saved but, prior to this update downloaded puzzles weren't given an extension. so in order to remain backwards compatible we're checking for an extension and give the user a warning if not found. only puzzles downloaded prior to this update should cause the alert.
-
-  const extension = imageURI.slice(-4);
-  if (extension === ".jpg") {
-    try {
-      await MediaLibrary.saveToLibraryAsync(
-        FileSystem.documentDirectory + imageURI
-      );
-      Toast.show("Image saved!", {
-        duration: Toast.durations.SHORT,
-      });
-    } catch (e) {
-      Toast.show("Image could not be saved", {
-        duration: Toast.durations.LONG,
-      });
-    }
-  } else alert("Cannot save image. Please take a screenshot instead.");
+  if (permission === "granted") {
+    const extension = imageURI.slice(-4);
+    if (extension === ".jpg") {
+      try {
+        await MediaLibrary.saveToLibraryAsync(
+          FileSystem.documentDirectory + imageURI
+        );
+        Toast.show("Image saved!", {
+          duration: Toast.durations.SHORT,
+        });
+      } catch (e) {
+        Toast.show("Image could not be saved", {
+          duration: Toast.durations.LONG,
+        });
+      }
+    } else alert("Cannot save image. Please take a screenshot instead.");
+  }
 };
 
 //a sent puzzle image could be in the received list and vice versa
@@ -110,4 +114,38 @@ export const safelyDeletePuzzleImage = async (
 ): Promise<void> => {
   if (!keeperList.map((puzzle) => puzzle.imageURI).includes(imageURI))
     await FileSystem.deleteAsync(FileSystem.documentDirectory + imageURI);
+};
+
+// check and return permission status
+export const checkPermission = async (camera: boolean): Promise<string> => {
+  let permission = camera
+    ? await ImagePicker.getCameraPermissionsAsync()
+    : await ImagePicker.getMediaLibraryPermissionsAsync();
+
+  if (permission.status === "granted") return permission.status;
+  else if (permission.status === "denied") {
+    Alert.alert(
+      `Sorry, we need to access your ${
+        camera ? "camera" : "photo library"
+      } to make this work!`,
+      "Please go to your phone's settings to grant permission",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Settings",
+          onPress: () => Linking.openSettings(),
+        },
+      ]
+    );
+    return permission.status;
+  } else {
+    permission = camera
+      ? await ImagePicker.requestCameraPermissionsAsync()
+      : await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    return checkPermission(camera);
+  }
 };
