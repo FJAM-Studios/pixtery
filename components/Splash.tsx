@@ -52,8 +52,25 @@ export default function Splash({
         //should probably do something here to make sure all local puzzles also have local images
         //and, if not, try to get them from server, and if they don't exist there, then delete puzzle
         //or otherwise mark it as invalid somehow
+
+        //if there are any loaded puzzles, run the routine to update image URIs
         if (loadedPuzzles.length || loadedSentPuzzles.length) {
-          await updateImageURIs(loadedPuzzles, loadedSentPuzzles);
+          const resaveLocalStorage = await updateImageURIs(
+            loadedPuzzles,
+            loadedSentPuzzles
+          );
+          //if it hasn't already been run, then also save the new data to local storage
+          //the loadedPuzzles and sentPuzzles should have the updated image URIs due to object reference in JS
+          if (resaveLocalStorage) {
+            await AsyncStorage.setItem(
+              "@pixteryPuzzles",
+              JSON.stringify(loadedPuzzles)
+            );
+            await AsyncStorage.setItem(
+              "@pixterySentPuzzles",
+              JSON.stringify(loadedSentPuzzles)
+            );
+          }
         }
         dispatch(setReceivedPuzzles(loadedPuzzles));
         dispatch(setSentPuzzles(loadedSentPuzzles));
