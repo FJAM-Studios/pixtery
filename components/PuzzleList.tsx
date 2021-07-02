@@ -194,21 +194,3 @@ export default function PuzzleList({
     </AdSafeAreaView>
   );
 }
-
-// ) : (
-//   <View
-//     style={{
-//       alignItems: "center",
-//     }}
-//   >
-// <<<<<<< HEAD
-//     <Headline
-//       style={{
-//         marginTop: height * 0.3,
-//       }}
-//     >
-//       You have no puzzles to solve!
-//     </Headline>
-//   </View>
-// )}
-// </>
