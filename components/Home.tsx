@@ -128,7 +128,7 @@ export default function Home({
       AdMobInterstitial.removeAllListeners();
       AdMobInterstitial.requestAdAsync();
     }
-    const fileName: string = uuid.v4();
+    const fileName: string = uuid.v4() + ".jpg";
     try {
       const localURI = await uploadImage(fileName);
       const newPuzzle = await uploadPuzzleSettings(fileName);
