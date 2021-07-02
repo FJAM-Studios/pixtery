@@ -4,7 +4,7 @@ import * as FileSystem from "expo-file-system";
 import * as ImageManipulator from "expo-image-manipulator";
 import React, { useEffect, useState, useRef } from "react";
 import { Text, View, StyleSheet, Image, LayoutChangeEvent } from "react-native";
-import { ActivityIndicator } from "react-native-paper";
+import { ActivityIndicator, Button } from "react-native-paper";
 import { Theme } from "react-native-paper/lib/typescript/types";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
@@ -28,6 +28,7 @@ import {
   PuzzleRoute,
   RootState,
 } from "../types";
+import { saveToLibrary } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 import PuzzlePiece from "./PuzzlePiece";
@@ -50,6 +51,7 @@ export default function PuzzleComponent({
   );
   const sentPuzzles = useSelector((state: RootState) => state.sentPuzzles);
   const adHeight = useSelector((state: RootState) => state.adHeight);
+  const [lowerBound, setLowerBound] = useState<number>(0);
 
   const [puzzle, setPuzzle] = useState<Puzzle>();
   const [pieces, setPieces] = useState<Piece[]>([]);
@@ -157,6 +159,8 @@ export default function PuzzleComponent({
           squareSize,
         minSandboxY
       );
+
+      setLowerBound(maxSandboxY);
 
       setPuzzle(pickedPuzzle);
 
@@ -321,20 +325,31 @@ export default function PuzzleComponent({
                 snapPoints={snapPoints}
                 currentBoard={currentBoard.current}
                 checkWin={checkWin}
+                lowerBound={lowerBound}
               />
             ))
           ) : (
-            <Image
-              source={{ uri: FileSystem.documentDirectory + puzzle.imageURI }}
-              style={{
-                width: boardSize,
-                height: boardSize,
-              }}
-            />
+            <>
+              <Image
+                source={{ uri: FileSystem.documentDirectory + puzzle.imageURI }}
+                style={{
+                  width: boardSize,
+                  height: boardSize,
+                }}
+              />
+              <View style={styles(styleProps).winContainer}>
+                <Text style={styles(styleProps).winText}>{winMessage}</Text>
+              </View>
+              <Button
+                icon="download-circle"
+                mode="contained"
+                style={{ margin: 15 }}
+                onPress={() => saveToLibrary(puzzle.imageURI)}
+              >
+                Save Image
+              </Button>
+            </>
           )}
-          <View style={styles(styleProps).winContainer}>
-            <Text style={styles(styleProps).winText}>{winMessage}</Text>
-          </View>
         </View>
       </AdSafeAreaView>
     );
