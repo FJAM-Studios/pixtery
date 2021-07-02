@@ -10,7 +10,7 @@ import { setProfile } from "../store/reducers/profile";
 import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
 import { setSentPuzzles } from "../store/reducers/sentPuzzles";
 import { ScreenNavigation, SplashRoute, RootState } from "../types";
-import { closeSplashAndNavigate } from "../util";
+import { closeSplashAndNavigate, updateImageURIs } from "../util";
 import Logo from "./Logo";
 import Title from "./Title";
 
@@ -52,6 +52,9 @@ export default function Splash({
         //should probably do something here to make sure all local puzzles also have local images
         //and, if not, try to get them from server, and if they don't exist there, then delete puzzle
         //or otherwise mark it as invalid somehow
+        if (loadedPuzzles.length || loadedSentPuzzles.length) {
+          await updateImageURIs(loadedPuzzles, loadedSentPuzzles);
+        }
         dispatch(setReceivedPuzzles(loadedPuzzles));
         dispatch(setSentPuzzles(loadedSentPuzzles));
       } catch (e) {
