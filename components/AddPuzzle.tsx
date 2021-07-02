@@ -51,7 +51,10 @@ export default function AddPuzzle({
       const fileName = imageURI.slice(imageURI.lastIndexOf("/") + 1);
       const downloadURL = await storage.ref("/" + imageURI).getDownloadURL();
       //put jpg in upload instead of here
-      const localURI = FileSystem.documentDirectory + fileName;
+      //but user could still download old pixtery (with no uploaded extension), so addl logic needed
+      const extension = imageURI.slice(-4) === ".jpg" ? "" : ".jpg";
+      newPuzzle.imageURI = fileName + extension;
+      const localURI = FileSystem.documentDirectory + fileName + extension;
       // if you already have this image, don't download it
       const fileInfo = await FileSystem.getInfoAsync(localURI);
       if (!fileInfo.exists) {
