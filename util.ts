@@ -150,12 +150,15 @@ export const updateImageURIs = async (
 
     //try to move the file from its original location to the documentDirectory
     try {
+      console.log("moving from " + imageURI);
+      console.log("to " + FileSystem.documentDirectory + newURI);
       await FileSystem.moveAsync({
         from: imageURI,
         to: FileSystem.documentDirectory + newURI,
       });
 
       //change the imageURI in the puzzle object
+      console.log("setting new puzzle imageURI to " + newURI);
       updatingPuzzle.imageURI = newURI;
     } catch (e) {
       console.log(e);
