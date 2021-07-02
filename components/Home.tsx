@@ -1,6 +1,7 @@
 import "firebase/functions";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AdMobInterstitial } from "expo-ads-admob";
+import * as FileSystem from "expo-file-system";
 import * as ImageManipulator from "expo-image-manipulator";
 import * as ImagePicker from "expo-image-picker";
 import { ImageInfo } from "expo-image-picker/build/ImagePicker.types";
@@ -130,12 +131,17 @@ export default function Home({
       AdMobInterstitial.removeAllListeners();
       AdMobInterstitial.requestAdAsync();
     }
-    const fileName: string = uuid.v4();
+    const fileName: string = uuid.v4() + ".jpg";
     try {
       const localURI = await uploadImage(fileName);
       const newPuzzle = await uploadPuzzleSettings(fileName);
       if (newPuzzle) {
-        newPuzzle.imageURI = localURI;
+        //move to document directory
+        const permanentURI = FileSystem.documentDirectory + fileName;
+        await FileSystem.moveAsync({
+          from: localURI,
+          to: permanentURI,
+        });
       }
       setModalVisible(false);
       if (newPuzzle) {

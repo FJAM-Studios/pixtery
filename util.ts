@@ -90,7 +90,9 @@ export const saveToLibrary = async (imageURI: string): Promise<void> => {
     const extension = imageURI.slice(-4);
     if (extension === ".jpg") {
       try {
-        await MediaLibrary.saveToLibraryAsync(imageURI);
+        await MediaLibrary.saveToLibraryAsync(
+          FileSystem.documentDirectory + imageURI
+        );
         Toast.show("Image saved!", {
           duration: Toast.durations.SHORT,
         });
@@ -111,7 +113,7 @@ export const safelyDeletePuzzleImage = async (
   keeperList: Puzzle[] //list to check against
 ): Promise<void> => {
   if (!keeperList.map((puzzle) => puzzle.imageURI).includes(imageURI))
-    await FileSystem.deleteAsync(imageURI);
+    await FileSystem.deleteAsync(FileSystem.documentDirectory + imageURI);
 };
 
 // check and return permission status
