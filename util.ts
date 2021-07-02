@@ -2,14 +2,12 @@ import {
   CommonActions,
   NavigationContainerRef,
 } from "@react-navigation/native";
-import Constants from "expo-constants"; //might be needed for the Android alternative currently commented out
 import * as FileSystem from "expo-file-system";
 import * as ImagePicker from "expo-image-picker";
-import * as IntentLauncher from "expo-intent-launcher"; //might be needed for the Android alternative currently commented out
 import * as Linking from "expo-linking";
 import * as MediaLibrary from "expo-media-library";
 import * as SplashScreen from "expo-splash-screen";
-import { Alert, Share, Platform } from "react-native"; // Platform might be needed for the Android alternative currently commented out
+import { Alert, Share } from "react-native";
 import Toast from "react-native-root-toast";
 
 import { Puzzle, ScreenNavigation } from "./types";
@@ -136,22 +134,7 @@ export const checkPermission = async (camera: boolean): Promise<string> => {
         },
         {
           text: "Settings",
-          onPress: () => {
-            //ANDROID USERS: if this doesn't bring you to the device's app settings, delete line 99 and uncomment the next block. there are two new packages so don't forget to install.
-
-            Linking.openSettings();
-
-            // if(Platform.OS = "ios") Linking.openSettings()
-            // else {
-            //   const pkg = Constants.manifest.releaseChannel
-            //     ? Constants.manifest.android.package  // When published, considered as using standalone build
-            //     : "host.exp.exponent"; // In expo client mode
-            //   IntentLauncher.startActivityAsync(
-            //     IntentLauncher.ACTION_APPLICATION_DETAILS_SETTINGS,
-            //     { data: "package:" + pkg }
-            //   );
-            // }
-          },
+          onPress: () => Linking.openSettings(),
         },
       ]
     );
