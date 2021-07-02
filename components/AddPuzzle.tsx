@@ -51,7 +51,16 @@ export default function AddPuzzle({
       const fileName = imageURI.slice(imageURI.lastIndexOf("/") + 1);
       const downloadURL = await storage.ref("/" + imageURI).getDownloadURL();
 
-      const localURI = FileSystem.documentDirectory + fileName;
+      // create directory for pixtery files if it doesn't exist
+      const pixteryDir = FileSystem.documentDirectory + "pixtery/";
+      const dirInfo = await FileSystem.getInfoAsync(pixteryDir);
+      if (!dirInfo.exists) {
+        console.log("Directory doesn't exist, creating...");
+        await FileSystem.makeDirectoryAsync(pixteryDir, {
+          intermediates: true,
+        });
+      }
+      const localURI = pixteryDir + fileName + ".jpg"; // adding an extension so the photo can be saved to the device's library later
       // if you already have this image, don't download it
       const fileInfo = await FileSystem.getInfoAsync(localURI);
       if (!fileInfo.exists) {
