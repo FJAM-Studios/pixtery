@@ -116,11 +116,13 @@ export const safelyDeletePuzzleImage = async (
 export const updateImageURIs = async (
   loadedPuzzles: Puzzle[],
   loadedSentPuzzles: Puzzle[]
-): Promise<void> => {
+): Promise<boolean> => {
+  //check if there is already an updateImageURIs key and, if so, skip this update routine
   const alreadyUpdated = await AsyncStorage.getItem("@updateImageURIs");
   if (alreadyUpdated) {
     console.log("Images have already been moved");
-    return;
+    //return false so the Splash component doesn't re-save the puzzles
+    return false;
   }
   console.log("Images not yet updated");
 
@@ -161,6 +163,13 @@ export const updateImageURIs = async (
       //if this image isn't found, remove it from the list
     }
   }
+
+  //mark the function as having been run
   await AsyncStorage.setItem("@updateImageURIs", "@updateImageURIs");
+
+  //for testing
   //await AsyncStorage.removeItem("@updateImageURIs");
+
+  //return true so the Splash component re-saves the puzzles
+  return true;
 };
