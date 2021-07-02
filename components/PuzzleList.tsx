@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { sortPuzzles } from "../puzzleUtils";
 import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
 import { Puzzle, ScreenNavigation, RootState } from "../types";
+import { saveToLibrary, safelyDeletePuzzleImage } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 
@@ -23,6 +24,7 @@ export default function PuzzleList({
     (state: RootState) => state.receivedPuzzles
   );
   const { height } = useSelector((state: RootState) => state.screenHeight);
+  const sentPuzzles = useSelector((state: RootState) => state.sentPuzzles);
   const [modalVisible, setModalVisible] = React.useState(false);
   const [puzzleToDelete, setPuzzleToDelete] = React.useState<Puzzle | null>(
     null
@@ -45,6 +47,8 @@ export default function PuzzleList({
         ...receivedPuzzles.filter((puz) => puz.publicKey !== puzzle.publicKey),
       ];
       await AsyncStorage.setItem("@pixteryPuzzles", JSON.stringify(newPuzzles));
+      //delete local image
+      await safelyDeletePuzzleImage(puzzle.imageURI, sentPuzzles);
       dispatch(setReceivedPuzzles(newPuzzles));
     }
     setPuzzleToDelete(null);
@@ -152,6 +156,14 @@ export default function PuzzleList({
                               : "view-grid"
                           }
                         />
+                        {receivedPuzzle.completed ? (
+                          <IconButton
+                            icon="download-circle"
+                            onPress={() =>
+                              saveToLibrary(receivedPuzzle.imageURI)
+                            }
+                          />
+                        ) : null}
                         <IconButton
                           icon="delete"
                           onPress={() => showDeleteModal(receivedPuzzle)}
@@ -182,3 +194,21 @@ export default function PuzzleList({
     </AdSafeAreaView>
   );
 }
+
+// ) : (
+//   <View
+//     style={{
+//       alignItems: "center",
+//     }}
+//   >
+// <<<<<<< HEAD
+//     <Headline
+//       style={{
+//         marginTop: height * 0.3,
+//       }}
+//     >
+//       You have no puzzles to solve!
+//     </Headline>
+//   </View>
+// )}
+// </>
