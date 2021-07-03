@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   CommonActions,
   NavigationContainerRef,
@@ -114,6 +115,70 @@ export const safelyDeletePuzzleImage = async (
 ): Promise<void> => {
   if (!keeperList.map((puzzle) => puzzle.imageURI).includes(imageURI))
     await FileSystem.deleteAsync(FileSystem.documentDirectory + imageURI);
+};
+
+export const updateImageURIs = async (
+  loadedPuzzles: Puzzle[],
+  loadedSentPuzzles: Puzzle[]
+): Promise<boolean> => {
+  //check if there is already an updateImageURIs key and, if so, skip this update routine
+  const alreadyUpdated = await AsyncStorage.getItem("@updateImageURIs");
+  if (alreadyUpdated) {
+    console.log("Images have already been moved");
+    //return false so the Splash component doesn't re-save the puzzles
+    return false;
+  }
+  console.log("Images not yet updated");
+
+  //go through each recvd and/or sent puzzle
+  const allPuzzles = [...loadedPuzzles, ...loadedSentPuzzles];
+
+  for (let i = 0; i < allPuzzles.length; i++) {
+    //the puzzle and image URI this will update
+    //for example:
+    // file:///data/user/0/host.exp.exponent/.../pixtery/78bc6d3b-f1b9-4d65-9790-eded084efd90
+    const updatingPuzzle = allPuzzles[i];
+    const { imageURI } = updatingPuzzle;
+
+    //get just the filename without the path
+    //for example:
+    //78bc6d3b-f1b9-4d65-9790-eded084efd90
+    const fileName = imageURI.slice(imageURI.lastIndexOf("/") + 1);
+
+    //new extension is .jpg unless it's already got a .jpg extension
+    const newExtension = imageURI.slice(-4) === ".jpg" ? "" : ".jpg";
+
+    //new URI will be just the fileName + extension
+    //ex: 78bc6d3b-f1b9-4d65-9790-eded084efd90.jpg
+    const newURI = fileName + newExtension;
+
+    //try to move the file from its original location to the documentDirectory
+    try {
+      console.log("moving from " + imageURI);
+      console.log("to " + FileSystem.documentDirectory + newURI);
+      await FileSystem.moveAsync({
+        from: imageURI,
+        to: FileSystem.documentDirectory + newURI,
+      });
+
+      //change the imageURI in the puzzle object
+      console.log("setting new puzzle imageURI to " + newURI);
+      updatingPuzzle.imageURI = newURI;
+    } catch (e) {
+      console.log(e);
+      //@todo
+      //if this image isn't found, remove it from the list
+    }
+  }
+
+  //mark the function as having been run
+  await AsyncStorage.setItem("@updateImageURIs", "@updateImageURIs");
+
+  //for testing
+  //await AsyncStorage.removeItem("@updateImageURIs");
+
+  //return true so the Splash component re-saves the puzzles
+  return true;
 };
 
 // check and return permission status
