@@ -10,7 +10,7 @@ import { setProfile } from "../store/reducers/profile";
 import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
 import { setSentPuzzles } from "../store/reducers/sentPuzzles";
 import { ScreenNavigation, SplashRoute, RootState } from "../types";
-import { closeSplashAndNavigate } from "../util";
+import { closeSplashAndNavigate, updateImageURIs } from "../util";
 import Logo from "./Logo";
 import Title from "./Title";
 
@@ -52,6 +52,26 @@ export default function Splash({
         //should probably do something here to make sure all local puzzles also have local images
         //and, if not, try to get them from server, and if they don't exist there, then delete puzzle
         //or otherwise mark it as invalid somehow
+
+        //if there are any loaded puzzles, run the routine to update image URIs
+        if (loadedPuzzles.length || loadedSentPuzzles.length) {
+          const resaveLocalStorage = await updateImageURIs(
+            loadedPuzzles,
+            loadedSentPuzzles
+          );
+          //if it hasn't already been run, then also save the new data to local storage
+          //the loadedPuzzles and sentPuzzles should have the updated image URIs due to object reference in JS
+          if (resaveLocalStorage) {
+            await AsyncStorage.setItem(
+              "@pixteryPuzzles",
+              JSON.stringify(loadedPuzzles)
+            );
+            await AsyncStorage.setItem(
+              "@pixterySentPuzzles",
+              JSON.stringify(loadedSentPuzzles)
+            );
+          }
+        }
         dispatch(setReceivedPuzzles(loadedPuzzles));
         dispatch(setSentPuzzles(loadedSentPuzzles));
       } catch (e) {
