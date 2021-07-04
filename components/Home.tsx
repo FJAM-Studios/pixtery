@@ -202,7 +202,6 @@ export default function Home({
     };
     try {
       await uploadPuzzleSettingsCallable({
-        fileName,
         newPuzzle,
       });
       return newPuzzle;

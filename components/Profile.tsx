@@ -5,6 +5,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import { Headline, Text, TextInput, Button } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 
+import { functions } from "../FirebaseApp";
 import { VERSION_NUMBER } from "../constants";
 import { setProfile } from "../store/reducers/profile";
 import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
@@ -19,6 +20,7 @@ export default function Profile({
 }: {
   navigation: ScreenNavigation;
 }): JSX.Element {
+  const removeUserPuzzle = functions.httpsCallable("removeUserPuzzle");
   const dispatch = useDispatch();
   const theme = useSelector((state: RootState) => state.theme);
   const receivedPuzzles = useSelector(
@@ -110,6 +112,11 @@ export default function Profile({
                 receivedPuzzle.imageURI,
                 sentPuzzles
               );
+              //mark userPuzzle inactive on server
+              removeUserPuzzle({
+                publicKey: receivedPuzzle.publicKey,
+                list: "received",
+              });
             }
             //update app state
             dispatch(setReceivedPuzzles([]));
@@ -133,6 +140,11 @@ export default function Profile({
                 sentPuzzle.imageURI,
                 receivedPuzzles
               );
+              //mark userPuzzle inactive on server
+              removeUserPuzzle({
+                publicKey: sentPuzzle.publicKey,
+                list: "sent",
+              });
             }
             //update app state
             dispatch(setSentPuzzles([]));

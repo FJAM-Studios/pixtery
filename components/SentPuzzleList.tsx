@@ -13,6 +13,7 @@ import Modal from "react-native-modal";
 import { Card, IconButton, Button, Headline } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 
+import { functions } from "../FirebaseApp";
 import { setSentPuzzles } from "../store/reducers/sentPuzzles";
 import { Puzzle, ScreenNavigation, RootState } from "../types";
 import { saveToLibrary, safelyDeletePuzzleImage, shareMessage } from "../util";
@@ -24,6 +25,7 @@ export default function SentPuzzleList({
 }: {
   navigation: ScreenNavigation;
 }): JSX.Element {
+  const removeUserPuzzle = functions.httpsCallable("removeUserPuzzle");
   const dispatch = useDispatch();
   const theme = useSelector((state: RootState) => state.theme);
   const receivedPuzzles = useSelector(
@@ -57,6 +59,11 @@ export default function SentPuzzleList({
       );
       await safelyDeletePuzzleImage(puzzle.imageURI, receivedPuzzles);
       dispatch(setSentPuzzles(newPuzzles));
+      //mark userPuzzle inactive on server
+      removeUserPuzzle({
+        publicKey: puzzle.publicKey,
+        list: "sent",
+      });
     }
     setPuzzleToDelete(null);
     setModalVisible(false);

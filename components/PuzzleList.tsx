@@ -6,6 +6,7 @@ import Modal from "react-native-modal";
 import { Text, Card, IconButton, Button, Headline } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 
+import { functions } from "../FirebaseApp";
 import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
 import { Puzzle, ScreenNavigation, RootState } from "../types";
 import { saveToLibrary, safelyDeletePuzzleImage } from "../util";
@@ -17,6 +18,7 @@ export default function PuzzleList({
 }: {
   navigation: ScreenNavigation;
 }): JSX.Element {
+  const removeUserPuzzle = functions.httpsCallable("removeUserPuzzle");
   const dispatch = useDispatch();
   const theme = useSelector((state: RootState) => state.theme);
   const receivedPuzzles = useSelector(
@@ -41,6 +43,11 @@ export default function PuzzleList({
       await AsyncStorage.setItem("@pixteryPuzzles", JSON.stringify(newPuzzles));
       //delete local image
       await safelyDeletePuzzleImage(puzzle.imageURI, sentPuzzles);
+      //mark userPuzzle inactive on server
+      removeUserPuzzle({
+        publicKey: puzzle.publicKey,
+        list: "received",
+      });
       dispatch(setReceivedPuzzles(newPuzzles));
     }
     setPuzzleToDelete(null);
