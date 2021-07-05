@@ -5,6 +5,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import { Headline, Text, TextInput, Button } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 
+import { signOut } from "../FirebaseApp";
 import { VERSION_NUMBER } from "../constants";
 import { setProfile } from "../store/reducers/profile";
 import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
@@ -87,6 +88,8 @@ export default function Profile({
           onPress={async () => {
             //delete local storage
             await AsyncStorage.removeItem("@pixteryProfile");
+            //sign out of Firebase account
+            await signOut();
             //update app state
             dispatch(setProfile(null));
             //send you to splash
