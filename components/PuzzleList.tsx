@@ -29,12 +29,10 @@ export default function PuzzleList({
   const [puzzleToDelete, setPuzzleToDelete] = React.useState<Puzzle | null>(
     null
   );
-  // the sortBy/sortOrder options are currently unused, but set up for future sort optionality
-  const [sortBy, setSortBy] = React.useState("dateReceived");
-  const [sortOrder, setSortOrder] = React.useState("desc");
-  const [receivedPuzzlesSorted, setReceivedPuzzlesSorted] = React.useState(
-    sortPuzzles("dateReceived", "desc", receivedPuzzles)
-  );
+  // the setSortBy/setSortOrder are currently unused, but set up for future sort optionality
+  const [sortBy, setSortBy] = React.useState<keyof Puzzle>("dateReceived");
+  // "desc" = descending or "asc" = ascending
+  const [sortOrder, setSortOrder] = React.useState<string>("desc");
 
   const showDeleteModal = (puzzle: Puzzle) => {
     setModalVisible(true);
@@ -115,65 +113,67 @@ export default function PuzzleList({
       />
       <ScrollView>
         <>
-          {receivedPuzzlesSorted.length ? (
-            receivedPuzzlesSorted.map((receivedPuzzle, ix) => (
-              <TouchableOpacity
-                onPress={() =>
-                  navigation.navigate("Puzzle", {
-                    publicKey: receivedPuzzle.publicKey,
-                  })
-                }
-                key={ix}
-              >
-                <Card
-                  style={{
-                    margin: 1,
-                    backgroundColor: receivedPuzzle.completed
-                      ? theme.colors.disabled
-                      : theme.colors.surface,
-                  }}
+          {receivedPuzzles.length ? (
+            receivedPuzzles
+              .sort(sortPuzzles(sortBy, sortOrder))
+              .map((receivedPuzzle, ix) => (
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate("Puzzle", {
+                      publicKey: receivedPuzzle.publicKey,
+                    })
+                  }
+                  key={ix}
                 >
-                  <Card.Title
-                    title={
-                      receivedPuzzle.message &&
-                      receivedPuzzle.message.length &&
-                      receivedPuzzle.completed
-                        ? receivedPuzzle.senderName +
-                          " - " +
-                          receivedPuzzle.message
-                        : receivedPuzzle.senderName
-                    }
-                    subtitle={moment(receivedPuzzle.dateReceived).calendar()}
-                    right={() => (
-                      <View
-                        style={{ flexDirection: "row", alignItems: "center" }}
-                      >
-                        <Text>{receivedPuzzle.gridSize}</Text>
-                        <IconButton
-                          icon={
-                            receivedPuzzle.puzzleType === "jigsaw"
-                              ? "puzzle"
-                              : "view-grid"
-                          }
-                        />
-                        {receivedPuzzle.completed ? (
+                  <Card
+                    style={{
+                      margin: 1,
+                      backgroundColor: receivedPuzzle.completed
+                        ? theme.colors.disabled
+                        : theme.colors.surface,
+                    }}
+                  >
+                    <Card.Title
+                      title={
+                        receivedPuzzle.message &&
+                        receivedPuzzle.message.length &&
+                        receivedPuzzle.completed
+                          ? receivedPuzzle.senderName +
+                            " - " +
+                            receivedPuzzle.message
+                          : receivedPuzzle.senderName
+                      }
+                      subtitle={moment(receivedPuzzle.dateReceived).calendar()}
+                      right={() => (
+                        <View
+                          style={{ flexDirection: "row", alignItems: "center" }}
+                        >
+                          <Text>{receivedPuzzle.gridSize}</Text>
                           <IconButton
-                            icon="download-circle"
-                            onPress={() =>
-                              saveToLibrary(receivedPuzzle.imageURI)
+                            icon={
+                              receivedPuzzle.puzzleType === "jigsaw"
+                                ? "puzzle"
+                                : "view-grid"
                             }
                           />
-                        ) : null}
-                        <IconButton
-                          icon="delete"
-                          onPress={() => showDeleteModal(receivedPuzzle)}
-                        />
-                      </View>
-                    )}
-                  />
-                </Card>
-              </TouchableOpacity>
-            ))
+                          {receivedPuzzle.completed ? (
+                            <IconButton
+                              icon="download-circle"
+                              onPress={() =>
+                                saveToLibrary(receivedPuzzle.imageURI)
+                              }
+                            />
+                          ) : null}
+                          <IconButton
+                            icon="delete"
+                            onPress={() => showDeleteModal(receivedPuzzle)}
+                          />
+                        </View>
+                      )}
+                    />
+                  </Card>
+                </TouchableOpacity>
+              ))
           ) : (
             <View
               style={{
