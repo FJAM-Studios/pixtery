@@ -14,7 +14,9 @@ const updateTestPuzzleIDs = async (collectionName: string) => {
   const snap = await db.collection(collectionName).get()
   snap.forEach(async (puzzle: { data: () => any; }) => {
     const puzzleData = await puzzle.data()
-    await db.collection(collectionName).doc(puzzleData.publicKey).set(puzzleData)
+    if (puzzleData.publicKey && puzzleData.publicKey.length === 9) {
+      await db.collection(collectionName).doc(puzzleData.publicKey).set(puzzleData)
+    }
     await db.collection(collectionName).doc(puzzleData.imageURI).delete() 
   })
 }
