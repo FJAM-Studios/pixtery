@@ -41,6 +41,10 @@ const verifySms = (
   return signInResponse;
 };
 
+const signOut = (): Promise<void> => {
+  return firebase.auth().signOut();
+};
+
 export {
   app,
   db,
@@ -49,4 +53,5 @@ export {
   firebaseConfig,
   verifySms,
   functions,
+  signOut,
 };
