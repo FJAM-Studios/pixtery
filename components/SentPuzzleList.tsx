@@ -37,12 +37,10 @@ export default function SentPuzzleList({
   const [puzzleToDelete, setPuzzleToDelete] = React.useState<Puzzle | null>(
     null
   );
-  // the sortBy/sortOrder options are currently unused, but set up for future sort optionality
-  const [sortBy, setSortBy] = React.useState("dateReceived");
-  const [sortOrder, setSortOrder] = React.useState("desc");
-  const [sentPuzzlesSorted, setSentPuzzlesSorted] = React.useState(
-    sortPuzzles("dateReceived", "desc", sentPuzzles)
-  );
+  // the setSortBy/setSortOrder are currently unused, but set up for future sort optionality
+  const [sortBy, setSortBy] = React.useState<keyof Puzzle>("dateReceived");
+  // "desc" = descending or "asc" = ascending
+  const [sortOrder, setSortOrder] = React.useState<string>("desc");
 
   const showDeleteModal = (puzzle: Puzzle) => {
     setModalVisible(true);
@@ -131,60 +129,63 @@ export default function SentPuzzleList({
       />
       <ScrollView>
         <>
-          {sentPuzzlesSorted.length ? (
-            sentPuzzlesSorted.map((sentPuzzle, ix) => (
-              <TouchableOpacity
-                onPress={() =>
-                  navigation.navigate("Puzzle", {
-                    publicKey: sentPuzzle.publicKey,
-                  })
-                }
-                key={ix}
-              >
-                <Card
-                  style={{
-                    margin: 1,
-                    backgroundColor: theme.colors.surface,
-                  }}
+          {sentPuzzles.length ? (
+            sentPuzzles
+              .sort(sortPuzzles(sortBy, sortOrder))
+              .map((sentPuzzle, ix) => (
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate("Puzzle", {
+                      publicKey: sentPuzzle.publicKey,
+                    })
+                  }
+                  key={ix}
                 >
-                  <Card.Title
-                    title={sentPuzzle.message || ""}
-                    subtitle={moment(sentPuzzle.dateReceived).calendar()}
-                    right={() => (
-                      <View
-                        style={{ flexDirection: "row", alignItems: "center" }}
-                      >
-                        <IconButton
-                          icon="download-circle"
-                          onPress={() => saveToLibrary(sentPuzzle.imageURI)}
+                  <Card
+                    style={{
+                      margin: 1,
+                      backgroundColor: theme.colors.surface,
+                    }}
+                  >
+                    <Card.Title
+                      title={sentPuzzle.message || ""}
+                      subtitle={moment(sentPuzzle.dateReceived).calendar()}
+                      right={() => (
+                        <View
+                          style={{ flexDirection: "row", alignItems: "center" }}
+                        >
+                          <IconButton
+                            icon="download-circle"
+                            onPress={() => saveToLibrary(sentPuzzle.imageURI)}
+                          />
+                          <IconButton
+                            icon="delete"
+                            onPress={() => showDeleteModal(sentPuzzle)}
+                          />
+                          <IconButton
+                            icon="send"
+                            onPress={() => sendPuzzle(sentPuzzle.publicKey)}
+                          />
+                        </View>
+                      )}
+                      left={() => (
+                        <ImageBackground
+                          source={{
+                            uri:
+                              FileSystem.documentDirectory +
+                              sentPuzzle.imageURI,
+                          }}
+                          style={{
+                            flex: 1,
+                            justifyContent: "space-around",
+                            padding: 1,
+                          }}
                         />
-                        <IconButton
-                          icon="delete"
-                          onPress={() => showDeleteModal(sentPuzzle)}
-                        />
-                        <IconButton
-                          icon="send"
-                          onPress={() => sendPuzzle(sentPuzzle.publicKey)}
-                        />
-                      </View>
-                    )}
-                    left={() => (
-                      <ImageBackground
-                        source={{
-                          uri:
-                            FileSystem.documentDirectory + sentPuzzle.imageURI,
-                        }}
-                        style={{
-                          flex: 1,
-                          justifyContent: "space-around",
-                          padding: 1,
-                        }}
-                      />
-                    )}
-                  />
-                </Card>
-              </TouchableOpacity>
-            ))
+                      )}
+                    />
+                  </Card>
+                </TouchableOpacity>
+              ))
           ) : (
             <View
               style={{

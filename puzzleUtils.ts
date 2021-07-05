@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { AnyIfEmpty } from "react-redux";
 import { DEGREE_CONVERSION } from "./constants";
 import {
   SvgPiece,
@@ -456,34 +455,29 @@ export const validateBoard = (
   } else return false;
 };
 
-// used insertion sort, which is efficient for almost sorted lists, assuming that for now it's more likely that users will reload a nearly sorted list based on default sort of dateReceived
-// could potentially use a different sorting algo for specific user-selected sorting
-export const sortPuzzles = (
-  sortBy: keyof Puzzle,
-  order: string,
-  puzzleList: Puzzle[]
-): Puzzle[] => {
-  let currPuzzle: Puzzle;
-  let i = 1;
-  while (i < puzzleList.length) {
-    currPuzzle = puzzleList[i];
-    const currValToSortBy = currPuzzle[sortBy];
-    let j = i - 1;
-    if (order === "desc") {
-      // assert here that the val to sort by is non null for now (given based on dateReceived); may need to be updated if we sort on optional fields
-      while (j >= 0 && puzzleList[j][sortBy]! < currValToSortBy!) {
-        puzzleList[j + 1] = puzzleList[j];
-        j--;
-      }
+// wrapper to pass in sortBy / sortOrder parameters; returns the comparator function
+export const sortPuzzles = (sortBy: keyof Puzzle, sortOrder: string) => {
+  return (a: Puzzle, b: Puzzle): number => {
+    let aValue;
+    let bValue;
+    // convert to Date if sorting by date received; this might work as strings in most cases but prob good to parse to dates just in case
+    if (sortBy === "dateReceived") {
+      aValue = new Date(a.dateReceived!);
+      bValue = new Date(b.dateReceived!);
+    } else {
+      // there may be further conditional logic depending on sortBy type
+      aValue = a[sortBy];
+      bValue = b[sortBy];
     }
-    if (order === "asc") {
-      while (j >= 0 && puzzleList[j][sortBy]! > currValToSortBy!) {
-        puzzleList[j + 1] = puzzleList[j];
-        j--;
-      }
+    if (sortOrder === "desc") {
+      if (aValue! > bValue!) return -1;
+      if (aValue! < bValue!) return 1;
     }
-    puzzleList[j + 1] = currPuzzle;
-    i++;
-  }
-  return puzzleList;
+    // if sortOrder is ascending
+    else {
+      if (aValue! > bValue!) return 1;
+      if (aValue! < bValue!) return -1;
+    }
+    return 0;
+  };
 };
