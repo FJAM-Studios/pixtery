@@ -50,11 +50,11 @@ const App = (): JSX.Element => {
         onPress: () => Updates.reloadAsync(),
       },
     ]);
-  }
+  };
   const getUpdate = async () => {
     try {
       const isUpdate = await Updates.checkForUpdateAsync();
-      if (isUpdate) {
+      if (isUpdate.isAvailable) {
         await Updates.fetchUpdateAsync();
         promptRestart();
       }
