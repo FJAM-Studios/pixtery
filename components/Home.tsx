@@ -39,7 +39,7 @@ import {
 } from "../puzzleUtils";
 import { setSentPuzzles } from "../store/reducers/sentPuzzles";
 import { Puzzle, ScreenNavigation, RootState } from "../types";
-import { checkPermission, createBlob, shareMessage } from "../util";
+import { createBlob, shareMessage, goToScreen, checkPermission } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 
@@ -148,6 +148,7 @@ export default function Home({
         if (newPuzzle.publicKey) {
           generateLink(newPuzzle.publicKey);
           addToSent(newPuzzle);
+          goToScreen(navigation, "SentPuzzleList");
         }
       }
     } catch (error) {
@@ -159,7 +160,7 @@ export default function Home({
   };
 
   const addToSent = async (puzzle: Puzzle) => {
-    const allPuzzles = [...sentPuzzles, puzzle];
+    const allPuzzles = [puzzle, ...sentPuzzles];
     await AsyncStorage.setItem(
       "@pixterySentPuzzles",
       JSON.stringify(allPuzzles)

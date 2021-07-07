@@ -6,6 +6,7 @@ import Modal from "react-native-modal";
 import { Text, Card, IconButton, Button, Headline } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 
+import { sortPuzzles } from "../puzzleUtils";
 import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
 import { Puzzle, ScreenNavigation, RootState } from "../types";
 import { saveToLibrary, safelyDeletePuzzleImage } from "../util";
@@ -22,11 +23,16 @@ export default function PuzzleList({
   const receivedPuzzles = useSelector(
     (state: RootState) => state.receivedPuzzles
   );
+  const { height } = useSelector((state: RootState) => state.screenHeight);
   const sentPuzzles = useSelector((state: RootState) => state.sentPuzzles);
   const [modalVisible, setModalVisible] = React.useState(false);
   const [puzzleToDelete, setPuzzleToDelete] = React.useState<Puzzle | null>(
     null
   );
+  // the setSortBy/setSortOrder are currently unused, but set up for future sort optionality
+  const [sortBy, setSortBy] = React.useState<keyof Puzzle>("dateReceived");
+  // "desc" = descending or "asc" = ascending
+  const [sortOrder, setSortOrder] = React.useState<string>("desc");
 
   const showDeleteModal = (puzzle: Puzzle) => {
     setModalVisible(true);
@@ -106,58 +112,84 @@ export default function PuzzleList({
         navigation={navigation}
       />
       <ScrollView>
-        {receivedPuzzles.map((receivedPuzzle, ix) => (
-          <TouchableOpacity
-            onPress={() =>
-              navigation.navigate("Puzzle", {
-                publicKey: receivedPuzzle.publicKey,
-              })
-            }
-            key={ix}
-          >
-            <Card
+        <>
+          {receivedPuzzles.length ? (
+            receivedPuzzles
+              .sort(sortPuzzles(sortBy, sortOrder))
+              .map((receivedPuzzle, ix) => (
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate("Puzzle", {
+                      publicKey: receivedPuzzle.publicKey,
+                    })
+                  }
+                  key={ix}
+                >
+                  <Card
+                    style={{
+                      margin: 1,
+                      backgroundColor: receivedPuzzle.completed
+                        ? theme.colors.disabled
+                        : theme.colors.surface,
+                    }}
+                  >
+                    <Card.Title
+                      title={
+                        receivedPuzzle.message &&
+                        receivedPuzzle.message.length &&
+                        receivedPuzzle.completed
+                          ? receivedPuzzle.senderName +
+                            " - " +
+                            receivedPuzzle.message
+                          : receivedPuzzle.senderName
+                      }
+                      subtitle={moment(receivedPuzzle.dateReceived).calendar()}
+                      right={() => (
+                        <View
+                          style={{ flexDirection: "row", alignItems: "center" }}
+                        >
+                          <Text>{receivedPuzzle.gridSize}</Text>
+                          <IconButton
+                            icon={
+                              receivedPuzzle.puzzleType === "jigsaw"
+                                ? "puzzle"
+                                : "view-grid"
+                            }
+                          />
+                          {receivedPuzzle.completed ? (
+                            <IconButton
+                              icon="download-circle"
+                              onPress={() =>
+                                saveToLibrary(receivedPuzzle.imageURI)
+                              }
+                            />
+                          ) : null}
+                          <IconButton
+                            icon="delete"
+                            onPress={() => showDeleteModal(receivedPuzzle)}
+                          />
+                        </View>
+                      )}
+                    />
+                  </Card>
+                </TouchableOpacity>
+              ))
+          ) : (
+            <View
               style={{
-                margin: 1,
-                backgroundColor: receivedPuzzle.completed
-                  ? theme.colors.disabled
-                  : theme.colors.surface,
+                alignItems: "center",
               }}
             >
-              <Card.Title
-                title={
-                  receivedPuzzle.message &&
-                  receivedPuzzle.message.length &&
-                  receivedPuzzle.completed
-                    ? receivedPuzzle.senderName + " - " + receivedPuzzle.message
-                    : receivedPuzzle.senderName
-                }
-                subtitle={moment(receivedPuzzle.dateReceived).calendar()}
-                right={() => (
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <Text>{receivedPuzzle.gridSize}</Text>
-                    <IconButton
-                      icon={
-                        receivedPuzzle.puzzleType === "jigsaw"
-                          ? "puzzle"
-                          : "view-grid"
-                      }
-                    />
-                    {receivedPuzzle.completed ? (
-                      <IconButton
-                        icon="download-circle"
-                        onPress={() => saveToLibrary(receivedPuzzle.imageURI)}
-                      />
-                    ) : null}
-                    <IconButton
-                      icon="delete"
-                      onPress={() => showDeleteModal(receivedPuzzle)}
-                    />
-                  </View>
-                )}
-              />
-            </Card>
-          </TouchableOpacity>
-        ))}
+              <Headline
+                style={{
+                  marginTop: height * 0.3,
+                }}
+              >
+                You have no puzzles to solve!
+              </Headline>
+            </View>
+          )}
+        </>
       </ScrollView>
     </AdSafeAreaView>
   );
