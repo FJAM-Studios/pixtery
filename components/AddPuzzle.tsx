@@ -6,6 +6,7 @@ import { Headline, ActivityIndicator } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 
 import { storage, functions } from "../FirebaseApp";
+import { sortPuzzles } from "../puzzleUtils";
 import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
 import { Puzzle, AddPuzzleRoute, ScreenNavigation, RootState } from "../types";
 import { goToScreen } from "../util";
@@ -63,7 +64,7 @@ export default function AddPuzzle({
         await FileSystem.downloadAsync(downloadURL, localURI);
       }
       // save puzzle data to localStorage
-      const allPuzzles = [...receivedPuzzles, newPuzzle];
+      const allPuzzles = [newPuzzle, ...receivedPuzzles];
       await AsyncStorage.setItem("@pixteryPuzzles", JSON.stringify(allPuzzles));
       dispatch(setReceivedPuzzles(allPuzzles));
     } catch (e) {

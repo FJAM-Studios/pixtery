@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { DEGREE_CONVERSION } from "./constants";
 import {
   SvgPiece,
@@ -6,6 +7,7 @@ import {
   Viewbox,
   PieceConfiguration,
   BoardSpace,
+  Puzzle,
 } from "./types";
 
 export const shuffle = (array: number[], disabledShuffle = true): number[] => {
@@ -451,4 +453,31 @@ export const validateBoard = (
     }
     return true;
   } else return false;
+};
+
+// wrapper to pass in sortBy / sortOrder parameters; returns the comparator function
+export const sortPuzzles = (sortBy: keyof Puzzle, sortOrder: string) => {
+  return (a: Puzzle, b: Puzzle): number => {
+    let aValue;
+    let bValue;
+    // convert to Date if sorting by date received; this might work as strings in most cases but prob good to parse to dates just in case
+    if (sortBy === "dateReceived") {
+      aValue = new Date(a.dateReceived!);
+      bValue = new Date(b.dateReceived!);
+    } else {
+      // there may be further conditional logic depending on sortBy type
+      aValue = a[sortBy];
+      bValue = b[sortBy];
+    }
+    if (sortOrder === "desc") {
+      if (aValue! > bValue!) return -1;
+      if (aValue! < bValue!) return 1;
+    }
+    // if sortOrder is ascending
+    else {
+      if (aValue! > bValue!) return 1;
+      if (aValue! < bValue!) return -1;
+    }
+    return 0;
+  };
 };
