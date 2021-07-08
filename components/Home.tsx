@@ -202,10 +202,7 @@ export default function Home({
       dateReceived: new Date().toISOString(),
     };
     try {
-      await uploadPuzzleSettingsCallable({
-        fileName,
-        newPuzzle,
-      });
+      await uploadPuzzleSettingsCallable({ newPuzzle });
       return newPuzzle;
     } catch (error) {
       console.error(error);
