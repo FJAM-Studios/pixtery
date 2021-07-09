@@ -35,7 +35,7 @@ const PUBLIC_KEY_LENGTH = 9;
 
 const MIN_BOTTOM_CLEARANCE = 0.7;
 
-const VERSION_NUMBER = "1.0.5";
+const VERSION_NUMBER = "1.1.0";
 
 const ARGUABLY_CLEVER_PHRASES = [
   "Please wait!",
