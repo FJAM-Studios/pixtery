@@ -5,11 +5,13 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import { Headline, Text, TextInput, Button } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 
+import { signOut } from "../FirebaseApp";
 import { VERSION_NUMBER } from "../constants";
 import { setProfile } from "../store/reducers/profile";
 import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
 import { setSentPuzzles } from "../store/reducers/sentPuzzles";
 import { ScreenNavigation, RootState } from "../types";
+import { safelyDeletePuzzleImage } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 
@@ -86,6 +88,8 @@ export default function Profile({
           onPress={async () => {
             //delete local storage
             await AsyncStorage.removeItem("@pixteryProfile");
+            //sign out of Firebase account
+            await signOut();
             //update app state
             dispatch(setProfile(null));
             //send you to splash
@@ -102,6 +106,14 @@ export default function Profile({
           onPress={async () => {
             //delete local storage
             await AsyncStorage.removeItem("@pixteryPuzzles");
+            //delete local images
+            for (const receivedPuzzle of receivedPuzzles) {
+              //only delete a recvd puzzle image if the image isn't also in sent list
+              await safelyDeletePuzzleImage(
+                receivedPuzzle.imageURI,
+                sentPuzzles
+              );
+            }
             //update app state
             dispatch(setReceivedPuzzles([]));
             //send you to splash
@@ -117,6 +129,14 @@ export default function Profile({
           onPress={async () => {
             //delete local storage
             await AsyncStorage.removeItem("@pixterySentPuzzles");
+            //delete local images
+            for (const sentPuzzle of sentPuzzles) {
+              //only delete a sent puzzle image if the image isn't also in recvd list
+              await safelyDeletePuzzleImage(
+                sentPuzzle.imageURI,
+                receivedPuzzles
+              );
+            }
             //update app state
             dispatch(setSentPuzzles([]));
             //send you to splash

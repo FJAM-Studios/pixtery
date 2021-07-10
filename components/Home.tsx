@@ -1,6 +1,7 @@
 import "firebase/functions";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AdMobInterstitial } from "expo-ads-admob";
+import * as FileSystem from "expo-file-system";
 import * as ImageManipulator from "expo-image-manipulator";
 import * as ImagePicker from "expo-image-picker";
 import { ImageInfo } from "expo-image-picker/build/ImagePicker.types";
@@ -30,6 +31,7 @@ import {
   COMPRESSION,
   INTERSTITIAL_ID,
   DISPLAY_PAINFUL_ADS,
+  ARGUABLY_CLEVER_PHRASES,
 } from "../constants";
 import {
   generateJigsawPiecePaths,
@@ -37,7 +39,7 @@ import {
 } from "../puzzleUtils";
 import { setSentPuzzles } from "../store/reducers/sentPuzzles";
 import { Puzzle, ScreenNavigation, RootState } from "../types";
-import { createBlob, shareMessage } from "../util";
+import { createBlob, shareMessage, goToScreen, checkPermission } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 
@@ -73,25 +75,28 @@ export default function Home({
   const [textFocus, setTextFocus] = React.useState(false);
 
   const selectImage = async (camera: boolean) => {
-    const result = camera
-      ? await ImagePicker.launchCameraAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.Images,
-          allowsEditing: true,
-          aspect: [4, 4],
-          quality: 1,
-        })
-      : await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.Images,
-          allowsEditing: true,
-          aspect: [4, 4],
-          quality: 1,
-        });
+    const permission = await checkPermission(camera);
+    if (permission === "granted") {
+      const result = camera
+        ? await ImagePicker.launchCameraAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [4, 4],
+            quality: 1,
+          })
+        : await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [4, 4],
+            quality: 1,
+          });
 
-    if (!result.cancelled) {
-      // if the resulting image is not a square because user did not zoom to fill image select box
-      if (result.width !== result.height)
-        result.uri = await cropToSquare(result);
-      setImageURI(result.uri);
+      if (!result.cancelled) {
+        // if the resulting image is not a square because user did not zoom to fill image select box
+        if (result.width !== result.height)
+          result.uri = await cropToSquare(result);
+        setImageURI(result.uri);
+      }
     }
   };
 
@@ -122,20 +127,28 @@ export default function Home({
   };
 
   const submitToServer = async (): Promise<void> => {
-    setModalVisible(true);
-    await displayPainfulAd();
-    const fileName: string = uuid.v4();
+    if (DISPLAY_PAINFUL_ADS) {
+      AdMobInterstitial.removeAllListeners();
+      AdMobInterstitial.requestAdAsync();
+    }
+    const fileName: string = uuid.v4() + ".jpg";
     try {
       const localURI = await uploadImage(fileName);
       const newPuzzle = await uploadPuzzleSettings(fileName);
       if (newPuzzle) {
-        newPuzzle.imageURI = localURI;
+        //move to document directory
+        const permanentURI = FileSystem.documentDirectory + fileName;
+        await FileSystem.moveAsync({
+          from: localURI,
+          to: permanentURI,
+        });
       }
       setModalVisible(false);
       if (newPuzzle) {
         if (newPuzzle.publicKey) {
           generateLink(newPuzzle.publicKey);
           addToSent(newPuzzle);
+          goToScreen(navigation, "SentPuzzleList");
         }
       }
     } catch (error) {
@@ -147,7 +160,7 @@ export default function Home({
   };
 
   const addToSent = async (puzzle: Puzzle) => {
-    const allPuzzles = [...sentPuzzles, puzzle];
+    const allPuzzles = [puzzle, ...sentPuzzles];
     await AsyncStorage.setItem(
       "@pixterySentPuzzles",
       JSON.stringify(allPuzzles)
@@ -189,10 +202,7 @@ export default function Home({
       dateReceived: new Date().toISOString(),
     };
     try {
-      await uploadPuzzleSettingsCallable({
-        fileName,
-        newPuzzle,
-      });
+      await uploadPuzzleSettingsCallable({ newPuzzle });
       return newPuzzle;
     } catch (error) {
       console.error(error);
@@ -210,12 +220,23 @@ export default function Home({
 
   const displayPainfulAd = async () => {
     if (DISPLAY_PAINFUL_ADS) {
+      //I tried adding the event listeners in the useEffect but that caused the filename passed to the image manipulator to be blank so instead they're created here and then cleaned up in the submitToServer so it doesn't trigger repeatedly when making more than one puzzle
+      AdMobInterstitial.addEventListener("interstitialDidClose", () => {
+        submitToServer();
+      });
+      AdMobInterstitial.addEventListener("interstitialDidFailToLoad", () => {
+        submitToServer();
+      });
       try {
-        await AdMobInterstitial.requestAdAsync();
         await AdMobInterstitial.showAdAsync();
+        setModalVisible(true);
       } catch (error) {
         console.log(error);
+        submitToServer();
       }
+    } else {
+      setModalVisible(true);
+      submitToServer();
     }
   };
 
@@ -230,23 +251,6 @@ export default function Home({
       );
   }, [gridSize, puzzleType, boardSize]);
 
-  React.useEffect(() => {
-    (async () => {
-      if (Platform.OS !== "web") {
-        let response = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        const libraryPermission = response.status;
-        if (libraryPermission !== "granted") {
-          alert("Sorry, we need camera roll permissions to make this work!");
-        } else {
-          response = await ImagePicker.requestCameraPermissionsAsync();
-          const cameraPermission = response.status;
-          if (cameraPermission !== "granted") {
-            alert("Sorry, we need camera permissions to make this work!");
-          }
-        }
-      }
-    })();
-  }, []);
   return (
     <AdSafeAreaView
       style={{
@@ -264,9 +268,14 @@ export default function Home({
           dismissable={false}
           contentContainerStyle={{ alignItems: "center" }}
         >
-          {gridSize % 2 ? <Text>Yeah you&apos;re working.</Text> : null}
           <Headline>Building a Pixtery!</Headline>
-          {gridSize % 2 ? null : <Text>And choosing so carefully</Text>}
+          <Text>
+            {
+              ARGUABLY_CLEVER_PHRASES[
+                Math.floor(ARGUABLY_CLEVER_PHRASES.length * Math.random())
+              ]
+            }
+          </Text>
           <ActivityIndicator
             animating
             color={theme.colors.text}
@@ -371,7 +380,6 @@ export default function Home({
               onPress={() => {
                 setPuzzleType("jigsaw");
               }}
-              disabled={!imageURI.length}
               animated={false}
             />
           </Surface>
@@ -395,7 +403,6 @@ export default function Home({
               onPress={() => {
                 setPuzzleType("squares");
               }}
-              disabled={!imageURI.length}
               animated={false}
             />
           </Surface>
@@ -412,7 +419,6 @@ export default function Home({
           >
             <Button
               mode="text"
-              disabled={!imageURI.length}
               onPress={() => setGridSize(2)}
               color="white"
               compact
@@ -432,7 +438,6 @@ export default function Home({
           >
             <Button
               mode="text"
-              disabled={!imageURI.length}
               onPress={() => setGridSize(3)}
               color="white"
               compact
@@ -452,7 +457,6 @@ export default function Home({
           >
             <Button
               mode="text"
-              disabled={!imageURI.length}
               onPress={() => setGridSize(4)}
               color="white"
               compact
@@ -465,7 +469,6 @@ export default function Home({
           placeholder="Message (optional, shows when solved)"
           multiline
           maxLength={messageLimit}
-          disabled={!imageURI.length}
           mode="outlined"
           value={message}
           onChangeText={(message) => setMessage(message)}
@@ -484,7 +487,7 @@ export default function Home({
         <Button
           icon="send"
           mode="contained"
-          onPress={submitToServer}
+          onPress={displayPainfulAd}
           style={{ margin: height * 0.01 }}
           disabled={imageURI.length === 0}
           onLayout={(ev) => setButtonHeight(ev.nativeEvent.layout.height)}

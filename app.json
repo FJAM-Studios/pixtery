@@ -6,7 +6,7 @@
     "slug": "pixtery",
     "privacy": "unlisted",
     "sdkVersion": "41.0.0",
-    "version": "1.0.5",
+    "version": "1.1.0",
     "platforms": ["android", "ios"],
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
@@ -28,7 +28,7 @@
     "assetBundlePatterns": ["assets/*"],
     "ios": {
       "bundleIdentifier": "com.fjamstudios.pixtery",
-      "buildNumber": "1.0.5",
+      "buildNumber": "1.1.0",
       "supportsTablet": true,
       "config": {
         "googleMobileAdsAppId": "ca-app-pub-5028593996211038~8814734724"
@@ -42,7 +42,7 @@
     },
     "android": {
       "package": "com.fjamstudios.pixtery",
-      "versionCode": 3,
+      "versionCode": 4,
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#C490D1"
