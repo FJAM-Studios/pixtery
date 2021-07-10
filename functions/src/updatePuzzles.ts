@@ -8,15 +8,15 @@ admin.initializeApp({
 const db = admin.firestore();
 
 
-const updateTestPuzzleIDs = async (collectionName: string) => {
-  console.log(`updating records in ${collectionName} collection...`)
-  const snap = await db.collection(collectionName).get()
+const copyPuzzles = async (sourceCollectionName: string, targetCollectionName: string) => {
+  console.log(`copying and renaming records in ${sourceCollectionName} collection...`)
+  const snap = await db.collection(sourceCollectionName).get()
   snap.forEach(async (puzzle: { data: () => any; }) => {
     const puzzleData = await puzzle.data()
     if (puzzleData.publicKey && puzzleData.publicKey.length === 9) {
-      await db.collection(collectionName).doc(puzzleData.publicKey).set(puzzleData)
+      await db.collection(targetCollectionName).doc(puzzleData.publicKey).set(puzzleData)
     }
-    await db.collection(collectionName).doc(puzzleData.imageURI).delete() 
+    if(sourceCollectionName == targetCollectionName) await db.collection(sourceCollectionName).doc(puzzleData.imageURI).delete() 
   })
 }
 
@@ -32,6 +32,6 @@ const generateTestData = async () => {
 }
 
 if (process.argv[2] === "generateTestData") generateTestData()
-else if (process.argv[2] === "updateTestData") updateTestPuzzleIDs("testUpdatePuzzles")
-else if (process.argv[2] === "updateRealDataForSure") updateTestPuzzleIDs("puzzles")
+else if (process.argv[2] === "updateTestData") copyPuzzles("testUpdatePuzzles", "testUpdatePuzzles")
+else if (process.argv[2] === "copyAllPixteries") copyPuzzles("puzzles", "pixteries")
 else console.log("no valid arguments provided")
