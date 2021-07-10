@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { DEGREE_CONVERSION } from "./constants";
 import {
   SvgPiece,
@@ -6,6 +7,7 @@ import {
   Viewbox,
   PieceConfiguration,
   BoardSpace,
+  Puzzle,
 } from "./types";
 
 export const shuffle = (array: number[], disabledShuffle = true): number[] => {
@@ -341,26 +343,15 @@ export const getInitialDimensions = (
       square.x === 0 || square.x === gridSize - 1
         ? squareSize * 1.25
         : squareSize * 1.5;
-    const scaleJigsawToSandbox =
-      Math.max(0, maxSandboxY - squareSize * 0.25 - minSandboxY) / minSandboxY;
     initialPlacement.x = Math.max(
       0,
       (shuffledIndex % gridSize) * squareSize - squareSize * 0.25
     );
-    const sandboxCenterY = (minSandboxY + maxSandboxY + squareSize) / 2;
-    // anchors on horiontal center of sandbox, and extrapolates Y by subtracting 1/2 of piece height
-    initialPlacement.y = Math.max(
-      sandboxCenterY +
-        Math.max(
-          0,
-          Math.floor(shuffledIndex / gridSize) * squareSize - squareSize * 0.25
-        ) *
-          scaleJigsawToSandbox -
-        randomFactor -
-        pieceDimensions.height * 0.5,
-      // limit upper bound of sandbox to half of the jigsaw "tab"
-      boardSize - (squareSize * 0.25) / 2
-    );
+
+    // calc piece's vertical center off of the square puzzle Y (initialPlacement.y)
+    const pieceVerticalCenter = initialPlacement.y + squareSize / 2;
+    // update Y initial placement for jigsaw as the piece's vertical center minus half of puzzle piece height
+    initialPlacement.y = pieceVerticalCenter - pieceDimensions.height / 2;
 
     viewBox.originX = Math.max(0, square.x * squareSize - squareSize * 0.25);
     viewBox.originY = Math.max(0, square.y * squareSize - squareSize * 0.25);
@@ -462,4 +453,31 @@ export const validateBoard = (
     }
     return true;
   } else return false;
+};
+
+// wrapper to pass in sortBy / sortOrder parameters; returns the comparator function
+export const sortPuzzles = (sortBy: keyof Puzzle, sortOrder: string) => {
+  return (a: Puzzle, b: Puzzle): number => {
+    let aValue;
+    let bValue;
+    // convert to Date if sorting by date received; this might work as strings in most cases but prob good to parse to dates just in case
+    if (sortBy === "dateReceived") {
+      aValue = new Date(a.dateReceived!);
+      bValue = new Date(b.dateReceived!);
+    } else {
+      // there may be further conditional logic depending on sortBy type
+      aValue = a[sortBy];
+      bValue = b[sortBy];
+    }
+    if (sortOrder === "desc") {
+      if (aValue! > bValue!) return -1;
+      if (aValue! < bValue!) return 1;
+    }
+    // if sortOrder is ascending
+    else {
+      if (aValue! > bValue!) return 1;
+      if (aValue! < bValue!) return -1;
+    }
+    return 0;
+  };
 };

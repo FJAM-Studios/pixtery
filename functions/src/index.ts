@@ -1,5 +1,3 @@
-/* eslint-disable max-len */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as functions from "firebase-functions";
 const admin = require("firebase-admin");
 import adminKey from "./serviceAccount";
@@ -23,8 +21,8 @@ interface Puzzle {
 }
 
 exports.uploadPuzzleSettings = functions.https.onCall(
-    async (data: { fileName: string; newPuzzle: Puzzle }, context) => {
-      const {fileName, newPuzzle} = data;
+    async (data: { newPuzzle: Puzzle }, context) => {
+      const { newPuzzle} = data;
       console.log("uploading puzzle settings");
       try {
       // throw error if user is not authenticated
@@ -34,8 +32,21 @@ exports.uploadPuzzleSettings = functions.https.onCall(
               "user not authenticated"
           );
         }
-        await db.collection("puzzles").doc(fileName).set(newPuzzle);
-        return {result: `successfully uploaded ${fileName}`};
+
+        // changed new doc ID to publicKey for better efficiency querying puzzles.
+        // See comment in queryPuzzle function below for more information
+
+        await db.collection("pixteries").doc(newPuzzle.publicKey).set(newPuzzle);
+
+        //add this puzzle to the user's sent collection
+        db.collection("userPixteries")
+          .doc(context.auth.uid)
+          .collection("sent")
+          .doc(newPuzzle.publicKey)
+          // adding the full puzzle to make it faster to retrieve later
+          .set({...newPuzzle, active: true});
+
+        return {result: `successfully uploaded ${newPuzzle.publicKey}`};
       } catch (error) {
         throw new functions.https.HttpsError("unknown", error.message, error);
       }
@@ -44,37 +55,65 @@ exports.uploadPuzzleSettings = functions.https.onCall(
 
 // return type set as an generic object bc a JSON is returned (Puzzle type is nested in that)
 exports.queryPuzzle = functions.https.onCall(
-    async (data): Promise<Record<string, any> | void> => {
+    async (data, context): Promise<Record<string, any> | void> => {
       try {
         const {publicKey} = data;
-        const snapshot = await db
-            .collection("puzzles")
-            .where("publicKey", "==", publicKey)
-            .get();
-        if (snapshot.empty) {
+        
+        // We should use the publicKey as the document id instead of the (image) fileName.
+        // This will let us retrieve the document directly by ID, rather than query the
+        // entire collection every time, filtering for the publicKey.
+        
+        const puzzle = await db.collection("pixteries").doc(publicKey).get()
+
+        if (puzzle.exists) {
+          const puzzleData = puzzle.data();
+          puzzleData.completed = false;
+
+          // add this puzzle to the user's received collection if they're authenticated
+          // i.e. solving in the app rather than the webpage
+          if (context.auth) {
+            db.collection("userPixteries")
+              .doc(context.auth.uid)
+              .collection("received")
+              .doc(publicKey)
+              .set({...puzzleData, active: true});
+          }
+
+          return puzzleData;
+        } else {
           console.log("no puzzle found!");
           throw new functions.https.HttpsError("not-found", "no puzzle found!");
-        } else {
-        // does this do anything? puzzleData is overwritten immediately below
-          let puzzleData: Record<string, any> = {
-            puzzleType: "",
-            gridSize: 0,
-            senderName: "",
-            senderPhone: "string",
-            imageURI: "",
-            message: null,
-            dateReceived: "",
-            completed: false,
-          };
-          // NOTE: there SHOULD only be one puzzle but it's in an object that has to iterated through to access the data
-          snapshot.forEach((puzzle: any) => {
-            puzzleData = puzzle.data();
-            puzzleData.completed = false;
-          });
-          return puzzleData;
         }
       } catch (error) {
         throw new functions.https.HttpsError("unknown", error.message, error);
       }
     }
+);
+
+// this function can be used to mark a user's sent/recvd puzzle as inactive in their list
+// it's not currently called anywhere in the app, but we can implement front end later
+exports.removeUserPuzzle = functions.https.onCall(
+  async (data: { publicKey: string, list: string }, context) => {
+    const {publicKey, list} = data;
+    console.log("deactivating user puzzle");
+    try {
+    // throw error if user is not authenticated
+      if (!context.auth) {
+        throw new functions.https.HttpsError(
+            "permission-denied",
+            "user not authenticated"
+        );
+      }
+
+      //mark userPuzzle as removed from user's list
+      db.collection("userPixteries")
+        .doc(context.auth.uid)
+        .collection(list)
+        .doc(publicKey)
+        .set({active: false}, {merge: true});
+      
+    } catch (error) {
+      throw new functions.https.HttpsError("unknown", error.message, error);
+    }
+  }
 );
