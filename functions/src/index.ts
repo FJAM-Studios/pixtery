@@ -36,10 +36,10 @@ exports.uploadPuzzleSettings = functions.https.onCall(
         // changed new doc ID to publicKey for better efficiency querying puzzles.
         // See comment in queryPuzzle function below for more information
 
-        await db.collection("puzzles").doc(newPuzzle.publicKey).set(newPuzzle);
+        await db.collection("pixteries").doc(newPuzzle.publicKey).set(newPuzzle);
 
         //add this puzzle to the user's sent collection
-        db.collection("userPuzzles")
+        db.collection("userPixteries")
           .doc(context.auth.uid)
           .collection("sent")
           .doc(newPuzzle.publicKey)
@@ -61,15 +61,9 @@ exports.queryPuzzle = functions.https.onCall(
         
         // We should use the publicKey as the document id instead of the (image) fileName.
         // This will let us retrieve the document directly by ID, rather than query the
-        // entire collection every time, filtering for the publicKey. 
-
-        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        // This WILL break all existing puzzles, so we should also run a routine once 
-        // to copy all existing puzzles in the database to new documents with the
-        // publicKey as ID and then delete the old document.
-        // see "updatePuzzles.ts" for such a function.
+        // entire collection every time, filtering for the publicKey.
         
-        const puzzle = await db.collection("puzzles").doc(publicKey).get()
+        const puzzle = await db.collection("pixteries").doc(publicKey).get()
 
         if (puzzle.exists) {
           const puzzleData = puzzle.data();
@@ -78,7 +72,7 @@ exports.queryPuzzle = functions.https.onCall(
           // add this puzzle to the user's received collection if they're authenticated
           // i.e. solving in the app rather than the webpage
           if (context.auth) {
-            db.collection("userPuzzles")
+            db.collection("userPixteries")
               .doc(context.auth.uid)
               .collection("received")
               .doc(publicKey)
@@ -112,7 +106,7 @@ exports.removeUserPuzzle = functions.https.onCall(
       }
 
       //mark userPuzzle as removed from user's list
-      db.collection("userPuzzles")
+      db.collection("userPixteries")
         .doc(context.auth.uid)
         .collection(list)
         .doc(publicKey)
