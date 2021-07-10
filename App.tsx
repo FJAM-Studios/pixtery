@@ -6,8 +6,9 @@ import { createStackNavigator } from "@react-navigation/stack";
 import * as Linking from "expo-linking";
 import * as SplashScreen from "expo-splash-screen";
 import { requestTrackingPermissionsAsync } from "expo-tracking-transparency";
+import * as Updates from "expo-updates";
 import React, { useRef, useEffect } from "react";
-import { View, LogBox, Dimensions } from "react-native";
+import { Alert, AppState, View, LogBox, Dimensions } from "react-native";
 import { Provider as PaperProvider } from "react-native-paper";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
@@ -37,7 +38,46 @@ const App = (): JSX.Element => {
   const dispatch = useDispatch();
   const navigationRef = useRef<NavigationContainerRef | null>(null);
   const theme = useSelector((state: RootState) => state.theme);
+
+  const promptRestart = () => {
+    Alert.alert("A new update is ready. Please restart the app.", "", [
+      {
+        text: "Close",
+        style: "cancel",
+      },
+      {
+        text: "Restart",
+        onPress: () => Updates.reloadAsync(),
+      },
+    ]);
+  };
+  const getUpdate = async () => {
+    try {
+      const isUpdate = await Updates.checkForUpdateAsync();
+      if (isUpdate.isAvailable) {
+        await Updates.fetchUpdateAsync();
+        promptRestart();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
+    // when update is downloaded, request reload
+    Updates.addListener((event) => {
+      if (event.type === Updates.UpdateEventType.UPDATE_AVAILABLE) {
+        promptRestart();
+      }
+    });
+
+    //check for updates when app is foregrounded
+    AppState.addEventListener("change", () => {
+      if (AppState.currentState === "active") {
+        getUpdate();
+      }
+    });
+
     async function requestTrackingPermissions() {
       try {
         await requestTrackingPermissionsAsync();

@@ -74,7 +74,8 @@
     "redux-thunk": "^2.3.0",
     "shortid": "^2.2.16",
     "tslib": "^2.1.0",
-    "uuid": "^3.3.2"
+    "uuid": "^3.3.2",
+    "expo-updates": "~0.5.4"
   },
   "devDependencies": {
     "@babel/core": "~7.9.0",
