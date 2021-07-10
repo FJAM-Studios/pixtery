@@ -87,12 +87,15 @@ export default function Splash({
           ? route.params.url
           : await getInitialUrl();
       //if you are logged in, load local puzzles, then either navigate to AddPuzzle or Home if there is no url
-      if (profile && url) {
+      if (profile) {
         await loadPuzzles();
-        const { path } = Linking.parse(url);
-        const publicKey = path?.substring(path.lastIndexOf("/") + 1);
-        if (publicKey && publicKey.length === PUBLIC_KEY_LENGTH) {
-          closeSplashAndNavigate(navigation, "AddPuzzle", { publicKey });
+        if (url) {
+          const { path } = Linking.parse(url);
+          const publicKey = path?.substring(path.lastIndexOf("/") + 1);
+          if (publicKey && publicKey.length === PUBLIC_KEY_LENGTH) {
+            closeSplashAndNavigate(navigation, "AddPuzzle", { publicKey });
+          } else closeSplashAndNavigate(navigation, "Home");
+          // if there's no url bc the app was reloaded by Android OTA update, navigate to Home
         } else closeSplashAndNavigate(navigation, "Home");
       } else {
         //otherwise, load profile from local storage if it exists
