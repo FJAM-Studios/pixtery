@@ -121,6 +121,7 @@ export default function PuzzleList({
                   onPress={() =>
                     navigation.navigate("Puzzle", {
                       publicKey: receivedPuzzle.publicKey,
+                      sourceList: "received",
                     })
                   }
                   key={ix}
@@ -148,6 +149,17 @@ export default function PuzzleList({
                         <View
                           style={{ flexDirection: "row", alignItems: "center" }}
                         >
+                          {/* This IconButton below is just for testing, so that you can delete the image but not the puzzle*/}
+                          <IconButton
+                            icon="skull"
+                            onPress={() =>
+                              safelyDeletePuzzleImage(
+                                receivedPuzzle.imageURI,
+                                []
+                              )
+                            }
+                          />
+                          {/* Remove component above*/}
                           <Text>{receivedPuzzle.gridSize}</Text>
                           <IconButton
                             icon={
