@@ -137,6 +137,7 @@ export default function SentPuzzleList({
                   onPress={() =>
                     navigation.navigate("Puzzle", {
                       publicKey: sentPuzzle.publicKey,
+                      sourceList: "sent",
                     })
                   }
                   key={ix}
@@ -154,6 +155,14 @@ export default function SentPuzzleList({
                         <View
                           style={{ flexDirection: "row", alignItems: "center" }}
                         >
+                          {/* This IconButton below is just for testing, so that you can delete the image but not the puzzle*/}
+                          <IconButton
+                            icon="skull"
+                            onPress={() =>
+                              safelyDeletePuzzleImage(sentPuzzle.imageURI, [])
+                            }
+                          />
+                          {/* Remove component above*/}
                           <IconButton
                             icon="download-circle"
                             onPress={() => saveToLibrary(sentPuzzle.imageURI)}
