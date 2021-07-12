@@ -251,9 +251,7 @@ export default function PuzzleComponent({
           setPieces(_pieces);
           setReady(true);
         } catch (e) {
-          // console.log(e);
-          // alert("Could not load puzzle!");
-          // navigation.navigate("Home");
+          console.log(e);
           setModalVisible(true);
         }
       };
@@ -411,8 +409,6 @@ export default function PuzzleComponent({
                 icon="reload"
                 mode="contained"
                 onPress={async () => {
-                  //delete puzzle from sent or received list
-                  await removeMissingPuzzle(publicKey, sourceList);
                   setModalVisible(false);
                   navigation.navigate("AddPuzzle", { publicKey, sourceList });
                 }}
