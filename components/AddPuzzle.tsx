@@ -1,8 +1,10 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as FileSystem from "expo-file-system";
 import * as React from "react";
 import { View } from "react-native";
 import { Headline, ActivityIndicator } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
+import { AnyAction } from "redux";
 
 import { functions } from "../FirebaseApp";
 import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
@@ -19,13 +21,26 @@ export default function AddPuzzle({
   navigation: ScreenNavigation;
   route: AddPuzzleRoute;
 }): JSX.Element {
-  const { sourceList } = route.params;
   const dispatch = useDispatch();
   const theme = useSelector((state: RootState) => state.theme);
   const receivedPuzzles = useSelector(
     (state: RootState) => state.receivedPuzzles
   );
   const sentPuzzles = useSelector((state: RootState) => state.sentPuzzles);
+  const { sourceList } = route.params;
+  let puzzleList: Puzzle[];
+  let storageItem: string;
+  let setPuzzles: (puzzleList: Puzzle[]) => AnyAction;
+  if (sourceList === "sent") {
+    puzzleList = sentPuzzles;
+    storageItem = "@pixterySentPuzzles";
+    setPuzzles = setSentPuzzles;
+  } else {
+    puzzleList = receivedPuzzles;
+    storageItem = "@pixteryPuzzles";
+    setPuzzles = setReceivedPuzzles;
+  }
+
   const fetchPuzzle = async (publicKey: string): Promise<Puzzle | void> => {
     const queryPuzzleCallable = functions.httpsCallable("queryPuzzle");
     let puzzleData;
@@ -38,34 +53,29 @@ export default function AddPuzzle({
     }
   };
 
-  const searchForLocalMatch = (publicKey: string): string | null => {
-    const matchingPuzzle = receivedPuzzles.filter(
+  const searchForLocalMatch = async (publicKey: string): Promise<boolean> => {
+    const matchingPuzzle = puzzleList.filter(
       (puz) => puz.publicKey === publicKey
     );
-    return matchingPuzzle.length ? publicKey : null;
+    //also check if we have the image already
+    if (matchingPuzzle.length) {
+      const { imageURI } = matchingPuzzle[0];
+      const fileName = imageURI.slice(imageURI.lastIndexOf("/") + 1);
+      const extension = imageURI.slice(-4) === ".jpg" ? "" : ".jpg";
+      const localURI = FileSystem.documentDirectory + fileName + extension;
+      const fileInfo = await FileSystem.getInfoAsync(localURI);
+      return fileInfo.exists;
+    } else return false;
   };
 
   const savePuzzle = async (newPuzzle: Puzzle) => {
     try {
       await downloadImage(newPuzzle);
-      let puzzleList;
-      let storageItem;
-      let setPuzzles;
-      if (sourceList === "sent") {
-        puzzleList = sentPuzzles;
-        storageItem = "@pixterySentPuzzles";
-        setPuzzles = setSentPuzzles;
-      } else {
-        puzzleList = receivedPuzzles;
-        storageItem = "@pixteryPuzzles";
-        setPuzzles = setReceivedPuzzles;
-      }
       // save puzzle data to localStorage
       const allPuzzles = [
         newPuzzle,
         ...puzzleList.filter((p) => p.publicKey !== newPuzzle.publicKey),
       ];
-      console.log(storageItem, puzzleList);
       await AsyncStorage.setItem(storageItem, JSON.stringify(allPuzzles));
       dispatch(setPuzzles(allPuzzles));
     } catch (e) {
@@ -80,7 +90,7 @@ export default function AddPuzzle({
       // all logic determining which screen to navigate to happens here in order to place navigation at the end of every branch. Otherwise the function will continue running after navigating away, which can cause the user to get redirected if there is an uncaught navigation further down the line
       try {
         const { publicKey } = route.params; //no need to check whether publicKey exists, that is done by Splash before navigating here
-        const match = searchForLocalMatch(publicKey);
+        const match = await searchForLocalMatch(publicKey);
         if (match) goToScreen(navigation, "Puzzle", { publicKey, sourceList });
         else {
           const newPuzzle: Puzzle | void = await fetchPuzzle(publicKey);
