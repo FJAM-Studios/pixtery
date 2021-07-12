@@ -1,15 +1,14 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as FileSystem from "expo-file-system";
 import * as React from "react";
 import { View } from "react-native";
 import { Headline, ActivityIndicator } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 
-import { storage, functions } from "../FirebaseApp";
-import { sortPuzzles } from "../puzzleUtils";
+import { functions } from "../FirebaseApp";
 import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
+import { setSentPuzzles } from "../store/reducers/sentPuzzles";
 import { Puzzle, AddPuzzleRoute, ScreenNavigation, RootState } from "../types";
-import { goToScreen } from "../util";
+import { goToScreen, downloadImage } from "../util";
 import Logo from "./Logo";
 import Title from "./Title";
 
@@ -20,12 +19,13 @@ export default function AddPuzzle({
   navigation: ScreenNavigation;
   route: AddPuzzleRoute;
 }): JSX.Element {
+  const { sourceList } = route.params;
   const dispatch = useDispatch();
   const theme = useSelector((state: RootState) => state.theme);
   const receivedPuzzles = useSelector(
     (state: RootState) => state.receivedPuzzles
   );
-
+  const sentPuzzles = useSelector((state: RootState) => state.sentPuzzles);
   const fetchPuzzle = async (publicKey: string): Promise<Puzzle | void> => {
     const queryPuzzleCallable = functions.httpsCallable("queryPuzzle");
     let puzzleData;
@@ -47,26 +47,27 @@ export default function AddPuzzle({
 
   const savePuzzle = async (newPuzzle: Puzzle) => {
     try {
-      const { imageURI } = newPuzzle;
-      // for now, giving image a filename based on URL from server, can change later if needed
-      const fileName = imageURI.slice(imageURI.lastIndexOf("/") + 1);
-      const downloadURL = await storage.ref("/" + imageURI).getDownloadURL();
-      //put jpg in upload instead of here
-      //but user could still download old pixtery (with no uploaded extension), so addl logic needed
-      const extension = imageURI.slice(-4) === ".jpg" ? "" : ".jpg";
-      newPuzzle.imageURI = fileName + extension;
-      const localURI = FileSystem.documentDirectory + fileName + extension;
-      // if you already have this image, don't download it
-      const fileInfo = await FileSystem.getInfoAsync(localURI);
-      if (!fileInfo.exists) {
-        console.log("Image doesn't exist, downloading...");
-        // download the image from pixtery server and save to pixtery dir
-        await FileSystem.downloadAsync(downloadURL, localURI);
+      await downloadImage(newPuzzle);
+      let puzzleList;
+      let storageItem;
+      let setPuzzles;
+      if (sourceList === "sent") {
+        puzzleList = sentPuzzles;
+        storageItem = "@pixterySentPuzzles";
+        setPuzzles = setSentPuzzles;
+      } else {
+        puzzleList = receivedPuzzles;
+        storageItem = "@pixteryPuzzles";
+        setPuzzles = setReceivedPuzzles;
       }
       // save puzzle data to localStorage
-      const allPuzzles = [newPuzzle, ...receivedPuzzles];
-      await AsyncStorage.setItem("@pixteryPuzzles", JSON.stringify(allPuzzles));
-      dispatch(setReceivedPuzzles(allPuzzles));
+      const allPuzzles = [
+        newPuzzle,
+        ...puzzleList.filter((p) => p.publicKey !== newPuzzle.publicKey),
+      ];
+      console.log(storageItem, puzzleList);
+      await AsyncStorage.setItem(storageItem, JSON.stringify(allPuzzles));
+      dispatch(setPuzzles(allPuzzles));
     } catch (e) {
       console.log(e);
       alert("Could not save puzzle to your phone");
@@ -80,12 +81,12 @@ export default function AddPuzzle({
       try {
         const { publicKey } = route.params; //no need to check whether publicKey exists, that is done by Splash before navigating here
         const match = searchForLocalMatch(publicKey);
-        if (match) goToScreen(navigation, "Puzzle", { publicKey });
+        if (match) goToScreen(navigation, "Puzzle", { publicKey, sourceList });
         else {
           const newPuzzle: Puzzle | void = await fetchPuzzle(publicKey);
           if (newPuzzle) {
             await savePuzzle(newPuzzle);
-            goToScreen(navigation, "Puzzle", { publicKey });
+            goToScreen(navigation, "Puzzle", { publicKey, sourceList });
           } else goToScreen(navigation, "Home");
         }
       } catch (e) {

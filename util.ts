@@ -11,6 +11,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { Alert, Share } from "react-native";
 import Toast from "react-native-root-toast";
 
+import { storage } from "./FirebaseApp";
 import { Puzzle, ScreenNavigation } from "./types";
 
 //convert URI into a blob to transmit to server
@@ -59,9 +60,10 @@ export const shareMessage = async (pixUrl: string): Promise<void> => {
 export const goToScreen = (
   navigation: ScreenNavigation | NavigationContainerRef,
   screen: string,
-  options: { url?: string | null; publicKey?: string } = {
+  options: { url?: string | null; publicKey?: string; sourceList?: string } = {
     url: "",
     publicKey: "",
+    sourceList: "",
   }
 ): void => {
   navigation.dispatch(
@@ -75,9 +77,10 @@ export const goToScreen = (
 export const closeSplashAndNavigate = async (
   navigation: ScreenNavigation | NavigationContainerRef,
   screen: string,
-  options: { url?: string | null; publicKey?: string } = {
+  options: { url?: string | null; publicKey?: string; sourceList?: string } = {
     url: "",
     publicKey: "",
+    sourceList: "",
   }
 ): Promise<void> => {
   goToScreen(navigation, screen, options);
@@ -212,5 +215,24 @@ export const checkPermission = async (camera: boolean): Promise<string> => {
       : await ImagePicker.requestMediaLibraryPermissionsAsync();
 
     return checkPermission(camera);
+  }
+};
+
+export const downloadImage = async (newPuzzle: Puzzle): Promise<void> => {
+  const { imageURI } = newPuzzle;
+  // for now, giving image a filename based on URL from server, can change later if needed
+  const fileName = imageURI.slice(imageURI.lastIndexOf("/") + 1);
+  const downloadURL = await storage.ref("/" + imageURI).getDownloadURL();
+  //put jpg in upload instead of here
+  //but user could still download old pixtery (with no uploaded extension), so addl logic needed
+  const extension = imageURI.slice(-4) === ".jpg" ? "" : ".jpg";
+  newPuzzle.imageURI = fileName + extension;
+  const localURI = FileSystem.documentDirectory + fileName + extension;
+  // if you already have this image, don't download it
+  const fileInfo = await FileSystem.getInfoAsync(localURI);
+  if (!fileInfo.exists) {
+    console.log("Image doesn't exist, downloading...");
+    // download the image from pixtery server and save to pixtery dir
+    await FileSystem.downloadAsync(downloadURL, localURI);
   }
 };
