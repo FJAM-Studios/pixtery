@@ -42,6 +42,8 @@ import { Puzzle, ScreenNavigation, RootState } from "../types";
 import { createBlob, shareMessage, goToScreen, checkPermission } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
+import { Camera } from "expo-camera";
+import IosCamera from "./iosCamera";
 
 const emptyImage = require("../assets/blank.jpg");
 
@@ -73,8 +75,12 @@ export default function Home({
   );
   const [buttonHeight, setButtonHeight] = React.useState(0);
   const [textFocus, setTextFocus] = React.useState(false);
+  const [iOSCameraLaunch, setiOSCameraLaunch] = React.useState(false);
 
   const selectImage = async (camera: boolean) => {
+    // if(camera && Platform.OS === 'ios') {
+    //   return <iOSCamera />
+    // }
     const permission = await checkPermission(camera);
     if (permission === "granted") {
       const result = camera
@@ -90,8 +96,10 @@ export default function Home({
             aspect: [4, 4],
             quality: 1,
           });
-
       if (!result.cancelled) {
+        // if(camera && Platform.OS === 'ios') {
+        //   return <iOSCamera />
+        // }
         // if the resulting image is not a square because user did not zoom to fill image select box
         if (result.width !== result.height)
           result.uri = await cropToSquare(result);
@@ -251,6 +259,8 @@ export default function Home({
       );
   }, [gridSize, puzzleType, boardSize]);
 
+  if(iOSCameraLaunch) return (<IosCamera setImageURI={setImageURI} setiOSCameraLaunch={setiOSCameraLaunch}/>)
+
   return (
     <AdSafeAreaView
       style={{
@@ -339,11 +349,18 @@ export default function Home({
         <Button
           icon="camera"
           mode="contained"
-          onPress={() => selectImage(true)}
+          onPress={
+            Platform.OS === "android"
+              ? () => selectImage(true)
+              : () => setiOSCameraLaunch(true)
+                  // () => selectImage(true)
+          }
+          // onPress={() => selectImage(true)}
           style={{ margin: height * 0.01 }}
         >
           Camera
         </Button>
+        {/* {iOSCameraLaunch ? <IosCamera setImageURI={setImageURI} /> : null} */}
         <Button
           icon="folder"
           mode="contained"
