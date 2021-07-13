@@ -94,7 +94,7 @@ const App = (): JSX.Element => {
         Math.min(height, width),
         MIN_BOTTOM_CLEARANCE * Math.max(height, width)
       );
-    dispatch(setDeviceSize(height, boardSize));
+    dispatch(setDeviceSize(width, height, boardSize));
 
     // on url change go to the splash screen, which will stop the user if they aren't logged in
     Linking.addEventListener("url", (ev) => {

@@ -10,7 +10,7 @@ import * as MediaLibrary from "expo-media-library";
 import * as SplashScreen from "expo-splash-screen";
 import { Alert, Share } from "react-native";
 import Toast from "react-native-root-toast";
-import { Camera } from 'expo-camera';
+import { Camera } from "expo-camera";
 
 import { Puzzle, ScreenNavigation } from "./types";
 
