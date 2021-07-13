@@ -3,11 +3,12 @@ import * as ImageManipulator from "expo-image-manipulator";
 import * as ImagePicker from "expo-image-picker";
 import { ImageInfo } from "expo-image-picker/build/ImagePicker.types";
 import React, { useEffect, useState, useRef } from "react";
-import { Animated, ImageBackground, Button, Text } from "react-native";
+import { Animated, ImageBackground, Button, Text, View } from "react-native";
 import {
   PanGestureHandler,
   State,
   PanGestureHandlerStateChangeEvent,
+  PinchGestureHandler,
 } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useSelector } from "react-redux";
@@ -18,7 +19,7 @@ import { checkPermission } from "../util";
 
 const emptyImage = require("../assets/blank.jpg");
 
-const width = 375;
+// const width = 375;
 
 export default function IosCamera({
   setImageURI,
@@ -27,15 +28,20 @@ export default function IosCamera({
   setImageURI: (uri: string) => void;
   setiOSCameraLaunch: (camera: boolean) => void;
 }): JSX.Element {
-  const { height, boardSize } = useSelector(
+  const { width, height, boardSize } = useSelector(
     (state: RootState) => state.screenHeight
   );
   const [imageBeforeCrop, setImageBeforeCrop] = useState<ImageInfo>();
-  const [cropPosition, setCropPosition] = useState({
-    x: (width - boardSize) / 2,
-    y: (height - boardSize) / 2,
+  const [imagePosition, setImagePosition] = useState({
+    x: 0,
+    y: 0,
   });
-  // const [imageLayoutHeight, setImageLayoutHeight] = useState(0);
+  console.log('width', width)
+  // const boxX = (width - boardSize) / 2;
+  // const boxY = (height - boardSize) / 2;
+  const boxX = (width - boardSize) / 2;
+  const boxY = 20;
+
   const pan = useRef(new Animated.ValueXY()).current;
   const onPanGestureEvent = Animated.event(
     [
@@ -54,12 +60,30 @@ export default function IosCamera({
   const onPanHandlerStateChange = (ev: PanGestureHandlerStateChangeEvent) => {
     console.log("event", ev.nativeEvent);
     console.log("pan", pan);
-    setCropPosition({
-      x: cropPosition.x + ev.nativeEvent.translationX,
-      y: cropPosition.y + ev.nativeEvent.translationY,
+    setImagePosition({
+      x: imagePosition.x + ev.nativeEvent.translationX,
+      y: imagePosition.y + ev.nativeEvent.translationY,
     });
     // reset distance tracker to 0
     pan.setValue({ x: 0, y: 0 });
+  };
+
+  const pinchScale = useRef(new Animated.Value(1)).current;
+  const baseScale = useRef(new Animated.Value(1)).current;
+  let lastScale = 1;
+  const scale = Animated.multiply(baseScale, pinchScale);
+
+  const onPinchGestureEvent = Animated.event(
+    [{ nativeEvent: { scale: pinchScale } }],
+    { useNativeDriver: USE_NATIVE_DRIVER }
+  );
+
+  const onPinchHandlerStateChange = (ev) => {
+    if (ev.nativeEvent.oldState === State.ACTIVE) {
+      lastScale *= ev.nativeEvent.scale;
+      baseScale.setValue(lastScale);
+      pinchScale.setValue(1);
+    }
   };
 
   const launchIosCamera = async () => {
@@ -79,15 +103,15 @@ export default function IosCamera({
   const setCrop = async (): Promise<void> => {
     // adjustment factor for actual image pixels vs screen px measurement; adjusted on widths
     const pixelToScreenRatio = imageBeforeCrop!.width / width;
-    console.log('finalcropX', cropPosition.x, 'finalcropy', cropPosition.y)
+    console.log("finalcropX", imagePosition.x, "finalcropy", imagePosition.y);
     const croppedImage = await ImageManipulator.manipulateAsync(
       imageBeforeCrop!.uri,
       [
         {
           crop: {
             // Origin X / Y are upper left coordinates where cropping begins
-            originX: cropPosition.x * pixelToScreenRatio,
-            originY: cropPosition.y * pixelToScreenRatio,
+            originX: (boxX - imagePosition.x) * pixelToScreenRatio,
+            originY: (boxY - imagePosition.y) * pixelToScreenRatio,
             width: boardSize * pixelToScreenRatio,
             height: boardSize * pixelToScreenRatio,
           },
@@ -102,48 +126,84 @@ export default function IosCamera({
   useEffect(() => {
     launchIosCamera();
   }, []);
-  console.log("running");
+
   if (imageBeforeCrop)
     return (
       <SafeAreaView>
-        <ImageBackground
-          source={imageBeforeCrop ? { uri: imageBeforeCrop.uri } : emptyImage}
+        <View
           style={{
-            width: "100%",
-            height: width * imageBeforeCrop.height / imageBeforeCrop.width,
+            left: boxX,
+            top: boxY,
+            width: boardSize,
+            height: boardSize,
+            borderColor: "white",
+            borderWidth: 2,
+            position: "absolute",
+            zIndex: 1,
           }}
-          // onLayout={(evt) => {
-          //   const {width, height} = evt.nativeEvent.layout
-          //   console.log("LAYOUT", evt.nativeEvent.layout)
-          //   console.log('img actual width: '+width)
-          //   console.log('img actual height: '+height)
-          //   setImageLayoutHeight(height);
-          // }}
+        />
+        {/* <PinchGestureHandler
+          onGestureEvent={onPinchGestureEvent}
+          onHandlerStateChange={onPinchHandlerStateChange}
+        > */}
+        {/* <Animated.View
+            style={[
+              {
+                transform: [{ scale }],
+              },
+            ]}
+          > */}
+        <PanGestureHandler
+          onGestureEvent={onPanGestureEvent}
+          onHandlerStateChange={onPanHandlerStateChange}
         >
-          {imageBeforeCrop ? (
-            <PanGestureHandler
-              onGestureEvent={onPanGestureEvent}
-              onHandlerStateChange={onPanHandlerStateChange}
+          <Animated.View
+            style={[
+              {
+                left: imagePosition.x,
+                top: imagePosition.y,
+              },
+              {
+                transform: [{ translateX: pan.x }, { translateY: pan.y }],
+              },
+            ]}
+          >
+            <ImageBackground
+              source={
+                imageBeforeCrop ? { uri: imageBeforeCrop.uri } : emptyImage
+              }
+              style={[
+                {
+                  width: "100%",
+                  height:
+                    (width * imageBeforeCrop.height) / imageBeforeCrop.width,
+                },
+              ]}
             >
-              <Animated.View
-                style={[
-                  {
-                    height: boardSize,
-                    width: boardSize,
-                    borderColor: "white",
-                    borderWidth: 2,
-                    left: cropPosition.x,
-                    top: cropPosition.y,
-                    position: "absolute",
-                  },
-                  {
-                    transform: [{ translateX: pan.x }, { translateY: pan.y }],
-                  },
-                ]}
-              />
-            </PanGestureHandler>
-          ) : null}
-        </ImageBackground>
+              {/* <Animated.View
+                    style={[
+                      {
+                        height: boardSize,
+                        width: boardSize,
+                        borderColor: "white",
+                        borderWidth: 2,
+                        left: cropPosition.x,
+                        top: cropPosition.y,
+                        position: "absolute",
+                      },
+                      {
+                        transform: [
+                          { translateX: pan.x },
+                          { translateY: pan.y },
+                        ],
+                      },
+                    ]}
+                  /> */}
+            </ImageBackground>
+          </Animated.View>
+        </PanGestureHandler>
+        {/* </Animated.View> */}
+        {/* </PinchGestureHandler> */}
         <Button onPress={setCrop} title="Crop" />
       </SafeAreaView>
     );
