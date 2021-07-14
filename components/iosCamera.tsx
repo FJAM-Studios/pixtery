@@ -2,7 +2,7 @@
 import * as ImageManipulator from "expo-image-manipulator";
 import * as ImagePicker from "expo-image-picker";
 import { ImageInfo } from "expo-image-picker/build/ImagePicker.types";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, createRef } from "react";
 import { Animated, ImageBackground, Button, Text, View } from "react-native";
 import {
   PanGestureHandler,
@@ -19,8 +19,8 @@ import { checkPermission } from "../util";
 
 const emptyImage = require("../assets/blank.jpg");
 
-// const width = 375;
-
+// start here: insight is that all i need is the end scale and end box position
+// or, i constantly need to multiply scale to panhandler set state
 export default function IosCamera({
   setImageURI,
   setiOSCameraLaunch,
@@ -36,7 +36,8 @@ export default function IosCamera({
     x: 0,
     y: 0,
   });
-  console.log('width', width)
+  const imagePinch = createRef();
+  const imagePan = createRef();
   // const boxX = (width - boardSize) / 2;
   // const boxY = (height - boardSize) / 2;
   const boxX = (width - boardSize) / 2;
@@ -60,18 +61,20 @@ export default function IosCamera({
   const onPanHandlerStateChange = (ev: PanGestureHandlerStateChangeEvent) => {
     console.log("event", ev.nativeEvent);
     console.log("pan", pan);
-    setImagePosition({
-      x: imagePosition.x + ev.nativeEvent.translationX,
-      y: imagePosition.y + ev.nativeEvent.translationY,
-    });
-    // reset distance tracker to 0
-    pan.setValue({ x: 0, y: 0 });
+    if (ev.nativeEvent.oldState === State.ACTIVE) {
+      setImagePosition({
+        x: imagePosition.x + ev.nativeEvent.translationX,
+        y: imagePosition.y + ev.nativeEvent.translationY,
+      });
+      // reset distance tracker to 0
+      pan.setValue({ x: 0, y: 0 });
+    }
   };
 
   const pinchScale = useRef(new Animated.Value(1)).current;
   const baseScale = useRef(new Animated.Value(1)).current;
   let lastScale = 1;
-  const scale = Animated.multiply(baseScale, pinchScale);
+  const _scale = Animated.multiply(baseScale, pinchScale);
 
   const onPinchGestureEvent = Animated.event(
     [{ nativeEvent: { scale: pinchScale } }],
@@ -79,10 +82,16 @@ export default function IosCamera({
   );
 
   const onPinchHandlerStateChange = (ev) => {
+    console.log('PINCH event', ev.nativeEvent, State);
     if (ev.nativeEvent.oldState === State.ACTIVE) {
+      console.log("pinching");
       lastScale *= ev.nativeEvent.scale;
       baseScale.setValue(lastScale);
       pinchScale.setValue(1);
+      // setImagePosition({
+      //   x: imagePosition.x + ev.nativeEvent.translationX,
+      //   y: imagePosition.y + ev.nativeEvent.translationY,
+      // });
     }
   };
 
@@ -103,7 +112,7 @@ export default function IosCamera({
   const setCrop = async (): Promise<void> => {
     // adjustment factor for actual image pixels vs screen px measurement; adjusted on widths
     const pixelToScreenRatio = imageBeforeCrop!.width / width;
-    console.log("finalcropX", imagePosition.x, "finalcropy", imagePosition.y);
+    console.log("finalcropX", imagePosition.x, "finalcropy", imagePosition.y, 'final scale', _scale);
     const croppedImage = await ImageManipulator.manipulateAsync(
       imageBeforeCrop!.uri,
       [
@@ -130,7 +139,7 @@ export default function IosCamera({
   if (imageBeforeCrop)
     return (
       <SafeAreaView>
-        <View
+        {/* <View
           style={{
             left: boxX,
             top: boxY,
@@ -141,34 +150,68 @@ export default function IosCamera({
             position: "absolute",
             zIndex: 1,
           }}
-        />
-        {/* <PinchGestureHandler
-          onGestureEvent={onPinchGestureEvent}
-          onHandlerStateChange={onPinchHandlerStateChange}
-        > */}
-        {/* <Animated.View
-            style={[
-              {
-                transform: [{ scale }],
-              },
-            ]}
-          > */}
+        /> */}
         <PanGestureHandler
           onGestureEvent={onPanGestureEvent}
           onHandlerStateChange={onPanHandlerStateChange}
+          // ref={imagePan}
+          // simultaneousHandlers={imagePinch}
         >
+          {/* <Animated.View> */}
           <Animated.View
-            style={[
-              {
-                left: imagePosition.x,
-                top: imagePosition.y,
-              },
-              {
-                transform: [{ translateX: pan.x }, { translateY: pan.y }],
-              },
-            ]}
+          // style={{
+          //   transform: [
+          //     { translateX: pan.x },
+          //     { translateY: pan.y },
+          //     // { scale: _scale },
+          //   ],
+          // }}
           >
-            <ImageBackground
+            <PinchGestureHandler
+              onGestureEvent={onPinchGestureEvent}
+              onHandlerStateChange={onPinchHandlerStateChange}
+              // ref={imagePinch}
+              // simultaneousHandlers={imagePan}
+            >
+              <Animated.View>
+                <Animated.View
+                  style={[
+                    {
+                      transform: [
+                        { scale: _scale },
+                        { translateX: pan.x },
+                        { translateY: pan.y },
+                      ],
+                    },
+                  ]}
+                >
+                  <ImageBackground
+                    source={
+                      imageBeforeCrop
+                        ? { uri: imageBeforeCrop.uri }
+                        : emptyImage
+                    }
+                    style={[
+                      {
+                        left: imagePosition.x,
+                        top: imagePosition.y,
+                      },
+                      {
+                        width: "100%",
+                        height:
+                          (width * imageBeforeCrop.height) /
+                          imageBeforeCrop.width,
+                      },
+                      // {
+                      //   transform: [
+                      //     { translateX: pan.x },
+                      //     { translateY: pan.y },
+                      //     // { scale: _scale },
+                      //   ],
+                      // },
+                    ]}
+                  >
+                    {/* <ImageBackground
               source={
                 imageBeforeCrop ? { uri: imageBeforeCrop.uri } : emptyImage
               }
@@ -179,8 +222,8 @@ export default function IosCamera({
                     (width * imageBeforeCrop.height) / imageBeforeCrop.width,
                 },
               ]}
-            >
-              {/* <Animated.View
+            > */}
+                    {/* <Animated.View
                     style={[
                       {
                         height: boardSize,
@@ -199,11 +242,38 @@ export default function IosCamera({
                       },
                     ]}
                   /> */}
-            </ImageBackground>
+                    {/* </ImageBackground> */}
+                  </ImageBackground>
+                </Animated.View>
+                <View
+                  style={{
+                    left: boxX,
+                    top: boxY,
+                    width: boardSize,
+                    height: boardSize,
+                    borderColor: "white",
+                    borderWidth: 2,
+                    position: "absolute",
+                    zIndex: 1,
+                  }}
+                />
+              </Animated.View>
+            </PinchGestureHandler>
+            {/* </Animated.View> */}
+            {/* <View
+              style={{
+                left: boxX,
+                top: boxY,
+                width: boardSize,
+                height: boardSize,
+                borderColor: "white",
+                borderWidth: 2,
+                position: "absolute",
+                zIndex: 1,
+              }}
+            /> */}
           </Animated.View>
         </PanGestureHandler>
-        {/* </Animated.View> */}
-        {/* </PinchGestureHandler> */}
         <Button onPress={setCrop} title="Crop" />
       </SafeAreaView>
     );
