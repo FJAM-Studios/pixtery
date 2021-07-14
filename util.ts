@@ -116,8 +116,13 @@ export const safelyDeletePuzzleImage = async (
   imageURI: string, //image to delete
   keeperList: Puzzle[] //list to check against
 ): Promise<void> => {
-  if (!keeperList.map((puzzle) => puzzle.imageURI).includes(imageURI))
-    await FileSystem.deleteAsync(FileSystem.documentDirectory + imageURI);
+  if (!keeperList.map((puzzle) => puzzle.imageURI).includes(imageURI)) {
+    const fileInfo = await FileSystem.getInfoAsync(
+      FileSystem.documentDirectory + imageURI
+    );
+    if (fileInfo.exists)
+      await FileSystem.deleteAsync(FileSystem.documentDirectory + imageURI);
+  }
 };
 
 export const updateImageURIs = async (
