@@ -38,6 +38,7 @@ export interface Puzzle {
 
 export interface Profile {
   name: string;
+  isGalleryAdmin: boolean;
 }
 
 export interface Piece {

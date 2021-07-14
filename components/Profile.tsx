@@ -5,8 +5,8 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import { Headline, Text, TextInput, Button } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 
-import { signOut } from "../FirebaseApp";
-import { VERSION_NUMBER } from "../constants";
+import { functions, signOut } from "../FirebaseApp";
+import { PUBLIC_KEY_LENGTH, VERSION_NUMBER } from "../constants";
 import { setProfile } from "../store/reducers/profile";
 import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
 import { setSentPuzzles } from "../store/reducers/sentPuzzles";
@@ -28,6 +28,7 @@ export default function Profile({
   const sentPuzzles = useSelector((state: RootState) => state.sentPuzzles);
   const profile = useSelector((state: RootState) => state.profile);
   const [name, setName] = useState((profile && profile.name) || "");
+  const [publicKey, setPublicKey] = useState("");
   const [errors, setErrors] = useState("");
   return (
     <AdSafeAreaView
@@ -69,10 +70,10 @@ export default function Profile({
               //save to local storage
               await AsyncStorage.setItem(
                 "@pixteryProfile",
-                JSON.stringify({ name })
+                JSON.stringify({ ...profile, name })
               );
               //update app state
-              dispatch(setProfile({ name }));
+              dispatch(setProfile({ ...profile, name }));
             } else {
               setErrors("You must enter a name!");
             }
@@ -145,6 +146,33 @@ export default function Profile({
         >
           Delete Sent Puzzles
         </Button>
+        {profile.isGalleryAdmin ? (
+          <>
+            <TextInput
+              placeholder="9 Character PublicKey"
+              value={publicKey}
+              onChangeText={(publicKey) => setPublicKey(publicKey)}
+            />
+            <Button
+              icon="upload"
+              mode="contained"
+              disabled={publicKey.length !== PUBLIC_KEY_LENGTH}
+              onPress={async () => {
+                const addPuzzleToGallery = functions.httpsCallable(
+                  "addPuzzleToGallery"
+                );
+                try {
+                  await addPuzzleToGallery({ publicKey });
+                } catch (e) {
+                  alert(e);
+                }
+              }}
+              style={{ margin: 10 }}
+            >
+              Add Puzzle To Gallery
+            </Button>
+          </>
+        ) : null}
         <Text>v{VERSION_NUMBER}</Text>
       </KeyboardAwareScrollView>
     </AdSafeAreaView>

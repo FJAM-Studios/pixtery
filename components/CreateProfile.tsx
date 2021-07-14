@@ -7,7 +7,12 @@ import { Headline, Text, TextInput, Button } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 
-import { phoneProvider, firebaseConfig, verifySms } from "../FirebaseApp";
+import {
+  phoneProvider,
+  firebaseConfig,
+  verifySms,
+  functions,
+} from "../FirebaseApp";
 import { setProfile } from "../store/reducers/profile";
 import { CreateProfileRoute, ScreenNavigation, RootState } from "../types";
 import { goToScreen } from "../util";
@@ -142,13 +147,19 @@ export default function CreateProfile({
                 try {
                   const authResult = await verifySms(verificationId, smsCode);
                   if (authResult) {
+                    // get whether or not pixtery admin
+                    const checkGalleryAdmin = functions.httpsCallable(
+                      "checkGalleryAdmin"
+                    );
+                    const res = await checkGalleryAdmin();
+                    const isGalleryAdmin = res.data;
                     //save to local storage
                     await AsyncStorage.setItem(
                       "@pixteryProfile",
-                      JSON.stringify({ name })
+                      JSON.stringify({ name, isGalleryAdmin })
                     );
                     //update app state
-                    dispatch(setProfile({ name }));
+                    dispatch(setProfile({ name, isGalleryAdmin }));
                     //send ya on your way, either home or to AddPuzzle if you were redirected here to log in first
                     if (route.params && route.params.url)
                       goToScreen(navigation, "Splash", {

@@ -7,6 +7,7 @@ admin.initializeApp({
   databaseURL: "https://pixstery-7c9b9-default-rtdb.firebaseio.com",
 });
 const db = admin.firestore();
+const FieldValue = admin.firestore.FieldValue;
 
 // importing from types throws tsc error and prevents build
 interface Puzzle {
@@ -117,3 +118,94 @@ exports.removeUserPuzzle = functions.https.onCall(
     }
   }
 );
+
+exports.getRandomPuzzle = functions.https.onCall(
+  async (data: {randomIx: number}, context) => {
+    const { randomIx } = data;
+    console.log("randomIx sent: ", randomIx)
+    try {
+      // throw error if user is not authenticated
+        if (!context.auth) {
+          throw new functions.https.HttpsError(
+              "permission-denied",
+              "user not authenticated"
+          );
+        }
+
+        // get max doc name
+        // const gallerySizeDoc = await db.collection("gallery").doc("gallerySize").get()
+        // const { count } = gallerySizeDoc.data()
+        
+        // choose a random doc
+
+
+      } catch (error) {
+        throw new functions.https.HttpsError("unknown", error.message, error);
+      }
+  }
+)
+
+exports.addPuzzleToGallery = functions.https.onCall(
+  async (data: {publicKey: string}, context) => {
+    const { publicKey } = data;
+
+    try {
+      // throw error if user is not authenticated
+        if (!context.auth) {
+          throw new functions.https.HttpsError(
+              "permission-denied",
+              "user not authenticated"
+          );
+        }
+
+        // throw error if user is not member of gallery admins
+        const admin = await db.collection("galleryAdmins").doc(context.auth.uid).get()
+        if(!admin.exists) {
+          throw new functions.https.HttpsError(
+              "permission-denied",
+              "user not gallery admin"
+          );
+        }
+
+        // make sure this puzzle exists
+        const puzzle = await db.collection("pixteries").doc(publicKey).get()
+        if (!puzzle.exists) throw new functions.https.HttpsError("unknown", "puzzle doesn't exist!");
+        
+        // get the gallery size so that new doc can be added with name as max size
+        const gallerySizeDoc = await db.collection("gallery").doc("gallerySize").get()
+        const { count } = gallerySizeDoc.data()
+        await db.collection("gallery").doc((count + 1).toString()).set({ publicKey})
+
+        // increment the total number of puzzles in the gallery 
+        // for purposes of finding a random puzzle
+        await db.collection("gallery").doc("gallerySize").update({ count: FieldValue.increment(1)})
+
+      } catch (error) {
+        throw new functions.https.HttpsError("unknown", error.message, error);
+      }
+  }
+)
+
+exports.checkGalleryAdmin = functions.https.onCall(
+  async (data, context) => {
+    try {
+      // throw error if user is not authenticated
+        if (!context.auth) {
+          throw new functions.https.HttpsError(
+              "permission-denied",
+              "user not authenticated"
+          );
+        }
+
+        // check if gallery admin
+        const admin = await db.collection("galleryAdmins").doc(context.auth.uid).get()
+        if(!admin.exists) {
+          return false
+        }
+        return true
+
+      } catch (error) {
+        throw new functions.https.HttpsError("unknown", error.message, error);
+      }
+  }
+)
