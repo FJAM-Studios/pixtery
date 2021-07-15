@@ -38,10 +38,13 @@ const disableShuffle = TESTING_MODE;
 export default function PuzzleComponent({
   navigation,
   route,
+  gallery,
 }: {
   navigation: ScreenNavigation;
   route: PuzzleRoute;
+  gallery?: boolean;
 }): JSX.Element {
+  console.log(gallery);
   const dispatch = useDispatch();
   const { publicKey } = route.params;
   const theme = useSelector((state: RootState) => state.theme);

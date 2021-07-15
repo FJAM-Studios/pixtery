@@ -120,9 +120,7 @@ exports.removeUserPuzzle = functions.https.onCall(
 );
 
 exports.getRandomPuzzle = functions.https.onCall(
-  async (data: {randomIx: number}, context) => {
-    const { randomIx } = data;
-    console.log("randomIx sent: ", randomIx)
+  async (data, context) => {
     try {
       // throw error if user is not authenticated
         if (!context.auth) {
@@ -133,11 +131,22 @@ exports.getRandomPuzzle = functions.https.onCall(
         }
 
         // get max doc name
-        // const gallerySizeDoc = await db.collection("gallery").doc("gallerySize").get()
-        // const { count } = gallerySizeDoc.data()
+        const gallerySizeDoc = await db.collection("gallery").doc("gallerySize").get()
+        const { count } = gallerySizeDoc.data()
         
         // choose a random doc
+        const randomDocId = (Math.floor(Math.random() * count) + 1).toString()
+        const randomDoc = await db.collection("gallery").doc(randomDocId).get()
+        const { publicKey } = randomDoc.data()
+        const puzzle = await db.collection("pixteries").doc(publicKey).get()
 
+        if (puzzle.exists) {
+          const puzzleData = puzzle.data();
+          // puzzleData.completed = false;
+          return puzzleData;
+        } else {
+          throw new functions.https.HttpsError("unknown", "error retrieving puzzle"); 
+        }
 
       } catch (error) {
         throw new functions.https.HttpsError("unknown", error.message, error);
@@ -170,7 +179,7 @@ exports.addPuzzleToGallery = functions.https.onCall(
         // make sure this puzzle exists
         const puzzle = await db.collection("pixteries").doc(publicKey).get()
         if (!puzzle.exists) throw new functions.https.HttpsError("unknown", "puzzle doesn't exist!");
-        
+
         // get the gallery size so that new doc can be added with name as max size
         const gallerySizeDoc = await db.collection("gallery").doc("gallerySize").get()
         const { count } = gallerySizeDoc.data()
