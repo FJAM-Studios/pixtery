@@ -9,7 +9,9 @@ import { ActivityIndicator, Button, Headline } from "react-native-paper";
 import { Theme } from "react-native-paper/lib/typescript/types";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
+import { AnyAction } from "redux";
 
+import { functions } from "../FirebaseApp";
 import { DEGREE_CONVERSION, TESTING_MODE } from "../constants";
 import {
   shuffle,
@@ -19,6 +21,7 @@ import {
   getInitialDimensions,
   validateBoard,
 } from "../puzzleUtils";
+import { setGalleryPuzzles } from "../store/reducers/galleryPuzzles";
 import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
 import { setSentPuzzles } from "../store/reducers/sentPuzzles";
 import {
@@ -40,13 +43,10 @@ const disableShuffle = TESTING_MODE;
 export default function PuzzleComponent({
   navigation,
   route,
-  gallery,
 }: {
   navigation: ScreenNavigation;
   route: PuzzleRoute;
-  gallery?: boolean;
 }): JSX.Element {
-  console.log(gallery);
   const dispatch = useDispatch();
   const { publicKey, sourceList } = route.params;
   const theme = useSelector((state: RootState) => state.theme);
@@ -55,6 +55,9 @@ export default function PuzzleComponent({
     (state: RootState) => state.receivedPuzzles
   );
   const sentPuzzles = useSelector((state: RootState) => state.sentPuzzles);
+  const galleryPuzzles = useSelector(
+    (state: RootState) => state.galleryPuzzles
+  );
   const adHeight = useSelector((state: RootState) => state.adHeight);
   const [lowerBound, setLowerBound] = useState<number>(0);
 
@@ -75,6 +78,23 @@ export default function PuzzleComponent({
   };
 
   const [modalVisible, setModalVisible] = React.useState(false);
+
+  let puzzleList: Puzzle[];
+  let storageItem: string;
+  let setPuzzles: (puzzleList: Puzzle[]) => AnyAction;
+
+  if (sourceList === "sent") {
+    puzzleList = sentPuzzles;
+    storageItem = "@pixterySentPuzzles";
+    setPuzzles = setSentPuzzles;
+  } else if (sourceList === "received") {
+    puzzleList = receivedPuzzles;
+    storageItem = "@pixteryPuzzles";
+    setPuzzles = setReceivedPuzzles;
+  } else {
+    puzzleList = galleryPuzzles;
+    setPuzzles = setGalleryPuzzles;
+  }
 
   // z index and current board are not handled through react state so that they don't
   // cause Puzzle/PuzzlePiece re-renders, which would break the positional tracking
@@ -129,7 +149,7 @@ export default function PuzzleComponent({
   const checkWin = () => {
     if (puzzle && validateBoard(currentBoard.current, puzzle.gridSize)) {
       animateWin();
-      markPuzzleComplete(publicKey);
+      if (sourceList === "received") markPuzzleComplete(publicKey);
     }
   };
 
@@ -142,28 +162,18 @@ export default function PuzzleComponent({
   };
 
   const removeMissingPuzzle = async (publicKey: string, sourceList: string) => {
-    let puzzleList;
-    let storageItem;
-    let setPuzzles;
-    if (sourceList === "sent") {
-      puzzleList = sentPuzzles;
-      storageItem = "@pixterySentPuzzles";
-      setPuzzles = setSentPuzzles;
-    } else {
-      puzzleList = receivedPuzzles;
-      storageItem = "@pixteryPuzzles";
-      setPuzzles = setReceivedPuzzles;
-    }
     const newPuzzles = [
       ...puzzleList.filter((puz) => puz.publicKey !== publicKey),
     ];
-    await AsyncStorage.setItem(storageItem, JSON.stringify(newPuzzles));
-    await dispatch(setPuzzles(newPuzzles));
+    if (storageItem) {
+      await AsyncStorage.setItem(storageItem, JSON.stringify(newPuzzles));
+      await dispatch(setPuzzles(newPuzzles));
+    }
   };
 
   useEffect(() => {
     setReady(false);
-    const matchingPuzzles = [...receivedPuzzles, ...sentPuzzles].filter(
+    const matchingPuzzles = [...puzzleList].filter(
       (puz) => puz.publicKey === publicKey
     );
     if (matchingPuzzles.length && puzzleAreaDimensions.puzzleAreaWidth > 0) {
@@ -373,6 +383,24 @@ export default function PuzzleComponent({
                 onPress={() => saveToLibrary(puzzle.imageURI)}
               >
                 Save Image
+              </Button>
+              <Button
+                icon="image-multiple"
+                mode="contained"
+                style={{ margin: 15 }}
+                onPress={async () => {
+                  const getRandomPuzzle = functions.httpsCallable(
+                    "getRandomPuzzle"
+                  );
+                  const res = await getRandomPuzzle();
+                  const { publicKey } = res.data;
+                  navigation.navigate("AddPuzzle", {
+                    publicKey,
+                    sourceList: "gallery",
+                  });
+                }}
+              >
+                More Gallery!
               </Button>
             </>
           )}

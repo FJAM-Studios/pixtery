@@ -134,20 +134,11 @@ exports.getRandomPuzzle = functions.https.onCall(
         const gallerySizeDoc = await db.collection("gallery").doc("gallerySize").get()
         const { count } = gallerySizeDoc.data()
         
-        // choose a random doc
+        // choose a random doc and return publicKey
         const randomDocId = (Math.floor(Math.random() * count) + 1).toString()
         const randomDoc = await db.collection("gallery").doc(randomDocId).get()
         const { publicKey } = randomDoc.data()
-        const puzzle = await db.collection("pixteries").doc(publicKey).get()
-
-        if (puzzle.exists) {
-          const puzzleData = puzzle.data();
-          // puzzleData.completed = false;
-          return puzzleData;
-        } else {
-          throw new functions.https.HttpsError("unknown", "error retrieving puzzle"); 
-        }
-
+        return publicKey
       } catch (error) {
         throw new functions.https.HttpsError("unknown", error.message, error);
       }

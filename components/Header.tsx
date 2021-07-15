@@ -3,6 +3,7 @@ import { View, TouchableWithoutFeedback } from "react-native";
 import { IconButton, Badge, Menu, Divider } from "react-native-paper";
 import { useSelector } from "react-redux";
 
+import { functions } from "../FirebaseApp";
 import { ScreenNavigation, RootState } from "../types";
 import Logo from "./Logo";
 import Title from "./Title";
@@ -84,6 +85,27 @@ export default function Header({
           }}
           title="Sent"
           icon="send"
+        />
+        <Divider />
+        <Menu.Item
+          onPress={async () => {
+            closeMenu();
+            // this can be more elegant later
+            // moved to its own component so you're not sitting and waiting
+            const getRandomPuzzle = functions.httpsCallable("getRandomPuzzle");
+            try {
+              const res = await getRandomPuzzle();
+              const { publicKey } = res.data;
+              navigation.navigate("AddPuzzle", {
+                publicKey,
+                sourceList: "gallery",
+              });
+            } catch (e) {
+              alert(e);
+            }
+          }}
+          title="Gallery"
+          icon="image-multiple"
         />
         <Divider />
         <Menu.Item

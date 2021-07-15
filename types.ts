@@ -93,6 +93,7 @@ export interface ScreenHeight {
 export interface RootState {
   profile: Profile;
   receivedPuzzles: Puzzle[];
+  galleryPuzzles: Puzzle[];
   sentPuzzles: Puzzle[];
   screenHeight: ScreenHeight;
   theme: Theme;

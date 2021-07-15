@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AnyAction } from "redux";
 
 import { functions } from "../FirebaseApp";
+import { setGalleryPuzzles } from "../store/reducers/galleryPuzzles";
 import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
 import { setSentPuzzles } from "../store/reducers/sentPuzzles";
 import { Puzzle, AddPuzzleRoute, ScreenNavigation, RootState } from "../types";
@@ -27,7 +28,12 @@ export default function AddPuzzle({
     (state: RootState) => state.receivedPuzzles
   );
   const sentPuzzles = useSelector((state: RootState) => state.sentPuzzles);
+  const galleryPuzzles = useSelector(
+    (state: RootState) => state.galleryPuzzles
+  );
+
   const { sourceList } = route.params;
+
   let puzzleList: Puzzle[];
   let storageItem: string;
   let setPuzzles: (puzzleList: Puzzle[]) => AnyAction;
@@ -35,10 +41,13 @@ export default function AddPuzzle({
     puzzleList = sentPuzzles;
     storageItem = "@pixterySentPuzzles";
     setPuzzles = setSentPuzzles;
-  } else {
+  } else if (sourceList === "received") {
     puzzleList = receivedPuzzles;
     storageItem = "@pixteryPuzzles";
     setPuzzles = setReceivedPuzzles;
+  } else {
+    puzzleList = galleryPuzzles;
+    setPuzzles = setGalleryPuzzles;
   }
 
   const fetchPuzzle = async (publicKey: string): Promise<Puzzle | void> => {
@@ -76,7 +85,8 @@ export default function AddPuzzle({
         newPuzzle,
         ...puzzleList.filter((p) => p.publicKey !== newPuzzle.publicKey),
       ];
-      await AsyncStorage.setItem(storageItem, JSON.stringify(allPuzzles));
+      if (storageItem)
+        await AsyncStorage.setItem(storageItem, JSON.stringify(allPuzzles));
       dispatch(setPuzzles(allPuzzles));
     } catch (e) {
       console.log(e);
@@ -120,7 +130,9 @@ export default function AddPuzzle({
     >
       <Logo width="100" height="100" />
       <Title width="100" height="35" />
-      <Headline>Adding New Pixtery</Headline>
+      <Headline>
+        {sourceList === "gallery" ? "Loading Gallery" : "Adding New Pixtery"}
+      </Headline>
       <ActivityIndicator animating color={theme.colors.text} size="large" />
     </View>
   );
