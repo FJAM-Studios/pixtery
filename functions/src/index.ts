@@ -138,7 +138,7 @@ exports.getRandomPuzzle = functions.https.onCall(
         const randomDocId = (Math.floor(Math.random() * count) + 1).toString()
         const randomDoc = await db.collection("gallery").doc(randomDocId).get()
         const { publicKey } = randomDoc.data()
-        return publicKey
+        return {publicKey}
       } catch (error) {
         throw new functions.https.HttpsError("unknown", error.message, error);
       }
