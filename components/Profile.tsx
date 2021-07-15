@@ -171,24 +171,6 @@ export default function Profile({
             >
               Add Puzzle To Gallery
             </Button>
-            <Button
-              icon="image-multiple"
-              mode="contained"
-              onPress={async () => {
-                const getRandomPuzzle = functions.httpsCallable(
-                  "getRandomPuzzle"
-                );
-                try {
-                  const res = await getRandomPuzzle();
-                  console.log(res.data);
-                } catch (e) {
-                  alert(e);
-                }
-              }}
-              style={{ margin: 10 }}
-            >
-              Get Random Number
-            </Button>
           </>
         ) : null}
         <Text>v{VERSION_NUMBER}</Text>
