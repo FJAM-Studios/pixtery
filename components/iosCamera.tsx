@@ -9,6 +9,7 @@ import {
   State,
   PanGestureHandlerStateChangeEvent,
   PinchGestureHandler,
+  PinchGestureHandlerStateChangeEvent,
 } from "react-native-gesture-handler";
 import { measure } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -20,9 +21,6 @@ import { checkPermission } from "../util";
 
 const emptyImage = require("../assets/blank.jpg");
 
-// start here: insight is that all i need is the end scale and end box position
-// or, i constantly need to multiply scale to panhandler set state
-// start here: either measure the view of image, or adjust by cumulative scale (so if image ends up being the same original size, then scale should be 1)
 export default function IosCamera({
   setImageURI,
   setiOSCameraLaunch,
@@ -41,10 +39,6 @@ export default function IosCamera({
   const imageWidth = useRef(imageBeforeCrop ? imageBeforeCrop.width : 0);
   const imageHeight = useRef(imageBeforeCrop ? imageBeforeCrop.height : 0);
 
-  const imagePinch = createRef();
-  const imagePan = createRef();
-  // const boxX = (width - boardSize) / 2;
-  // const boxY = (height - boardSize) / 2;
   const boxX = (width - boardSize) / 2;
   const boxY = 20;
 
@@ -66,6 +60,9 @@ export default function IosCamera({
   const onPanHandlerStateChange = (ev: PanGestureHandlerStateChangeEvent) => {
     console.log("event", ev.nativeEvent);
     console.log("pan", pan);
+    if (!imageWidth.current) imageWidth.current = imageBeforeCrop?.width;
+    if (!imageHeight.current) imageHeight.current = imageBeforeCrop?.height;
+
     if (ev.nativeEvent.oldState === State.ACTIVE) {
       setImagePosition({
         x: imagePosition.x + ev.nativeEvent.translationX,
@@ -78,8 +75,6 @@ export default function IosCamera({
 
   const pinchScale = useRef(new Animated.Value(1)).current;
   const baseScale = useRef(new Animated.Value(1)).current;
-  // const pinchScale = new Animated.Value(1);
-  // const baseScale = new Animated.Value(1);
   let lastScale = 1;
   const _scale = Animated.multiply(baseScale, pinchScale);
   const scaleNumber = useRef();
@@ -91,10 +86,11 @@ export default function IosCamera({
     { useNativeDriver: USE_NATIVE_DRIVER }
   );
 
-  const onPinchHandlerStateChange = (ev) => {
-    if (imageWidth.current === 0) imageWidth.current = imageBeforeCrop?.width;
-    if (imageHeight.current === 0)
-      imageHeight.current = imageBeforeCrop?.height;
+  const onPinchHandlerStateChange = (
+    ev: PinchGestureHandlerStateChangeEvent
+  ) => {
+    if (!imageWidth.current) imageWidth.current = imageBeforeCrop?.width;
+    if (!imageHeight.current) imageHeight.current = imageBeforeCrop?.height;
 
     console.log(
       "PINCH event",
@@ -168,22 +164,15 @@ export default function IosCamera({
   const setCrop = async (): Promise<void> => {
     // adjustment factor for actual image pixels vs screen px measurement; adjusted on widths
     const pixelToScreenRatio = imageBeforeCrop!.width / width;
-    // finalScale adjusts for zoomed image width vs uri width
-    // const finalScaleX = imageWidth.current / imageBeforeCrop!.width;
-    // const finalScaleY = imageHeight.current / imageBeforeCrop!.height;
-    const finalScaleX = imageWidth.current / width;
-    const finalScaleY = imageHeight.current / height;
-
+    // adjusts for zoomed image dimension vs screen dimension
+    const finalScaleXvsScreen = imageWidth.current / width;
+    const finalScaleYvsScreen = imageHeight.current / height;
 
     console.log(
       "finalcropX",
       imagePosition.x,
       "finalcropy",
       imagePosition.y,
-      // "final scale",
-      // scaleNumber.current,
-      // "typeof",
-      // typeof scaleNumber.current,
       "boxX",
       boxX,
       "boxY",
@@ -193,30 +182,61 @@ export default function IosCamera({
       "lastscale",
       lastScale,
       "finalScaleX",
-      finalScaleX,
+      finalScaleXvsScreen,
       "finalscaleY",
-      finalScaleY,
-      'image width zoomed', imageWidth.current, 'imageheightzoomed', imageHeight.current
+      finalScaleYvsScreen,
+      "image width zoomed",
+      imageWidth.current,
+      "imageheightzoomed",
+      imageHeight.current
     );
-    // const originX =
-    //   (boxX * scaleNumber.current - imagePosition.x * scaleNumber.current) *
-    //   pixelToScreenRatio *
-    //   scaleNumber.current;
-    // const originY =
-    //   (boxY * scaleNumber.current - imagePosition.y * scaleNumber.current) *
-    //   pixelToScreenRatio *
-    //   scaleNumber.current;
-    // const cropWidth = (boardSize * pixelToScreenRatio) / scaleNumber.current;
-    // const cropHeight = (boardSize * pixelToScreenRatio) / scaleNumber.current;
-    // adjust box distance with final scale (vs base uri image), then, adjust to size of original image 
-    const originX =
-      (boxX - imagePosition.x) * pixelToScreenRatio * finalScaleX * (imageBeforeCrop.width / imageWidth.current);
-    const originY =
-      (boxY - imagePosition.y) * pixelToScreenRatio * finalScaleY * (imageBeforeCrop.height / imageHeight.current);
-    const cropWidth = (boardSize * pixelToScreenRatio) / finalScaleX;
-    const cropHeight = (boardSize * pixelToScreenRatio) / finalScaleY;
 
-    console.log("originX", originX, "originY", originY, "cropwidth", cropWidth);
+    // adjust box distance with final scale (vs base uri image), then, adjust to size of original image
+    // distance between box and image position, at screen scale
+    // blow it up to zoomed image
+    // adjust this distance from zoomed image to original image
+    const originX =
+      (boxX * finalScaleXvsScreen - imagePosition.x) *
+      finalScaleXvsScreen *
+      (imageBeforeCrop.width / imageWidth.current);
+    const originY =
+      (boxY * finalScaleYvsScreen - imagePosition.y) *
+      finalScaleYvsScreen *
+      (imageBeforeCrop.height / imageHeight.current);
+
+    // const originX =
+    //   (boxX - imagePosition.x) *
+    //   pixelToScreenRatio *
+    //   finalScaleX *
+    //   (imageBeforeCrop.width / imageWidth.current);
+    // const originY =
+    //   (boxY - imagePosition.y) *
+    //   pixelToScreenRatio *
+    //   finalScaleY *
+    //   (imageBeforeCrop.height / imageHeight.current);
+    // boardSize length scaled to zoom = ratio of board size to overall width times zoomed image width
+    // divide by final scale because image is zoomed
+    // adjust from zoom image to actual image dimension
+
+    const cropWidth =
+      // scale boardSize on screen to image before zooming
+      (boardSize * pixelToScreenRatio) /
+      // reduce this board size that's scaled to image by the zoom scale
+      (imageWidth.current / imageBeforeCrop.width);
+    const cropHeight =
+      (boardSize * pixelToScreenRatio) /
+      (imageHeight.current / imageBeforeCrop.height);
+
+    console.log(
+      "originX",
+      originX,
+      "originY",
+      originY,
+      "cropwidth",
+      cropWidth,
+      "cropheight",
+      cropHeight
+    );
 
     const croppedImage = await ImageManipulator.manipulateAsync(
       imageBeforeCrop!.uri,
@@ -228,8 +248,6 @@ export default function IosCamera({
             originY,
             width: cropWidth,
             height: cropHeight,
-            // width: (boardSize * pixelToScreenRatio),
-            // height: (boardSize * pixelToScreenRatio),
           },
         },
       ],
