@@ -42,7 +42,6 @@ import { Puzzle, ScreenNavigation, RootState } from "../types";
 import { createBlob, shareMessage, goToScreen, checkPermission } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
-import { Camera } from "expo-camera";
 import IosCamera from "./IosCamera";
 
 const emptyImage = require("../assets/blank.jpg");
