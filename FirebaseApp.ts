@@ -7,7 +7,7 @@ import "firebase/storage"; // for jest testing purposes
 
 const firebaseConfig = {
   apiKey: "***REMOVED***",
-  authDomain: "pixstery-7c9b9.firebaseapp.com",
+  authDomain: "pixtery.io",
   databaseURL: "https://pixstery-7c9b9-default-rtdb.firebaseio.com",
   projectId: "pixstery-7c9b9",
   storageBucket: "pixstery-7c9b9.appspot.com",

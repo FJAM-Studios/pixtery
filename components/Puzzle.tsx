@@ -4,7 +4,8 @@ import * as FileSystem from "expo-file-system";
 import * as ImageManipulator from "expo-image-manipulator";
 import React, { useEffect, useState, useRef } from "react";
 import { Text, View, StyleSheet, Image, LayoutChangeEvent } from "react-native";
-import { ActivityIndicator, Button } from "react-native-paper";
+import Modal from "react-native-modal";
+import { ActivityIndicator, Button, Headline } from "react-native-paper";
 import { Theme } from "react-native-paper/lib/typescript/types";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
@@ -19,6 +20,7 @@ import {
   validateBoard,
 } from "../puzzleUtils";
 import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
+import { setSentPuzzles } from "../store/reducers/sentPuzzles";
 import {
   Puzzle,
   Piece,
@@ -43,7 +45,7 @@ export default function PuzzleComponent({
   route: PuzzleRoute;
 }): JSX.Element {
   const dispatch = useDispatch();
-  const { publicKey } = route.params;
+  const { publicKey, sourceList } = route.params;
   const theme = useSelector((state: RootState) => state.theme);
   const { boardSize } = useSelector((state: RootState) => state.screenHeight);
   const receivedPuzzles = useSelector(
@@ -68,6 +70,8 @@ export default function PuzzleComponent({
     theme,
     boardSize,
   };
+
+  const [modalVisible, setModalVisible] = React.useState(false);
 
   // z index and current board are not handled through react state so that they don't
   // cause Puzzle/PuzzlePiece re-renders, which would break the positional tracking
@@ -132,6 +136,26 @@ export default function PuzzleComponent({
       puzzleAreaWidth: ev.nativeEvent.layout.width,
       puzzleAreaHeight: ev.nativeEvent.layout.height,
     });
+  };
+
+  const removeMissingPuzzle = async (publicKey: string, sourceList: string) => {
+    let puzzleList;
+    let storageItem;
+    let setPuzzles;
+    if (sourceList === "sent") {
+      puzzleList = sentPuzzles;
+      storageItem = "@pixterySentPuzzles";
+      setPuzzles = setSentPuzzles;
+    } else {
+      puzzleList = receivedPuzzles;
+      storageItem = "@pixteryPuzzles";
+      setPuzzles = setReceivedPuzzles;
+    }
+    const newPuzzles = [
+      ...puzzleList.filter((puz) => puz.publicKey !== publicKey),
+    ];
+    await AsyncStorage.setItem(storageItem, JSON.stringify(newPuzzles));
+    await dispatch(setPuzzles(newPuzzles));
   };
 
   useEffect(() => {
@@ -228,8 +252,7 @@ export default function PuzzleComponent({
           setReady(true);
         } catch (e) {
           console.log(e);
-          alert("Could not load puzzle!");
-          navigation.navigate("Home");
+          setModalVisible(true);
         }
       };
       createPieces();
@@ -356,6 +379,58 @@ export default function PuzzleComponent({
   } else {
     return (
       <SafeAreaView style={styles(styleProps).parentContainer}>
+        <Modal
+          isVisible={modalVisible}
+          onBackdropPress={() => {
+            setModalVisible(false);
+            navigation.navigate("Home");
+          }}
+          animationIn="fadeIn"
+          animationOut="fadeOut"
+          backdropTransitionOutTiming={0}
+        >
+          <View
+            style={{
+              padding: 30,
+              alignSelf: "center",
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: theme.colors.backdrop,
+              borderRadius: theme.roundness,
+            }}
+          >
+            <Headline>Could Not Load Puzzle!</Headline>
+            <View
+              style={{
+                flexDirection: "column",
+              }}
+            >
+              <Button
+                icon="reload"
+                mode="contained"
+                onPress={async () => {
+                  setModalVisible(false);
+                  navigation.navigate("AddPuzzle", { publicKey, sourceList });
+                }}
+                style={{ margin: 5 }}
+              >
+                Redownload Puzzle
+              </Button>
+              <Button
+                icon="delete"
+                mode="contained"
+                onPress={async () => {
+                  await removeMissingPuzzle(publicKey, sourceList);
+                  setModalVisible(false);
+                  navigation.navigate("Home");
+                }}
+                style={{ margin: 5 }}
+              >
+                Delete Puzzle
+              </Button>
+            </View>
+          </View>
+        </Modal>
         <ActivityIndicator animating color={theme.colors.text} size="large" />
       </SafeAreaView>
     );
