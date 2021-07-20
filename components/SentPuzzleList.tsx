@@ -137,6 +137,7 @@ export default function SentPuzzleList({
                   onPress={() =>
                     navigation.navigate("Puzzle", {
                       publicKey: sentPuzzle.publicKey,
+                      sourceList: "sent",
                     })
                   }
                   key={ix}

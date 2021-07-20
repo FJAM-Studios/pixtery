@@ -121,6 +121,7 @@ export default function PuzzleList({
                   onPress={() =>
                     navigation.navigate("Puzzle", {
                       publicKey: receivedPuzzle.publicKey,
+                      sourceList: "received",
                     })
                   }
                   key={ix}
