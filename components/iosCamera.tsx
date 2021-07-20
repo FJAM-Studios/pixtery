@@ -3,7 +3,7 @@ import * as ImageManipulator from "expo-image-manipulator";
 import * as ImagePicker from "expo-image-picker";
 import { ImageInfo } from "expo-image-picker/build/ImagePicker.types";
 import React, { useEffect, useState, useRef } from "react";
-import { Animated, ImageBackground, Button, Text, View } from "react-native";
+import { Animated, ImageBackground, Text, View, Button } from "react-native";
 import {
   PanGestureHandler,
   State,
@@ -34,48 +34,67 @@ export default function IosCamera({
     (state: RootState) => state.screenHeight
   );
   const [imageBeforeCrop, setImageBeforeCrop] = useState<ImageInfo>();
-  const [imagePosition, setImagePosition] = useState({
-    x: 0,
-    y: 0,
-  });
   // can't use height because image does not take up entire height of screen
   const initialImageHeightOnScreen = imageBeforeCrop
     ? width * (imageBeforeCrop.height / imageBeforeCrop.width)
     : 0;
   const boxX = (width - boardSize) / 2;
   const boxY = (initialImageHeightOnScreen - boardSize) / 2;
+  const safeAreaViewInsets = useSafeAreaInsets();
+  // absolute Y position of crop box, including status bar
+  const boxYPlusStatusBar = boxY + safeAreaViewInsets.top;
   const imageView = useRef<View>();
-  const pan = useRef(new Animated.ValueXY()).current;
+
+  // pan (i.e. drag)
+  const translateX = new Animated.Value(0);
+  const translateY = new Animated.Value(0);
+  const lastOffset = { x: 0, y: 0 };
 
   const onPanGestureEvent = Animated.event(
     [
       {
         nativeEvent: {
-          translationX: pan.x,
-          translationY: pan.y,
+          translationX: translateX,
+          translationY: translateY,
         },
       },
     ],
-    {
-      useNativeDriver: USE_NATIVE_DRIVER,
-    }
+    { useNativeDriver: USE_NATIVE_DRIVER }
   );
 
-  const safeAreaViewInsets = useSafeAreaInsets();
-
   const onPanHandlerStateChange = (ev: PanGestureHandlerStateChangeEvent) => {
+    // to persist original event; otherwise gets nullified
+    ev.persist();
     if (ev.nativeEvent.oldState === State.ACTIVE) {
-      setImagePosition({
-        x: imagePosition.x + ev.nativeEvent.translationX,
-        y: imagePosition.y + ev.nativeEvent.translationY,
-      });
-      // reset distance tracker to 0
-      pan.setValue({ x: 0, y: 0 });
+      // measureInWindow gets absolute dimensions
+      imageView.current!.measureInWindow(
+        (x: number, y: number, imageWidth: number, imageHeight: number) => {
+          const rightImagePos = x + imageWidth;
+          const bottomImagePos = y + imageHeight;
+          const rightBoxPos = boxX + boardSize;
+          const bottomBoxPos = boxYPlusStatusBar + boardSize;
+          // if all bounds of image are outside the crop box, move box
+          if (
+            x <= boxX &&
+            y <= boxYPlusStatusBar &&
+            rightImagePos >= rightBoxPos &&
+            bottomImagePos >= bottomBoxPos
+          ) {
+            lastOffset.x += ev.nativeEvent.translationX;
+            lastOffset.y += ev.nativeEvent.translationY;
+            translateX.setOffset(lastOffset.x);
+            translateY.setOffset(lastOffset.y);
+          }
+          translateX.setValue(0);
+          translateY.setValue(0);
+        }
+      );
     }
   };
 
-  const pinchScale = useRef(new Animated.Value(1)).current;
-  const baseScale = useRef(new Animated.Value(1)).current;
+  // pinch (i.e. zoom)
+  const baseScale = new Animated.Value(1);
+  const pinchScale = new Animated.Value(1);
   let lastScale = 1;
   const _scale = Animated.multiply(baseScale, pinchScale);
 
@@ -88,9 +107,18 @@ export default function IosCamera({
     ev: PinchGestureHandlerStateChangeEvent
   ) => {
     if (ev.nativeEvent.oldState === State.ACTIVE) {
-      lastScale *= ev.nativeEvent.scale;
-      baseScale.setValue(lastScale);
-      pinchScale.setValue(1);
+      // to persist original event; otherwise gets nullified
+      ev.persist();
+      imageView.current!.measureInWindow(
+        (x: number, y: number, imageWidth: number, imageHeight: number) => {
+          // if image is larger than crop box, zoom box
+          if (imageWidth >= boardSize && imageHeight >= boardSize)
+            lastScale *= ev.nativeEvent.scale;
+          // reset baseScale and pinchScale either way
+          baseScale.setValue(lastScale);
+          pinchScale.setValue(1);
+        }
+      );
     }
   };
 
@@ -108,30 +136,17 @@ export default function IosCamera({
     }
   };
 
-  const setCrop = async (): Promise<void> => {
+  const setCrop = (): void => {
     // adjustment factor for actual image pixels vs screen px measurement; adjusted on width
     const pixelToScreenRatio = imageBeforeCrop!.width / width;
-    const statusBarHeight = safeAreaViewInsets.top;
     // measureInWindow gets absolute dimensions on screen
-    await imageView.current!.measureInWindow(
+    imageView.current!.measureInWindow(
       async (
         finalX: number,
         finalY: number,
         finalImageWidth: number,
         finalImageHeight: number
       ) => {
-        console.log(
-          "finalx",
-          finalX,
-          "finalY",
-          finalY,
-          "finalwidth",
-          finalImageWidth,
-          "finalheight",
-          finalImageHeight, "status bar",
-          statusBarHeight
-        );
-        // start here - need to add statusbarheight only if zoom/pan goes beyond status bar
         const originX =
           // distance from top of image to crop box X
           ((boxX - finalX) *
@@ -142,7 +157,7 @@ export default function IosCamera({
         const originY =
           // distance from top of image to crop box Y
           // add status bar height to crop box Y given positions are absolutes
-          ((boxY + statusBarHeight - finalY) *
+          ((boxYPlusStatusBar - finalY) *
             // scale image to original picture (relevant if zoomed)
             imageBeforeCrop!.height) /
           finalImageHeight;
@@ -157,27 +172,7 @@ export default function IosCamera({
           (boardSize * pixelToScreenRatio) /
           (finalImageHeight / initialImageHeightOnScreen);
 
-        console.log(
-          "originX",
-          originX,
-          "originY",
-          originY,
-          "cropwidth",
-          cropWidth,
-          "cropheight",
-          cropHeight,
-          "boardSize",
-          boardSize,
-          "height",
-          height,
-          "width",
-          width,
-          "boxX",
-          boxX,
-          "boxY",
-          boxY
-        );
-
+        // crop image with above coordinates
         const croppedImage = await ImageManipulator.manipulateAsync(
           imageBeforeCrop!.uri,
           [
@@ -193,6 +188,7 @@ export default function IosCamera({
           ],
           { compress: COMPRESSION, format: ImageManipulator.SaveFormat.JPEG }
         );
+        // set image URI, and iOS Camera Launch state to false on Home component
         setImageURI(croppedImage.uri);
         setiOSCameraLaunch(false);
       }
@@ -218,15 +214,12 @@ export default function IosCamera({
               <Animated.View>
                 <Animated.View
                   ref={imageView}
-                  // onLayout={undefined}
                   style={[
                     {
-                      left: imagePosition.x,
-                      top: imagePosition.y,
                       transform: [
                         { scale: _scale },
-                        { translateX: pan.x },
-                        { translateY: pan.y },
+                        { translateX },
+                        { translateY },
                       ],
                     },
                   ]}
@@ -261,7 +254,15 @@ export default function IosCamera({
             </PinchGestureHandler>
           </Animated.View>
         </PanGestureHandler>
-        <Button onPress={setCrop} title="Crop" />
+        <View
+          style={{
+            top: height - 80,
+            position: "absolute",
+            alignSelf: "center",
+          }}
+        >
+          <Button onPress={setCrop} title="Crop" />
+        </View>
       </SafeAreaView>
     );
   return <Text>Loading</Text>;

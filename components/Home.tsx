@@ -353,14 +353,11 @@ export default function Home({
             Platform.OS === "android"
               ? () => selectImage(true)
               : () => setiOSCameraLaunch(true)
-            // () => selectImage(true)
           }
-          // onPress={() => selectImage(true)}
           style={{ margin: height * 0.01 }}
         >
           Camera
         </Button>
-        {/* {iOSCameraLaunch ? <IosCamera setImageURI={setImageURI} /> : null} */}
         <Button
           icon="folder"
           mode="contained"
