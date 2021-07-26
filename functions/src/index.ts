@@ -58,11 +58,11 @@ exports.queryPuzzle = functions.https.onCall(
     async (data, context): Promise<Record<string, any> | void> => {
       try {
         const {publicKey} = data;
-        
+
         // We should use the publicKey as the document id instead of the (image) fileName.
         // This will let us retrieve the document directly by ID, rather than query the
         // entire collection every time, filtering for the publicKey.
-        
+
         const puzzle = await db.collection("pixteries").doc(publicKey).get()
 
         if (puzzle.exists) {
@@ -90,6 +90,27 @@ exports.queryPuzzle = functions.https.onCall(
     }
 );
 
+// send a user's entire sent or received list (listType) to the client
+exports.fetchPuzzles = functions.https.onCall(
+  async (listType, context) => {
+  try {
+    const user = context.auth?.uid;
+    console.log("list",listType);
+
+    let puzzles = await db.collection("userPixteries")
+              .doc(user)
+              .collection(listType)
+              .get();
+    if(!puzzles.empty){
+      puzzles = puzzles.docs.map((doc:any) => doc.data());
+      return puzzles;
+    } else return [];
+
+  } catch (error) {
+    throw new functions.https.HttpsError("unknown", error.message, error);
+  }
+  });
+
 // this function can be used to mark a user's sent/recvd puzzle as inactive in their list
 // it's not currently called anywhere in the app, but we can implement front end later
 exports.removeUserPuzzle = functions.https.onCall(
@@ -111,7 +132,7 @@ exports.removeUserPuzzle = functions.https.onCall(
         .collection(list)
         .doc(publicKey)
         .set({active: false}, {merge: true});
-      
+
     } catch (error) {
       throw new functions.https.HttpsError("unknown", error.message, error);
     }

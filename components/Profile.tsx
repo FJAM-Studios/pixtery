@@ -11,7 +11,7 @@ import { setProfile } from "../store/reducers/profile";
 import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
 import { setSentPuzzles } from "../store/reducers/sentPuzzles";
 import { ScreenNavigation, RootState } from "../types";
-import { safelyDeletePuzzleImage } from "../util";
+import { safelyDeletePuzzleImage, restorePuzzles } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 
@@ -144,6 +144,25 @@ export default function Profile({
           style={{ margin: 10 }}
         >
           Delete Sent Puzzles
+        </Button>
+        <Button
+          icon="cloud-download"
+          mode="contained"
+          onPress={async () => {
+            try {
+              const [
+                mergedReceivedPuzzles,
+                mergedSentPuzzles,
+              ] = await restorePuzzles(receivedPuzzles, sentPuzzles);
+              dispatch(setReceivedPuzzles(mergedReceivedPuzzles));
+              dispatch(setSentPuzzles(mergedSentPuzzles));
+            } catch (error) {
+              console.log(error);
+            }
+          }}
+          style={{ margin: 10 }}
+        >
+          Restore Puzzles
         </Button>
         <Text>v{VERSION_NUMBER}</Text>
       </KeyboardAwareScrollView>
