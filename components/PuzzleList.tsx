@@ -137,7 +137,9 @@ export default function PuzzleList({
           placeholder="Enter puzzle ID or URL"
           value={puzzleURL}
           onChangeText={(text) => setPuzzleURL(text)}
-          onSubmitEditing={downloadPuzzle}
+          onSubmitEditing={() => {
+            if (puzzleURL.length > 8) downloadPuzzle();
+          }}
           // maxLength={50}
           style={{ flex: 2 }}
         />
@@ -175,11 +177,11 @@ export default function PuzzleList({
                     <Card.Title
                       title={
                         receivedPuzzle.message &&
-                        receivedPuzzle.message.length &&
-                        receivedPuzzle.completed
+                          receivedPuzzle.message.length &&
+                          receivedPuzzle.completed
                           ? receivedPuzzle.senderName +
-                            " - " +
-                            receivedPuzzle.message
+                          " - " +
+                          receivedPuzzle.message
                           : receivedPuzzle.senderName
                       }
                       subtitle={moment(receivedPuzzle.dateReceived).calendar()}
