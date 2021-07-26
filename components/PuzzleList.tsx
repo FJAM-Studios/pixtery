@@ -177,11 +177,11 @@ export default function PuzzleList({
                     <Card.Title
                       title={
                         receivedPuzzle.message &&
-                          receivedPuzzle.message.length &&
-                          receivedPuzzle.completed
+                        receivedPuzzle.message.length &&
+                        receivedPuzzle.completed
                           ? receivedPuzzle.senderName +
-                          " - " +
-                          receivedPuzzle.message
+                            " - " +
+                            receivedPuzzle.message
                           : receivedPuzzle.senderName
                       }
                       subtitle={moment(receivedPuzzle.dateReceived).calendar()}
