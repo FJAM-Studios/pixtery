@@ -277,7 +277,7 @@ const fetchCollection = async (listType: string): Promise<Puzzle[]> => {
   return puzzles.data;
 };
 
-const savePuzzles = async (
+const mergePuzzles = async (
   storageKey: string,
   puzzlesInState: Puzzle[],
   downloadedPuzzles: Puzzle[]
@@ -308,17 +308,15 @@ export const restorePuzzles = async (
   receivedState: Puzzle[],
   sentState: Puzzle[]
 ): Promise<Puzzle[][]> => {
-  console.log("Fetching Puzzles from Server");
   try {
     const [receivedFromServer, sentFromServer] = await fetchAllPuzzleData();
-    const mergedReceivedPuzzles = await savePuzzles(
+    const mergedReceivedPuzzles = await mergePuzzles(
       "@pixteryPuzzles",
       receivedState,
       receivedFromServer
     );
     let imageErrors = fetchImages(mergedReceivedPuzzles);
-    console.log("MERGED PUZZLES", mergedReceivedPuzzles);
-    const mergedSentPuzzles = await savePuzzles(
+    const mergedSentPuzzles = await mergePuzzles(
       "@pixterySentPuzzles",
       sentState,
       sentFromServer
