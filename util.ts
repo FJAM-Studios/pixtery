@@ -250,12 +250,18 @@ export const downloadImage = async (newPuzzle: Puzzle): Promise<number> => {
   }
 };
 
-const fetchImages = (puzzles: Puzzle[]): number => {
+const fetchImages = async (puzzles: Puzzle[]): Promise<number> => {
   let downloadErrors = 0;
-  puzzles.forEach(async (puzzle) => {
+
+  for (const puzzle of puzzles) {
     const error = await downloadImage(puzzle);
     downloadErrors += error;
-  });
+    console.log("Download errors:", downloadErrors);
+  }
+  // puzzles.forEach(async (puzzle) => {
+  //   const error = await downloadImage(puzzle);
+  //   downloadErrors += error;
+  // });
 
   return downloadErrors;
 };
@@ -315,16 +321,16 @@ export const restorePuzzles = async (
       receivedState,
       receivedFromServer
     );
-    let imageErrors = fetchImages(mergedReceivedPuzzles);
+    let imageErrors = await fetchImages(mergedReceivedPuzzles);
     const mergedSentPuzzles = await mergePuzzles(
       "@pixterySentPuzzles",
       sentState,
       sentFromServer
     );
-    imageErrors += fetchImages(mergedSentPuzzles);
+    imageErrors += await fetchImages(mergedSentPuzzles);
     if (imageErrors > 0)
       Toast.show(
-        `Could not download ${imageErrors} images.\nThis may be due to poor internet connection.\nPlease try again later`,
+        `Could not download ${imageErrors} images.\nThis may be due to poor internet connection.\nPlease try again later.`,
         {
           duration: Toast.durations.LONG,
         }
