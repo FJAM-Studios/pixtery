@@ -3,13 +3,20 @@ import moment from "moment";
 import * as React from "react";
 import { View, ScrollView, TouchableOpacity } from "react-native";
 import Modal from "react-native-modal";
-import { Text, Card, IconButton, Button, Headline } from "react-native-paper";
+import {
+  Text,
+  TextInput,
+  Card,
+  IconButton,
+  Button,
+  Headline,
+} from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 
 import { sortPuzzles } from "../puzzleUtils";
 import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
 import { Puzzle, ScreenNavigation, RootState } from "../types";
-import { saveToLibrary, safelyDeletePuzzleImage } from "../util";
+import { saveToLibrary, safelyDeletePuzzleImage, goToScreen } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 
@@ -33,6 +40,7 @@ export default function PuzzleList({
   const [sortBy, setSortBy] = React.useState<keyof Puzzle>("dateReceived");
   // "desc" = descending or "asc" = ascending
   const [sortOrder, setSortOrder] = React.useState<string>("desc");
+  const [puzzleURL, setPuzzleURL] = React.useState<string>("");
 
   const showDeleteModal = (puzzle: Puzzle) => {
     setModalVisible(true);
@@ -51,6 +59,11 @@ export default function PuzzleList({
     }
     setPuzzleToDelete(null);
     setModalVisible(false);
+  };
+
+  const downloadPuzzle = () => {
+    const publicKey = puzzleURL.slice(puzzleURL.lastIndexOf("/") + 1); //parse the public key from the text, so users can enter either the public key or the whole url.
+    goToScreen(navigation, "AddPuzzle", { publicKey });
   };
 
   return (
@@ -111,6 +124,33 @@ export default function PuzzleList({
         }
         navigation={navigation}
       />
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          marginBottom: "2%",
+        }}
+      >
+        <TextInput
+          mode="outlined"
+          label="Enter puzzle ID or URL"
+          placeholder="Enter puzzle ID or URL"
+          value={puzzleURL}
+          onChangeText={(text) => setPuzzleURL(text)}
+          onSubmitEditing={() => {
+            if (puzzleURL.length > 8) downloadPuzzle();
+          }}
+          // maxLength={50}
+          style={{ flex: 2 }}
+        />
+        <IconButton
+          icon="arrow-down-bold-circle"
+          onPress={downloadPuzzle}
+          style={{ flex: 0 }}
+          size={40}
+          disabled={puzzleURL.length < 9}
+        />
+      </View>
       <ScrollView>
         <>
           {receivedPuzzles.length ? (
