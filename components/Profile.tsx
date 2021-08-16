@@ -11,7 +11,11 @@ import { setProfile } from "../store/reducers/profile";
 import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
 import { setSentPuzzles } from "../store/reducers/sentPuzzles";
 import { ScreenNavigation, RootState } from "../types";
-import { safelyDeletePuzzleImage, restorePuzzles } from "../util";
+import {
+  safelyDeletePuzzleImage,
+  restorePuzzles,
+  deactivateAllPuzzlesOnServer,
+} from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 
@@ -29,6 +33,7 @@ export default function Profile({
   const profile = useSelector((state: RootState) => state.profile);
   const [name, setName] = useState((profile && profile.name) || "");
   const [errors, setErrors] = useState("");
+  const [restoring, setRestoring] = useState(false);
   return (
     <AdSafeAreaView
       style={{
@@ -116,6 +121,7 @@ export default function Profile({
             }
             //update app state
             dispatch(setReceivedPuzzles([]));
+            deactivateAllPuzzlesOnServer("received");
             //send you to splash
           }}
           style={{ margin: 10 }}
@@ -139,6 +145,7 @@ export default function Profile({
             }
             //update app state
             dispatch(setSentPuzzles([]));
+            deactivateAllPuzzlesOnServer("sent");
             //send you to splash
           }}
           style={{ margin: 10 }}
@@ -148,15 +155,19 @@ export default function Profile({
         <Button
           icon="cloud-download"
           mode="contained"
+          disabled={restoring}
           onPress={async () => {
             try {
+              setRestoring(true);
               const [
                 mergedReceivedPuzzles,
                 mergedSentPuzzles,
               ] = await restorePuzzles(receivedPuzzles, sentPuzzles);
               dispatch(setReceivedPuzzles(mergedReceivedPuzzles));
               dispatch(setSentPuzzles(mergedSentPuzzles));
+              setRestoring(false);
             } catch (error) {
+              setRestoring(false);
               console.log(error);
             }
           }}

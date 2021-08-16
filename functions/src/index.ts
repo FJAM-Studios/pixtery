@@ -100,6 +100,7 @@ exports.fetchPuzzles = functions.https.onCall(
     let puzzles = await db.collection("userPixteries")
               .doc(user)
               .collection(listType)
+              .where("active", "==", true)
               .get();
     if(!puzzles.empty){
       puzzles = puzzles.docs.map((doc:any) => doc.data());
@@ -113,7 +114,37 @@ exports.fetchPuzzles = functions.https.onCall(
 
 // this function can be used to mark a user's sent/recvd puzzle as inactive in their list
 // it's not currently called anywhere in the app, but we can implement front end later
-exports.removeUserPuzzle = functions.https.onCall(
+exports.deactivateAllUserPuzzles = functions.https.onCall(
+  async (list, context) => {
+    console.log("deactivating user puzzle");
+    try {
+    // throw error if user is not authenticated
+      if (!context.auth) {
+        throw new functions.https.HttpsError(
+            "permission-denied",
+            "user not authenticated"
+        );
+      }
+
+      //mark userPuzzle as removed from user's list
+      db.collection("userPixteries")
+        .doc(context.auth.uid)
+        .collection(list)
+        .get()
+        .then(function (querySnapshot: any){
+          querySnapshot.forEach(function (doc: any){
+            doc.ref.update({
+              active: false
+            })
+          })
+        })
+    } catch (error) {
+      throw new functions.https.HttpsError("unknown", error.message, error);
+    }
+  }
+);
+
+exports.deactivateUserPuzzle = functions.https.onCall(
   async (data: { publicKey: string, list: string }, context) => {
     const {publicKey, list} = data;
     console.log("deactivating user puzzle");

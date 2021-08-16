@@ -315,6 +315,9 @@ export const restorePuzzles = async (
   sentState: Puzzle[]
 ): Promise<Puzzle[][]> => {
   try {
+    Toast.show(`Downloading puzzles from server`, {
+      duration: Toast.durations.SHORT,
+    });
     const [receivedFromServer, sentFromServer] = await fetchAllPuzzleData();
     const mergedReceivedPuzzles = await mergePuzzles(
       "@pixteryPuzzles",
@@ -355,5 +358,32 @@ export const restorePuzzles = async (
       }
     );
     throw new Error("Error restoring puzzles");
+  }
+};
+
+export const deactivatePuzzleOnServer = async (
+  publicKey: string,
+  list: string
+): Promise<void> => {
+  try {
+    const deactivateUserPuzzle = functions.httpsCallable(
+      "deactivateUserPuzzle"
+    );
+    await deactivateUserPuzzle({ publicKey, list });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const deactivateAllPuzzlesOnServer = async (
+  list: string
+): Promise<void> => {
+  try {
+    const deactivateAllUserPuzzles = functions.httpsCallable(
+      "deactivateAllUserPuzzles"
+    );
+    await deactivateAllUserPuzzles(list);
+  } catch (error) {
+    console.log(error);
   }
 };
