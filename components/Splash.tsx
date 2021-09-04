@@ -93,7 +93,10 @@ export default function Splash({
           const { path } = Linking.parse(url);
           const publicKey = path?.substring(path.lastIndexOf("/") + 1);
           if (publicKey && publicKey.length === PUBLIC_KEY_LENGTH) {
-            closeSplashAndNavigate(navigation, "AddPuzzle", { publicKey });
+            closeSplashAndNavigate(navigation, "AddPuzzle", {
+              publicKey,
+              sourceList: "received",
+            });
           } else closeSplashAndNavigate(navigation, "Home");
           // if there's no url bc the app was reloaded by Android OTA update, navigate to Home
         } else closeSplashAndNavigate(navigation, "Home");

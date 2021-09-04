@@ -16,7 +16,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { sortPuzzles } from "../puzzleUtils";
 import { setSentPuzzles } from "../store/reducers/sentPuzzles";
 import { Puzzle, ScreenNavigation, RootState } from "../types";
-import { saveToLibrary, safelyDeletePuzzleImage, shareMessage } from "../util";
+import {
+  saveToLibrary,
+  safelyDeletePuzzleImage,
+  shareMessage,
+  deactivatePuzzleOnServer,
+} from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 
@@ -64,6 +69,7 @@ export default function SentPuzzleList({
       );
       await safelyDeletePuzzleImage(puzzle.imageURI, receivedPuzzles);
       dispatch(setSentPuzzles(newPuzzles));
+      deactivatePuzzleOnServer(puzzle.publicKey, "sent");
     }
     setPuzzleToDelete(null);
     setModalVisible(false);
@@ -137,6 +143,7 @@ export default function SentPuzzleList({
                   onPress={() =>
                     navigation.navigate("Puzzle", {
                       publicKey: sentPuzzle.publicKey,
+                      sourceList: "sent",
                     })
                   }
                   key={ix}

@@ -7,7 +7,7 @@ import * as ImagePicker from "expo-image-picker";
 import { ImageInfo } from "expo-image-picker/build/ImagePicker.types";
 import * as Linking from "expo-linking";
 import * as React from "react";
-import { Image, View, Platform } from "react-native";
+import { Image, View, Platform, Keyboard } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import {
   Button,
@@ -219,6 +219,7 @@ export default function Home({
   };
 
   const displayPainfulAd = async () => {
+    Keyboard.dismiss();
     if (DISPLAY_PAINFUL_ADS) {
       //I tried adding the event listeners in the useEffect but that caused the filename passed to the image manipulator to be blank so instead they're created here and then cleaned up in the submitToServer so it doesn't trigger repeatedly when making more than one puzzle
       AdMobInterstitial.addEventListener("interstitialDidClose", () => {
