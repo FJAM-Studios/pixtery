@@ -11,6 +11,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { Alert, Share } from "react-native";
 import Toast from "react-native-root-toast";
 
+import { storage, functions } from "./FirebaseApp";
 import { Puzzle, ScreenNavigation } from "./types";
 
 //convert URI into a blob to transmit to server
@@ -59,9 +60,10 @@ export const shareMessage = async (pixUrl: string): Promise<void> => {
 export const goToScreen = (
   navigation: ScreenNavigation | NavigationContainerRef,
   screen: string,
-  options: { url?: string | null; publicKey?: string } = {
+  options: { url?: string | null; publicKey?: string; sourceList?: string } = {
     url: "",
     publicKey: "",
+    sourceList: "",
   }
 ): void => {
   navigation.dispatch(
@@ -75,9 +77,10 @@ export const goToScreen = (
 export const closeSplashAndNavigate = async (
   navigation: ScreenNavigation | NavigationContainerRef,
   screen: string,
-  options: { url?: string | null; publicKey?: string } = {
+  options: { url?: string | null; publicKey?: string; sourceList?: string } = {
     url: "",
     publicKey: "",
+    sourceList: "",
   }
 ): Promise<void> => {
   goToScreen(navigation, screen, options);
@@ -113,8 +116,13 @@ export const safelyDeletePuzzleImage = async (
   imageURI: string, //image to delete
   keeperList: Puzzle[] //list to check against
 ): Promise<void> => {
-  if (!keeperList.map((puzzle) => puzzle.imageURI).includes(imageURI))
-    await FileSystem.deleteAsync(FileSystem.documentDirectory + imageURI);
+  if (!keeperList.map((puzzle) => puzzle.imageURI).includes(imageURI)) {
+    const fileInfo = await FileSystem.getInfoAsync(
+      FileSystem.documentDirectory + imageURI
+    );
+    if (fileInfo.exists)
+      await FileSystem.deleteAsync(FileSystem.documentDirectory + imageURI);
+  }
 };
 
 export const updateImageURIs = async (
@@ -212,5 +220,170 @@ export const checkPermission = async (camera: boolean): Promise<string> => {
       : await ImagePicker.requestMediaLibraryPermissionsAsync();
 
     return checkPermission(camera);
+  }
+};
+
+export const downloadImage = async (newPuzzle: Puzzle): Promise<number> => {
+  try {
+    const { imageURI } = newPuzzle;
+    // for now, giving image a filename based on URL from server, can change later if needed
+    const fileName = imageURI.slice(imageURI.lastIndexOf("/") + 1);
+    const downloadURL = await storage.ref("/" + imageURI).getDownloadURL();
+    //put jpg in upload instead of here
+    //but user could still download old pixtery (with no uploaded extension), so addl logic needed
+    const extension = imageURI.slice(-4) === ".jpg" ? "" : ".jpg";
+    newPuzzle.imageURI = fileName + extension;
+    const localURI = FileSystem.documentDirectory + fileName + extension;
+    // if you already have this image, don't download it
+    const fileInfo = await FileSystem.getInfoAsync(localURI);
+    if (!fileInfo.exists) {
+      console.log("Image doesn't exist, downloading...");
+      // download the image from pixtery server and save to pixtery dir
+      await FileSystem.downloadAsync(downloadURL, localURI);
+    }
+
+    return 0;
+  } catch (error) {
+    console.log(error);
+    // NOTE: I am not throwing an error here because if something goes wrong and an image can't be downloaded, we should still continue with the puzzle data that we do have and rely on the function asking the user to redownload the image when opening the puzzle. Also, assuming it was just an internet issue, hitting restore puzzles when you have better service should redownload the images that you don't have.
+    return 1;
+  }
+};
+
+const fetchImages = async (puzzles: Puzzle[]): Promise<number> => {
+  let downloadErrors = 0;
+
+  for (const puzzle of puzzles) {
+    const error = await downloadImage(puzzle);
+    downloadErrors += error;
+    console.log("Download errors:", downloadErrors);
+  }
+  // puzzles.forEach(async (puzzle) => {
+  //   const error = await downloadImage(puzzle);
+  //   downloadErrors += error;
+  // });
+
+  return downloadErrors;
+};
+
+const fetchAllPuzzleData = async (): Promise<Puzzle[][]> => {
+  try {
+    const receivedPuzzles = await fetchCollection("received");
+    const sentPuzzles = await fetchCollection("sent");
+    return [receivedPuzzles, sentPuzzles];
+  } catch (error) {
+    console.log(error);
+    throw new Error("Error fetching puzzle data from server");
+  }
+};
+
+const fetchCollection = async (listType: string): Promise<Puzzle[]> => {
+  const fetchPuzzles = functions.httpsCallable("fetchPuzzles");
+  const puzzles = await fetchPuzzles(listType);
+  return puzzles.data;
+};
+
+const mergePuzzles = async (
+  storageKey: string,
+  puzzlesInState: Puzzle[],
+  downloadedPuzzles: Puzzle[]
+) => {
+  try {
+    // run through downloaded puzzles and select only puzzles that aren't already in state.
+    // add those puzzles to state and add them to memory
+    const allPuzzles = [
+      ...puzzlesInState,
+      ...downloadedPuzzles.filter(
+        (downloadedPuzzle) =>
+          !puzzlesInState.find(
+            (puzzleInState) =>
+              puzzleInState.publicKey === downloadedPuzzle.publicKey
+          )
+      ),
+    ];
+    await AsyncStorage.setItem(storageKey, JSON.stringify(allPuzzles));
+
+    return allPuzzles;
+  } catch (error) {
+    console.log(error);
+    throw new Error("Error saving puzzle data to device");
+  }
+};
+
+export const restorePuzzles = async (
+  receivedState: Puzzle[],
+  sentState: Puzzle[]
+): Promise<Puzzle[][]> => {
+  try {
+    Toast.show(`Downloading puzzles from server`, {
+      duration: Toast.durations.SHORT,
+    });
+    const [receivedFromServer, sentFromServer] = await fetchAllPuzzleData();
+    const mergedReceivedPuzzles = await mergePuzzles(
+      "@pixteryPuzzles",
+      receivedState,
+      receivedFromServer
+    );
+    let imageErrors = await fetchImages(mergedReceivedPuzzles);
+    const mergedSentPuzzles = await mergePuzzles(
+      "@pixterySentPuzzles",
+      sentState,
+      sentFromServer
+    );
+    imageErrors += await fetchImages(mergedSentPuzzles);
+    if (imageErrors > 0)
+      Toast.show(
+        `Could not download ${imageErrors} images.\nThis may be due to poor internet connection.\nPlease try again later.`,
+        {
+          duration: Toast.durations.LONG,
+        }
+      );
+    else
+      Toast.show(
+        receivedState.length === mergedReceivedPuzzles.length &&
+          sentState.length === mergedSentPuzzles.length
+          ? "Puzzles already up to date"
+          : "Puzzles downloaded",
+        {
+          duration: Toast.durations.SHORT,
+        }
+      );
+    return [mergedReceivedPuzzles, mergedSentPuzzles];
+  } catch (error) {
+    console.log(error);
+    Toast.show(
+      `Could not restore puzzles.\nThis may be due to poor internet connection.\nPlease try again later.`,
+      {
+        duration: Toast.durations.LONG,
+      }
+    );
+    throw new Error("Error restoring puzzles");
+  }
+};
+
+export const deactivatePuzzleOnServer = async (
+  publicKey: string,
+  list: string
+): Promise<void> => {
+  try {
+    const deactivateUserPuzzle = functions.httpsCallable(
+      "deactivateUserPuzzle"
+    );
+    await deactivateUserPuzzle({ publicKey, list });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const deactivateAllPuzzlesOnServer = async (
+  list: string
+): Promise<void> => {
+  try {
+    const deactivateAllUserPuzzles = functions.httpsCallable(
+      "deactivateAllUserPuzzles"
+    );
+    await deactivateAllUserPuzzles(list);
+  } catch (error) {
+    console.log(error);
   }
 };
