@@ -70,6 +70,7 @@ export default function IosCamera({
     imageHeight: initialImageHeightOnScreen,
   });
 
+  // keeps track of when user has released image, so that on release (i.e. released state is true), lastPos is updated with actual X Y coordinates
   const [released, setReleased] = useState(true);
 
   // pan (i.e. drag)
@@ -100,29 +101,24 @@ export default function IosCamera({
           const rightImagePos = x + imageWidth;
           const bottomImagePos = y + imageHeight;
 
-          // if all bounds of image are outside the crop box, move image as user intends
-          if (
-            x <= boxX &&
-            y <= boxYPlusStatusBar &&
-            rightImagePos >= rightBoxPos &&
-            bottomImagePos >= bottomBoxPos
-          ) {
-            // set offset to diff between new position and last position
+          // evaluate image X position relative to crop box
+          // if image x position is outside of crop box, move image X position as user desires
+          if (x <= boxX && rightImagePos >= rightBoxPos) {
+            // set offset to difference between new position and last position
             lastOffset.current.x += x - lastPos.current.x;
-            lastOffset.current.y += y - lastPos.current.y;
             translateX.setOffset(lastOffset.current.x);
-            translateY.setOffset(lastOffset.current.y);
 
             // set image as not aligned to crop box
             alignedAtBoxRight.current = false;
             alignedAtBoxLeft.current = false;
-            alignedAtBoxTop.current = false;
-            alignedAtBoxBottom.current = false;
           }
-          // if all bounds of moved image are not outside crop box, snap back image to align to a side of crop box depending on where user tried to move image to
+          // else if all bounds of moved image are not outside crop box, snap back image to align to a side of crop box depending on where user tried to move image to
           else {
             // if image X moves to the right of crop box left side, and wasn't aligned there before, align image left side to crop box left side
-            if (x > boxX && !alignedAtBoxLeft.current) {
+            if (
+              x > boxX
+              //  && !alignedAtBoxLeft.current
+            ) {
               // offset is the difference between box absolute position and the last X starting position, adjusted by the current scale vs original proportions
               lastOffset.current.x += boxX - lastPos.current.x;
               translateX.setOffset(lastOffset.current.x);
@@ -134,8 +130,9 @@ export default function IosCamera({
             }
             // if image right edge moves to the left of crop box's right side, and wasn't aligned there before, align image right side to crop box right side
             else if (
-              rightImagePos < rightBoxPos &&
-              !alignedAtBoxRight.current
+              rightImagePos < rightBoxPos
+              //  &&
+              // !alignedAtBoxRight.current
             ) {
               // end goal of where imageX needs to be when image right side is aligned to right side of crop box
               const imageXWhenAlignedToBoxRight = rightBoxPos - imageWidth;
@@ -149,8 +146,26 @@ export default function IosCamera({
               alignedAtBoxRight.current = true;
               alignedAtBoxLeft.current = false;
             }
+          }
+
+          // evaluate image Y position relative to crop box
+          // if image Y position is outside of crop box, move image Y position as user desires
+          if (y <= boxYPlusStatusBar && bottomImagePos >= bottomBoxPos) {
+            // set offset to diff between new position and last position
+            lastOffset.current.y += y - lastPos.current.y;
+            translateY.setOffset(lastOffset.current.y);
+
+            // set image as not aligned to crop box
+            alignedAtBoxTop.current = false;
+            alignedAtBoxBottom.current = false;
+          }
+          // else if all bounds of moved image are not outside crop box, snap back image to align to a side of crop box depending on where user tried to move image to
+          else {
             // if image Y moves below crop box top, and wasn't aligned there before, align image top side to crop box top
-            if (y > boxYPlusStatusBar && !alignedAtBoxTop.current) {
+            if (
+              y > boxYPlusStatusBar
+              // && !alignedAtBoxTop.current
+            ) {
               // offset is the difference between where image Y needs to be and the last Y starting position, adjusted by the current scale vs original proportions
               lastOffset.current.y += boxYPlusStatusBar - lastPos.current.y;
               translateY.setOffset(lastOffset.current.y);
@@ -162,8 +177,9 @@ export default function IosCamera({
             }
             // if image bottom edge is above bottom of crop box, and wasn't aligned there before, align image bottom to crop box bottom
             else if (
-              bottomImagePos < bottomBoxPos &&
-              !alignedAtBoxBottom.current
+              bottomImagePos < bottomBoxPos
+              // &&
+              // !alignedAtBoxBottom.current
             ) {
               // end goal of where imageY needs to be when image bottom side is aligned to bottom of crop box
               const boxYOnBottom = boxYPlusStatusBar + boardSize - imageHeight;
@@ -207,6 +223,7 @@ export default function IosCamera({
         (x: number, y: number, imageWidth: number, imageHeight: number) => {
           // if image is larger than crop box, zoom box as user intends
           if (imageWidth >= boardSize && imageHeight >= boardSize) {
+            console.log('moved correctly', 'imageWidth', imageWidth, 'imageHeight', imageHeight)
             lastScale.current *= ev.nativeEvent.scale;
 
             // set image as not aligned to crop box
@@ -217,6 +234,8 @@ export default function IosCamera({
           }
           // if box is not fit to both sides of crop box already, fit width in crop box
           else if (!alignedAtBoxLeft.current || !alignedAtBoxRight.current) {
+            console.log('moved INcorrectly', 'imageWidth', imageWidth, 'imageHeight', imageHeight)
+
             // set scale to fit in box
             lastScale.current = boardSize / width;
 
