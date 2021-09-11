@@ -3,7 +3,7 @@ import * as ImageManipulator from "expo-image-manipulator";
 import * as ImagePicker from "expo-image-picker";
 import { ImageInfo } from "expo-image-picker/build/ImagePicker.types";
 import React, { useEffect, useState, useRef } from "react";
-import { Animated, ImageBackground, Text, View, Button } from "react-native";
+import { Animated, ImageBackground, View, Button } from "react-native";
 import {
   PanGestureHandler,
   State,
@@ -98,106 +98,101 @@ export default function IosCamera({
       // measureInWindow gets absolute dimensions
       imageView.current!.measureInWindow(
         (x: number, y: number, imageWidth: number, imageHeight: number) => {
-          const rightImagePos = x + imageWidth;
-          const bottomImagePos = y + imageHeight;
-
           // evaluate image X position relative to crop box
-          // if image x position is outside of crop box, move image X position as user desires
-          if (x <= boxX && rightImagePos >= rightBoxPos) {
-            // set offset to difference between new position and last position
-            lastOffset.current.x += x - lastPos.current.x;
-            translateX.setOffset(lastOffset.current.x);
-
-            // set image as not aligned to crop box
-            alignedAtBoxRight.current = false;
-            alignedAtBoxLeft.current = false;
-          }
-          // else if all bounds of moved image are not outside crop box, snap back image to align to a side of crop box depending on where user tried to move image to
-          else {
-            // if image X moves to the right of crop box left side, and wasn't aligned there before, align image left side to crop box left side
-            if (
-              x > boxX
-              //  && !alignedAtBoxLeft.current
-            ) {
-              // offset is the difference between box absolute position and the last X starting position, adjusted by the current scale vs original proportions
-              lastOffset.current.x += boxX - lastPos.current.x;
-              translateX.setOffset(lastOffset.current.x);
-              // store X absolute position (which is box X) as starting point for next movement
-              lastPos.current.x = boxX;
-              // set image as aligned at box left, and no longer at box right
-              alignedAtBoxLeft.current = true;
-              alignedAtBoxRight.current = false;
-            }
-            // if image right edge moves to the left of crop box's right side, and wasn't aligned there before, align image right side to crop box right side
-            else if (
-              rightImagePos < rightBoxPos
-              //  &&
-              // !alignedAtBoxRight.current
-            ) {
-              // end goal of where imageX needs to be when image right side is aligned to right side of crop box
-              const imageXWhenAlignedToBoxRight = rightBoxPos - imageWidth;
-              // offset is the difference between where image X needs to be and the last X starting position, adjusted by the current scale vs original proportions
-              lastOffset.current.x +=
-                imageXWhenAlignedToBoxRight - lastPos.current.x;
-              translateX.setOffset(lastOffset.current.x);
-              // store X absolute position as starting point for next movement
-              lastPos.current.x = imageXWhenAlignedToBoxRight;
-              // set image as aligned at box right, and no longer at box left
-              alignedAtBoxRight.current = true;
-              alignedAtBoxLeft.current = false;
-            }
-          }
-
+          evaluateXPos(x, imageWidth);
           // evaluate image Y position relative to crop box
-          // if image Y position is outside of crop box, move image Y position as user desires
-          if (y <= boxYPlusStatusBar && bottomImagePos >= bottomBoxPos) {
-            // set offset to diff between new position and last position
-            lastOffset.current.y += y - lastPos.current.y;
-            translateY.setOffset(lastOffset.current.y);
+          evaluateYPos(y, imageHeight);
 
-            // set image as not aligned to crop box
-            alignedAtBoxTop.current = false;
-            alignedAtBoxBottom.current = false;
-          }
-          // else if all bounds of moved image are not outside crop box, snap back image to align to a side of crop box depending on where user tried to move image to
-          else {
-            // if image Y moves below crop box top, and wasn't aligned there before, align image top side to crop box top
-            if (
-              y > boxYPlusStatusBar
-              // && !alignedAtBoxTop.current
-            ) {
-              // offset is the difference between where image Y needs to be and the last Y starting position, adjusted by the current scale vs original proportions
-              lastOffset.current.y += boxYPlusStatusBar - lastPos.current.y;
-              translateY.setOffset(lastOffset.current.y);
-              // store Y absolute position as starting point for next movement
-              lastPos.current.y = boxYPlusStatusBar;
-              // set image as aligned at box top, and no longer at box bottom
-              alignedAtBoxTop.current = true;
-              alignedAtBoxBottom.current = false;
-            }
-            // if image bottom edge is above bottom of crop box, and wasn't aligned there before, align image bottom to crop box bottom
-            else if (
-              bottomImagePos < bottomBoxPos
-              // &&
-              // !alignedAtBoxBottom.current
-            ) {
-              // end goal of where imageY needs to be when image bottom side is aligned to bottom of crop box
-              const boxYOnBottom = boxYPlusStatusBar + boardSize - imageHeight;
-              // offset is the difference between where image Y needs to be and the last Y starting position, adjusted by the current scale vs original proportions
-              lastOffset.current.y += boxYOnBottom - lastPos.current.y;
-              translateY.setOffset(lastOffset.current.y);
-              // store Y absolute position as starting point for next movement
-              lastPos.current.y = boxYOnBottom;
-              // set image as aligned at box bottom, and no longer at box top
-              alignedAtBoxBottom.current = true;
-              alignedAtBoxTop.current = false;
-            }
-          }
           translateX.setValue(0);
           translateY.setValue(0);
           setReleased(true);
         }
       );
+    }
+  };
+
+  // evaluate image X position relative to crop box
+  const evaluateXPos = (x: number, imageWidth: number) => {
+    const rightImagePos = x + imageWidth;
+
+    // if image x position is outside of crop box, move image X position as user desires
+    if (x <= boxX && rightImagePos >= rightBoxPos) {
+      // set offset to difference between new position and last position
+      lastOffset.current.x += x - lastPos.current.x;
+      translateX.setOffset(lastOffset.current.x);
+
+      // set image as not aligned to crop box
+      alignedAtBoxRight.current = false;
+      alignedAtBoxLeft.current = false;
+    }
+    // else if X position of moved image are not outside crop box, snap back image to align to a side of crop box depending on where user tried to move image to
+    else {
+      // if image X moves to the right of crop box left side, and wasn't aligned there before, align image left side to crop box left side
+      if (x > boxX && !alignedAtBoxLeft.current) {
+        // offset is the difference between box absolute position and the last X starting position, adjusted by the current scale vs original proportions
+        lastOffset.current.x += boxX - lastPos.current.x;
+        translateX.setOffset(lastOffset.current.x);
+        // store X absolute position (which is box X) as starting point for next movement
+        lastPos.current.x = boxX;
+        // set image as aligned at box left, and no longer at box right
+        alignedAtBoxLeft.current = true;
+        alignedAtBoxRight.current = false;
+      }
+      // if image right edge moves to the left of crop box's right side, and wasn't aligned there before, align image right side to crop box right side
+      else if (rightImagePos < rightBoxPos && !alignedAtBoxRight.current) {
+        // end goal of where imageX needs to be when image right side is aligned to right side of crop box
+        const imageXWhenAlignedToBoxRight = rightBoxPos - imageWidth;
+        // offset is the difference between where image X needs to be and the last X starting position, adjusted by the current scale vs original proportions
+        lastOffset.current.x += imageXWhenAlignedToBoxRight - lastPos.current.x;
+        translateX.setOffset(lastOffset.current.x);
+        // store X absolute position as starting point for next movement
+        lastPos.current.x = imageXWhenAlignedToBoxRight;
+        // set image as aligned at box right, and no longer at box left
+        alignedAtBoxRight.current = true;
+        alignedAtBoxLeft.current = false;
+      }
+    }
+  };
+
+  // evaluate image Y position relative to crop box
+  const evaluateYPos = (y: number, imageHeight: number) => {
+    const bottomImagePos = y + imageHeight;
+    // if image Y position is outside of crop box, move image Y position as user desires
+    if (y <= boxYPlusStatusBar && bottomImagePos >= bottomBoxPos) {
+      // set offset to diff between new position and last position
+      lastOffset.current.y += y - lastPos.current.y;
+      translateY.setOffset(lastOffset.current.y);
+
+      // set image as not aligned to crop box
+      alignedAtBoxTop.current = false;
+      alignedAtBoxBottom.current = false;
+    }
+    // else if Y position of moved image is not outside crop box, snap back image to align to a side of crop box depending on where user tried to move image to
+    else {
+      // if image Y moves below crop box top, and wasn't aligned there before, align image top side to crop box top
+      if (y > boxYPlusStatusBar && !alignedAtBoxTop.current) {
+        // offset is the difference between where image Y needs to be and the last Y starting position, adjusted by the current scale vs original proportions
+        lastOffset.current.y += boxYPlusStatusBar - lastPos.current.y;
+        translateY.setOffset(lastOffset.current.y);
+        // store Y absolute position as starting point for next movement
+        lastPos.current.y = boxYPlusStatusBar;
+        // set image as aligned at box top, and no longer at box bottom
+        alignedAtBoxTop.current = true;
+        alignedAtBoxBottom.current = false;
+      }
+      // if image bottom edge is above bottom of crop box, and wasn't aligned there before, align image bottom to crop box bottom
+      else if (bottomImagePos < bottomBoxPos && !alignedAtBoxBottom.current) {
+        // end goal of where imageY needs to be when image bottom side is aligned to bottom of crop box
+        const boxYOnBottom = boxYPlusStatusBar + boardSize - imageHeight;
+        // offset is the difference between where image Y needs to be and the last Y starting position, adjusted by the current scale vs original proportions
+        lastOffset.current.y += boxYOnBottom - lastPos.current.y;
+        translateY.setOffset(lastOffset.current.y);
+        // store Y absolute position as starting point for next movement
+        lastPos.current.y = boxYOnBottom;
+        // set image as aligned at box bottom, and no longer at box top
+        alignedAtBoxBottom.current = true;
+        alignedAtBoxTop.current = false;
+      }
     }
   };
 
@@ -223,19 +218,34 @@ export default function IosCamera({
         (x: number, y: number, imageWidth: number, imageHeight: number) => {
           // if image is larger than crop box, zoom box as user intends
           if (imageWidth >= boardSize && imageHeight >= boardSize) {
-            console.log('moved correctly', 'imageWidth', imageWidth, 'imageHeight', imageHeight)
             lastScale.current *= ev.nativeEvent.scale;
-
-            // set image as not aligned to crop box
             alignedAtBoxLeft.current = false;
             alignedAtBoxRight.current = false;
             alignedAtBoxTop.current = false;
             alignedAtBoxBottom.current = false;
-          }
-          // if box is not fit to both sides of crop box already, fit width in crop box
-          else if (!alignedAtBoxLeft.current || !alignedAtBoxRight.current) {
-            console.log('moved INcorrectly', 'imageWidth', imageWidth, 'imageHeight', imageHeight)
 
+            // below code adjusts image to cropbox corner(s) if after pinch, image is moved so that it is inside crop box
+            const rightImagePos = x + imageWidth;
+            // if after pinch, image right (X) or left positions are inside crop box, snap back to closer side
+            if (x > boxX || rightImagePos < rightBoxPos) {
+              // set lastPos before the evaluatePos function (since the function calcs offset from that position)
+              lastPos.current.x = x;
+              evaluateXPos(x, imageWidth);
+              translateX.setValue(0);
+            }
+
+            const bottomImagePos = y + imageHeight;
+            // if after pinch, image top (Y) or bottom positions are inside crop box, snap back to closer side
+            if (y > boxYPlusStatusBar || bottomImagePos < bottomBoxPos) {
+              // set lastPos before the evaluatePos function (since the function calcs offset from that position)
+              lastPos.current.y = y;
+              evaluateYPos(y, imageHeight);
+              translateY.setValue(0);
+            }
+          }
+
+          // else if pinched image is smaller tham cropbox, and box is not fit to both sides of crop box already, fit width in crop box
+          else if (!alignedAtBoxLeft.current || !alignedAtBoxRight.current) {
             // set scale to fit in box
             lastScale.current = boardSize / width;
 
@@ -315,6 +325,8 @@ export default function IosCamera({
       if (!result.cancelled) {
         lastPos.current.imageHeight = width * (result.height / result.width);
         setImageBeforeCrop(result);
+      } else {
+        setiOSCameraLaunch(false);
       }
     }
   };
@@ -397,7 +409,7 @@ export default function IosCamera({
 
   if (imageBeforeCrop && initialImageHeightOnScreen)
     return (
-      <SafeAreaView>
+      <SafeAreaView style={{ flex: 1, backgroundColor: "black" }}>
         <PanGestureHandler
           onGestureEvent={onPanGestureEvent}
           onHandlerStateChange={onPanHandlerStateChange}
@@ -459,9 +471,9 @@ export default function IosCamera({
             alignSelf: "center",
           }}
         >
-          <Button onPress={setCrop} title="Crop" />
+          <Button color="white" onPress={setCrop} title="Crop" />
         </View>
       </SafeAreaView>
     );
-  return <Text>Loading</Text>;
+  return null;
 }
