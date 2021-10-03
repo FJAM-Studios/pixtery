@@ -197,8 +197,8 @@ export default function PuzzlePiece({
         const rotation = (lastRotate + initialRotation) % (Math.PI * 2);
         matchingPiece.rotation = rotation;
       }
-
       checkWin();
+      playSnapSound();
     }
   };
 
