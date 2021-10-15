@@ -10,6 +10,7 @@ import { VERSION_NUMBER } from "../constants";
 import { setProfile } from "../store/reducers/profile";
 import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
 import { setSentPuzzles } from "../store/reducers/sentPuzzles";
+import { setTutorialFinished } from "../store/reducers/tutorialFinished";
 import { ScreenNavigation, RootState } from "../types";
 import {
   safelyDeletePuzzleImage,
@@ -174,6 +175,17 @@ export default function Profile({
           style={{ margin: 10 }}
         >
           Restore Puzzles
+        </Button>
+        <Button
+          icon="cursor-pointer"
+          mode="contained"
+          onPress={async () => {
+            dispatch(setTutorialFinished(false));
+            navigation.navigate("Home");
+          }}
+          style={{ margin: 10 }}
+        >
+          Tutorial
         </Button>
         <Text>v{VERSION_NUMBER}</Text>
       </KeyboardAwareScrollView>

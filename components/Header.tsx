@@ -1,5 +1,9 @@
 import React from "react";
-import { View, TouchableWithoutFeedback } from "react-native";
+import {
+  View,
+  TouchableWithoutFeedback,
+  LayoutChangeEvent,
+} from "react-native";
 import { IconButton, Badge, Menu, Divider } from "react-native-paper";
 import { useSelector } from "react-redux";
 
@@ -10,9 +14,11 @@ import Title from "./Title";
 export default function Header({
   navigation,
   notifications,
+  measure,
 }: {
   navigation: ScreenNavigation;
   notifications: number;
+  measure?: (ev: LayoutChangeEvent) => void;
 }): JSX.Element {
   const theme = useSelector((state: RootState) => state.theme);
   const [visible, setVisible] = React.useState(false);
@@ -27,6 +33,7 @@ export default function Header({
         flexDirection: "row",
         height: height * 0.05,
       }}
+      onLayout={(ev) => (measure ? measure(ev) : null)}
     >
       <View
         style={{

@@ -97,4 +97,5 @@ export interface RootState {
   screenHeight: ScreenHeight;
   theme: Theme;
   adHeight: number;
+  tutorialFinished: boolean;
 }

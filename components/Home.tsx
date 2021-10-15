@@ -7,7 +7,14 @@ import * as ImagePicker from "expo-image-picker";
 import { ImageInfo } from "expo-image-picker/build/ImagePicker.types";
 import * as Linking from "expo-linking";
 import * as React from "react";
-import { Image, View, Platform, Keyboard } from "react-native";
+import {
+  Image,
+  View,
+  Platform,
+  Keyboard,
+  LayoutChangeEvent,
+  LayoutRectangle,
+} from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import {
   Button,
@@ -43,6 +50,7 @@ import { createBlob, shareMessage, goToScreen, checkPermission } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 import IosCamera from "./IosCamera";
+import Tutorial from "./Tutorial";
 
 const emptyImage = require("../assets/blank.jpg");
 
@@ -63,6 +71,9 @@ export default function Home({
   );
   const sentPuzzles = useSelector((state: RootState) => state.sentPuzzles);
   const profile = useSelector((state: RootState) => state.profile);
+  const tutorialFinished = useSelector(
+    (state: RootState) => state.tutorialFinished
+  );
   const [imageURI, setImageURI] = React.useState("");
   const [puzzleType, setPuzzleType] = React.useState("jigsaw");
   const [gridSize, setGridSize] = React.useState(3);
@@ -207,7 +218,8 @@ export default function Home({
       return newPuzzle;
     } catch (error) {
       console.error(error);
-      throw new Error(error);
+      if (typeof error === "undefined" || typeof error === "string")
+        throw new Error(error);
     }
   };
 
@@ -241,6 +253,55 @@ export default function Home({
       submitToServer();
     }
   };
+
+  const measure = (
+    ev: LayoutChangeEvent,
+    setLayout: React.Dispatch<React.SetStateAction<LayoutRectangle>>
+  ) => {
+    setLayout(ev.nativeEvent.layout);
+  };
+
+  const [cameraButtonLayout, setCameraButtonLayout] = React.useState({
+    height: 0,
+    width: 0,
+    x: 0,
+    y: 0,
+  });
+
+  const [galleryButtonLayout, setGalleryButtonLayout] = React.useState({
+    height: 0,
+    width: 0,
+    x: 0,
+    y: 0,
+  });
+
+  const [headerLayout, setHeaderLayout] = React.useState({
+    height: 0,
+    width: 0,
+    x: 0,
+    y: 0,
+  });
+
+  const [imageLayout, setImageLayout] = React.useState({
+    height: 0,
+    width: 0,
+    x: 0,
+    y: 0,
+  });
+
+  const [settingsLayout, setSettingsLayout] = React.useState({
+    height: 0,
+    width: 0,
+    x: 0,
+    y: 0,
+  });
+
+  const [textLayout, setTextLayout] = React.useState({
+    height: 0,
+    width: 0,
+    x: 0,
+    y: 0,
+  });
 
   React.useEffect(() => {
     if (puzzleType === "squares")
@@ -299,6 +360,7 @@ export default function Home({
           receivedPuzzles.filter((puzzle) => !puzzle.completed).length
         }
         navigation={navigation}
+        measure={(ev) => measure(ev, setHeaderLayout)}
       />
       <KeyboardAwareScrollView
         resetScrollToCoords={{ x: 0, y: 0 }}
@@ -313,6 +375,7 @@ export default function Home({
             alignSelf: "center",
             alignItems: "center",
           }}
+          onLayout={(ev) => measure(ev, setImageLayout)}
         >
           <Surface
             style={{
@@ -355,6 +418,7 @@ export default function Home({
               : () => setiOSCameraLaunch(true)
           }
           style={{ margin: height * 0.01 }}
+          onLayout={(ev) => measure(ev, setCameraButtonLayout)}
         >
           Camera
         </Button>
@@ -363,6 +427,7 @@ export default function Home({
           mode="contained"
           onPress={() => selectImage(false)}
           style={{ margin: height * 0.01 }}
+          onLayout={(ev) => measure(ev, setGalleryButtonLayout)}
         >
           Gallery
         </Button>
@@ -372,6 +437,7 @@ export default function Home({
             alignItems: "center",
             justifyContent: "space-evenly",
           }}
+          onLayout={(ev) => measure(ev, setSettingsLayout)}
         >
           <Text>Type:</Text>
           <Surface
@@ -492,6 +558,7 @@ export default function Home({
             minHeight: height * 0.09,
             justifyContent: "center",
           }}
+          onLayout={(ev) => measure(ev, setTextLayout)}
         />
         {textFocus ? (
           <Text style={{ textAlign: "right" }}>
@@ -509,6 +576,18 @@ export default function Home({
           Send
         </Button>
       </KeyboardAwareScrollView>
+      {tutorialFinished ? null : (
+        <Tutorial
+          height={height}
+          cameraButtonLayout={cameraButtonLayout}
+          headerLayout={headerLayout}
+          imageLayout={imageLayout}
+          galleryButtonLayout={galleryButtonLayout}
+          settingsLayout={settingsLayout}
+          textLayout={textLayout}
+          sendHeight={buttonHeight}
+        />
+      )}
     </AdSafeAreaView>
   );
 }

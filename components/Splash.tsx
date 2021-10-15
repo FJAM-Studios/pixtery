@@ -9,6 +9,7 @@ import { PUBLIC_KEY_LENGTH } from "../constants";
 import { setProfile } from "../store/reducers/profile";
 import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
 import { setSentPuzzles } from "../store/reducers/sentPuzzles";
+import { setTutorialFinished } from "../store/reducers/tutorialFinished";
 import { ScreenNavigation, SplashRoute, RootState } from "../types";
 import { closeSplashAndNavigate, updateImageURIs } from "../util";
 import Logo from "./Logo";
@@ -42,6 +43,20 @@ export default function Splash({
         return null;
       }
     };
+
+    const loadTutorialState = async () => {
+      try {
+        const jsonValue = await AsyncStorage.getItem("@tutorialFinished");
+        const tutorialFinished =
+          jsonValue != null ? JSON.parse(jsonValue) : false;
+        return tutorialFinished;
+      } catch (e) {
+        console.log(e);
+        alert("Could not load profile.");
+        return null;
+      }
+    };
+
     const loadPuzzles = async () => {
       try {
         const jsonValue = await AsyncStorage.getItem("@pixteryPuzzles");
@@ -86,6 +101,9 @@ export default function Splash({
         route.params && route.params.url
           ? route.params.url
           : await getInitialUrl();
+      // load tutorial state
+      const tutorialFinished = await loadTutorialState();
+      dispatch(setTutorialFinished(tutorialFinished));
       //if you are logged in, load local puzzles, then either navigate to AddPuzzle or Home if there is no url
       if (profile) {
         await loadPuzzles();
@@ -111,7 +129,6 @@ export default function Splash({
         }
       }
     };
-
     loadAppData();
   }, [dispatch, navigation, profile, route.params]);
 
