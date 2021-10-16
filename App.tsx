@@ -14,6 +14,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 
 import AddPuzzle from "./components/AddPuzzle";
+import ContactUs from "./components/ContactUs";
 import CreateProfile from "./components/CreateProfile";
 import HomeScreen from "./components/Home";
 import Profile from "./components/Profile";
@@ -142,6 +143,9 @@ const App = (): JSX.Element => {
               </Stack.Screen>
               <Stack.Screen name="Profile">
                 {(props) => <Profile {...props} />}
+              </Stack.Screen>
+              <Stack.Screen name="ContactUs">
+                {(props) => <ContactUs {...props} />}
               </Stack.Screen>
             </Stack.Navigator>
           </View>

@@ -94,6 +94,15 @@ export default function Header({
           title="Profile"
           icon="cog"
         />
+        <Divider />
+        <Menu.Item
+          onPress={() => {
+            closeMenu();
+            navigation.navigate("ContactUs");
+          }}
+          title="Contact Us"
+          icon="cog"
+        />
       </Menu>
     </View>
   );
