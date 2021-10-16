@@ -74,6 +74,7 @@ export type StackScreens = {
   Puzzle: { publicKey: string; sourceList: string };
   AddPuzzle: { publicKey: string; sourceList: string };
   Profile: undefined;
+  ContactUs: undefined;
 };
 
 export type ScreenNavigation = StackNavigationProp<StackScreens>;
