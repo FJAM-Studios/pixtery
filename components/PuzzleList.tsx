@@ -146,7 +146,7 @@ export default function PuzzleList({
             if (puzzleURL.length > 8) downloadPuzzle();
           }}
           outlineColor={theme.colors.primary}
-          placeholderTextColor={theme.colors.disabled}
+          placeholderTextColor={theme.colors.primary}
           // maxLength={50}
           style={{ flex: 2 }}
         />
