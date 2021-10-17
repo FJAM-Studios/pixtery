@@ -18,6 +18,7 @@ import {
 } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
+import ThemeSelector from "./ThemeSelector";
 
 export default function Profile({
   navigation,
@@ -34,6 +35,8 @@ export default function Profile({
   const [name, setName] = useState((profile && profile.name) || "");
   const [errors, setErrors] = useState("");
   const [restoring, setRestoring] = useState(false);
+  const [selectingTheme, setSelectingTheme] = useState(false);
+
   return (
     <AdSafeAreaView
       style={{
@@ -175,7 +178,18 @@ export default function Profile({
         >
           Restore Puzzles
         </Button>
+        <Button
+          icon="palette"
+          mode="contained"
+          onPress={() => setSelectingTheme(true)}
+          style={{ margin: 10 }}
+        >
+          Change Theme
+        </Button>
         <Text>v{VERSION_NUMBER}</Text>
+        {selectingTheme ? (
+          <ThemeSelector setSelectingTheme={setSelectingTheme} />
+        ) : null}
       </KeyboardAwareScrollView>
     </AdSafeAreaView>
   );

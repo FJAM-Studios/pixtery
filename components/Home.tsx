@@ -434,7 +434,7 @@ export default function Home({
             <Button
               mode="text"
               onPress={() => setGridSize(2)}
-              color="white"
+              color={theme.colors.text}
               compact
             >
               2
@@ -453,7 +453,7 @@ export default function Home({
             <Button
               mode="text"
               onPress={() => setGridSize(3)}
-              color="white"
+              color={theme.colors.text}
               compact
             >
               3
@@ -472,7 +472,7 @@ export default function Home({
             <Button
               mode="text"
               onPress={() => setGridSize(4)}
-              color="white"
+              color={theme.colors.text}
               compact
             >
               4
@@ -488,6 +488,8 @@ export default function Home({
           onChangeText={(message) => setMessage(message)}
           onFocus={() => setTextFocus(true)}
           onBlur={() => setTextFocus(false)}
+          outlineColor={theme.colors.primary}
+          placeholderTextColor={theme.colors.disabled}
           style={{
             minHeight: height * 0.09,
             justifyContent: "center",
