@@ -1,10 +1,12 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import React from "react";
 import { ScrollView, View } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { Headline, Text } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 
-import { allThemes, setTheme } from "../store/reducers/theme";
+import { setTheme } from "../store/reducers/theme";
+import { allThemes } from "../themes";
 import { PixteryTheme, RootState } from "../types";
 
 function ThemeDisplay({
@@ -21,8 +23,9 @@ function ThemeDisplay({
   return (
     <TouchableOpacity
       style={{ alignItems: "center" }}
-      onPress={() => {
+      onPress={async () => {
         dispatch(setTheme(pixTheme));
+        await AsyncStorage.setItem("@themeID", JSON.stringify(pixTheme.ID));
         setSelectingTheme(false);
       }}
     >

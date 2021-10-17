@@ -489,7 +489,7 @@ export default function Home({
           onFocus={() => setTextFocus(true)}
           onBlur={() => setTextFocus(false)}
           outlineColor={theme.colors.primary}
-          placeholderTextColor={theme.colors.disabled}
+          placeholderTextColor={theme.colors.primary}
           style={{
             minHeight: height * 0.09,
             justifyContent: "center",
