@@ -99,4 +99,4 @@ export interface RootState {
   adHeight: number;
 }
 
-export type PixteryTheme = Theme & { name: string };
+export type PixteryTheme = Theme & { name: string; ID: number };
