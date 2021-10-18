@@ -53,6 +53,7 @@ export default function PuzzleComponent({
   );
   const sentPuzzles = useSelector((state: RootState) => state.sentPuzzles);
   const adHeight = useSelector((state: RootState) => state.adHeight);
+  const profile = useSelector((state: RootState) => state.profile);
   const [lowerBound, setLowerBound] = useState<number>(0);
 
   const [puzzle, setPuzzle] = useState<Puzzle>();
@@ -119,7 +120,7 @@ export default function PuzzleComponent({
         setWinMessage(winMessage);
         setOpaque(false);
       }, 100);
-      if (sound) sound.playAsync();
+      if (sound && !profile.noSound) sound.playAsync();
     }, 100);
   };
 
