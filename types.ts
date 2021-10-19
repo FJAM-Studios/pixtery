@@ -74,6 +74,7 @@ export type StackScreens = {
   Puzzle: { publicKey: string; sourceList: string };
   AddPuzzle: { publicKey: string; sourceList: string };
   Profile: undefined;
+  Tutorial: undefined;
 };
 
 export type ScreenNavigation = StackNavigationProp<StackScreens>;
@@ -97,4 +98,5 @@ export interface RootState {
   screenHeight: ScreenHeight;
   theme: Theme;
   adHeight: number;
+  tutorialFinished: boolean;
 }
