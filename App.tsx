@@ -22,6 +22,7 @@ import PuzzleList from "./components/PuzzleList";
 import SentPuzzleList from "./components/SentPuzzleList";
 import Splash from "./components/Splash";
 import TitleScreen from "./components/TitleScreen";
+import Tutorial from "./components/Tutorial";
 import { MIN_BOTTOM_CLEARANCE } from "./constants";
 import { setDeviceSize } from "./store/reducers/screenHeight";
 import { StackScreens, RootState } from "./types";
@@ -142,6 +143,9 @@ const App = (): JSX.Element => {
               </Stack.Screen>
               <Stack.Screen name="Profile">
                 {(props) => <Profile {...props} />}
+              </Stack.Screen>
+              <Stack.Screen name="Tutorial">
+                {(props) => <Tutorial {...props} />}
               </Stack.Screen>
             </Stack.Navigator>
           </View>
