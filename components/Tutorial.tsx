@@ -67,12 +67,6 @@ export default function Tutorial({
         justifyContent: "space-between",
       }}
     >
-      <Header
-        notifications={
-          receivedPuzzles.filter((puzzle) => !puzzle.completed).length
-        }
-        navigation={navigation}
-      />
       {/* transparent overlay */}
       <View
         style={{
@@ -86,13 +80,20 @@ export default function Tutorial({
           zIndex: 1,
         }}
       />
+      <Header
+        notifications={
+          receivedPuzzles.filter((puzzle) => !puzzle.completed).length
+        }
+        navigation={navigation}
+        headerStep={step === 5}
+      />
 
       {/* instructions */}
       <View
         style={{
           width: "80%",
           position: "absolute",
-          top: "12%",
+          top: height * 0.14,
           alignSelf: "center",
           zIndex: 3,
         }}
@@ -100,8 +101,10 @@ export default function Tutorial({
         <Surface
           style={{
             padding: height * 0.03,
+            height: height * 0.15,
             borderRadius: theme.roundness,
             backgroundColor: "rgba(0,0,0,0.5)",
+            justifyContent: "center",
           }}
         >
           {step === 5 ? null : (
@@ -123,12 +126,15 @@ export default function Tutorial({
             else setStep(step + 1);
           }}
         >
-          <Text>{step === 5 ? "Finish!" : "Next"}</Text>
+          <Text>
+            {step === 0 ? "Start Tutorial" : step === 5 ? "Finish!" : "Next"}
+          </Text>
         </Button>
 
         {step === 0 ? null : (
           <Button
             style={{
+              marginHorizontal: 20,
               borderRadius: theme.roundness,
               backgroundColor: theme.colors.onSurface,
             }}
