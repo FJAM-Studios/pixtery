@@ -47,9 +47,9 @@ export default function AdSafeAreaView(props: {
 
       // if app can ask and been more than 1 day, ask for review
       if (hasAction && isAvail && !askedRecently) {
-        StoreReview.requestReview();
         lastAskedReview = Date.now().toString();
         await AsyncStorage.setItem("@lastAskedReview", lastAskedReview);
+        StoreReview.requestReview();
       }
     };
     checkReviewAvailable();
