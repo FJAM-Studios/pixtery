@@ -43,10 +43,10 @@ export default function AdSafeAreaView(props: {
       }
 
       // check if > 1 day since last asked
-      const askedRecently = Date.now() - +lastAskedReview > DAY_IN_MILLISECONDS;
+      const longEnough = Date.now() - +lastAskedReview > DAY_IN_MILLISECONDS;
 
       // if app can ask and been more than 1 day, ask for review
-      if (hasAction && isAvail && !askedRecently) {
+      if (hasAction && isAvail && longEnough) {
         lastAskedReview = Date.now().toString();
         await AsyncStorage.setItem("@lastAskedReview", lastAskedReview);
         StoreReview.requestReview();
