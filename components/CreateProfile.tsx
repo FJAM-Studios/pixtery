@@ -114,7 +114,7 @@ export default function CreateProfile({
               }
             } catch (e) {
               console.log(e);
-              setErrors(e.message);
+              if (e instanceof Error) setErrors(e.message);
             }
           }}
           style={{ margin: 10 }}
@@ -157,7 +157,7 @@ export default function CreateProfile({
                     else goToScreen(navigation, "Home");
                   }
                 } catch (e) {
-                  setErrors(e.message);
+                  if (e instanceof Error) setErrors(e.message);
                   setResetAllowed(true);
                 }
               }}

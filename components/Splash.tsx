@@ -10,7 +10,11 @@ import { setProfile } from "../store/reducers/profile";
 import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
 import { setSentPuzzles } from "../store/reducers/sentPuzzles";
 import { ScreenNavigation, SplashRoute, RootState } from "../types";
-import { closeSplashAndNavigate, updateImageURIs } from "../util";
+import {
+  clearEIMcache,
+  closeSplashAndNavigate,
+  updateImageURIs,
+} from "../util";
 import Logo from "./Logo";
 import Title from "./Title";
 
@@ -113,6 +117,8 @@ export default function Splash({
     };
 
     loadAppData();
+
+    clearEIMcache();
   }, [dispatch, navigation, profile, route.params]);
 
   return (
