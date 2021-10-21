@@ -38,6 +38,7 @@ export interface Puzzle {
 
 export interface Profile {
   name: string;
+  noSound?: boolean;
 }
 
 export interface Piece {
@@ -96,7 +97,9 @@ export interface RootState {
   receivedPuzzles: Puzzle[];
   sentPuzzles: Puzzle[];
   screenHeight: ScreenHeight;
-  theme: Theme;
+  theme: PixteryTheme;
   adHeight: number;
   tutorialFinished: boolean;
 }
+
+export type PixteryTheme = Theme & { name: string; ID: number };
