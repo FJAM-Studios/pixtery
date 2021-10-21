@@ -139,13 +139,14 @@ export default function PuzzleList({
       >
         <TextInput
           mode="outlined"
-          label="Enter puzzle ID or URL"
           placeholder="Enter puzzle ID or URL"
           value={puzzleURL}
           onChangeText={(text) => setPuzzleURL(text)}
           onSubmitEditing={() => {
             if (puzzleURL.length > 8) downloadPuzzle();
           }}
+          outlineColor={theme.colors.primary}
+          placeholderTextColor={theme.colors.primary}
           // maxLength={50}
           style={{ flex: 2 }}
         />

@@ -95,6 +95,8 @@ export interface RootState {
   receivedPuzzles: Puzzle[];
   sentPuzzles: Puzzle[];
   screenHeight: ScreenHeight;
-  theme: Theme;
+  theme: PixteryTheme;
   adHeight: number;
 }
+
+export type PixteryTheme = Theme & { name: string; ID: number };
