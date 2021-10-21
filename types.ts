@@ -75,6 +75,7 @@ export type StackScreens = {
   Puzzle: { publicKey: string; sourceList: string };
   AddPuzzle: { publicKey: string; sourceList: string };
   Profile: undefined;
+  Tutorial: undefined;
 };
 
 export type ScreenNavigation = StackNavigationProp<StackScreens>;
@@ -98,6 +99,7 @@ export interface RootState {
   screenHeight: ScreenHeight;
   theme: PixteryTheme;
   adHeight: number;
+  tutorialFinished: boolean;
 }
 
 export type PixteryTheme = Theme & { name: string; ID: number };
