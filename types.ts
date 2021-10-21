@@ -38,6 +38,7 @@ export interface Puzzle {
 
 export interface Profile {
   name: string;
+  noSound?: boolean;
 }
 
 export interface Piece {
