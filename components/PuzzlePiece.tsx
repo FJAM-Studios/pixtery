@@ -10,6 +10,7 @@ import {
   TapGestureHandlerStateChangeEvent,
 } from "react-native-gesture-handler";
 import { Svg, Image, Defs, ClipPath, Path, Rect } from "react-native-svg";
+import { useSelector } from "react-redux";
 
 import {
   DEGREE_CONVERSION,
@@ -17,7 +18,7 @@ import {
   USE_NATIVE_DRIVER,
 } from "../constants";
 import { getPointsDistance, snapAngle } from "../puzzleUtils";
-import { Point, Piece, BoardSpace } from "../types";
+import { Point, Piece, BoardSpace, RootState } from "../types";
 
 const AnimatedSvg = Animated.createAnimatedComponent(Svg);
 
@@ -65,6 +66,7 @@ export default function PuzzlePiece({
     y: snapOffset.y / pieceDimensions.height,
   };
   const [snapSound, setSnapSound] = useState<Audio.Sound>();
+  const profile = useSelector((state: RootState) => state.profile);
 
   let isDragged = false;
 
@@ -160,7 +162,7 @@ export default function PuzzlePiece({
           const rotation = (lastRotate + initialRotation) % (Math.PI * 2);
           currentBoard.push({ pointIndex, solvedIndex, rotation });
           checkWin();
-          playSnapSound();
+          if (!profile.noSound) playSnapSound();
           break;
         }
       }
@@ -198,7 +200,7 @@ export default function PuzzlePiece({
         matchingPiece.rotation = rotation;
       }
       checkWin();
-      playSnapSound();
+      if (!profile.noSound) playSnapSound();
     }
   };
 
