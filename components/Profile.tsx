@@ -17,6 +17,7 @@ import { VERSION_NUMBER } from "../constants";
 import { setProfile } from "../store/reducers/profile";
 import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
 import { setSentPuzzles } from "../store/reducers/sentPuzzles";
+import { setTutorialFinished } from "../store/reducers/tutorialFinished";
 import { ScreenNavigation, RootState } from "../types";
 import {
   safelyDeletePuzzleImage,
@@ -104,6 +105,14 @@ export default function Profile({
           />
           <Text>On</Text>
         </View>
+        <Button
+          icon="palette"
+          mode="contained"
+          onPress={() => setSelectingTheme(true)}
+          style={{ margin: 10 }}
+        >
+          Change Theme
+        </Button>
         <Button
           icon="camera-iris"
           mode="contained"
@@ -215,13 +224,17 @@ export default function Profile({
           Restore Puzzles
         </Button>
         <Button
-          icon="palette"
+          icon="cursor-pointer"
           mode="contained"
-          onPress={() => setSelectingTheme(true)}
+          onPress={async () => {
+            dispatch(setTutorialFinished(false));
+            navigation.navigate("Tutorial");
+          }}
           style={{ margin: 10 }}
         >
-          Change Theme
+          Tutorial
         </Button>
+
         <Text>v{VERSION_NUMBER}</Text>
         {selectingTheme ? (
           <ThemeSelector setSelectingTheme={setSelectingTheme} />
