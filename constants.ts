@@ -45,6 +45,8 @@ const ARGUABLY_CLEVER_PHRASES = [
   "So pixterious!",
 ];
 
+const DAY_IN_MILLISECONDS = 0;
+
 export {
   TESTING_MODE,
   SNAP_MARGIN,
