@@ -1,9 +1,4 @@
-import React from "react";
-import { useSelector } from "react-redux";
-import theme from "../store/reducers/theme";
-import { ScreenNavigation, RootState } from "../types";
-import AdSafeAreaView from "./AdSafeAreaView";
-import Header from "./Header";
+import React, { useState } from "react";
 import {
   Button,
   IconButton,
@@ -15,6 +10,14 @@ import {
   Modal,
   Portal,
 } from "react-native-paper";
+import { useSelector } from "react-redux";
+import theme from "../store/reducers/theme";
+import { ScreenNavigation, RootState } from "../types";
+import AdSafeAreaView from "./AdSafeAreaView";
+import Header from "./Header";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+
+import { functions } from "../FirebaseApp";
 
 export default function ContactUs({
   navigation,
@@ -26,6 +29,25 @@ export default function ContactUs({
   const receivedPuzzles = useSelector(
     (state: RootState) => state.receivedPuzzles
   );
+  const [message, setMessage] = useState("");
+
+  const submit = async () => {
+    const handleEmailCallable = functions.httpsCallable("handleEmail");
+    try {
+      console.log("test");
+      const result = await handleEmailCallable({
+        firstNumber: 1,
+        secondNumber: 2,
+      });
+      // console.log('result', result.data)
+      return result.data;
+      // return puzzleData.data; // get just nested data from returned JSON
+    } catch (error) {
+      console.log("in contact us");
+      console.error(error);
+      throw new Error(error); //rethrow the error so it can be caught by outer method
+    }
+  };
 
   return (
     <AdSafeAreaView
@@ -43,20 +65,39 @@ export default function ContactUs({
         }
         navigation={navigation}
       />
-      <TextInput
-        placeholder="Subject"
-        multiline
-        // maxLength={messageLimit}
-        mode="outlined"
-        // value={message}
-        // onChangeText={(message) => setMessage(message)}
-        // onFocus={() => setTextFocus(true)}
-        // onBlur={() => setTextFocus(false)}
-        style={{
-          minHeight: height * 0.09,
-          justifyContent: "center",
-        }}
-      />
+      <KeyboardAwareScrollView
+        resetScrollToCoords={{ x: 0, y: 0 }}
+        keyboardShouldPersistTaps="handled"
+        // extraScrollHeight={
+        //   Platform.OS === "ios" ? 0 : buttonHeight + height * 0.2
+        // }
+        enableOnAndroid
+      >
+        <TextInput
+          placeholder="Subject"
+          multiline
+          // maxLength={messageLimit}
+          mode="outlined"
+          value={message}
+          onChangeText={(message) => setMessage(message)}
+          // onFocus={() => setTextFocus(true)}
+          // onBlur={() => setTextFocus(false)}
+          style={{
+            minHeight: height * 0.09,
+            justifyContent: "center",
+          }}
+        />
+        <Button
+          icon="send"
+          mode="contained"
+          onPress={submit}
+          style={{ margin: height * 0.01 }}
+          disabled={message.length === 0}
+          // onLayout={(ev) => setButtonHeight(ev.nativeEvent.layout.height)}
+        >
+          Submit Feedback
+        </Button>
+      </KeyboardAwareScrollView>
     </AdSafeAreaView>
   );
 }
