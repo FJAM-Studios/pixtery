@@ -169,3 +169,20 @@ exports.deactivateUserPuzzle = functions.https.onCall(
     }
   }
 );
+
+  exports.handleEmail = functions.https.onCall((data, context) => {
+    console.log("adding nums");
+    // Numbers passed from the client.
+    // const firstNumber = data.firstNumber;
+    // const secondNumber = data.secondNumber;
+    // returning result.
+    // const result = {
+    //     firstNumber: firstNumber,
+    //     secondNumber: secondNumber,
+    //     operator: "+",
+    //     operationResult: firstNumber + secondNumber,
+    // };
+    return {"result": "successfully uploaded"}
+  }
+
+);
