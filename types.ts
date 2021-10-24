@@ -93,12 +93,13 @@ export interface ScreenHeight {
 }
 
 export interface RootState {
+  adHeight: number;
+  message: string;
   profile: Profile;
   receivedPuzzles: Puzzle[];
   sentPuzzles: Puzzle[];
   screenHeight: ScreenHeight;
   theme: PixteryTheme;
-  adHeight: number;
   tutorialFinished: boolean;
 }
 
