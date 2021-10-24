@@ -15,7 +15,6 @@ import {
   Text,
   Surface,
   Headline,
-  TextInput,
   ActivityIndicator,
   Modal,
   Portal,
@@ -43,6 +42,7 @@ import { createBlob, shareMessage, goToScreen, checkPermission } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 import IosCamera from "./IosCamera";
+import MessageInput from "./MessageInput";
 
 const emptyImage = require("../assets/blank.jpg");
 
@@ -63,17 +63,17 @@ export default function Home({
   );
   const sentPuzzles = useSelector((state: RootState) => state.sentPuzzles);
   const profile = useSelector((state: RootState) => state.profile);
+  const message = useSelector((state: RootState) => state.message);
   const [imageURI, setImageURI] = React.useState("");
   const [puzzleType, setPuzzleType] = React.useState("jigsaw");
   const [gridSize, setGridSize] = React.useState(3);
   const [modalVisible, setModalVisible] = React.useState(false);
-  const [message, setMessage] = React.useState("");
-  const messageLimit = 70;
+  // const [message, setMessage] = React.useState("");
+
   const [paths, setPaths] = React.useState(
     generateJigsawPiecePaths(gridSize, boardSize / (1.6 * gridSize), true)
   );
   const [buttonHeight, setButtonHeight] = React.useState(0);
-  const [textFocus, setTextFocus] = React.useState(false);
   const [iOSCameraLaunch, setiOSCameraLaunch] = React.useState(false);
 
   const selectImage = async (camera: boolean) => {
@@ -479,27 +479,7 @@ export default function Home({
             </Button>
           </Surface>
         </View>
-        <TextInput
-          placeholder="Message (optional, shows when solved)"
-          multiline
-          maxLength={messageLimit}
-          mode="outlined"
-          value={message}
-          onChangeText={(message) => setMessage(message)}
-          onFocus={() => setTextFocus(true)}
-          onBlur={() => setTextFocus(false)}
-          outlineColor={theme.colors.primary}
-          placeholderTextColor={theme.colors.primary}
-          style={{
-            minHeight: height * 0.09,
-            justifyContent: "center",
-          }}
-        />
-        {textFocus ? (
-          <Text style={{ textAlign: "right" }}>
-            {message.length}/{messageLimit} characters
-          </Text>
-        ) : null}
+        <MessageInput height={height * 0.09} theme={theme} />
         <Button
           icon="send"
           mode="contained"
