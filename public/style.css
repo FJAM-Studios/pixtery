@@ -71,13 +71,14 @@ body {
   justify-content: space-between;
 }
 
-#board *, #banner * {
+#board *,
+#banner * {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
-   -khtml-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 .dot {
@@ -94,7 +95,7 @@ body {
 }
 
 /* just app store logos on homepage displays as column */
-.links:not(#banner>.links):not(#callToAction .links){
+.links:not(#banner > .links):not(#callToAction .links) {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -147,7 +148,7 @@ body {
     font-size: 15px;
   }
   #web-win-message {
-    font-size: 18px
+    font-size: 18px;
   }
 }
 

@@ -479,7 +479,11 @@ export default function Home({
             </Button>
           </Surface>
         </View>
-        <MessageInput height={height * 0.09} theme={theme} />
+        <MessageInput
+          height={height * 0.09}
+          margin={height * 0.01}
+          theme={theme}
+        />
         <Button
           icon="send"
           mode="contained"
