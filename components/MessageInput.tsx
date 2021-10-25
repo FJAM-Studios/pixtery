@@ -32,12 +32,18 @@ export default function MessageInput({
           margin,
         }}
       >
-        <Text style={{ 
-            textAlign: "left" }}>
+        <Text
+          style={{
+            textAlign: "left",
+          }}
+        >
           Secret Message
         </Text>
-        <Text style={{ 
-            textAlign: "right" }}>
+        <Text
+          style={{
+            textAlign: "right",
+          }}
+        >
           {message.length}/{messageLimit} characters
         </Text>
         <TextInput
