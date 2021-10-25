@@ -34,13 +34,10 @@ export default function ContactUs({
   const submit = async () => {
     const handleEmailCallable = functions.httpsCallable("handleEmail");
     try {
-      console.log("test");
-      const result = await handleEmailCallable({
-        firstNumber: 1,
-        secondNumber: 2,
-      });
+      await handleEmailCallable({ message });
+      // handleEmailCallable().then((result) => console.log(result.data));
       // console.log('result', result.data)
-      return result.data;
+      // return result;
       // return puzzleData.data; // get just nested data from returned JSON
     } catch (error) {
       console.log("in contact us");

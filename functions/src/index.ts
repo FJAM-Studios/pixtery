@@ -169,20 +169,37 @@ exports.deactivateUserPuzzle = functions.https.onCall(
     }
   }
 );
+const { createTransport } = require('nodemailer');
 
-  exports.handleEmail = functions.https.onCall((data, context) => {
-    console.log("adding nums");
-    // Numbers passed from the client.
-    // const firstNumber = data.firstNumber;
-    // const secondNumber = data.secondNumber;
-    // returning result.
-    // const result = {
-    //     firstNumber: firstNumber,
-    //     secondNumber: secondNumber,
-    //     operator: "+",
-    //     operationResult: firstNumber + secondNumber,
-    // };
-    return {"result": "successfully uploaded"}
+const sender = adminKey.senderAccount;
+const password = adminKey.password;
+
+const transporter = createTransport({
+  service: 'gmail',
+  auth: {
+    user: sender,
+    pass: password,
+  },
+});
+const transport = (error: any, info: { messageId: any; }) => error ? console.log(error) : console.log(info.messageId);
+
+  exports.handleEmail = functions.https.onCall(async(data, context) => {
+    const { message } = data;
+    try{
+      console.log('cloud email')
+      const mailOptions = {
+        from: sender,
+        to: 'studios.fjam@gmail.com',
+        subject: 'Pixtery feedback',
+        text: message,
+      };      
+        await transporter.sendMail(mailOptions, transport);
+        // res.send({ status: 200 });
+        return {status: "200"}
+    }
+    catch (error) {
+      console.log('in cloud catch')
+      throw new functions.https.HttpsError("unknown", error.message, error);
+    }
   }
-
 );
