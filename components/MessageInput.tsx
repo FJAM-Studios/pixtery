@@ -8,9 +8,11 @@ import { PixteryTheme, RootState } from "../types";
 
 export default function MessageInput({
   height,
+  margin,
   theme,
 }: {
   height: number;
+  margin: number;
   theme: PixteryTheme;
 }): JSX.Element {
   const dispatch = useDispatch();
@@ -20,27 +22,41 @@ export default function MessageInput({
 
   return (
     <View>
-      <Surface>
-        <Text style={{ textAlign: "right" }}>
-            {message.length}/{messageLimit} characters
+      <Surface
+        style={{
+          alignItems: "center",
+          justifyContent: "center",
+          elevation: 2,
+          borderRadius: theme.roundness,
+          backgroundColor: theme.colors.primary,
+          margin,
+        }}
+      >
+        <Text style={{ 
+            textAlign: "left" }}>
+          Secret Message
+        </Text>
+        <Text style={{ 
+            textAlign: "right" }}>
+          {message.length}/{messageLimit} characters
         </Text>
         <TextInput
-            placeholder="Message (optional, shows when solved)"
-            multiline
-            maxLength={messageLimit}
-            mode="outlined"
-            value={message}
-            onChangeText={(message) => dispatch(setMessage(message))}
-            onFocus={() => setTextFocus(true)}
-            onBlur={() => setTextFocus(false)}
-            outlineColor={theme.colors.primary}
-            placeholderTextColor={theme.colors.primary}
-            style={{
+          placeholder="Message (optional, shows when solved)"
+          multiline
+          maxLength={messageLimit}
+          mode="outlined"
+          value={message}
+          onChangeText={(message) => dispatch(setMessage(message))}
+          onFocus={() => setTextFocus(true)}
+          onBlur={() => setTextFocus(false)}
+          outlineColor={theme.colors.primary}
+          placeholderTextColor={theme.colors.primary}
+          style={{
             minHeight: height,
             justifyContent: "center",
-            }}
-        />  
-        </Surface>
+          }}
+        />
+      </Surface>
     </View>
   );
 }
