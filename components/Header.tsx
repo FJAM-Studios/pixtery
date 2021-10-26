@@ -101,7 +101,7 @@ export default function Header({
             navigation.navigate("ContactUs");
           }}
           title="Contact Us"
-          icon="cog"
+          icon="email"
         />
       </Menu>
     </View>
