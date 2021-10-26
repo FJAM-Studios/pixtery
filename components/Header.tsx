@@ -10,9 +10,11 @@ import Title from "./Title";
 export default function Header({
   navigation,
   notifications,
+  headerStep,
 }: {
   navigation: ScreenNavigation;
   notifications: number;
+  headerStep?: boolean;
 }): JSX.Element {
   const theme = useSelector((state: RootState) => state.theme);
   const [visible, setVisible] = React.useState(false);
@@ -26,6 +28,7 @@ export default function Header({
         alignItems: "center",
         flexDirection: "row",
         height: height * 0.05,
+        zIndex: headerStep ? 3 : 0,
       }}
     >
       <View

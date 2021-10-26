@@ -53,6 +53,7 @@ export default function PuzzleComponent({
   );
   const sentPuzzles = useSelector((state: RootState) => state.sentPuzzles);
   const adHeight = useSelector((state: RootState) => state.adHeight);
+  const profile = useSelector((state: RootState) => state.profile);
   const [lowerBound, setLowerBound] = useState<number>(0);
 
   const [puzzle, setPuzzle] = useState<Puzzle>();
@@ -119,7 +120,7 @@ export default function PuzzleComponent({
         setWinMessage(winMessage);
         setOpaque(false);
       }, 100);
-      if (sound) sound.playAsync();
+      if (sound && !profile.noSound) sound.playAsync();
     }, 100);
   };
 
@@ -452,7 +453,7 @@ const styles = (props: { theme: Theme; boardSize: number }) =>
       flexWrap: "wrap",
       textAlign: "center",
       flex: 1,
-      color: "white",
+      color: props.theme.colors.text,
       marginTop: 20,
     },
     startText: {
@@ -460,13 +461,13 @@ const styles = (props: { theme: Theme; boardSize: number }) =>
       flexWrap: "wrap",
       textAlign: "center",
       margin: 10,
-      color: "white",
+      color: props.theme.colors.text,
     },
     puzzleArea: {
       width: props.boardSize,
       height: props.boardSize,
       borderWidth: 4,
-      borderColor: "white",
+      borderColor: props.theme.colors.text,
       position: "absolute",
       top: "0%",
       justifyContent: "center",

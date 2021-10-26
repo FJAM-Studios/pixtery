@@ -38,6 +38,7 @@ export interface Puzzle {
 
 export interface Profile {
   name: string;
+  noSound?: boolean;
 }
 
 export interface Piece {
@@ -75,6 +76,7 @@ export type StackScreens = {
   AddPuzzle: { publicKey: string; sourceList: string };
   Profile: undefined;
   ContactUs: undefined;
+  Tutorial: undefined;
 };
 
 export type ScreenNavigation = StackNavigationProp<StackScreens>;
@@ -86,6 +88,7 @@ export type SplashRoute = RouteProp<StackScreens, "Splash">;
 
 //// STORE /////
 export interface ScreenHeight {
+  width: number;
   height: number;
   boardSize: number;
 }
@@ -95,6 +98,9 @@ export interface RootState {
   receivedPuzzles: Puzzle[];
   sentPuzzles: Puzzle[];
   screenHeight: ScreenHeight;
-  theme: Theme;
+  theme: PixteryTheme;
   adHeight: number;
+  tutorialFinished: boolean;
 }
+
+export type PixteryTheme = Theme & { name: string; ID: number };

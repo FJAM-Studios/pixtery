@@ -5,6 +5,7 @@ import {
 import { createStackNavigator } from "@react-navigation/stack";
 import * as Linking from "expo-linking";
 import * as SplashScreen from "expo-splash-screen";
+import { StatusBar } from "expo-status-bar";
 import { requestTrackingPermissionsAsync } from "expo-tracking-transparency";
 import * as Updates from "expo-updates";
 import React, { useRef, useEffect } from "react";
@@ -23,11 +24,11 @@ import PuzzleList from "./components/PuzzleList";
 import SentPuzzleList from "./components/SentPuzzleList";
 import Splash from "./components/Splash";
 import TitleScreen from "./components/TitleScreen";
+import Tutorial from "./components/Tutorial";
 import { MIN_BOTTOM_CLEARANCE } from "./constants";
 import { setDeviceSize } from "./store/reducers/screenHeight";
 import { StackScreens, RootState } from "./types";
 import { goToScreen } from "./util";
-
 //less than ideal, but idk if we have a choice right now. suppresses the firebase timeout warning
 LogBox.ignoreLogs(["Setting a timer for a long period of time"]);
 
@@ -95,7 +96,7 @@ const App = (): JSX.Element => {
         Math.min(height, width),
         MIN_BOTTOM_CLEARANCE * Math.max(height, width)
       );
-    dispatch(setDeviceSize(height, boardSize));
+    dispatch(setDeviceSize(width, height, boardSize));
 
     // on url change go to the splash screen, which will stop the user if they aren't logged in
     Linking.addEventListener("url", (ev) => {
@@ -118,6 +119,7 @@ const App = (): JSX.Element => {
       <SafeAreaProvider>
         <NavigationContainer ref={navigationRef} onReady={gotoSplash}>
           <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
+            <StatusBar style={theme.dark ? "light" : "dark"} />
             <Stack.Navigator initialRouteName="TitleScreen" headerMode="none">
               <Stack.Screen name="TitleScreen" component={TitleScreen} />
               <Stack.Screen name="Splash">
@@ -146,6 +148,9 @@ const App = (): JSX.Element => {
               </Stack.Screen>
               <Stack.Screen name="ContactUs">
                 {(props) => <ContactUs {...props} />}
+              </Stack.Screen>
+              <Stack.Screen name="Tutorial">
+                {(props) => <Tutorial {...props} />}
               </Stack.Screen>
             </Stack.Navigator>
           </View>
