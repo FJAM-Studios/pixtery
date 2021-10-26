@@ -8,9 +8,14 @@ const SET_HEIGHT = "SET_HEIGHT";
 
 // action creators
 
-export const setDeviceSize = (height: number, boardSize: number): AnyAction => {
+export const setDeviceSize = (
+  width: number,
+  height: number,
+  boardSize: number
+): AnyAction => {
   return {
     type: SET_HEIGHT,
+    width,
     height,
     boardSize,
   };
@@ -18,7 +23,7 @@ export const setDeviceSize = (height: number, boardSize: number): AnyAction => {
 
 // reducer
 
-const initialState: ScreenHeight = { boardSize: 0, height: 0 };
+const initialState: ScreenHeight = { width: 0, boardSize: 0, height: 0 };
 
 function reducer(state = initialState, action: AnyAction): ScreenHeight {
   switch (action.type) {
@@ -26,6 +31,7 @@ function reducer(state = initialState, action: AnyAction): ScreenHeight {
       return {
         boardSize: action.boardSize,
         height: action.height,
+        width: action.width,
       };
     default:
       return state;

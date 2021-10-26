@@ -42,6 +42,7 @@ import { Puzzle, ScreenNavigation, RootState } from "../types";
 import { createBlob, shareMessage, goToScreen, checkPermission } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
+import IosCamera from "./IosCamera";
 
 const emptyImage = require("../assets/blank.jpg");
 
@@ -73,6 +74,7 @@ export default function Home({
   );
   const [buttonHeight, setButtonHeight] = React.useState(0);
   const [textFocus, setTextFocus] = React.useState(false);
+  const [iOSCameraLaunch, setiOSCameraLaunch] = React.useState(false);
 
   const selectImage = async (camera: boolean) => {
     const permission = await checkPermission(camera);
@@ -90,7 +92,6 @@ export default function Home({
             aspect: [4, 4],
             quality: 1,
           });
-
       if (!result.cancelled) {
         // if the resulting image is not a square because user did not zoom to fill image select box
         if (result.width !== result.height)
@@ -252,6 +253,14 @@ export default function Home({
       );
   }, [gridSize, puzzleType, boardSize]);
 
+  if (iOSCameraLaunch)
+    return (
+      <IosCamera
+        setImageURI={setImageURI}
+        setiOSCameraLaunch={setiOSCameraLaunch}
+      />
+    );
+
   return (
     <AdSafeAreaView
       style={{
@@ -340,7 +349,11 @@ export default function Home({
         <Button
           icon="camera"
           mode="contained"
-          onPress={() => selectImage(true)}
+          onPress={
+            Platform.OS === "android"
+              ? () => selectImage(true)
+              : () => setiOSCameraLaunch(true)
+          }
           style={{ margin: height * 0.01 }}
         >
           Camera
@@ -421,7 +434,7 @@ export default function Home({
             <Button
               mode="text"
               onPress={() => setGridSize(2)}
-              color="white"
+              color={theme.colors.text}
               compact
             >
               2
@@ -440,7 +453,7 @@ export default function Home({
             <Button
               mode="text"
               onPress={() => setGridSize(3)}
-              color="white"
+              color={theme.colors.text}
               compact
             >
               3
@@ -459,7 +472,7 @@ export default function Home({
             <Button
               mode="text"
               onPress={() => setGridSize(4)}
-              color="white"
+              color={theme.colors.text}
               compact
             >
               4
@@ -475,6 +488,8 @@ export default function Home({
           onChangeText={(message) => setMessage(message)}
           onFocus={() => setTextFocus(true)}
           onBlur={() => setTextFocus(false)}
+          outlineColor={theme.colors.primary}
+          placeholderTextColor={theme.colors.primary}
           style={{
             minHeight: height * 0.09,
             justifyContent: "center",

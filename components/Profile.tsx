@@ -2,7 +2,14 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useState } from "react";
 import { View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { Headline, Text, TextInput, Button } from "react-native-paper";
+import {
+  Headline,
+  Text,
+  TextInput,
+  Button,
+  Switch,
+  IconButton,
+} from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 
 import { signOut } from "../FirebaseApp";
@@ -10,6 +17,7 @@ import { VERSION_NUMBER } from "../constants";
 import { setProfile } from "../store/reducers/profile";
 import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
 import { setSentPuzzles } from "../store/reducers/sentPuzzles";
+import { setTutorialFinished } from "../store/reducers/tutorialFinished";
 import { ScreenNavigation, RootState } from "../types";
 import {
   safelyDeletePuzzleImage,
@@ -18,6 +26,7 @@ import {
 } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
+import ThemeSelector from "./ThemeSelector";
 
 export default function Profile({
   navigation,
@@ -32,8 +41,22 @@ export default function Profile({
   const sentPuzzles = useSelector((state: RootState) => state.sentPuzzles);
   const profile = useSelector((state: RootState) => state.profile);
   const [name, setName] = useState((profile && profile.name) || "");
+  const [noSound, setNoSound] = useState((profile && profile.noSound) || false);
   const [errors, setErrors] = useState("");
   const [restoring, setRestoring] = useState(false);
+
+  const toggleSound = async () => {
+    //save to local storage
+    await AsyncStorage.setItem(
+      "@pixteryProfile",
+      JSON.stringify({ ...profile, noSound: !noSound })
+    );
+    //update app state
+    dispatch(setProfile({ ...profile, noSound: !noSound }));
+    setNoSound(!noSound);
+  };
+  const [selectingTheme, setSelectingTheme] = useState(false);
+
   return (
     <AdSafeAreaView
       style={{
@@ -65,6 +88,31 @@ export default function Profile({
         </View>
         <Text>Name</Text>
         <TextInput value={name} onChangeText={(name) => setName(name)} />
+        <View
+          style={{
+            justifyContent: "flex-start",
+            alignItems: "center",
+            flexDirection: "row",
+            marginVertical: 10,
+          }}
+        >
+          <IconButton icon="volume-high" />
+          <Text>Off</Text>
+          <Switch
+            value={!noSound}
+            onValueChange={toggleSound}
+            style={{ marginHorizontal: 10 }}
+          />
+          <Text>On</Text>
+        </View>
+        <Button
+          icon="palette"
+          mode="contained"
+          onPress={() => setSelectingTheme(true)}
+          style={{ margin: 10 }}
+        >
+          Change Theme
+        </Button>
         <Button
           icon="camera-iris"
           mode="contained"
@@ -74,10 +122,10 @@ export default function Profile({
               //save to local storage
               await AsyncStorage.setItem(
                 "@pixteryProfile",
-                JSON.stringify({ name })
+                JSON.stringify({ name, noSound })
               );
               //update app state
-              dispatch(setProfile({ name }));
+              dispatch(setProfile({ name, noSound }));
             } else {
               setErrors("You must enter a name!");
             }
@@ -175,7 +223,22 @@ export default function Profile({
         >
           Restore Puzzles
         </Button>
+        <Button
+          icon="cursor-pointer"
+          mode="contained"
+          onPress={async () => {
+            dispatch(setTutorialFinished(false));
+            navigation.navigate("Tutorial");
+          }}
+          style={{ margin: 10 }}
+        >
+          Tutorial
+        </Button>
+
         <Text>v{VERSION_NUMBER}</Text>
+        {selectingTheme ? (
+          <ThemeSelector setSelectingTheme={setSelectingTheme} />
+        ) : null}
       </KeyboardAwareScrollView>
     </AdSafeAreaView>
   );
