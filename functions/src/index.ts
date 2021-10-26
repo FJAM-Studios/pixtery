@@ -1,5 +1,6 @@
 import * as functions from "firebase-functions";
 const admin = require("firebase-admin");
+const { createTransport } = require('nodemailer');
 import adminKey from "./serviceAccount";
 
 admin.initializeApp({
@@ -169,7 +170,6 @@ exports.deactivateUserPuzzle = functions.https.onCall(
     }
   }
 );
-const { createTransport } = require('nodemailer');
 
 const sender = adminKey.senderAccount;
 const password = adminKey.password;
@@ -184,21 +184,18 @@ const transporter = createTransport({
 const transport = (error: any, info: { messageId: any; }) => error ? console.log(error) : console.log(info.messageId);
 
   exports.handleEmail = functions.https.onCall(async(data, context) => {
-    const { message } = data;
+    const { subject, email, message } = data;
     try{
-      console.log('cloud email')
       const mailOptions = {
         from: sender,
         to: 'studios.fjam@gmail.com',
-        subject: 'Pixtery feedback',
-        text: message,
-      };      
+        subject: subject,
+        text: `from: ${email}\n\nmessage: ${message}`,
+      };
         await transporter.sendMail(mailOptions, transport);
-        // res.send({ status: 200 });
         return {status: "200"}
     }
     catch (error) {
-      console.log('in cloud catch')
       throw new functions.https.HttpsError("unknown", error.message, error);
     }
   }
