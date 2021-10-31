@@ -202,7 +202,7 @@ export default function PuzzlePiece({
         matchingPiece.rotation = rotation;
       }
       checkWin();
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       if (!profile.noSound) playSnapSound();
     }
   };
