@@ -1,0 +1,130 @@
+commit c9f74d4209cb5217e235d916f22340f792b12bb4
+tree 5068379b0ad9f4f620edbf07ee593b05c7253097
+parent dd94c48a8301e24a8f1072ecf96a5de012b7ddba
+author Fu Goto <fu.goto@gmail.com> 1634416133 -0400
+committer Fu Goto <fu.goto@gmail.com> 1634416133 -0400
+
+    menu and input box
+
+diff --git a/App.tsx b/App.tsx
+index 2ab931a..fd786f8 100644
+--- a/App.tsx
++++ b/App.tsx
+@@ -14,6 +14,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
+ import { useDispatch, useSelector } from "react-redux";
+ 
+ import AddPuzzle from "./components/AddPuzzle";
++import ContactUs from "./components/ContactUs";
+ import CreateProfile from "./components/CreateProfile";
+ import HomeScreen from "./components/Home";
+ import Profile from "./components/Profile";
+@@ -143,6 +144,9 @@ const App = (): JSX.Element => {
+               <Stack.Screen name="Profile">
+                 {(props) => <Profile {...props} />}
+               </Stack.Screen>
++              <Stack.Screen name="ContactUs">
++                {(props) => <ContactUs {...props} />}
++              </Stack.Screen>
+             </Stack.Navigator>
+           </View>
+         </NavigationContainer>
+diff --git a/components/ContactUs.tsx b/components/ContactUs.tsx
+new file mode 100644
+index 0000000..b643d3b
+--- /dev/null
++++ b/components/ContactUs.tsx
+@@ -0,0 +1,62 @@
++import React from "react";
++import { useSelector } from "react-redux";
++import theme from "../store/reducers/theme";
++import { ScreenNavigation, RootState } from "../types";
++import AdSafeAreaView from "./AdSafeAreaView";
++import Header from "./Header";
++import {
++  Button,
++  IconButton,
++  Text,
++  Surface,
++  Headline,
++  TextInput,
++  ActivityIndicator,
++  Modal,
++  Portal,
++} from "react-native-paper";
++
++export default function ContactUs({
++  navigation,
++}: {
++  navigation: ScreenNavigation;
++}): JSX.Element {
++  const theme = useSelector((state: RootState) => state.theme);
++  const { height } = useSelector((state: RootState) => state.screenHeight);
++  const receivedPuzzles = useSelector(
++    (state: RootState) => state.receivedPuzzles
++  );
++
++  return (
++    <AdSafeAreaView
++      style={{
++        flex: 1,
++        flexDirection: "column",
++        padding: height * 0.015,
++        backgroundColor: theme.colors.background,
++        justifyContent: "space-between",
++      }}
++    >
++      <Header
++        notifications={
++          receivedPuzzles.filter((puzzle) => !puzzle.completed).length
++        }
++        navigation={navigation}
++      />
++      <TextInput
++        placeholder="Subject"
++        multiline
++        // maxLength={messageLimit}
++        mode="outlined"
++        // value={message}
++        // onChangeText={(message) => setMessage(message)}
++        // onFocus={() => setTextFocus(true)}
++        // onBlur={() => setTextFocus(false)}
++        style={{
++          minHeight: height * 0.09,
++          justifyContent: "center",
++        }}
++      />
++    </AdSafeAreaView>
++  );
++}
+diff --git a/components/Header.tsx b/components/Header.tsx
+index 7629950..9d8d5b1 100644
+--- a/components/Header.tsx
++++ b/components/Header.tsx
+@@ -94,6 +94,15 @@ export default function Header({
+           title="Profile"
+           icon="cog"
+         />
++        <Divider />
++        <Menu.Item
++          onPress={() => {
++            closeMenu();
++            navigation.navigate("ContactUs");
++          }}
++          title="Contact Us"
++          icon="cog"
++        />
+       </Menu>
+     </View>
+   );
+diff --git a/types.ts b/types.ts
+index 4495e97..220fa9a 100644
+--- a/types.ts
++++ b/types.ts
+@@ -74,6 +74,7 @@ export type StackScreens = {
+   Puzzle: { publicKey: string; sourceList: string };
+   AddPuzzle: { publicKey: string; sourceList: string };
+   Profile: undefined;
++  ContactUs: undefined;
+ };
+ 
+ export type ScreenNavigation = StackNavigationProp<StackScreens>;
