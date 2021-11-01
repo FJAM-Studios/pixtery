@@ -395,8 +395,6 @@ export const clearEIMcache = async (): Promise<void> => {
     if (EIMcacheInfo.exists && EIMcacheInfo.isDirectory) {
       console.log("removing old EIM cache...");
       await FileSystem.deleteAsync(EIMcacheDir);
-      console.log("creating new EIM cache...");
-      await FileSystem.makeDirectoryAsync(EIMcacheDir);
     } else {
       console.log("No EIM cache found");
     }
