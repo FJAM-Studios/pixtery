@@ -117,9 +117,11 @@ export default function Splash({
     };
 
     loadAppData();
-
-    clearEIMcache();
   }, [dispatch, navigation, profile, route.params]);
+
+  useEffect(() => {
+    clearEIMcache();
+  }, []);
 
   return (
     <View
