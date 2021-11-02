@@ -52,8 +52,8 @@ export const shareMessage = async (pixUrl: string): Promise<void> => {
       subject: "Someone sent you a Pixtery to solve!",
     };
     await Share.share(content, options);
-  } catch (error) {
-    alert(error.message);
+  } catch (error: unknown) {
+    if (error instanceof Error) alert(error.message);
   }
 };
 
@@ -385,5 +385,20 @@ export const deactivateAllPuzzlesOnServer = async (
     await deactivateAllUserPuzzles(list);
   } catch (error) {
     console.log(error);
+  }
+};
+
+export const clearEIMcache = async (): Promise<void> => {
+  try {
+    const EIMcacheDir = FileSystem.cacheDirectory + "ImageManipulator";
+    const EIMcacheInfo = await FileSystem.getInfoAsync(EIMcacheDir);
+    if (EIMcacheInfo.exists && EIMcacheInfo.isDirectory) {
+      console.log("removing old EIM cache...");
+      await FileSystem.deleteAsync(EIMcacheDir);
+    } else {
+      console.log("No EIM cache found");
+    }
+  } catch (e) {
+    console.log(e);
   }
 };
