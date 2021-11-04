@@ -15,7 +15,9 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 
 import AddPuzzle from "./components/AddPuzzle";
+import AddToGallery from "./components/AddToGallery";
 import CreateProfile from "./components/CreateProfile";
+import Gallery from "./components/Gallery";
 import GalleryQueue from "./components/GalleryQueue";
 import GalleryReview from "./components/GalleryReview";
 import HomeScreen from "./components/Home";
@@ -155,6 +157,12 @@ const App = (): JSX.Element => {
               </Stack.Screen>
               <Stack.Screen name="GalleryReview">
                 {(props) => <GalleryReview {...props} />}
+              </Stack.Screen>
+              <Stack.Screen name="Gallery">
+                {(props) => <Gallery {...props} />}
+              </Stack.Screen>
+              <Stack.Screen name="AddToGallery">
+                {(props) => <AddToGallery {...props} />}
               </Stack.Screen>
             </Stack.Navigator>
           </View>
