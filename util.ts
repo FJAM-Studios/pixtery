@@ -223,7 +223,10 @@ export const checkPermission = async (camera: boolean): Promise<string> => {
   }
 };
 
-export const downloadImage = async (newPuzzle: Puzzle): Promise<number> => {
+export const downloadImage = async (
+  newPuzzle: Puzzle,
+  temporaryStorage = false
+): Promise<number> => {
   try {
     const { imageURI } = newPuzzle;
     // for now, giving image a filename based on URL from server, can change later if needed
@@ -233,7 +236,10 @@ export const downloadImage = async (newPuzzle: Puzzle): Promise<number> => {
     //but user could still download old pixtery (with no uploaded extension), so addl logic needed
     const extension = imageURI.slice(-4) === ".jpg" ? "" : ".jpg";
     newPuzzle.imageURI = fileName + extension;
-    const localURI = FileSystem.documentDirectory + fileName + extension;
+    const downloadFolder = temporaryStorage
+      ? FileSystem.cacheDirectory + "ImageManipulator"
+      : FileSystem.documentDirectory;
+    const localURI = downloadFolder + fileName + extension;
     // if you already have this image, don't download it
     const fileInfo = await FileSystem.getInfoAsync(localURI);
     if (!fileInfo.exists) {
