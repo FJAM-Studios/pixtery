@@ -41,7 +41,7 @@ export default function Tutorial({
     "Step 4:",
   ];
   const instructions = [
-    "Touch Next to learn how to use the app or Skip if you're ready to go!",
+    "Touch Start to learn how to use the app or Skip if you're ready to go!",
     "Snap a pic or choose one from your photo gallery",
     "Choose your puzzle type and size",
     "Enter an optional secret message to be revealed when the puzzle is solved",
