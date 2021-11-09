@@ -77,6 +77,7 @@ export type StackScreens = {
   Profile: undefined;
   ContactUs: undefined;
   Tutorial: undefined;
+  Help: undefined;
 };
 
 export type ScreenNavigation = StackNavigationProp<StackScreens>;

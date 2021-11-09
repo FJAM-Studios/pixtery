@@ -181,6 +181,7 @@ const transporter = createTransport({
     pass: password,
   },
 });
+
 const transport = (error: any, info: { messageId: any; }) => error ? console.log(error) : console.log(info.messageId);
 
   exports.handleEmail = functions.https.onCall(async(data, context) => {

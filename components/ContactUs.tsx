@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Keyboard, Text } from "react-native";
+import { Keyboard, Text, Linking, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Button, TextInput } from "react-native-paper";
 import { useSelector } from "react-redux";
@@ -27,6 +27,10 @@ export default function ContactUs({
     Keyboard.dismiss();
     const handleEmailCallable = functions.httpsCallable("handleEmail");
     try {
+      if (email.length && (!email.includes(".") || !email.includes("@"))) {
+        alert("Please type in a valid email.");
+        return;
+      }
       await handleEmailCallable({ subject, email, message });
       setMessage("");
       setEmail("");
@@ -35,7 +39,7 @@ export default function ContactUs({
     } catch (error) {
       console.error(error);
       alert("Your message was not sent. Please try again.");
-      throw new Error(error); //rethrow the error so it can be caught by outer method
+      if (error instanceof Error) throw new Error(error.message); //rethrow the error so it can be caught by outer method
     }
   };
 
@@ -60,16 +64,31 @@ export default function ContactUs({
         keyboardShouldPersistTaps="handled"
         enableOnAndroid
       >
-        <Text
-          style={{
-            color: "white",
-            fontSize: 20,
-            padding: 10,
-          }}
-        >
-          If you have any suggestions for features or encounter any bugs, please
-          let us know! We&apos;d love to hear from you.
-        </Text>
+        <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+          <Text
+            style={{
+              color: "white",
+              fontSize: 20,
+              padding: 10,
+            }}
+          >
+            If you have any suggestions for features or encounter any bugs,
+            please let us know! We&apos;d love to hear from you via the form
+            below.
+            {"\n"}(You can also email us directly at{" "}
+            <Text
+              onPress={() => Linking.openURL("mailto:contact@pixtery.io")}
+              style={{
+                textDecorationLine: "underline",
+                color: "blue",
+                fontSize: 20,
+              }}
+            >
+              contact@pixtery.io
+            </Text>
+            ).
+          </Text>
+        </View>
         <TextInput
           placeholder="Subject"
           multiline
@@ -78,7 +97,7 @@ export default function ContactUs({
           onChangeText={(subject) => setSubject(subject)}
         />
         <TextInput
-          placeholder="Your email"
+          placeholder="Your email (optional)"
           multiline
           mode="outlined"
           value={email}

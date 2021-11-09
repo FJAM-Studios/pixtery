@@ -101,10 +101,10 @@ export default function Header({
         <Menu.Item
           onPress={() => {
             closeMenu();
-            navigation.navigate("ContactUs");
+            navigation.navigate("Help");
           }}
-          title="Contact Us"
-          icon="email"
+          title="Help"
+          icon="help-circle"
         />
       </Menu>
     </View>
