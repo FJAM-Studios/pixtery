@@ -154,6 +154,10 @@ export default function GalleryQueue({
             </TouchableOpacity>
           ))}
         </ScrollView>
+
+        {/* ////////////
+        Remove the block below later, kept for testing for now
+        ///////////// */}
         <View
           style={{
             flexDirection: "row",
@@ -192,6 +196,9 @@ export default function GalleryQueue({
             }}
           />
         </View>
+        {/* /////////
+        Remove Above
+        ////////// */}
       </View>
     </AdSafeAreaView>
   );
