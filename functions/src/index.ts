@@ -322,7 +322,7 @@ exports.addToQueue = functions.https.onCall(
         );
       }
 
-      const {publicKey} = data;
+      const {publicKey, message} = data;
 
       //get the puzzle data
       const res = await db.collection("pixteries").doc(publicKey).get()
@@ -330,7 +330,8 @@ exports.addToQueue = functions.https.onCall(
 
       //add it to the gallery queue
       if(puzzleData) await db.collection("galleryQueue").doc(publicKey).set(
-        {...puzzleData, 
+        {...puzzleData,
+          message,
           active: true, 
           dateQueued: new Date(), 
           senderName: data.anonymousChecked ? "Anonymous" : puzzleData.senderName
