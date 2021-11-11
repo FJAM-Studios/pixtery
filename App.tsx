@@ -17,6 +17,7 @@ import { useDispatch, useSelector } from "react-redux";
 import AddPuzzle from "./components/AddPuzzle";
 import AddToGallery from "./components/AddToGallery";
 import CreateProfile from "./components/CreateProfile";
+import DailyCalendar from "./components/DailyCalendar";
 import Gallery from "./components/Gallery";
 import GalleryQueue from "./components/GalleryQueue";
 import GalleryReview from "./components/GalleryReview";
@@ -69,19 +70,22 @@ const App = (): JSX.Element => {
   };
 
   useEffect(() => {
-    // when update is downloaded, request reload
-    Updates.addListener((event) => {
-      if (event.type === Updates.UpdateEventType.UPDATE_AVAILABLE) {
-        promptRestart();
-      }
-    });
+    //don't check for updates in dev mode
+    if (process.env.NODE_ENV !== "development") {
+      // when update is downloaded, request reload
+      Updates.addListener((event) => {
+        if (event.type === Updates.UpdateEventType.UPDATE_AVAILABLE) {
+          promptRestart();
+        }
+      });
 
-    //check for updates when app is foregrounded
-    AppState.addEventListener("change", () => {
-      if (AppState.currentState === "active") {
-        getUpdate();
-      }
-    });
+      //check for updates when app is foregrounded
+      AppState.addEventListener("change", () => {
+        if (AppState.currentState === "active") {
+          getUpdate();
+        }
+      });
+    }
 
     async function requestTrackingPermissions() {
       try {
@@ -163,6 +167,9 @@ const App = (): JSX.Element => {
               </Stack.Screen>
               <Stack.Screen name="AddToGallery">
                 {(props) => <AddToGallery {...props} />}
+              </Stack.Screen>
+              <Stack.Screen name="DailyCalendar">
+                {(props) => <DailyCalendar {...props} />}
               </Stack.Screen>
             </Stack.Navigator>
           </View>
