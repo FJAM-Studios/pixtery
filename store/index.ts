@@ -6,6 +6,7 @@ import profile from "./reducers/profile";
 import receivedPuzzles from "./reducers/receivedPuzzles";
 import screenHeight from "./reducers/screenHeight";
 import sentPuzzles from "./reducers/sentPuzzles";
+import sound from "./reducers/sound";
 import theme from "./reducers/theme";
 import tutorialFinished from "./reducers/tutorialFinished";
 
@@ -17,6 +18,7 @@ const reducer = combineReducers({
   theme,
   adHeight,
   tutorialFinished,
+  sound,
 });
 
 export default createStore(reducer, applyMiddleware(thunk));

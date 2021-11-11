@@ -1,5 +1,6 @@
 import { RouteProp } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
+import { Audio } from "expo-av";
 import * as ImageManipulator from "expo-image-manipulator";
 import { Theme } from "react-native-paper/lib/typescript/types";
 
@@ -109,6 +110,7 @@ export interface RootState {
   theme: PixteryTheme;
   adHeight: number;
   tutorialFinished: boolean;
+  sound: Audio.Sound | null;
 }
 
 export type PixteryTheme = Theme & { name: string; ID: number };
