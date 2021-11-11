@@ -16,6 +16,8 @@ import { useDispatch, useSelector } from "react-redux";
 
 import AddPuzzle from "./components/AddPuzzle";
 import CreateProfile from "./components/CreateProfile";
+import GalleryQueue from "./components/GalleryQueue";
+import GalleryReview from "./components/GalleryReview";
 import HomeScreen from "./components/Home";
 import Profile from "./components/Profile";
 import Puzzle from "./components/Puzzle";
@@ -147,6 +149,12 @@ const App = (): JSX.Element => {
               </Stack.Screen>
               <Stack.Screen name="Tutorial">
                 {(props) => <Tutorial {...props} />}
+              </Stack.Screen>
+              <Stack.Screen name="GalleryQueue">
+                {(props) => <GalleryQueue {...props} />}
+              </Stack.Screen>
+              <Stack.Screen name="GalleryReview">
+                {(props) => <GalleryReview {...props} />}
               </Stack.Screen>
             </Stack.Navigator>
           </View>

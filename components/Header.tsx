@@ -17,6 +17,7 @@ export default function Header({
   headerStep?: boolean;
 }): JSX.Element {
   const theme = useSelector((state: RootState) => state.theme);
+  const profile = useSelector((state: RootState) => state.profile);
   const [visible, setVisible] = React.useState(false);
   const openMenu = () => setVisible(true);
   const { height } = useSelector((state: RootState) => state.screenHeight);
@@ -97,6 +98,19 @@ export default function Header({
           title="Profile"
           icon="cog"
         />
+        {profile && profile.isGalleryAdmin ? (
+          <>
+            <Divider />
+            <Menu.Item
+              onPress={() => {
+                closeMenu();
+                navigation.navigate("GalleryQueue");
+              }}
+              title="Gallery Queue"
+              icon="account-lock"
+            />
+          </>
+        ) : null}
       </Menu>
     </View>
   );
