@@ -1,3 +1,4 @@
+import { AdMobInterstitial } from "expo-ads-admob";
 import * as FileSystem from "expo-file-system";
 import React, { useState, useEffect } from "react";
 import { View, Image, TouchableOpacity } from "react-native";
@@ -5,10 +6,13 @@ import { ActivityIndicator, Button, Headline, Text } from "react-native-paper";
 import { useSelector } from "react-redux";
 
 import { functions } from "../FirebaseApp";
+import { INTERSTITIAL_ID } from "../constants";
 import { Puzzle, RootState, ScreenNavigation } from "../types";
 import { downloadImage } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
+
+AdMobInterstitial.setAdUnitID(INTERSTITIAL_ID);
 
 export default function Gallery({
   navigation,
@@ -73,12 +77,35 @@ export default function Gallery({
             <ActivityIndicator size="large" />
           ) : daily ? (
             <TouchableOpacity
-              onPress={() => {
+              onPress={async () => {
+                setLoading(true);
                 const { publicKey } = daily;
-                navigation.navigate("AddPuzzle", {
-                  publicKey,
-                  sourceList: "received",
-                });
+                AdMobInterstitial.addEventListener(
+                  "interstitialDidClose",
+                  () => {
+                    AdMobInterstitial.removeAllListeners();
+                    navigation.navigate("AddPuzzle", {
+                      publicKey,
+                      sourceList: "received",
+                    });
+                  }
+                );
+                AdMobInterstitial.addEventListener(
+                  "interstitialDidFailToLoad",
+                  () => {
+                    AdMobInterstitial.removeAllListeners();
+                    navigation.navigate("AddPuzzle", {
+                      publicKey,
+                      sourceList: "received",
+                    });
+                  }
+                );
+                try {
+                  await AdMobInterstitial.requestAdAsync();
+                  await AdMobInterstitial.showAdAsync();
+                } catch (error) {
+                  console.log(error);
+                }
               }}
             >
               <Image

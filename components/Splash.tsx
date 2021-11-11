@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Audio } from "expo-av";
 import * as Linking from "expo-linking";
 import React, { useEffect } from "react";
 import { View } from "react-native";
@@ -9,6 +10,7 @@ import { PUBLIC_KEY_LENGTH } from "../constants";
 import { setProfile } from "../store/reducers/profile";
 import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
 import { setSentPuzzles } from "../store/reducers/sentPuzzles";
+import { setSound } from "../store/reducers/sound";
 import { setTheme } from "../store/reducers/theme";
 import { setTutorialFinished } from "../store/reducers/tutorialFinished";
 import { allThemes } from "../themes";
@@ -127,6 +129,11 @@ export default function Splash({
       // load theme
       const loadedTheme = await loadTheme();
       dispatch(setTheme(loadedTheme));
+      // load audio
+      const { sound } = await Audio.Sound.createAsync(
+        require("../assets/click.m4a")
+      );
+      dispatch(setSound(sound));
       //if you are logged in, load local puzzles, then either navigate to AddPuzzle or Home if there is no url
       if (profile) {
         await loadPuzzles();
