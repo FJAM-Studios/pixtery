@@ -77,6 +77,8 @@ export type StackScreens = {
   AddPuzzle: { publicKey: string; sourceList: string };
   Profile: undefined;
   Tutorial: undefined;
+  Gallery: undefined;
+  AddToGallery: undefined;
   GalleryQueue: undefined | { forceReload: boolean };
   GalleryReview: { puzzle: Puzzle };
 };

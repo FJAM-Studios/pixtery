@@ -322,14 +322,24 @@ exports.addToQueue = functions.https.onCall(
         );
       }
 
-      const {publicKey} = data;
+      const {publicKey, message} = data;
 
       //get the puzzle data
       const res = await db.collection("pixteries").doc(publicKey).get()
       const puzzleData = res.data()
 
       //add it to the gallery queue
-      await db.collection("galleryQueue").doc(publicKey).set({...puzzleData, active: true, dateQueued: new Date()},{merge: true});
+      if(puzzleData) await db.collection("galleryQueue").doc(publicKey).set(
+        {...puzzleData,
+          message,
+          active: true, 
+          dateQueued: new Date(), 
+          senderName: data.anonymousChecked ? "Anonymous" : puzzleData.senderName
+        },{merge: true});
+      else throw new functions.https.HttpsError(
+        "not-found",
+        "puzzle not found"
+    );
     } catch (error: any) {
       throw new functions.https.HttpsError("unknown", error.message, error);
     }
