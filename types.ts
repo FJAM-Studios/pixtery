@@ -34,6 +34,7 @@ export interface Puzzle {
   message?: string | null;
   dateReceived?: string;
   completed?: boolean;
+  dailyDate?: string;
 }
 
 export interface Profile {
@@ -80,7 +81,8 @@ export type StackScreens = {
   Gallery: undefined;
   AddToGallery: undefined;
   GalleryQueue: undefined | { forceReload: boolean };
-  GalleryReview: { puzzle: Puzzle };
+  GalleryReview: { puzzle: Puzzle; daily?: boolean };
+  DailyCalendar: undefined;
 };
 
 export type ScreenNavigation = StackNavigationProp<StackScreens>;

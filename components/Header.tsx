@@ -77,7 +77,7 @@ export default function Header({
             closeMenu();
             navigation.navigate("Gallery");
           }}
-          title="Gallery"
+          title="Daily Pixtery"
           icon="image-multiple"
         />
         <Divider />
@@ -115,7 +115,7 @@ export default function Header({
                 closeMenu();
                 navigation.navigate("GalleryQueue");
               }}
-              title="Gallery Queue"
+              title="Admin"
               icon="account-lock"
             />
           </>
