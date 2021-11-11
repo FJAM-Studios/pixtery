@@ -75,6 +75,15 @@ export default function Header({
         <Menu.Item
           onPress={() => {
             closeMenu();
+            navigation.navigate("Gallery");
+          }}
+          title="Gallery"
+          icon="image-multiple"
+        />
+        <Divider />
+        <Menu.Item
+          onPress={() => {
+            closeMenu();
             navigation.navigate("PuzzleList");
           }}
           title="Solve"
