@@ -207,7 +207,7 @@ export default function Home({
       return newPuzzle;
     } catch (error) {
       console.error(error);
-      throw new Error(error);
+      if (error instanceof Error) throw new Error(error.message);
     }
   };
 

@@ -1,5 +1,7 @@
 import * as functions from "firebase-functions";
-const admin = require("firebase-admin");
+//should import rather than require so that we get TS benefits
+import * as admin from "firebase-admin"
+//may need to change serviceAccount.ts to have right type
 import adminKey from "./serviceAccount";
 
 admin.initializeApp({
@@ -47,7 +49,7 @@ exports.uploadPuzzleSettings = functions.https.onCall(
           .set({...newPuzzle, active: true});
 
         return {result: `successfully uploaded ${newPuzzle.publicKey}`};
-      } catch (error) {
+      } catch (error: any) {
         throw new functions.https.HttpsError("unknown", error.message, error);
       }
     }
@@ -67,7 +69,7 @@ exports.queryPuzzle = functions.https.onCall(
 
         if (puzzle.exists) {
           const puzzleData = puzzle.data();
-          puzzleData.completed = false;
+          if(puzzleData) puzzleData.completed = false;
 
           // add this puzzle to the user's received collection if they're authenticated
           // i.e. solving in the app rather than the webpage
@@ -84,7 +86,7 @@ exports.queryPuzzle = functions.https.onCall(
           console.log("no puzzle found!");
           throw new functions.https.HttpsError("not-found", "no puzzle found!");
         }
-      } catch (error) {
+      } catch (error: any) {
         throw new functions.https.HttpsError("unknown", error.message, error);
       }
     }
@@ -96,18 +98,19 @@ exports.fetchPuzzles = functions.https.onCall(
   try {
     const user = context.auth?.uid;
     console.log("list",listType);
-
-    let puzzles = await db.collection("userPixteries")
-              .doc(user)
-              .collection(listType)
-              .where("active", "==", true)
-              .get();
-    if(!puzzles.empty){
-      puzzles = puzzles.docs.map((doc:any) => doc.data());
-      return puzzles;
-    } else return [];
-
-  } catch (error) {
+    if(user) {
+      const puzzles = await db.collection("userPixteries")
+        .doc(user)
+        .collection(listType)
+        .where("active", "==", true)
+        .get();
+      if(!puzzles.empty){
+        const puzzleData = puzzles.docs.map((doc:any) => doc.data());
+        return puzzleData;
+      } 
+    } 
+    return [];
+  } catch (error: any) {
     throw new functions.https.HttpsError("unknown", error.message, error);
   }
   });
@@ -138,7 +141,7 @@ exports.deactivateAllUserPuzzles = functions.https.onCall(
             })
           })
         })
-    } catch (error) {
+    } catch (error: any) {
       throw new functions.https.HttpsError("unknown", error.message, error);
     }
   }
@@ -164,8 +167,181 @@ exports.deactivateUserPuzzle = functions.https.onCall(
         .doc(publicKey)
         .set({active: false}, {merge: true});
 
-    } catch (error) {
+    } catch (error: any) {
       throw new functions.https.HttpsError("unknown", error.message, error);
     }
   }
 );
+
+exports.checkGalleryAdmin = functions.https.onCall(
+  async (data, context) => {
+    try {
+      // throw error if user is not authenticated
+        if (!context.auth) {
+          throw new functions.https.HttpsError(
+              "permission-denied",
+              "user not authenticated"
+          );
+        }
+
+        // check if gallery admin
+        const admin = await db.collection("galleryAdmins").doc(context.auth.uid).get()
+        if(!admin.exists) {
+          return false
+        }
+        return true
+
+      } catch (error: any) {
+        throw new functions.https.HttpsError("unknown", error.message, error);
+      }
+  }
+)
+
+exports.getGalleryQueue = functions.https.onCall(
+  async (data, context) => {
+    try {
+      // throw error if user is not authenticated
+        if (!context.auth) {
+          throw new functions.https.HttpsError(
+              "permission-denied",
+              "user not authenticated"
+          );
+        }
+
+        // throw error if user is not member of gallery admins
+        const admin = await db.collection("galleryAdmins").doc(context.auth.uid).get()
+        if(!admin.exists) {
+          throw new functions.https.HttpsError(
+              "permission-denied",
+              "user not gallery admin"
+          );
+        }
+        //can get active or inactive puzzles, start at for pagination, limit
+        const { active, startAt, limit } = data
+
+        const queue = await db.collection("galleryQueue").where('active', '==', active)
+          .orderBy("dateQueued")
+          .startAt(startAt)
+          .limit(limit)
+          .get()
+        if(!queue.empty){
+            // this will include whatever data we want the user to submit with the puzzle
+            // i.e., sender name vs anonymous, tags, title, etc.
+            // that will need to be built out in the gallery submission form.
+            // for now, it only includes the normal puzzle data
+          const queueData = queue.docs.map((doc:any) => doc.data());
+          return queueData;
+        } else return [];
+      } catch (error: any) {
+        throw new functions.https.HttpsError("unknown", error.message, error);
+      }
+  }
+)
+
+exports.deactivateInQueue = functions.https.onCall(
+  async (data, context): Promise<Record<string, any> | void> => {
+    try {
+      // throw error if user is not authenticated
+      if (!context.auth) {
+        throw new functions.https.HttpsError(
+            "permission-denied",
+            "user not authenticated"
+        );
+      }
+
+      // throw error if user is not member of gallery admins
+      const admin = await db.collection("galleryAdmins").doc(context.auth.uid).get()
+      if(!admin.exists) {
+        throw new functions.https.HttpsError(
+            "permission-denied",
+            "user not gallery admin"
+        );
+      }
+      const {publicKey} = data;
+      await db.collection("galleryQueue").doc(publicKey).set({active: false},{merge: true});
+    } catch (error: any) {
+      throw new functions.https.HttpsError("unknown", error.message, error);
+    }
+  }
+);
+
+exports.addToGallery = functions.https.onCall(
+  async (data, context): Promise<Record<string, any> | void> => {
+    try {
+      // throw error if user is not authenticated
+      if (!context.auth) {
+        throw new functions.https.HttpsError(
+            "permission-denied",
+            "user not authenticated"
+        );
+      }
+
+      // throw error if user is not member of gallery admins
+      const admin = await db.collection("galleryAdmins").doc(context.auth.uid).get()
+      if(!admin.exists) {
+        throw new functions.https.HttpsError(
+            "permission-denied",
+            "user not gallery admin"
+        );
+      }
+
+      const {publicKey} = data;
+
+      //get the puzzle data from the gallery queue
+      const res = await db.collection("galleryQueue").doc(publicKey).get()
+      const puzzleData = res.data()
+
+      //add it to the real gallery with who added and when
+      await db.collection("gallery").doc(publicKey).set({...puzzleData, addedBy: context.auth.uid, addedOn: new Date()},{merge: true});
+
+      //make the puzzle inactive in the queue
+      await db.collection("galleryQueue").doc(publicKey).set({active: false},{merge: true});
+    } catch (error: any) {
+      throw new functions.https.HttpsError("unknown", error.message, error);
+    }
+  }
+)
+
+exports.addToQueue = functions.https.onCall(
+  async (data, context): Promise<Record<string, any> | void> => {
+    try {
+      // throw error if user is not authenticated
+      if (!context.auth) {
+        throw new functions.https.HttpsError(
+            "permission-denied",
+            "user not authenticated"
+        );
+      }
+
+      // throw error if user is not member of gallery admins
+      const admin = await db.collection("galleryAdmins").doc(context.auth.uid).get()
+      if(!admin.exists) {
+        throw new functions.https.HttpsError(
+            "permission-denied",
+            "user not gallery admin"
+        );
+      }
+
+      const {publicKey, message} = data;
+
+      //get the puzzle data
+      const res = await db.collection("pixteries").doc(publicKey).get()
+      const puzzleData = res.data()
+
+      //add it to the gallery queue
+      if(puzzleData) await db.collection("galleryQueue").doc(publicKey).set(
+        {...puzzleData,
+          message,
+          active: true, 
+          dateQueued: new Date(), 
+          senderName: data.anonymousChecked ? "Anonymous" : puzzleData.senderName
+        },{merge: true});
+      else throw new functions.https.HttpsError(
+        "not-found",
+        "puzzle not found"
+    );
+    } catch (error: any) {
+      throw new functions.https.HttpsError("unknown", error.message, error);
+    }
+  }
+)
