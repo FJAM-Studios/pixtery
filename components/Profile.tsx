@@ -42,6 +42,9 @@ export default function Profile({
   const profile = useSelector((state: RootState) => state.profile);
   const [name, setName] = useState((profile && profile.name) || "");
   const [noSound, setNoSound] = useState((profile && profile.noSound) || false);
+  const [noVibration, setNoVibration] = useState(
+    (profile && profile.noVibration) || false
+  );
   const [errors, setErrors] = useState("");
   const [restoring, setRestoring] = useState(false);
 
@@ -55,6 +58,18 @@ export default function Profile({
     dispatch(setProfile({ ...profile, noSound: !noSound }));
     setNoSound(!noSound);
   };
+
+  const toggleVibration = async () => {
+    //save to local storage
+    await AsyncStorage.setItem(
+      "@pixteryProfile",
+      JSON.stringify({ ...profile, noVibration: !noVibration })
+    );
+    //update app state
+    dispatch(setProfile({ ...profile, noVibration: !noVibration }));
+    setNoVibration(!noVibration);
+  };
+
   const [selectingTheme, setSelectingTheme] = useState(false);
 
   return (
@@ -90,20 +105,36 @@ export default function Profile({
         <TextInput value={name} onChangeText={(name) => setName(name)} />
         <View
           style={{
-            justifyContent: "flex-start",
+            justifyContent: "space-around",
             alignItems: "center",
             flexDirection: "row",
             marginVertical: 10,
           }}
         >
-          <IconButton icon="volume-high" />
-          <Text>Off</Text>
-          <Switch
-            value={!noSound}
-            onValueChange={toggleSound}
-            style={{ marginHorizontal: 10 }}
-          />
-          <Text>On</Text>
+          <View
+            style={{
+              justifyContent: "flex-start",
+              alignItems: "center",
+              flexDirection: "row",
+            }}
+          >
+            <IconButton icon="volume-high" />
+            <Text>Off</Text>
+            <Switch value={!noSound} onValueChange={toggleSound} />
+            <Text>On</Text>
+          </View>
+          <View
+            style={{
+              justifyContent: "flex-start",
+              alignItems: "center",
+              flexDirection: "row",
+            }}
+          >
+            <IconButton icon="vibrate" />
+            <Text>Off</Text>
+            <Switch value={!noVibration} onValueChange={toggleVibration} />
+            <Text>On</Text>
+          </View>
         </View>
         <Button
           icon="palette"
@@ -122,10 +153,10 @@ export default function Profile({
               //save to local storage
               await AsyncStorage.setItem(
                 "@pixteryProfile",
-                JSON.stringify({ name, noSound })
+                JSON.stringify({ name, noSound, noVibration })
               );
               //update app state
-              dispatch(setProfile({ name, noSound }));
+              dispatch(setProfile({ name, noSound, noVibration }));
             } else {
               setErrors("You must enter a name!");
             }

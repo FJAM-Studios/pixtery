@@ -40,6 +40,7 @@ export interface Profile {
   name: string;
   isGalleryAdmin?: boolean;
   noSound?: boolean;
+  noVibration?: boolean;
 }
 
 export interface Piece {
