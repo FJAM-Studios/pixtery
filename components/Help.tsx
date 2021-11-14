@@ -15,6 +15,7 @@ import { setTutorialFinished } from "../store/reducers/tutorialFinished";
 import { ScreenNavigation, RootState } from "../types";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
+import { VERSION_NUMBER } from "../constants";
 
 export default function Help({
   navigation,
@@ -77,6 +78,7 @@ export default function Help({
         >
           Contact Us
         </Button>
+        <Text>v{VERSION_NUMBER}</Text>
       </KeyboardAwareScrollView>
     </AdSafeAreaView>
   );
