@@ -38,7 +38,9 @@ export interface Puzzle {
 
 export interface Profile {
   name: string;
+  isGalleryAdmin?: boolean;
   noSound?: boolean;
+  noVibration?: boolean;
 }
 
 export interface Piece {
@@ -78,6 +80,10 @@ export type StackScreens = {
   ContactUs: undefined;
   Tutorial: undefined;
   Help: undefined;
+  Gallery: undefined;
+  AddToGallery: undefined;
+  GalleryQueue: undefined | { forceReload: boolean };
+  GalleryReview: { puzzle: Puzzle };
 };
 
 export type ScreenNavigation = StackNavigationProp<StackScreens>;
@@ -86,6 +92,8 @@ export type PuzzleRoute = RouteProp<StackScreens, "Puzzle">;
 export type AddPuzzleRoute = RouteProp<StackScreens, "AddPuzzle">;
 export type CreateProfileRoute = RouteProp<StackScreens, "CreateProfile">;
 export type SplashRoute = RouteProp<StackScreens, "Splash">;
+export type GalleryQueueRoute = RouteProp<StackScreens, "GalleryQueue">;
+export type GalleryReviewRoute = RouteProp<StackScreens, "GalleryReview">;
 
 //// STORE /////
 export interface ScreenHeight {

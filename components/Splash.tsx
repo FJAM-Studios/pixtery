@@ -13,7 +13,11 @@ import { setTheme } from "../store/reducers/theme";
 import { setTutorialFinished } from "../store/reducers/tutorialFinished";
 import { allThemes } from "../themes";
 import { ScreenNavigation, SplashRoute, RootState } from "../types";
-import { closeSplashAndNavigate, updateImageURIs } from "../util";
+import {
+  clearEIMcache,
+  closeSplashAndNavigate,
+  updateImageURIs,
+} from "../util";
 import Logo from "./Logo";
 import Title from "./Title";
 
@@ -151,6 +155,10 @@ export default function Splash({
 
     loadAppData();
   }, [dispatch, navigation, profile, route.params]);
+
+  useEffect(() => {
+    clearEIMcache();
+  }, []);
 
   return (
     <View
