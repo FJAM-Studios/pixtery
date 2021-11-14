@@ -1,9 +1,8 @@
+import Constants from "expo-constants";
 import firebase from "firebase";
 import "firebase/functions";
 import "firebase/firestore";
 import "firebase/storage"; // for jest testing purposes
-
-// import { MY_LAN_IP } from "./ip";
 
 const firebaseConfig = {
   apiKey: "***REMOVED***",
@@ -28,7 +27,20 @@ const app = initializeApp();
 const db = app.firestore();
 
 const functions = app.functions();
+
+// uncomment if not using block below for func emu testing
+// import { MY_LAN_IP } from "./ip";
 // functions.useFunctionsEmulator(`${MY_LAN_IP}:5001`);
+
+if (
+  Constants.manifest &&
+  Constants.manifest.extra &&
+  Constants.manifest.extra.functionEmulator
+) {
+  console.log("using function emulator");
+  const { MY_LAN_IP } = require("./ip");
+  functions.useFunctionsEmulator(`${MY_LAN_IP}:5001`);
+}
 
 const storage = app.storage();
 const phoneProvider = new firebase.auth.PhoneAuthProvider();
