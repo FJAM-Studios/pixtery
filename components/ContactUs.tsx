@@ -35,6 +35,7 @@ export default function ContactUs({
       setMessage("");
       setEmail("");
       setSubject("");
+      navigation.navigate("Home");
       alert("Thank you! Your message has been successfully sent.");
     } catch (error) {
       console.error(error);
