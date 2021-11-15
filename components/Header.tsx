@@ -107,6 +107,15 @@ export default function Header({
           title="Profile"
           icon="cog"
         />
+        <Divider />
+        <Menu.Item
+          onPress={() => {
+            closeMenu();
+            navigation.navigate("Help");
+          }}
+          title="Help"
+          icon="help-circle"
+        />
         {profile && profile.isGalleryAdmin ? (
           <>
             <Divider />

@@ -1,3 +1,4 @@
+import * as Haptics from "expo-haptics";
 import * as ImageManipulator from "expo-image-manipulator";
 import React, { useRef } from "react";
 import { Animated } from "react-native";
@@ -161,6 +162,8 @@ export default function PuzzlePiece({
           const rotation = (lastRotate + initialRotation) % (Math.PI * 2);
           currentBoard.push({ pointIndex, solvedIndex, rotation });
           checkWin();
+          if (!profile.noVibration)
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
           if (!profile.noSound) playSnapSound();
           break;
         }
@@ -199,6 +202,8 @@ export default function PuzzlePiece({
         matchingPiece.rotation = rotation;
       }
       checkWin();
+      if (!profile.noVibration)
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       if (!profile.noSound) playSnapSound();
     }
   };

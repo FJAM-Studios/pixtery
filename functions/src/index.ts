@@ -1,4 +1,5 @@
 import * as functions from "firebase-functions";
+const { createTransport } = require('nodemailer');
 //should import rather than require so that we get TS benefits
 import * as admin from "firebase-admin"
 //may need to change serviceAccount.ts to have right type
@@ -169,6 +170,37 @@ exports.deactivateUserPuzzle = functions.https.onCall(
 
     } catch (error: any) {
       throw new functions.https.HttpsError("unknown", error.message, error);
+    }
+  }
+);
+
+const sender = adminKey.senderAccount;
+const password = adminKey.password;
+
+const transporter = createTransport({
+  service: 'gmail',
+  auth: {
+    user: sender,
+    pass: password,
+  },
+});
+
+const transport = (error: any, info: { messageId: any; }) => error ? console.log(error) : console.log(info.messageId);
+
+exports.handleEmail = functions.https.onCall(async(data, context) => {
+  const { subject, email, message } = data;
+  try{
+    const mailOptions = {
+      from: sender,
+      to: 'studios.fjam@gmail.com',
+      subject: subject,
+      text: `from: ${email}\n\nmessage: ${message}`,
+    };
+      await transporter.sendMail(mailOptions, transport);
+      return {status: "200"}
+    }
+  catch (error: any) {
+    throw new functions.https.HttpsError("unknown", error.message, error);
     }
   }
 );
