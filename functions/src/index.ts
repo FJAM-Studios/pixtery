@@ -199,7 +199,7 @@ exports.handleEmail = functions.https.onCall(async(data, context) => {
       await transporter.sendMail(mailOptions, transport);
       return {status: "200"}
     }
-  catch (error) {
+  catch (error: any) {
     throw new functions.https.HttpsError("unknown", error.message, error);
     }
   }
