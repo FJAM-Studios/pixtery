@@ -27,6 +27,11 @@ const app = initializeApp();
 const db = app.firestore();
 
 const functions = app.functions();
+
+// uncomment if not using block below for func emu testing
+// import { MY_LAN_IP } from "./ip";
+// functions.useFunctionsEmulator(`${MY_LAN_IP}:5001`);
+
 if (
   Constants.manifest &&
   Constants.manifest.extra &&

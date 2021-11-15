@@ -42,6 +42,7 @@ export interface Profile {
   name: string;
   isGalleryAdmin?: boolean;
   noSound?: boolean;
+  noVibration?: boolean;
 }
 
 export interface Piece {
@@ -78,7 +79,9 @@ export type StackScreens = {
   Puzzle: { publicKey: string; sourceList: string };
   AddPuzzle: { publicKey: string; sourceList: string };
   Profile: undefined;
+  ContactUs: undefined;
   Tutorial: undefined;
+  Help: undefined;
   Gallery: undefined;
   AddToGallery: undefined;
   GalleryQueue: undefined | { forceReload: boolean };
