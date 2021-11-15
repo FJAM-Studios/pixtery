@@ -13,11 +13,9 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 
 import { signOut } from "../FirebaseApp";
-import { VERSION_NUMBER } from "../constants";
 import { setProfile } from "../store/reducers/profile";
 import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
 import { setSentPuzzles } from "../store/reducers/sentPuzzles";
-import { setTutorialFinished } from "../store/reducers/tutorialFinished";
 import { ScreenNavigation, RootState } from "../types";
 import {
   safelyDeletePuzzleImage,
@@ -254,19 +252,6 @@ export default function Profile({
         >
           Restore Puzzles
         </Button>
-        <Button
-          icon="cursor-pointer"
-          mode="contained"
-          onPress={async () => {
-            dispatch(setTutorialFinished(false));
-            navigation.navigate("Tutorial");
-          }}
-          style={{ margin: 10 }}
-        >
-          Tutorial
-        </Button>
-
-        <Text>v{VERSION_NUMBER}</Text>
         {selectingTheme ? (
           <ThemeSelector setSelectingTheme={setSelectingTheme} />
         ) : null}
