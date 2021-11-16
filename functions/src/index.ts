@@ -11,9 +11,6 @@ admin.initializeApp({
 });
 const db = admin.firestore();
 
-// if we want to adjust timezone for dailies. see addToGallery and getDaily
-// const TZ_ADJUST = 6
-
 // importing from types throws tsc error and prevents build
 interface Puzzle {
   puzzleType: string;
@@ -322,8 +319,6 @@ exports.addToGallery = functions.https.onCall(
 
       const {publicKey, dailyDate} = data;
 
-      //could adjust for timezone here. Firebase defaults to UTC.
-      // dailyDate.setHours(dailyDate.getHours() + TZ_ADJUST);
 
       //get the puzzle data from the gallery queue
       const res = await db.collection("galleryQueue").doc(publicKey).get()
@@ -480,9 +475,6 @@ exports.getDaily = functions.https.onCall(
 
         const { today } = data
         const timestamp = new Date(today);
-
-        //could adjust for timezone here. Firebase defaults to UTC.
-        // timestamp.setHours(timestamp.getHours() - TZ_ADJUST);
 
         const dailies = await db.collection("gallery").where("dailyDate","==", timestamp )
           .limit(1)
