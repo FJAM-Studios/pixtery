@@ -8,12 +8,10 @@ import {
   IconButton,
   ActivityIndicator,
   Button,
-  TextInput,
 } from "react-native-paper";
 import { useSelector } from "react-redux";
 
 import { functions } from "../FirebaseApp";
-import { PUBLIC_KEY_LENGTH } from "../constants";
 import {
   ScreenNavigation,
   RootState,
@@ -41,7 +39,6 @@ export default function GalleryQueue({
   const [loading, setLoading] = useState(false);
   const [queue, setQueue] = useState<Puzzle[]>([]);
   const [message, setMessage] = useState("");
-  const [publicKey, setPublicKey] = useState<string>();
   const loadQueue = async () => {
     try {
       setQueue([]);
@@ -92,7 +89,7 @@ export default function GalleryQueue({
           flexGrow: 1,
         }}
       >
-        <Headline>Gallery Queue</Headline>
+        <Headline>Submission Queue</Headline>
         <Text style={{ color: "red", backgroundColor: "white" }}>
           {message}
         </Text>
@@ -154,10 +151,6 @@ export default function GalleryQueue({
             </TouchableOpacity>
           ))}
         </ScrollView>
-
-        {/* ////////////
-        Remove the block below later, kept for testing for now
-        ///////////// */}
         <View
           style={{
             flexDirection: "row",
@@ -166,39 +159,14 @@ export default function GalleryQueue({
             alignItems: "center",
           }}
         >
-          <TextInput
-            placeholder="Submit a Pixtery publicKey to Gallery Queue"
-            mode="outlined"
-            style={{ flex: 1 }}
-            value={publicKey}
-            onChangeText={(t) => setPublicKey(t)}
-          />
-          <IconButton
-            icon="arrow-up-bold-circle"
-            onPress={async () => {
-              const addToQueue = functions.httpsCallable("addToQueue");
-              if (publicKey && publicKey.length === PUBLIC_KEY_LENGTH) {
-                try {
-                  await addToQueue({ publicKey });
-                  loadQueue();
-                } catch (e) {
-                  if (e instanceof Error) {
-                    setMessage(e.message);
-                    console.log(e.message);
-                  }
-                }
-                setPublicKey("");
-              } else {
-                setMessage(
-                  `Pixtery publicKey is ${PUBLIC_KEY_LENGTH} characters.`
-                );
-              }
-            }}
-          />
+          <Button
+            icon="calendar"
+            mode="contained"
+            onPress={() => navigation.navigate("DailyCalendar")}
+          >
+            View Daily Calendar
+          </Button>
         </View>
-        {/* /////////
-        Remove Above
-        ////////// */}
       </View>
     </AdSafeAreaView>
   );

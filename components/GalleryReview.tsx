@@ -14,6 +14,7 @@ import { functions } from "../FirebaseApp";
 import { GalleryReviewRoute, RootState, ScreenNavigation } from "../types";
 import { downloadImage } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
+import DateSelect from "./DateSelect";
 import Header from "./Header";
 
 export default function GalleryReview({
@@ -23,7 +24,7 @@ export default function GalleryReview({
   navigation: ScreenNavigation;
   route: GalleryReviewRoute;
 }): JSX.Element {
-  const { puzzle } = route.params;
+  const { puzzle, daily } = route.params;
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [actionType, setActionType] = useState<"delete" | "confirm">();
@@ -39,6 +40,19 @@ export default function GalleryReview({
     };
     loadImage();
   }, [puzzle]);
+
+  const addToCalendar = (publicKey: string, callback: () => void) => {
+    return async (dailyDate: string) => {
+      try {
+        const addToGallery = functions.httpsCallable("addToGallery");
+        setLoading(true);
+        await addToGallery({ publicKey, dailyDate });
+        callback();
+      } catch (e) {
+        console.log(e);
+      }
+    };
+  };
 
   return (
     <AdSafeAreaView
@@ -82,6 +96,7 @@ export default function GalleryReview({
             <View style={{ flexDirection: "column", alignItems: "center" }}>
               <Text>Sender: {puzzle.senderName}</Text>
               <Text>Message: {puzzle.message}</Text>
+              {daily ? <Text>Daily: {puzzle.dailyDate}</Text> : null}
               <View style={{ flexDirection: "row", alignItems: "center" }}>
                 <Text>{puzzle.gridSize}</Text>
                 <IconButton
@@ -95,7 +110,8 @@ export default function GalleryReview({
                   style={{ backgroundColor: theme.colors.primary }}
                   onPress={() => {
                     setModalVisible(false);
-                    navigation.navigate("GalleryQueue");
+                    if (daily) navigation.navigate("DailyCalendar");
+                    else navigation.navigate("GalleryQueue");
                   }}
                 />
                 <IconButton
@@ -107,15 +123,17 @@ export default function GalleryReview({
                     setActionType("delete");
                   }}
                 />
-                <IconButton
-                  icon="check"
-                  size={40}
-                  style={{ backgroundColor: theme.colors.primary }}
-                  onPress={() => {
-                    setModalVisible(true);
-                    setActionType("confirm");
-                  }}
-                />
+                {daily ? null : (
+                  <IconButton
+                    icon="check"
+                    size={40}
+                    style={{ backgroundColor: theme.colors.primary }}
+                    onPress={() => {
+                      setModalVisible(true);
+                      setActionType("confirm");
+                    }}
+                  />
+                )}
               </View>
             </View>
           </>
@@ -125,7 +143,7 @@ export default function GalleryReview({
             style={{
               backgroundColor: theme.colors.backdrop,
               width: "80%",
-              height: "80%",
+              minHeight: "80%",
               borderRadius: theme.roundness,
               position: "absolute",
               top: "10%",
@@ -139,21 +157,32 @@ export default function GalleryReview({
             {actionType === "delete" ? (
               <>
                 <Headline style={{ textAlign: "center" }}>
-                  Remove from Gallery Queue?
+                  {daily
+                    ? "Remove from date and move to Queue?"
+                    : "Remove from Daily Puzzle Queue?"}
                 </Headline>
                 <IconButton
                   icon="delete-forever"
                   size={40}
                   style={{ backgroundColor: "red" }}
                   onPress={async () => {
-                    const deactivateInQueue = functions.httpsCallable(
-                      "deactivateInQueue"
-                    );
                     const { publicKey } = puzzle;
                     setLoading(true);
-                    await deactivateInQueue({ publicKey });
+                    if (daily) {
+                      const removeDailyPuzzle = functions.httpsCallable(
+                        "removeDailyPuzzle"
+                      );
+                      await removeDailyPuzzle({ publicKey });
+                    } else {
+                      const deactivateInQueue = functions.httpsCallable(
+                        "deactivateInQueue"
+                      );
+                      await deactivateInQueue({ publicKey });
+                    }
                     setModalVisible(false);
-                    navigation.navigate("GalleryQueue", { forceReload: true });
+                    navigation.navigate("GalleryQueue", {
+                      forceReload: true,
+                    });
                   }}
                 />
               </>
@@ -161,26 +190,14 @@ export default function GalleryReview({
             {actionType === "confirm" ? (
               <>
                 <Headline style={{ textAlign: "center" }}>
-                  Add to Production Gallery and remove from Gallery Queue?
+                  Add to calendar and remove from Queue?
                 </Headline>
-                <IconButton
-                  icon="check"
-                  size={40}
-                  style={{ backgroundColor: "green" }}
-                  onPress={async () => {
-                    try {
-                      const addToGallery = functions.httpsCallable(
-                        "addToGallery"
-                      );
-                      const { publicKey } = puzzle;
-                      setLoading(true);
-                      await addToGallery({ publicKey });
-                    } catch (e) {
-                      console.log(e);
-                    }
+                <DateSelect
+                  navigation={navigation}
+                  addToCalendar={addToCalendar(puzzle.publicKey, () => {
                     setModalVisible(false);
                     navigation.navigate("GalleryQueue", { forceReload: true });
-                  }}
+                  })}
                 />
               </>
             ) : null}

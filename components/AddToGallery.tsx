@@ -22,6 +22,7 @@ import {
 } from "react-native-paper";
 import Toast from "react-native-root-toast";
 import { useSelector } from "react-redux";
+import shortid from "shortid";
 
 import { functions } from "../FirebaseApp";
 import { ScreenNavigation, RootState } from "../types";
@@ -152,7 +153,13 @@ export default function AddToGallery({
                   setLoading(true);
                   const addToQueue = functions.httpsCallable("addToQueue");
                   try {
-                    await addToQueue({ publicKey, anonymousChecked, message });
+                    const newPublicKey: string = shortid.generate();
+                    await addToQueue({
+                      publicKey,
+                      anonymousChecked,
+                      message,
+                      newPublicKey,
+                    });
                     Toast.show(
                       "Thanks for your submission! The Pixtery team will review soon!",
                       {
@@ -174,14 +181,16 @@ export default function AddToGallery({
                   setModalVisible(false);
                 }}
               >
-                Submit To Gallery
+                Submit To Daily Pixtery
               </Button>
             </>
           )}
         </KeyboardAwareScrollView>
       ) : (
         <ScrollView>
-          <Headline>Choose Gallery Submission</Headline>
+          <Headline style={{ alignSelf: "center", textAlign: "center" }}>
+            Choose A Puzzle to Submit To The Daily Pixtery
+          </Headline>
           <>
             {sentPuzzles.length ? (
               sentPuzzles.map((sentPuzzle, ix) => (
