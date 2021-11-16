@@ -1,6 +1,6 @@
 import * as React from "react";
 import { View } from "react-native";
-import { Surface, Text, TextInput } from "react-native-paper";
+import { IconButton, Text, TextInput } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 
 import { setMessage } from "../store/reducers/message";
@@ -16,20 +16,25 @@ export default function MessageInput({
   theme: PixteryTheme;
 }): JSX.Element {
   const dispatch = useDispatch();
-  const messageLimit = 70;
   const message = useSelector((state: RootState) => state.message);
-  const [textFocus, setTextFocus] = React.useState(false);
+  const messageLimit = 70;
+  const messageDraft = message.length > 0;
 
   return (
-    <View>
-      <Surface
+    <View
+      style={{
+        marginTop: margin,
+        marginLeft: margin,
+        marginRight: margin,
+        justifyContent: "center",
+      }}
+    >
+      <View
         style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
           alignItems: "center",
-          justifyContent: "center",
-          elevation: 2,
-          borderRadius: theme.roundness,
-          backgroundColor: theme.colors.primary,
-          margin,
+          height: height * 0.25,
         }}
       >
         <Text
@@ -37,32 +42,50 @@ export default function MessageInput({
             textAlign: "left",
           }}
         >
-          Secret Message
+          Secret Message:
         </Text>
-        <Text
+        <View
           style={{
-            textAlign: "right",
+            flexDirection: "row",
+            alignItems: "center",
           }}
         >
-          {message.length}/{messageLimit} characters
-        </Text>
-        <TextInput
-          placeholder="Message (optional, shows when solved)"
-          multiline
-          maxLength={messageLimit}
-          mode="outlined"
-          value={message}
-          onChangeText={(message) => dispatch(setMessage(message))}
-          onFocus={() => setTextFocus(true)}
-          onBlur={() => setTextFocus(false)}
-          outlineColor={theme.colors.primary}
-          placeholderTextColor={theme.colors.primary}
-          style={{
-            minHeight: height,
-            justifyContent: "center",
-          }}
-        />
-      </Surface>
+          <Text
+            style={{
+              textAlign: "right",
+            }}
+          >
+            {message.length}/{messageLimit} characters
+          </Text>
+          <IconButton
+            icon="delete-circle-outline"
+            style={{
+              margin: 0,
+            }}
+            size={20}
+            color={messageDraft ? theme.colors.primary : theme.colors.disabled}
+            disabled={!messageDraft}
+            onPress={() => {
+              dispatch(setMessage(""));
+            }}
+          />
+        </View>
+      </View>
+      <TextInput
+        placeholder="Congrats! You solved the puzzle!"
+        multiline
+        maxLength={messageLimit}
+        mode="outlined"
+        value={message}
+        onChangeText={(message) => dispatch(setMessage(message))}
+        outlineColor={theme.colors.primary}
+        placeholderTextColor={theme.colors.primary}
+        style={{
+          minHeight: height * 0.75,
+          marginTop: 0,
+          justifyContent: "center",
+        }}
+      />
     </View>
   );
 }
