@@ -1,11 +1,18 @@
-import React, { useState } from "react";
-import { View } from "react-native";
-import { Button, Headline, Text } from "react-native-paper";
+import { AdMobInterstitial } from "expo-ads-admob";
+import * as FileSystem from "expo-file-system";
+import React, { useState, useEffect } from "react";
+import { View, Image, TouchableOpacity } from "react-native";
+import { ActivityIndicator, Button, Headline, Text } from "react-native-paper";
 import { useSelector } from "react-redux";
 
-import { RootState, ScreenNavigation } from "../types";
+import { functions } from "../FirebaseApp";
+import { INTERSTITIAL_ID } from "../constants";
+import { Puzzle, RootState, ScreenNavigation } from "../types";
+import { downloadImage } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
+
+AdMobInterstitial.setAdUnitID(INTERSTITIAL_ID);
 
 export default function Gallery({
   navigation,
@@ -16,6 +23,27 @@ export default function Gallery({
   const receivedPuzzles = useSelector(
     (state: RootState) => state.receivedPuzzles
   );
+  const { boardSize } = useSelector((state: RootState) => state.screenHeight);
+  const [loading, setLoading] = useState(true);
+  const [daily, setDaily] = useState<Puzzle | null>(null);
+  useEffect(() => {
+    const loadDaily = async () => {
+      const getDaily = functions.httpsCallable("getDaily");
+      try {
+        const today = new Date().toISOString().split("T")[0];
+        const res = await getDaily({ today });
+        const daily = res.data[0];
+        if (daily) {
+          await downloadImage(daily);
+          setDaily(daily);
+        }
+      } catch (e) {
+        console.log(e);
+      }
+      setLoading(false);
+    };
+    loadDaily();
+  }, []);
   return (
     <AdSafeAreaView
       style={{
@@ -40,11 +68,60 @@ export default function Gallery({
           flexGrow: 1,
         }}
       >
-        <Headline>Gallery</Headline>
-        <View
-          style={{ flex: 1, alignContent: "center", justifyContent: "center" }}
-        >
-          <Text>Gallery Content Here</Text>
+        <Headline>Daily Pixtery</Headline>
+        {!loading && daily ? (
+          <Text style={{ fontSize: 20 }}>Touch to solve!</Text>
+        ) : null}
+        <View style={{ flex: 1, alignContent: "center", margin: 10 }}>
+          {loading ? (
+            <ActivityIndicator size="large" />
+          ) : daily ? (
+            <TouchableOpacity
+              onPress={async () => {
+                setLoading(true);
+                const { publicKey } = daily;
+                AdMobInterstitial.addEventListener(
+                  "interstitialDidClose",
+                  () => {
+                    AdMobInterstitial.removeAllListeners();
+                    navigation.navigate("AddPuzzle", {
+                      publicKey,
+                      sourceList: "received",
+                    });
+                  }
+                );
+                AdMobInterstitial.addEventListener(
+                  "interstitialDidFailToLoad",
+                  () => {
+                    AdMobInterstitial.removeAllListeners();
+                    navigation.navigate("AddPuzzle", {
+                      publicKey,
+                      sourceList: "received",
+                    });
+                  }
+                );
+                try {
+                  await AdMobInterstitial.requestAdAsync();
+                  await AdMobInterstitial.showAdAsync();
+                } catch (error) {
+                  console.log(error);
+                }
+              }}
+            >
+              <Image
+                source={{
+                  uri: FileSystem.documentDirectory + daily.imageURI,
+                }}
+                style={{
+                  width: boardSize * 0.8,
+                  height: boardSize * 0.8,
+                }}
+                blurRadius={boardSize * 0.03}
+              />
+            </TouchableOpacity>
+          ) : (
+            <Text>We must be asleep! No Daily today :(</Text>
+          )}
         </View>
         <View
           style={{
@@ -62,7 +139,7 @@ export default function Gallery({
             }}
             // style={{ margin: 5 }}
           >
-            Submit To The Gallery!
+            Suggest a Daily Pixtery!
           </Button>
         </View>
       </View>
