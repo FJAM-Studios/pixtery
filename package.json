@@ -19,7 +19,7 @@
     "build": "webpack",
     "emulate-host": "firebase emulators:start --only hosting",
     "web-dev": "npm run build && npm run emulate-host",
-    "func-dev": "concurrently \"cd functions && npm run serve\" \"npm run func-env\"",
+    "func-dev": "concurrently \"cd functions && npm run build:watch\" \"cd functions && firebase emulators:start --only functions\" \"npm run func-env\"",
     "func-env": "cross-env FUNC=true npm start"
   },
   "jest": {
@@ -62,6 +62,7 @@
     "react": "16.13.1",
     "react-dom": "16.13.1",
     "react-native": "https://github.com/expo/react-native/archive/sdk-41.0.0.tar.gz",
+    "react-native-calendars": "^1.1268.0",
     "react-native-gesture-handler": "~1.10.2",
     "react-native-get-random-values": "~1.7.0",
     "react-native-keyboard-aware-scroll-view": "^0.9.3",

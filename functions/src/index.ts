@@ -317,14 +317,20 @@ exports.addToGallery = functions.https.onCall(
         );
       }
 
-      const {publicKey} = data;
+      const {publicKey, dailyDate} = data;
+
 
       //get the puzzle data from the gallery queue
       const res = await db.collection("galleryQueue").doc(publicKey).get()
       const puzzleData = res.data()
 
       //add it to the real gallery with who added and when
-      await db.collection("gallery").doc(publicKey).set({...puzzleData, addedBy: context.auth.uid, addedOn: new Date()},{merge: true});
+      await db.collection("gallery").doc(publicKey).set({
+        ...puzzleData,
+        dailyDate: new Date(dailyDate),
+        addedBy: context.auth.uid,
+        addedOn: new Date()
+      },{merge: true});
 
       //make the puzzle inactive in the queue
       await db.collection("galleryQueue").doc(publicKey).set({active: false},{merge: true});
@@ -345,6 +351,98 @@ exports.addToQueue = functions.https.onCall(
         );
       }
 
+      const {publicKey, message, newPublicKey} = data;
+
+      //get the puzzle data
+      const res = await db.collection("pixteries").doc(publicKey).get()
+      const puzzleData = res.data()
+
+      if(puzzleData) {
+        //add it to the list of pixteries under the new PK
+        //this is so the changed message or anonymous sender will be reflected when you add the daily puzzle
+        await db.collection("pixteries").doc(newPublicKey).set(
+          {...puzzleData,
+            publicKey: newPublicKey,
+            message,
+            senderName: data.anonymousChecked ? "Anonymous" : puzzleData.senderName
+          },{merge: true});
+        
+        //add it to the gallery queue
+        await db.collection("galleryQueue").doc(newPublicKey).set(
+        {...puzzleData,
+          publicKey: newPublicKey,
+          message,
+          active: true, 
+          dateQueued: new Date(), 
+          senderName: data.anonymousChecked ? "Anonymous" : puzzleData.senderName
+        },{merge: true});
+      }
+      else throw new functions.https.HttpsError(
+        "not-found",
+        "puzzle not found"
+    );
+    } catch (error: any) {
+      throw new functions.https.HttpsError("unknown", error.message, error);
+    }
+  }
+)
+
+exports.getDailyDates = functions.https.onCall(
+  async (data, context) => {
+    try {
+      // throw error if user is not authenticated
+        if (!context.auth) {
+          throw new functions.https.HttpsError(
+              "permission-denied",
+              "user not authenticated"
+          );
+        }
+
+        // throw error if user is not member of gallery admins
+        const admin = await db.collection("galleryAdmins").doc(context.auth.uid).get()
+        if(!admin.exists) {
+          throw new functions.https.HttpsError(
+              "permission-denied",
+              "user not gallery admin"
+          );
+        }
+        const { dateString } = data
+        const timestamp = new Date(dateString);
+        const dailies = await db.collection("gallery").where("dailyDate",">=", timestamp )
+          .orderBy("dailyDate")
+          .limit(31)
+          .get()
+        if(!dailies.empty){
+            // this will include whatever data we want the user to submit with the puzzle
+            // i.e., sender name vs anonymous, tags, title, etc.
+            // that will need to be built out in the gallery submission form.
+            // for now, it only includes the normal puzzle data
+          const dailyPuzzles = dailies.docs.map((doc) => {
+            const data = doc.data()
+            return {
+              ...data,
+              dailyDate: data.dailyDate.toDate().toISOString().split("T")[0],
+            }
+          });
+          return dailyPuzzles;
+        } else return [];
+      } catch (error: any) {
+        throw new functions.https.HttpsError("unknown", error.message, error);
+      }
+  }
+)
+
+exports.removeDailyPuzzle = functions.https.onCall(
+  async (data, context): Promise<Record<string, any> | void> => {
+    try {
+      // throw error if user is not authenticated
+      if (!context.auth) {
+        throw new functions.https.HttpsError(
+            "permission-denied",
+            "user not authenticated"
+        );
+      }
+
       // throw error if user is not member of gallery admins
       const admin = await db.collection("galleryAdmins").doc(context.auth.uid).get()
       if(!admin.exists) {
@@ -353,27 +451,53 @@ exports.addToQueue = functions.https.onCall(
             "user not gallery admin"
         );
       }
-
-      const {publicKey, message} = data;
-
-      //get the puzzle data
-      const res = await db.collection("pixteries").doc(publicKey).get()
-      const puzzleData = res.data()
-
-      //add it to the gallery queue
-      if(puzzleData) await db.collection("galleryQueue").doc(publicKey).set(
-        {...puzzleData,
-          message,
-          active: true, 
-          dateQueued: new Date(), 
-          senderName: data.anonymousChecked ? "Anonymous" : puzzleData.senderName
-        },{merge: true});
-      else throw new functions.https.HttpsError(
-        "not-found",
-        "puzzle not found"
-    );
+      const {publicKey} = data;
+      //remove it from gallery/daily
+      await db.collection("gallery").doc(publicKey).delete();
+      //set it active in queue
+      await db.collection("galleryQueue").doc(publicKey).set({active: true},{merge: true});
     } catch (error: any) {
       throw new functions.https.HttpsError("unknown", error.message, error);
     }
+  }
+);
+
+exports.getDaily = functions.https.onCall(
+  async (data, context) => {
+    try {
+      // throw error if user is not authenticated
+        if (!context.auth) {
+          throw new functions.https.HttpsError(
+              "permission-denied",
+              "user not authenticated"
+          );
+        }
+
+        const { today } = data
+        const timestamp = new Date(today);
+
+        const dailies = await db.collection("gallery").where("dailyDate","==", timestamp )
+          .limit(1)
+          .get()
+        if(!dailies.empty){
+            // this will include whatever data we want the user to submit with the puzzle
+            // i.e., sender name vs anonymous, tags, title, etc.
+            // that will need to be built out in the gallery submission form.
+            // for now, it only includes the normal puzzle data
+          const dailyPuzzles = dailies.docs.map((doc) => {
+            const data = doc.data()
+            return {
+              ...data,
+              dailyDate: data.dailyDate.toDate().toISOString().split("T")[0],
+            }
+          });
+          return dailyPuzzles;
+        } else {
+          // @todo - decide on something to be done when no current daily, e.g. get most recent
+          return [];
+        }
+      } catch (error: any) {
+        throw new functions.https.HttpsError("unknown", error.message, error);
+      }
   }
 )
