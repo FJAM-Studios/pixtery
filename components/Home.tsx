@@ -68,7 +68,6 @@ export default function Home({
   const [puzzleType, setPuzzleType] = React.useState("jigsaw");
   const [gridSize, setGridSize] = React.useState(3);
   const [modalVisible, setModalVisible] = React.useState(false);
-  // const [message, setMessage] = React.useState("");
 
   const [paths, setPaths] = React.useState(
     generateJigsawPiecePaths(gridSize, boardSize / (1.6 * gridSize), true)
