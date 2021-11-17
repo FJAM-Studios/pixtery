@@ -24,7 +24,7 @@ export default function GalleryReview({
   navigation: ScreenNavigation;
   route: GalleryReviewRoute;
 }): JSX.Element {
-  const { puzzle, daily } = route.params;
+  const { puzzle } = route.params;
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [actionType, setActionType] = useState<"delete" | "confirm">();
@@ -34,6 +34,8 @@ export default function GalleryReview({
     (state: RootState) => state.receivedPuzzles
   );
   useEffect(() => {
+    setLoading(true);
+    setModalVisible(false);
     const loadImage = async () => {
       await downloadImage(puzzle, true);
       setLoading(false);
@@ -52,6 +54,22 @@ export default function GalleryReview({
         console.log(e);
       }
     };
+  };
+
+  const onUnmarkedDayPress = (dailyDate: string) => {
+    const addPuzzle = addToCalendar(puzzle.publicKey, () => {
+      setModalVisible(false);
+      navigation.navigate("GalleryQueue", { forceReload: true });
+    });
+    addPuzzle(dailyDate);
+  };
+
+  const onMarkedDayPress = (dateString: string, markedDates: any) => {
+    const { puzzle } = markedDates[dateString];
+    setModalVisible(false);
+    navigation.push("GalleryReview", {
+      puzzle,
+    });
   };
 
   return (
@@ -96,7 +114,7 @@ export default function GalleryReview({
             <View style={{ flexDirection: "column", alignItems: "center" }}>
               <Text>Sender: {puzzle.senderName}</Text>
               <Text>Message: {puzzle.message}</Text>
-              {daily ? <Text>Daily: {puzzle.dailyDate}</Text> : null}
+              {puzzle.dailyDate ? <Text>Daily: {puzzle.dailyDate}</Text> : null}
               <View style={{ flexDirection: "row", alignItems: "center" }}>
                 <Text>{puzzle.gridSize}</Text>
                 <IconButton
@@ -110,8 +128,7 @@ export default function GalleryReview({
                   style={{ backgroundColor: theme.colors.primary }}
                   onPress={() => {
                     setModalVisible(false);
-                    if (daily) navigation.navigate("DailyCalendar");
-                    else navigation.navigate("GalleryQueue");
+                    navigation.goBack();
                   }}
                 />
                 <IconButton
@@ -123,7 +140,7 @@ export default function GalleryReview({
                     setActionType("delete");
                   }}
                 />
-                {daily ? null : (
+                {puzzle.dailyDate ? null : (
                   <IconButton
                     icon="check"
                     size={40}
@@ -157,7 +174,7 @@ export default function GalleryReview({
             {actionType === "delete" ? (
               <>
                 <Headline style={{ textAlign: "center" }}>
-                  {daily
+                  {puzzle.dailyDate
                     ? "Remove from date and move to Queue?"
                     : "Remove from Daily Puzzle Queue?"}
                 </Headline>
@@ -168,7 +185,7 @@ export default function GalleryReview({
                   onPress={async () => {
                     const { publicKey } = puzzle;
                     setLoading(true);
-                    if (daily) {
+                    if (puzzle.dailyDate) {
                       const removeDailyPuzzle = functions.httpsCallable(
                         "removeDailyPuzzle"
                       );
@@ -193,11 +210,8 @@ export default function GalleryReview({
                   Add to calendar and remove from Queue?
                 </Headline>
                 <DateSelect
-                  navigation={navigation}
-                  addToCalendar={addToCalendar(puzzle.publicKey, () => {
-                    setModalVisible(false);
-                    navigation.navigate("GalleryQueue", { forceReload: true });
-                  })}
+                  onMarkedDayPress={onMarkedDayPress}
+                  onUnmarkedDayPress={onUnmarkedDayPress}
                 />
               </>
             ) : null}
