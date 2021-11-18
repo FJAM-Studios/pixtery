@@ -87,8 +87,8 @@ export const getDailyDates = functions.https.onCall(
               "user not gallery admin"
           );
         }
-        const { dateString } = data
-        const timestamp = new Date(dateString);
+        const { year, month } = data
+        const timestamp = new Date(`${year}-${month}-1`);
         const dailies = await db.collection("gallery").where("dailyDate",">=", timestamp )
           .orderBy("dailyDate")
           .limit(31)
