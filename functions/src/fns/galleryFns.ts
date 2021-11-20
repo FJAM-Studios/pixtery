@@ -46,8 +46,6 @@ export const addToGallery = functions.https.onCall(
       }
 
       const {publicKey, dailyDate} = data;
-
-
       //get the puzzle data from the gallery queue
       const res = await db.collection("galleryQueue").doc(publicKey).get()
       const puzzleData = res.data()
@@ -156,6 +154,8 @@ export const getDaily = functions.https.onCall(
 
         const { today } = data
         const timestamp = new Date(today);
+        // console.log(timestamp)
+        timestamp.setUTCHours(0,0,0,0)
 
         const dailies = await db.collection("gallery").where("dailyDate","==", timestamp )
           .limit(1)
