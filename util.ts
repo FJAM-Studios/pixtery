@@ -13,6 +13,7 @@ import Toast from "react-native-root-toast";
 
 import { storage, functions } from "./FirebaseApp";
 import { Puzzle, ScreenNavigation } from "./types";
+import { DateData } from "react-native-calendars/src/types";
 
 //convert URI into a blob to transmit to server
 export const createBlob = (localUri: string): Promise<Blob> => {
@@ -407,4 +408,20 @@ export const clearEIMcache = async (): Promise<void> => {
   } catch (e) {
     console.log(e);
   }
+};
+
+// start here - change type to DateData and figure out the number vs string thing
+// then return the month from gallery
+export const getESTDate = (date: Date): DateData => {
+  const todayEST = date
+    .toLocaleString("en-US", {
+      timeZone: "America/New_York",
+    })
+    .split(",")[0]
+    .split("/");
+  return {
+    year: todayEST[2],
+    month: todayEST[0],
+    day: todayEST[1],
+  };
 };
