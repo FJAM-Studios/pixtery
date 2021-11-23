@@ -1,23 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { Calendar } from "react-native-calendars";
 import { DateData } from "react-native-calendars/src/types";
-import Toast from "react-native-root-toast";
+import { ActivityIndicator, Text } from "react-native-paper";
 
 import { functions } from "../FirebaseApp";
-import { Puzzle, ScreenNavigation } from "../types";
-
-interface DailyDate {
-  [key: string]: { selected: boolean; puzzle: Puzzle };
-}
+import { DailyDate, Puzzle } from "../types";
 
 export default function DateSelect({
-  navigation,
-  addToCalendar,
+  onMarkedDayPress,
+  onUnmarkedDayPress,
 }: {
-  navigation: ScreenNavigation;
-  addToCalendar?: (date: string) => Promise<void>;
+  onMarkedDayPress: (date: string, markedDates: DailyDate) => void;
+  onUnmarkedDayPress: (date: string) => void;
 }): JSX.Element {
   const [markedDates, setMarkedDates] = useState<DailyDate>({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   const loadDailies = async (monthData: DateData) => {
     try {
@@ -33,7 +31,9 @@ export default function DateSelect({
       setMarkedDates(newDates);
     } catch (e) {
       console.log(e);
+      setError(true);
     }
+    setLoading(false);
   };
   useEffect(() => {
     const today = new Date();
@@ -47,29 +47,16 @@ export default function DateSelect({
     };
     loadDailies(monthData);
   }, []);
+  if (loading) return <ActivityIndicator size="small" />;
+  if (error) return <Text>Sorry, something went wrong.</Text>;
   return (
     <Calendar
       style={{ margin: 10 }}
       markedDates={markedDates}
       onDayPress={(day) => {
-        if (addToCalendar) {
-          if (!markedDates[day.dateString]) {
-            addToCalendar(day.dateString);
-          } else {
-            Toast.show("Pick unoccupied date", {
-              duration: Toast.durations.SHORT,
-              position: Toast.positions.CENTER,
-            });
-          }
-        } else {
-          if (markedDates[day.dateString]) {
-            const { puzzle } = markedDates[day.dateString];
-            navigation.navigate("GalleryReview", {
-              puzzle,
-              daily: true,
-            });
-          }
-        }
+        if (markedDates[day.dateString])
+          onMarkedDayPress(day.dateString, markedDates);
+        else onUnmarkedDayPress(day.dateString);
       }}
       onVisibleMonthsChange={(months) => {
         loadDailies(months[0]);
