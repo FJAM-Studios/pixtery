@@ -1,14 +1,13 @@
 import { AdMobInterstitial } from "expo-ads-admob";
-import * as FileSystem from "expo-file-system";
 import React, { useState, useEffect } from "react";
-import { View, Image, TouchableOpacity } from "react-native";
+import { View, TouchableOpacity } from "react-native";
 import { ActivityIndicator, Button, Headline, Text } from "react-native-paper";
 import { useSelector } from "react-redux";
 
 import { functions } from "../FirebaseApp";
 import { INTERSTITIAL_ID } from "../constants";
 import { Puzzle, RootState, ScreenNavigation } from "../types";
-import { downloadImage, msToTime } from "../util";
+import { msToTime } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 
