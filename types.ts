@@ -85,7 +85,7 @@ export type StackScreens = {
   Gallery: undefined;
   AddToGallery: undefined;
   GalleryQueue: undefined | { forceReload: boolean };
-  GalleryReview: { puzzle: Puzzle; daily?: boolean };
+  GalleryReview: { puzzle: Puzzle };
   DailyCalendar: undefined;
 };
 
