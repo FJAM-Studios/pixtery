@@ -52,7 +52,7 @@ export default function Gallery({
         const todayEST = getESTDate(new Date());
         const res = await getDaily(todayEST);
         const daily = res.data;
-        console.log('daily', daily)
+        console.log("daily", daily);
         if (daily) {
           await downloadImage(daily);
           setDaily(daily);
