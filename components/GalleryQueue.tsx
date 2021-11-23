@@ -93,19 +93,17 @@ export default function GalleryQueue({
         <Text style={{ color: "red", backgroundColor: "white" }}>
           {message}
         </Text>
-
-        <ScrollView
-          style={{
-            width: "100%",
-          }}
-        >
-          {loading ? (
-            <ActivityIndicator
-              animating
-              color={theme.colors.text}
-              size="small"
-            />
-          ) : (
+        {loading ? (
+          <ActivityIndicator animating color={theme.colors.text} size="small" />
+        ) : (
+          <>
+            <Button
+              icon="calendar"
+              mode="contained"
+              onPress={() => navigation.navigate("DailyCalendar")}
+            >
+              View Daily Calendar
+            </Button>
             <Button
               icon="reload"
               mode="contained"
@@ -114,7 +112,14 @@ export default function GalleryQueue({
             >
               Reload Queue (Max {limit} Results)
             </Button>
-          )}
+          </>
+        )}
+        <ScrollView
+          style={{
+            width: "100%",
+            flex: 1,
+          }}
+        >
           {queue.map((puzzle) => (
             <TouchableOpacity
               onPress={() =>
@@ -151,22 +156,6 @@ export default function GalleryQueue({
             </TouchableOpacity>
           ))}
         </ScrollView>
-        <View
-          style={{
-            flexDirection: "row",
-            position: "absolute",
-            bottom: 10,
-            alignItems: "center",
-          }}
-        >
-          <Button
-            icon="calendar"
-            mode="contained"
-            onPress={() => navigation.navigate("DailyCalendar")}
-          >
-            View Daily Calendar
-          </Button>
-        </View>
       </View>
     </AdSafeAreaView>
   );
