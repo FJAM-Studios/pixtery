@@ -4,7 +4,11 @@ import { DateData } from "react-native-calendars/src/types";
 import Toast from "react-native-root-toast";
 
 import { functions } from "../FirebaseApp";
-import { ScreenNavigation } from "../types";
+import { Puzzle, ScreenNavigation } from "../types";
+
+interface DailyDate {
+  [key: string]: { selected: boolean; puzzle: Puzzle };
+}
 
 export default function DateSelect({
   navigation,
@@ -13,17 +17,18 @@ export default function DateSelect({
   navigation: ScreenNavigation;
   addToCalendar?: (date: string) => Promise<void>;
 }): JSX.Element {
-  const [markedDates, setMarkedDates] = useState<any>({});
+  const [markedDates, setMarkedDates] = useState<DailyDate>({});
 
   const loadDailies = async (monthData: DateData) => {
     try {
       const getDailyDates = functions.httpsCallable("getDailyDates");
       const res = await getDailyDates(monthData);
-      const foundDailies = res.data;
-      const newDates: any = {};
+      const foundDailies: Puzzle[] = res.data;
+      const newDates: DailyDate = {};
       for (let i = 0; i < foundDailies.length; i++) {
         const daily = foundDailies[i];
-        newDates[daily.dailyDate] = { selected: true, puzzle: daily };
+        if (daily.dailyDate)
+          newDates[daily.dailyDate] = { selected: true, puzzle: daily };
       }
       setMarkedDates(newDates);
     } catch (e) {

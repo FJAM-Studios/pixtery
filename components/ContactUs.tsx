@@ -25,13 +25,13 @@ export default function ContactUs({
 
   const submit = async () => {
     Keyboard.dismiss();
-    const handleEmailCallable = functions.httpsCallable("handleEmail");
+    const submitFeedbackCallable = functions.httpsCallable("submitFeedback");
     try {
       if (email.length && (!email.includes(".") || !email.includes("@"))) {
         alert("Please type in a valid email.");
         return;
       }
-      await handleEmailCallable({ subject, email, message });
+      await submitFeedbackCallable({ subject, email, message });
       setMessage("");
       setEmail("");
       setSubject("");

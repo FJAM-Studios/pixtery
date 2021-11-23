@@ -1,27 +1,19 @@
-export { handleEmail } from "./fns/emailFns"
-
-export { 
-  checkGalleryAdmin, 
-  addToGallery, 
-  getDailyDates, 
-  removeDailyPuzzle, 
-  getDaily 
-} from "./fns/galleryFns"
+export { submitFeedback } from "./fns/emailFns";
 
 export {
-  uploadPuzzleSettings,
-  queryPuzzle,
-} from "./fns/puzzleFns"
+  checkGalleryAdmin,
+  addToGallery,
+  getDailyDates,
+  removeDailyPuzzle,
+  getDaily,
+} from "./fns/galleryFns";
 
-export {
-  getGalleryQueue, 
-  deactivateInQueue, 
-  addToQueue, 
-} from "./fns/queueFns"
+export { uploadPuzzleSettings, queryPuzzle } from "./fns/puzzleFns";
+
+export { getGalleryQueue, deactivateInQueue, addToQueue } from "./fns/queueFns";
 
 export {
   fetchPuzzles,
   deactivateAllUserPuzzles,
-  deactivateUserPuzzle
-} from "./fns/userFns"
-
+  deactivateUserPuzzle,
+} from "./fns/userFns";

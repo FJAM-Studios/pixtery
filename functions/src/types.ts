@@ -9,3 +9,7 @@ declare interface Puzzle {
   dateReceived?: string;
   completed?: boolean;
 }
+
+declare interface DailyDate {
+  [key: string]: string;
+}

@@ -15,14 +15,14 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 
 import AddPuzzle from "./components/AddPuzzle";
-import ContactUs from "./components/ContactUs";
-import Help from "./components/Help";
 import AddToGallery from "./components/AddToGallery";
+import ContactUs from "./components/ContactUs";
 import CreateProfile from "./components/CreateProfile";
 import DailyCalendar from "./components/DailyCalendar";
 import Gallery from "./components/Gallery";
 import GalleryQueue from "./components/GalleryQueue";
 import GalleryReview from "./components/GalleryReview";
+import Help from "./components/Help";
 import HomeScreen from "./components/Home";
 import Profile from "./components/Profile";
 import Puzzle from "./components/Puzzle";
