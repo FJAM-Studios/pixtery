@@ -9,11 +9,11 @@ import * as Linking from "expo-linking";
 import * as MediaLibrary from "expo-media-library";
 import * as SplashScreen from "expo-splash-screen";
 import { Alert, Share } from "react-native";
+import { DateData } from "react-native-calendars/src/types";
 import Toast from "react-native-root-toast";
 
 import { storage, functions } from "./FirebaseApp";
-import { Puzzle, ScreenNavigation } from "./types";
-import { DateData } from "react-native-calendars/src/types";
+import { DateObjString, Puzzle, ScreenNavigation } from "./types";
 
 //convert URI into a blob to transmit to server
 export const createBlob = (localUri: string): Promise<Blob> => {
@@ -410,18 +410,22 @@ export const clearEIMcache = async (): Promise<void> => {
   }
 };
 
-// start here - change type to DateData and figure out the number vs string thing
-// then return the month from gallery
+// converts Date to EST; as far as I could tell only way to do it is to use toLocaleString
 export const getESTDate = (date: Date): DateData => {
-  const todayEST = date
-    .toLocaleString("en-US", {
-      timeZone: "America/New_York",
-    })
-    .split(",")[0]
-    .split("/");
-  return {
-    year: todayEST[2],
-    month: todayEST[0],
-    day: todayEST[1],
-  };
+  const dateString = date.toLocaleString("en-US", {
+    timeZone: "America/New_York",
+  });
+  const todayESTArr = dateString.split(",")[0].split("/");
+  const dateData: DateData = {} as DateData;
+  dateData.year = Number(todayESTArr[2]);
+  dateData.month = Number(todayESTArr[0]);
+  dateData.day = Number(todayESTArr[1]);
+  dateData.dateString = dateString;
+  return dateData;
+};
+
+// converts single digit integers to double digit strings (e.g. 9 -> "09")
+export const convertIntToDoubleDigitString = (number: number): string => {
+  if (number >= 10) return number.toString();
+  else return `0${number}`;
 };
