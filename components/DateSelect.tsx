@@ -15,15 +15,28 @@ export default function DateSelect({
 }): JSX.Element {
   const [markedDates, setMarkedDates] = useState<any>({});
 
-  const loadDailies = async (monthData: DateData) => {
+  const loadDailies = async (visibleMonthData: DateData) => {
     try {
       const getDailyDates = functions.httpsCallable("getDailyDates");
-      const res = await getDailyDates(monthData);
+      // need to add 0 at the front of string if single digit to match firestore
+      const monthOfDaily =
+        visibleMonthData.month >= 10
+          ? visibleMonthData.month.toString()
+          : `0${visibleMonthData.month}`;
+      // pass in year / month as strings formatted as in firestore
+      const res = await getDailyDates({
+        year: visibleMonthData.year.toString(),
+        month: monthOfDaily,
+      });
       const foundDailies = res.data;
       const newDates: any = {};
       for (let i = 0; i < foundDailies.length; i++) {
-        const daily = foundDailies[i];
-        newDates[daily.dailyDate] = { selected: true, puzzle: daily };
+        const dailyPixteryWithDay = foundDailies[i];
+        const daily = dailyPixteryWithDay.puzzleData;
+        const dayOfDaily = dailyPixteryWithDay.day;
+
+        const dateOfDaily = `${visibleMonthData.year}-${monthOfDaily}-${dayOfDaily}`;
+        newDates[dateOfDaily] = { selected: true, puzzle: daily };
       }
       setMarkedDates(newDates);
     } catch (e) {

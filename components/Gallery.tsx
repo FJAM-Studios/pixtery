@@ -8,7 +8,7 @@ import { useSelector } from "react-redux";
 import { functions } from "../FirebaseApp";
 import { INTERSTITIAL_ID } from "../constants";
 import { Puzzle, RootState, ScreenNavigation } from "../types";
-import { downloadImage, getESTDate } from "../util";
+import { downloadImage, getESTDate, convertIntToDoubleDigitString } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 
@@ -30,27 +30,12 @@ export default function Gallery({
     const loadDaily = async () => {
       const getDaily = functions.httpsCallable("getDaily");
       try {
-        // const today = new Date().toISOString().split("T")[0];
-        // const todayEST = new Date()
-        //   .toLocaleString("en-US", {
-        //     timeZone: "America/New_York",
-        //   })
-        //   .split(",")[0]
-        //   .split("/");
-        // const todayMonth = todayEST[0];
-        // const todayDay = todayEST[1];
-        // const todayYear = todayEST[2];
-
-        // console.log(
-        //   "newdate",
-        //   new Date(),
-        //   "today",
-        //   todayEST,
-        //   "newtoday", todayEST
-        // );
-
         const todayEST = getESTDate(new Date());
-        const res = await getDaily(todayEST);
+        const res = await getDaily({
+          year: todayEST.year.toString(),
+          month: convertIntToDoubleDigitString(todayEST.month),
+          day: convertIntToDoubleDigitString(todayEST.day)
+        });
         const daily = res.data;
         console.log("daily", daily);
         if (daily) {
