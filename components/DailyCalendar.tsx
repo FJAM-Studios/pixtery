@@ -1,6 +1,7 @@
 import React from "react";
 import { View } from "react-native";
 import { Headline, IconButton } from "react-native-paper";
+import Toast from "react-native-root-toast";
 import { useSelector } from "react-redux";
 
 import { RootState, ScreenNavigation } from "../types";
@@ -17,6 +18,20 @@ export default function DailyCalendar({
   const receivedPuzzles = useSelector(
     (state: RootState) => state.receivedPuzzles
   );
+
+  const onUnmarkedDayPress = (dailyDate: string) => {
+    Toast.show("Nothing on that date", {
+      duration: Toast.durations.SHORT,
+      position: Toast.positions.CENTER,
+    });
+  };
+
+  const onMarkedDayPress = (dateString: string, markedDates: any) => {
+    const { puzzle } = markedDates[dateString];
+    navigation.navigate("GalleryReview", {
+      puzzle,
+    });
+  };
 
   return (
     <AdSafeAreaView
@@ -47,7 +62,10 @@ export default function DailyCalendar({
         <View
           style={{ flex: 1, alignContent: "center", justifyContent: "center" }}
         >
-          <DateSelect navigation={navigation} />
+          <DateSelect
+            onMarkedDayPress={onMarkedDayPress}
+            onUnmarkedDayPress={onUnmarkedDayPress}
+          />
           <IconButton
             icon="arrow-left"
             size={20}

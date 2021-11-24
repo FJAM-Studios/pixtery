@@ -8,7 +8,11 @@ import { useSelector } from "react-redux";
 import { functions } from "../FirebaseApp";
 import { INTERSTITIAL_ID } from "../constants";
 import { Puzzle, RootState, ScreenNavigation } from "../types";
-import { downloadImage, getESTDate, convertIntToDoubleDigitString } from "../util";
+import {
+  downloadImage,
+  getESTDate,
+  convertIntToDoubleDigitString,
+} from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 
@@ -34,10 +38,9 @@ export default function Gallery({
         const res = await getDaily({
           year: todayEST.year.toString(),
           month: convertIntToDoubleDigitString(todayEST.month),
-          day: convertIntToDoubleDigitString(todayEST.day)
+          day: convertIntToDoubleDigitString(todayEST.day),
         });
         const daily = res.data;
-        console.log("daily", daily);
         if (daily) {
           await downloadImage(daily);
           setDaily(daily);
