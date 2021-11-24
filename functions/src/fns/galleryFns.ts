@@ -163,8 +163,6 @@ export const getDaily = functions.https.onCall(
               "user not authenticated"
           );
         }
-        // start here - format month and day with first digit as 0
-        // make this util function
         const { year, month, day } = data
         const daily = await db.collection("gallery")
         .doc(year)
