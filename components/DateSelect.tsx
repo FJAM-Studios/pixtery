@@ -4,6 +4,7 @@ import { DateData } from "react-native-calendars/src/types";
 import { ActivityIndicator, Text } from "react-native-paper";
 
 import { functions } from "../FirebaseApp";
+import { convertIntToDoubleDigitString } from "../util";
 
 export default function DateSelect({
   onMarkedDayPress,
@@ -19,25 +20,20 @@ export default function DateSelect({
   const loadDailies = async (visibleMonthData: DateData) => {
     try {
       const getDailyDates = functions.httpsCallable("getDailyDates");
-      // need to add 0 at the front of string if single digit to match firestore
-      const monthOfDaily =
-        visibleMonthData.month >= 10
-          ? visibleMonthData.month.toString()
-          : `0${visibleMonthData.month}`;
       // pass in year / month as strings formatted as in firestore
-      const res = await getDailyDates({
+      const formattedDates = {
         year: visibleMonthData.year.toString(),
-        month: monthOfDaily,
-      });
+        // need to add 0 at the front of string if single digit to match firestore
+        month: convertIntToDoubleDigitString(visibleMonthData.month),
+      };
+      const res = await getDailyDates(formattedDates);
       const foundDailies = res.data;
       const newDates: any = {};
       for (let i = 0; i < foundDailies.length; i++) {
         const dailyPixteryWithDay = foundDailies[i];
-        const daily = dailyPixteryWithDay.puzzleData;
-        const dayOfDaily = dailyPixteryWithDay.day;
-
-        const dateOfDaily = `${visibleMonthData.year}-${monthOfDaily}-${dayOfDaily}`;
-        newDates[dateOfDaily] = { selected: true, puzzle: daily };
+        const { puzzleData, day } = dailyPixteryWithDay;
+        const dateOfDaily = `${formattedDates.year}-${formattedDates.month}-${day}`;
+        newDates[dateOfDaily] = { selected: true, puzzle: puzzleData };
       }
       setMarkedDates(newDates);
     } catch (e) {
