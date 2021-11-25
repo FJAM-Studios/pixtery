@@ -13,7 +13,7 @@ import { DateData } from "react-native-calendars/src/types";
 import Toast from "react-native-root-toast";
 
 import { storage, functions } from "./FirebaseApp";
-import { DateObjString, Puzzle, ScreenNavigation } from "./types";
+import { Puzzle, ScreenNavigation } from "./types";
 
 //convert URI into a blob to transmit to server
 export const createBlob = (localUri: string): Promise<Blob> => {
