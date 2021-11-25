@@ -117,9 +117,3 @@ export interface RootState {
 }
 
 export type PixteryTheme = Theme & { name: string; ID: number };
-
-export interface DateObjString {
-  day: string;
-  month: string;
-  year: string;
-}
