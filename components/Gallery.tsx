@@ -7,7 +7,7 @@ import { ActivityIndicator, Button, Headline, Text } from "react-native-paper";
 import { useSelector } from "react-redux";
 
 import { functions } from "../FirebaseApp";
-import { INTERSTITIAL_ID } from "../constants";
+import { INTERSTITIAL_ID, DAILY_TIMEZONE } from "../constants";
 import { Puzzle, RootState, ScreenNavigation } from "../types";
 import { downloadImage, convertIntToDoubleDigitString } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
@@ -31,12 +31,15 @@ export default function Gallery({
     const loadDaily = async () => {
       const getDaily = functions.httpsCallable("getDaily");
       try {
-        const todayEST = moment().tz("America/New_York");
+        // daily timezone is currently set to EST
+        const todayInDailyTimezone = moment().tz(DAILY_TIMEZONE);
         const res = await getDaily({
-          year: todayEST.year().toString(),
+          year: todayInDailyTimezone.year().toString(),
           // month is indexed from 0
-          month: convertIntToDoubleDigitString(todayEST.month() + 1),
-          day: convertIntToDoubleDigitString(todayEST.date()),
+          month: convertIntToDoubleDigitString(
+            todayInDailyTimezone.month() + 1
+          ),
+          day: convertIntToDoubleDigitString(todayInDailyTimezone.date()),
         });
         const daily = res.data;
         if (daily) {

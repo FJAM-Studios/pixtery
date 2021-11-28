@@ -17,7 +17,7 @@ import {
   ScreenNavigation,
   StatusOfDaily,
 } from "../types";
-import { downloadImage } from "../util";
+import { downloadImage, convertDateStringToObject } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import DateSelect from "./DateSelect";
 import Header from "./Header";
@@ -30,7 +30,7 @@ export default function GalleryReview({
   route: GalleryReviewRoute;
 }): JSX.Element {
   const { puzzle, statusOfDaily, publishedDate } = route.params;
-  const { UNDER_REVIEW, PUBLISHED } = StatusOfDaily;
+  const { PUBLISHED } = StatusOfDaily;
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [actionType, setActionType] = useState<"delete" | "confirm">();
@@ -54,7 +54,9 @@ export default function GalleryReview({
       try {
         const addToGallery = functions.httpsCallable("addToGallery");
         setLoading(true);
-        await addToGallery({ publicKey, dailyDate });
+        // original dailyDate string is "YYYY-MM-DD"
+        const { year, month, day } = convertDateStringToObject(dailyDate);
+        await addToGallery({ publicKey, year, month, day });
         callback();
       } catch (e) {
         console.log(e);
@@ -76,8 +78,9 @@ export default function GalleryReview({
     navigation.push("GalleryReview", {
       puzzle,
       // when this onMarkedDayPress is passed to DateSelect from this component,
-      // Daily will always be under review (i.e. not published)
-      statusOfDaily: UNDER_REVIEW,
+      // marked Daily will always be under review (i.e. not published)
+      statusOfDaily: PUBLISHED,
+      publishedDate: dateString,
     });
   };
 
@@ -200,7 +203,12 @@ export default function GalleryReview({
                       const removeDailyPuzzle = functions.httpsCallable(
                         "removeDailyPuzzle"
                       );
-                      await removeDailyPuzzle({ publicKey });
+                      // publishedDate format "YYYY-MM-DD"
+                      const { year, month, day } = convertDateStringToObject(
+                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                        publishedDate!
+                      );
+                      await removeDailyPuzzle({ publicKey, year, month, day });
                     } else {
                       const deactivateInQueue = functions.httpsCallable(
                         "deactivateInQueue"
