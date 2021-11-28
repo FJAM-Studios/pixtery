@@ -12,7 +12,7 @@ import { Alert, Share } from "react-native";
 import Toast from "react-native-root-toast";
 
 import { storage, functions } from "./FirebaseApp";
-import { Puzzle, ScreenNavigation } from "./types";
+import { Puzzle, ScreenNavigation, DateObjString } from "./types";
 
 //convert URI into a blob to transmit to server
 export const createBlob = (localUri: string): Promise<Blob> => {
@@ -413,4 +413,16 @@ export const clearEIMcache = async (): Promise<void> => {
 export const convertIntToDoubleDigitString = (number: number): string => {
   // return the two numbers from end of string (i.e. "09" or "10")
   return `0${number}`.slice(-2);
+};
+
+export const convertDateStringToObject = (
+  dateString: string
+): DateObjString => {
+  // dateString passed in is "YYYY-MM-DD"
+  const dateArray = dateString.split("-");
+  return {
+    year: dateArray[0],
+    month: dateArray[1],
+    day: dateArray[2],
+  };
 };

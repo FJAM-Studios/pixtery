@@ -126,6 +126,7 @@ export default function GalleryQueue({
               onPress={() =>
                 navigation.navigate("GalleryReview", {
                   puzzle,
+                  // when navigating from GalleryQueue to GalleryReview, daily will be under review (not published)
                   statusOfDaily: StatusOfDaily.UNDER_REVIEW,
                 })
               }
