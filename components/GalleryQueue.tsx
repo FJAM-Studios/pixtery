@@ -17,6 +17,7 @@ import {
   RootState,
   Puzzle,
   GalleryQueueRoute,
+  StatusOfDaily,
 } from "../types";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
@@ -125,6 +126,7 @@ export default function GalleryQueue({
               onPress={() =>
                 navigation.navigate("GalleryReview", {
                   puzzle,
+                  statusOfDaily: StatusOfDaily.UNDER_REVIEW,
                 })
               }
               key={puzzle.publicKey}
