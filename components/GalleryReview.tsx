@@ -77,8 +77,8 @@ export default function GalleryReview({
     setModalVisible(false);
     navigation.push("GalleryReview", {
       puzzle,
-      // when this onMarkedDayPress is passed to DateSelect from this component,
-      // marked Daily will always be under review (i.e. not published)
+      // when navigating to GalleryReview from Calendar,
+      // marked Daily will always be published (i.e. not under review)
       statusOfDaily: PUBLISHED,
       publishedDate: dateString,
     });
@@ -199,14 +199,13 @@ export default function GalleryReview({
                   onPress={async () => {
                     const { publicKey } = puzzle;
                     setLoading(true);
-                    if (statusOfDaily === PUBLISHED) {
+                    if (statusOfDaily === PUBLISHED && publishedDate) {
                       const removeDailyPuzzle = functions.httpsCallable(
                         "removeDailyPuzzle"
                       );
                       // publishedDate format "YYYY-MM-DD"
                       const { year, month, day } = convertDateStringToObject(
-                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                        publishedDate!
+                        publishedDate
                       );
                       await removeDailyPuzzle({ publicKey, year, month, day });
                     } else {
