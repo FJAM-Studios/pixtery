@@ -126,3 +126,9 @@ export enum StatusOfDaily {
   UNDER_REVIEW,
   PUBLISHED,
 }
+
+export interface DateObjString {
+  year: string;
+  month: string;
+  day: string;
+}

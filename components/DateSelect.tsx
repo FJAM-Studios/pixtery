@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Calendar } from "react-native-calendars";
 import { DateData } from "react-native-calendars/src/types";
 import { ActivityIndicator, Text } from "react-native-paper";
-import moment from "moment-timezone";
 
 import { functions } from "../FirebaseApp";
 import { convertIntToDoubleDigitString } from "../util";

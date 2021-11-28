@@ -45,23 +45,16 @@ export const addToGallery = functions.https.onCall(
         );
       }
 
-      const {publicKey, dailyDate} = data;
-
+      const {publicKey, year, month, day } = data;
       //get the puzzle data from the gallery queue
       const res = await db.collection("galleryQueue").doc(publicKey).get()
       const puzzleData = res.data()
-
-      // original dailyDate string is e.g. "2021-11-22"
-      const dailyDateArray = dailyDate.split("-") 
-      const dailyDateYear = dailyDateArray[0]
-      const dailyDateMonth = dailyDateArray[1]
-      const dailyDateDay = dailyDateArray[2]
       
       // set puzzle for that date on firestore
       await db.collection("gallery")
-      .doc(dailyDateYear)
-      .collection(dailyDateMonth)
-      .doc(dailyDateDay)
+      .doc(year)
+      .collection(month)
+      .doc(day)
       .set({
         ...puzzleData,
         addedBy: context.auth.uid,
@@ -142,10 +135,14 @@ export const removeDailyPuzzle = functions.https.onCall(
             "user not gallery admin"
         );
       }
-      const {publicKey} = data;
-      //remove it from gallery/daily
-      await db.collection("gallery").doc(publicKey).delete();
-      //set it active in queue
+      const { publicKey, year, month, day } = data;
+      // remove it from gallery/daily
+      await db.collection("gallery")
+      .doc(year)
+      .collection(month)
+      .doc(day)
+      .delete();
+      // set it active in queue
       await db.collection("galleryQueue").doc(publicKey).set({active: true},{merge: true});
     } catch (error: any) {
       throw new functions.https.HttpsError("unknown", error.message, error);
