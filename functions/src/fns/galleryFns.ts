@@ -164,7 +164,6 @@ export const getDaily = functions.https.onCall(
           );
         }
         const { year, month, day } = data
-        console.log(year, month, day)
         const daily = await db.collection("gallery")
         .doc(year)
         .collection(month)
