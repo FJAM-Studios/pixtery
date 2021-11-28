@@ -85,7 +85,11 @@ export type StackScreens = {
   Gallery: undefined;
   AddToGallery: undefined;
   GalleryQueue: undefined | { forceReload: boolean };
-  GalleryReview: { puzzle: Puzzle };
+  GalleryReview: {
+    puzzle: Puzzle;
+    statusOfDaily: StatusOfDaily;
+    publishedDate?: string;
+  };
   DailyCalendar: undefined;
 };
 
@@ -117,3 +121,8 @@ export interface RootState {
 }
 
 export type PixteryTheme = Theme & { name: string; ID: number };
+
+export enum StatusOfDaily {
+  UNDER_REVIEW,
+  PUBLISHED,
+}

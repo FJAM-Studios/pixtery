@@ -11,7 +11,12 @@ import {
 import { useSelector } from "react-redux";
 
 import { functions } from "../FirebaseApp";
-import { GalleryReviewRoute, RootState, ScreenNavigation } from "../types";
+import {
+  GalleryReviewRoute,
+  RootState,
+  ScreenNavigation,
+  StatusOfDaily,
+} from "../types";
 import { downloadImage } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import DateSelect from "./DateSelect";
@@ -24,7 +29,8 @@ export default function GalleryReview({
   navigation: ScreenNavigation;
   route: GalleryReviewRoute;
 }): JSX.Element {
-  const { puzzle } = route.params;
+  const { puzzle, statusOfDaily, publishedDate } = route.params;
+  const { UNDER_REVIEW, PUBLISHED } = StatusOfDaily;
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [actionType, setActionType] = useState<"delete" | "confirm">();
@@ -69,6 +75,9 @@ export default function GalleryReview({
     setModalVisible(false);
     navigation.push("GalleryReview", {
       puzzle,
+      // when this onMarkedDayPress is passed to DateSelect from this component,
+      // Daily will always be under review (i.e. not published)
+      statusOfDaily: UNDER_REVIEW,
     });
   };
 
@@ -114,7 +123,9 @@ export default function GalleryReview({
             <View style={{ flexDirection: "column", alignItems: "center" }}>
               <Text>Sender: {puzzle.senderName}</Text>
               <Text>Message: {puzzle.message}</Text>
-              {puzzle.dailyDate ? <Text>Daily: {puzzle.dailyDate}</Text> : null}
+              {statusOfDaily === PUBLISHED ? (
+                <Text>Daily: {publishedDate}</Text>
+              ) : null}
               <View style={{ flexDirection: "row", alignItems: "center" }}>
                 <Text>{puzzle.gridSize}</Text>
                 <IconButton
@@ -140,7 +151,7 @@ export default function GalleryReview({
                     setActionType("delete");
                   }}
                 />
-                {puzzle.dailyDate ? null : (
+                {statusOfDaily === PUBLISHED ? null : (
                   <IconButton
                     icon="check"
                     size={40}
@@ -174,8 +185,8 @@ export default function GalleryReview({
             {actionType === "delete" ? (
               <>
                 <Headline style={{ textAlign: "center" }}>
-                  {puzzle.dailyDate
-                    ? "Remove from date and move to Queue?"
+                  {statusOfDaily === PUBLISHED
+                    ? "Remove Daily from date and move to Queue?"
                     : "Remove from Daily Puzzle Queue?"}
                 </Headline>
                 <IconButton
@@ -185,7 +196,7 @@ export default function GalleryReview({
                   onPress={async () => {
                     const { publicKey } = puzzle;
                     setLoading(true);
-                    if (puzzle.dailyDate) {
+                    if (statusOfDaily === PUBLISHED) {
                       const removeDailyPuzzle = functions.httpsCallable(
                         "removeDailyPuzzle"
                       );
