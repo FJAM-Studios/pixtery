@@ -5,6 +5,7 @@ import { ActivityIndicator, Text } from "react-native-paper";
 
 import { functions } from "../FirebaseApp";
 import { DailyDate, Puzzle } from "../types";
+import { convertIntToDoubleDigitString } from "../util";
 
 export default function DateSelect({
   onMarkedDayPress,
@@ -17,16 +18,23 @@ export default function DateSelect({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
-  const loadDailies = async (monthData: DateData) => {
+  const loadDailies = async (visibleMonthData: DateData) => {
     try {
       const getDailyDates = functions.httpsCallable("getDailyDates");
-      const res = await getDailyDates(monthData);
-      const foundDailies: Puzzle[] = res.data;
+      // pass in year / month as strings formatted as in firestore
+      const formattedDates = {
+        year: visibleMonthData.year.toString(),
+        // need to add 0 at the front of string if single digit to match firestore
+        month: convertIntToDoubleDigitString(visibleMonthData.month),
+      };
+      const res = await getDailyDates(formattedDates);
+      const foundDailies: { puzzleData: Puzzle; day: string }[] = res.data;
       const newDates: DailyDate = {};
       for (let i = 0; i < foundDailies.length; i++) {
-        const daily = foundDailies[i];
-        if (daily.dailyDate)
-          newDates[daily.dailyDate] = { selected: true, puzzle: daily };
+        const dailyPixteryWithDay = foundDailies[i];
+        const { puzzleData, day } = dailyPixteryWithDay;
+        const dateOfDaily = `${formattedDates.year}-${formattedDates.month}-${day}`;
+        newDates[dateOfDaily] = { selected: true, puzzle: puzzleData };
       }
       setMarkedDates(newDates);
     } catch (e) {
