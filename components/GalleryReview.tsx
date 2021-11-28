@@ -77,7 +77,7 @@ export default function GalleryReview({
     setModalVisible(false);
     navigation.push("GalleryReview", {
       puzzle,
-      // when navigating to GalleryReview from Calendar,
+      // when navigating to GalleryReview from the calendar,
       // marked Daily will always be published (i.e. not under review)
       statusOfDaily: PUBLISHED,
       publishedDate: dateString,
