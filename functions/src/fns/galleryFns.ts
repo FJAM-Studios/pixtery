@@ -45,18 +45,23 @@ export const addToGallery = functions.https.onCall(
         );
       }
 
-      const {publicKey, dailyDate} = data;
+      const {publicKey, year, month, day } = data;
       //get the puzzle data from the gallery queue
       const res = await db.collection("galleryQueue").doc(publicKey).get()
       const puzzleData = res.data()
-
-      //add it to the real gallery with who added and when
-      await db.collection("gallery").doc(publicKey).set({
+      
+      // set puzzle for that date on firestore
+      await db.collection("gallery")
+      .doc(year)
+      .collection(month)
+      .doc(day)
+      .set({
         ...puzzleData,
-        dailyDate: new Date(dailyDate),
         addedBy: context.auth.uid,
         addedOn: new Date()
-      },{merge: true});
+        // currently will overwrite an existing daily at the date
+        // before overwrite, could move existing Daily to a retired folder
+      },{merge: false});
 
       //make the puzzle inactive in the queue
       await db.collection("galleryQueue").doc(publicKey).set({active: false},{merge: true});
@@ -76,7 +81,6 @@ export const getDailyDates = functions.https.onCall(
               "user not authenticated"
           );
         }
-
         // throw error if user is not member of gallery admins
         const admin = await db.collection("galleryAdmins").doc(context.auth.uid).get()
         if(!admin.exists) {
@@ -85,25 +89,26 @@ export const getDailyDates = functions.https.onCall(
               "user not gallery admin"
           );
         }
-        const { year, month } = data
-        const timestamp = new Date(`${year}-${month}-1`);
-        const dailies = await db.collection("gallery").where("dailyDate",">=", timestamp )
-          .orderBy("dailyDate")
-          .limit(31)
+        const { month, year } = data        
+        const dailies = await db.collection("gallery")
+          .doc(year)
+          .collection(month)
           .get()
+
         if(!dailies.empty){
             // this will include whatever data we want the user to submit with the puzzle
             // i.e., sender name vs anonymous, tags, title, etc.
             // that will need to be built out in the gallery submission form.
             // for now, it only includes the normal puzzle data
-          const dailyPuzzles = dailies.docs.map((doc) => {
-            const data = doc.data()
+          const dailyPuzzlesForTheMonth = dailies.docs.map((doc) => {
+            const puzzleData = doc.data()
+            const day = doc.id
             return {
-              ...data,
-              dailyDate: data.dailyDate.toDate().toISOString().split("T")[0],
+              puzzleData,
+              day,
             }
           });
-          return dailyPuzzles;
+          return dailyPuzzlesForTheMonth;
         } else return [];
       } catch (error: any) {
         throw new functions.https.HttpsError("unknown", error.message, error);
@@ -130,10 +135,14 @@ export const removeDailyPuzzle = functions.https.onCall(
             "user not gallery admin"
         );
       }
-      const {publicKey} = data;
-      //remove it from gallery/daily
-      await db.collection("gallery").doc(publicKey).delete();
-      //set it active in queue
+      const { publicKey, year, month, day } = data;
+      // remove it from gallery/daily
+      await db.collection("gallery")
+      .doc(year)
+      .collection(month)
+      .doc(day)
+      .delete();
+      // set it active in queue
       await db.collection("galleryQueue").doc(publicKey).set({active: true},{merge: true});
     } catch (error: any) {
       throw new functions.https.HttpsError("unknown", error.message, error);
@@ -151,30 +160,16 @@ export const getDaily = functions.https.onCall(
               "user not authenticated"
           );
         }
+        const { year, month, day } = data
+        const daily = await db.collection("gallery")
+        .doc(year)
+        .collection(month)
+        .doc(day)
+        .get();
 
-        const { today } = data
-        const timestamp = new Date(today);
-        // console.log(timestamp)
-        timestamp.setUTCHours(0,0,0,0)
-
-        const dailies = await db.collection("gallery").where("dailyDate","==", timestamp )
-          .limit(1)
-          .get()
-        if(!dailies.empty){
-            // this will include whatever data we want the user to submit with the puzzle
-            // i.e., sender name vs anonymous, tags, title, etc.
-            // that will need to be built out in the gallery submission form.
-            // for now, it only includes the normal puzzle data
-          const dailyPuzzles = dailies.docs.map((doc) => {
-            const data = doc.data()
-            return {
-              ...data,
-              dailyDate: data.dailyDate.toDate().toISOString().split("T")[0],
-            }
-          });
-          return dailyPuzzles;
-        } else {
-          // @todo - decide on something to be done when no current daily, e.g. get most recent
+        if(daily.exists) return daily.data()
+        else {
+          // @todo - once a day cloud function that populates from last years puzzle
           return [];
         }
       } catch (error: any) {
