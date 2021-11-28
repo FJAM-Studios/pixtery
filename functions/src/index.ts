@@ -24,4 +24,3 @@ export {
   deactivateAllUserPuzzles,
   deactivateUserPuzzle
 } from "./fns/userFns"
-

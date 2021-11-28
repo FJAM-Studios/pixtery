@@ -4,7 +4,7 @@ import { Headline, IconButton } from "react-native-paper";
 import Toast from "react-native-root-toast";
 import { useSelector } from "react-redux";
 
-import { RootState, ScreenNavigation } from "../types";
+import { RootState, ScreenNavigation, StatusOfDaily } from "../types";
 import AdSafeAreaView from "./AdSafeAreaView";
 import DateSelect from "./DateSelect";
 import Header from "./Header";
@@ -30,6 +30,8 @@ export default function DailyCalendar({
     const { puzzle } = markedDates[dateString];
     navigation.navigate("GalleryReview", {
       puzzle,
+      statusOfDaily: StatusOfDaily.PUBLISHED,
+      publishedDate: dateString,
     });
   };
 
