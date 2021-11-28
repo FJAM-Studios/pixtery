@@ -47,8 +47,6 @@ const ARGUABLY_CLEVER_PHRASES = [
 
 const DAY_IN_MILLISECONDS = 1000 * 60 * 60 * 24;
 
-const EST_TO_UTC = 5;
-
 export {
   TESTING_MODE,
   SNAP_MARGIN,
