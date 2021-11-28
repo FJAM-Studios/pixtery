@@ -16,8 +16,9 @@ import {
   GalleryReviewRoute,
   RootState,
   ScreenNavigation,
+  StatusOfDaily,
 } from "../types";
-import { downloadImage } from "../util";
+import { downloadImage, convertDateStringToObject } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import DateSelect from "./DateSelect";
 import Header from "./Header";
@@ -29,7 +30,8 @@ export default function GalleryReview({
   navigation: ScreenNavigation;
   route: GalleryReviewRoute;
 }): JSX.Element {
-  const { puzzle } = route.params;
+  const { puzzle, statusOfDaily, publishedDate } = route.params;
+  const { PUBLISHED } = StatusOfDaily;
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [actionType, setActionType] = useState<"delete" | "confirm">();
@@ -53,7 +55,9 @@ export default function GalleryReview({
       try {
         const addToGallery = functions.httpsCallable("addToGallery");
         setLoading(true);
-        await addToGallery({ publicKey, dailyDate });
+        // original dailyDate string is "YYYY-MM-DD"
+        const { year, month, day } = convertDateStringToObject(dailyDate);
+        await addToGallery({ publicKey, year, month, day });
         callback();
       } catch (e) {
         console.log(e);
@@ -74,6 +78,10 @@ export default function GalleryReview({
     setModalVisible(false);
     navigation.push("GalleryReview", {
       puzzle,
+      // when navigating to GalleryReview from the calendar,
+      // marked Daily will always be published (i.e. not under review)
+      statusOfDaily: PUBLISHED,
+      publishedDate: dateString,
     });
   };
 
@@ -119,7 +127,9 @@ export default function GalleryReview({
             <View style={{ flexDirection: "column", alignItems: "center" }}>
               <Text>Sender: {puzzle.senderName}</Text>
               <Text>Message: {puzzle.message}</Text>
-              {puzzle.dailyDate ? <Text>Daily: {puzzle.dailyDate}</Text> : null}
+              {statusOfDaily === PUBLISHED ? (
+                <Text>Daily: {publishedDate}</Text>
+              ) : null}
               <View style={{ flexDirection: "row", alignItems: "center" }}>
                 <Text>{puzzle.gridSize}</Text>
                 <IconButton
@@ -145,7 +155,7 @@ export default function GalleryReview({
                     setActionType("delete");
                   }}
                 />
-                {puzzle.dailyDate ? null : (
+                {statusOfDaily === PUBLISHED ? null : (
                   <IconButton
                     icon="check"
                     size={40}
@@ -179,8 +189,8 @@ export default function GalleryReview({
             {actionType === "delete" ? (
               <>
                 <Headline style={{ textAlign: "center" }}>
-                  {puzzle.dailyDate
-                    ? "Remove from date and move to Queue?"
+                  {statusOfDaily === PUBLISHED
+                    ? "Remove Daily from date and move to Queue?"
                     : "Remove from Daily Puzzle Queue?"}
                 </Headline>
                 <IconButton
@@ -190,11 +200,15 @@ export default function GalleryReview({
                   onPress={async () => {
                     const { publicKey } = puzzle;
                     setLoading(true);
-                    if (puzzle.dailyDate) {
+                    if (statusOfDaily === PUBLISHED && publishedDate) {
                       const removeDailyPuzzle = functions.httpsCallable(
                         "removeDailyPuzzle"
                       );
-                      await removeDailyPuzzle({ publicKey });
+                      // publishedDate format "YYYY-MM-DD"
+                      const { year, month, day } = convertDateStringToObject(
+                        publishedDate
+                      );
+                      await removeDailyPuzzle({ publicKey, year, month, day });
                     } else {
                       const deactivateInQueue = functions.httpsCallable(
                         "deactivateInQueue"

@@ -1,13 +1,14 @@
 import { AdMobInterstitial } from "expo-ads-admob";
+import moment from "moment-timezone";
 import React, { useState, useEffect } from "react";
 import { View, TouchableOpacity } from "react-native";
 import { ActivityIndicator, Button, Headline, Text } from "react-native-paper";
 import { useSelector } from "react-redux";
 
 import { functions } from "../FirebaseApp";
-import { INTERSTITIAL_ID } from "../constants";
+import { INTERSTITIAL_ID, DAILY_TIMEZONE } from "../constants";
 import { Puzzle, RootState, ScreenNavigation } from "../types";
-import { msToTime } from "../util";
+import { msToTime, convertIntToDoubleDigitString } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 
@@ -43,9 +44,15 @@ export default function Gallery({
     setLoading(true);
     const getDaily = functions.httpsCallable("getDaily");
     try {
-      const today = new Date().toISOString();
-      const res = await getDaily({ today });
-      const daily = res.data[0];
+      // daily timezone is currently set to EST
+      const todayInDailyTimezone = moment().tz(DAILY_TIMEZONE);
+      const res = await getDaily({
+        year: todayInDailyTimezone.year().toString(),
+        // month is indexed from 0
+        month: convertIntToDoubleDigitString(todayInDailyTimezone.month() + 1),
+        day: convertIntToDoubleDigitString(todayInDailyTimezone.date()),
+      });
+      const daily = res.data;
       if (daily) {
         // think we don't need to do this if not showing blurred image here
         // await downloadImage(daily);
