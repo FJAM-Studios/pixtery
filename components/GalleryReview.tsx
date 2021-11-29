@@ -12,6 +12,7 @@ import { useSelector } from "react-redux";
 
 import { functions } from "../FirebaseApp";
 import {
+  DailyDate,
   GalleryReviewRoute,
   RootState,
   ScreenNavigation,
@@ -72,7 +73,7 @@ export default function GalleryReview({
     addPuzzle(dailyDate);
   };
 
-  const onMarkedDayPress = (dateString: string, markedDates: any) => {
+  const onMarkedDayPress = (dateString: string, markedDates: DailyDate) => {
     const { puzzle } = markedDates[dateString];
     setModalVisible(false);
     navigation.push("GalleryReview", {
