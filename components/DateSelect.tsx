@@ -4,16 +4,17 @@ import { DateData } from "react-native-calendars/src/types";
 import { ActivityIndicator, Text } from "react-native-paper";
 
 import { functions } from "../FirebaseApp";
+import { DailyDate, Puzzle } from "../types";
 import { convertIntToDoubleDigitString } from "../util";
 
 export default function DateSelect({
   onMarkedDayPress,
   onUnmarkedDayPress,
 }: {
-  onMarkedDayPress: (date: string, markedDates?: any) => void;
+  onMarkedDayPress: (date: string, markedDates: DailyDate) => void;
   onUnmarkedDayPress: (date: string) => void;
 }): JSX.Element {
-  const [markedDates, setMarkedDates] = useState<any>({});
+  const [markedDates, setMarkedDates] = useState<DailyDate>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
@@ -27,8 +28,8 @@ export default function DateSelect({
         month: convertIntToDoubleDigitString(visibleMonthData.month),
       };
       const res = await getDailyDates(formattedDates);
-      const foundDailies = res.data;
-      const newDates: any = {};
+      const foundDailies: { puzzleData: Puzzle; day: string }[] = res.data;
+      const newDates: DailyDate = {};
       for (let i = 0; i < foundDailies.length; i++) {
         const dailyPixteryWithDay = foundDailies[i];
         const { puzzleData, day } = dailyPixteryWithDay;

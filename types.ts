@@ -122,6 +122,10 @@ export interface RootState {
 
 export type PixteryTheme = Theme & { name: string; ID: number };
 
+export interface DailyDate {
+  [key: string]: { selected: boolean; puzzle: Puzzle };
+}
+
 export enum StatusOfDaily {
   UNDER_REVIEW,
   PUBLISHED,

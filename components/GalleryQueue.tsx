@@ -34,9 +34,9 @@ export default function GalleryQueue({
     (state: RootState) => state.receivedPuzzles
   );
   // these are fixed now, but later if we want to paginate or look at inactive gallery queue listings, we can
-  const [limit, setLimit] = useState(10);
-  const [active, setActive] = useState(true);
-  const [startAt, setStartAt] = useState(0);
+  const [limit] = useState(10);
+  const [active] = useState(true);
+  const [startAt] = useState(0);
   const [loading, setLoading] = useState(false);
   const [queue, setQueue] = useState<Puzzle[]>([]);
   const [message, setMessage] = useState("");
