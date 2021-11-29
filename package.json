@@ -90,6 +90,7 @@
     "@babel/preset-typescript": "^7.13.0",
     "@testing-library/jest-native": "^4.0.1",
     "@testing-library/react-native": "^7.2.0",
+    "@types/nodemailer": "^6.4.4",
     "@types/react": "~16.9.35",
     "@types/react-dom": "~16.9.8",
     "@types/react-native": "~0.63.2",

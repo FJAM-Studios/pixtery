@@ -1,21 +1,14 @@
-import React, { useState } from "react";
+import React from "react";
 import { View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import {
-  Headline,
-  Text,
-  TextInput,
-  Button,
-  Switch,
-  IconButton,
-} from "react-native-paper";
+import { Headline, Text, Button } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 
+import { VERSION_NUMBER } from "../constants";
 import { setTutorialFinished } from "../store/reducers/tutorialFinished";
 import { ScreenNavigation, RootState } from "../types";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
-import { VERSION_NUMBER } from "../constants";
 
 export default function Help({
   navigation,

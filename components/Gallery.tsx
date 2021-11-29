@@ -1,8 +1,7 @@
 import { AdMobInterstitial } from "expo-ads-admob";
-import * as FileSystem from "expo-file-system";
 import moment from "moment-timezone";
 import React, { useState, useEffect } from "react";
-import { View, Image, TouchableOpacity } from "react-native";
+import { View, TouchableOpacity } from "react-native";
 import { ActivityIndicator, Button, Headline, Text } from "react-native-paper";
 import { useSelector } from "react-redux";
 
