@@ -1,9 +1,11 @@
+/* eslint-disable no-empty */
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as FirebaseRecaptcha from "expo-firebase-recaptcha";
 import React, { useState, useRef } from "react";
 import { View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Headline, Text, TextInput, Button } from "react-native-paper";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import {
   phoneProvider,
@@ -12,12 +14,13 @@ import {
   registerOnFirebase,
   functions,
 } from "../FirebaseApp";
+import { setProfile } from "../store/reducers/profile";
 import { RegisterRoute, ScreenNavigation, RootState } from "../types";
 import { goToScreen } from "../util";
-import Logo from "./Logo";
-import Title from "./Title";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
+import Logo from "./Logo";
+import Title from "./Title";
 
 const phoneFormat = require("phone");
 
@@ -31,6 +34,7 @@ export default function Register({
   const recaptchaVerifier = useRef<FirebaseRecaptcha.FirebaseRecaptchaVerifierModal>(
     null
   );
+  const dispatch = useDispatch();
   const theme = useSelector((state: RootState) => state.theme);
   const profile = useSelector((state: RootState) => state.profile);
   const receivedPuzzles = useSelector(
@@ -153,12 +157,22 @@ export default function Register({
                     smsCode
                   );
                   if (authResult) {
-                    // get whether or not pixtery admin
-                    const checkGalleryAdmin = functions.httpsCallable(
-                      "checkGalleryAdmin"
-                    );
-                    const res = await checkGalleryAdmin();
-                    const isGalleryAdmin = res.data;
+                    try {
+                      // get whether or not pixtery admin
+                      const checkGalleryAdmin = functions.httpsCallable(
+                        "checkGalleryAdmin"
+                      );
+                      const res = await checkGalleryAdmin();
+                      const isGalleryAdmin = res.data;
+
+                      //save to local storage
+                      await AsyncStorage.setItem(
+                        "@pixteryProfile",
+                        JSON.stringify({ isGalleryAdmin })
+                      );
+                      //update app state
+                      dispatch(setProfile({ isGalleryAdmin }));
+                    } catch (e) {}
 
                     //back to profile
                     goToScreen(navigation, "Profile");
