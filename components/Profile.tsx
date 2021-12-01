@@ -119,7 +119,7 @@ export default function Profile({
             }}
             style={{ margin: 10 }}
           >
-            Register Account
+            Sign In / Register Account
           </Button>
         )}
         <Button
