@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import firebase from "firebase";
 import "firebase/functions";
 import "firebase/firestore";
@@ -35,7 +37,7 @@ const phoneProvider = new firebase.auth.PhoneAuthProvider();
 const verifySms = (
   id: string,
   code: string
-): Promise<firebase.auth.UserCredential> => {
+): Promise<firebase.auth.UserCredential | undefined> | undefined => {
   const credential = firebase.auth.PhoneAuthProvider.credential(id, code);
   const signInResponse = firebase.auth().signInWithCredential(credential);
   return signInResponse;
@@ -43,6 +45,74 @@ const verifySms = (
 
 const signOut = (): Promise<void> => {
   return firebase.auth().signOut();
+};
+
+const anonSignIn = async (): Promise<void> => {
+  try {
+    // Anonymous sign in. This should only fire the first time someone uses the app.
+    if (!firebase.auth().currentUser) await firebase.auth().signInAnonymously();
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const migratePuzzles = async (
+  prevUser: firebase.User,
+  currentUser: firebase.User
+): Promise<void> => {
+  console.log("MIGRATE PUZZLES");
+  const _migratePuzzles = functions.httpsCallable("migratePuzzles");
+  _migratePuzzles(prevUser.uid);
+};
+
+const registerOnFirebase = async (
+  providerType: string,
+  id: string,
+  verificationCode: string
+): Promise<firebase.User | void> => {
+  let authProvider;
+
+  switch (providerType) {
+    case "phone":
+      authProvider = firebase.auth.PhoneAuthProvider;
+      break;
+    case "google":
+      authProvider = firebase.auth.GoogleAuthProvider;
+      break;
+    default:
+      break;
+  }
+
+  if (authProvider) {
+    try {
+      // Get user credential using auth provider
+      const newCredential = authProvider.credential(id, verificationCode);
+
+      const prevUser = firebase.auth().currentUser!;
+      ////the below comes from https://firebase.google.com/docs/auth/web/account-linking
+      let currentUser;
+      // Sign in user with the account you want to link to
+      firebase
+        .auth()
+        .signInWithCredential(newCredential)
+        .then((result) => {
+          currentUser = result.user;
+
+          // Merge prevUser and currentUser data stored in Firebase.
+          // Note: How you handle this is specific to your application
+          if (currentUser && prevUser.uid !== currentUser.uid)
+            migratePuzzles(prevUser, currentUser);
+          return currentUser;
+        })
+        .catch((error) => {
+          // If there are errors we want to undo the data merge/deletion
+          console.log("Sign In Error", error);
+        });
+      return currentUser;
+    } catch (error) {
+      console.log(error);
+    }
+  }
 };
 
 export {
@@ -54,4 +124,6 @@ export {
   verifySms,
   functions,
   signOut,
+  anonSignIn,
+  registerOnFirebase,
 };

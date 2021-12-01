@@ -74,6 +74,7 @@ export type StackScreens = {
   Puzzle: { publicKey: string; sourceList: string };
   AddPuzzle: { publicKey: string; sourceList: string };
   Profile: undefined;
+  Register: undefined;
 };
 
 export type ScreenNavigation = StackNavigationProp<StackScreens>;
@@ -82,6 +83,7 @@ export type PuzzleRoute = RouteProp<StackScreens, "Puzzle">;
 export type AddPuzzleRoute = RouteProp<StackScreens, "AddPuzzle">;
 export type CreateProfileRoute = RouteProp<StackScreens, "CreateProfile">;
 export type SplashRoute = RouteProp<StackScreens, "Splash">;
+export type RegisterRoute = RouteProp<StackScreens, "Register">;
 
 //// STORE /////
 export interface ScreenHeight {
