@@ -20,6 +20,27 @@ interface Puzzle {
   completed?: boolean;
 }
 
+const copyList = async (sourceUser: string, targetUser: string, listType:string) => {
+  const puzzleCollection =
+  await db.collection("userPixteries")
+    .doc(sourceUser)
+    .collection(listType)
+    .get();
+
+    puzzleCollection.forEach((puzzle:any) => {
+      const puzzleData = puzzle.data();
+      if(puzzleData && puzzleData.publicKey){
+      db.collection("userPixteries")
+      .doc(targetUser)
+      .collection(listType)
+      .doc(puzzleData.publicKey)
+      // adding the full puzzle to make it faster to retrieve later
+      .set({...puzzleData});
+      }
+    })
+
+}
+
 exports.uploadPuzzleSettings = functions.https.onCall(
     async (data: { newPuzzle: Puzzle }, context) => {
       const { newPuzzle} = data;
@@ -164,6 +185,24 @@ exports.deactivateUserPuzzle = functions.https.onCall(
         .doc(publicKey)
         .set({active: false}, {merge: true});
 
+    } catch (error) {
+      throw new functions.https.HttpsError("unknown", error.message, error);
+    }
+  }
+);
+
+exports.migratePuzzles = functions.https.onCall(
+  async ( prevUserId: string, context) => {
+    try {
+    // throw error if user is not authenticated
+      if (!context.auth) {
+        throw new functions.https.HttpsError(
+            "permission-denied",
+            "user not authenticated"
+        );
+      }
+        copyList(prevUserId, context!.auth!.uid, "sent");
+        copyList(prevUserId, context!.auth!.uid, "received");
     } catch (error) {
       throw new functions.https.HttpsError("unknown", error.message, error);
     }
