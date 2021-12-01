@@ -39,7 +39,7 @@ export interface Puzzle {
 }
 
 export interface Profile {
-  name: string;
+  name?: string;
   isGalleryAdmin?: boolean;
   noSound?: boolean;
   noVibration?: boolean;
