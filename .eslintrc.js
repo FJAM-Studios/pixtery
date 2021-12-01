@@ -33,5 +33,6 @@ module.exports = {
   },
   rules: {
     "@typescript-eslint/no-var-requires": "off",
+    "react-hooks/exhaustive-deps": "off",
   },
 };

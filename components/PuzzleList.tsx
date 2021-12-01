@@ -42,9 +42,9 @@ export default function PuzzleList({
     null
   );
   // the setSortBy/setSortOrder are currently unused, but set up for future sort optionality
-  const [sortBy, setSortBy] = React.useState<keyof Puzzle>("dateReceived");
+  const [sortBy] = React.useState<keyof Puzzle>("dateReceived");
   // "desc" = descending or "asc" = ascending
-  const [sortOrder, setSortOrder] = React.useState<string>("desc");
+  const [sortOrder] = React.useState<string>("desc");
   const [puzzleURL, setPuzzleURL] = React.useState<string>("");
 
   const showDeleteModal = (puzzle: Puzzle) => {
@@ -139,13 +139,14 @@ export default function PuzzleList({
       >
         <TextInput
           mode="outlined"
-          label="Enter puzzle ID or URL"
           placeholder="Enter puzzle ID or URL"
           value={puzzleURL}
           onChangeText={(text) => setPuzzleURL(text)}
           onSubmitEditing={() => {
             if (puzzleURL.length > 8) downloadPuzzle();
           }}
+          outlineColor={theme.colors.primary}
+          placeholderTextColor={theme.colors.primary}
           // maxLength={50}
           style={{ flex: 2 }}
         />

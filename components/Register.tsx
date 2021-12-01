@@ -10,6 +10,7 @@ import {
   firebaseConfig,
   // verifySms,
   registerOnFirebase,
+  functions,
 } from "../FirebaseApp";
 import { RegisterRoute, ScreenNavigation, RootState } from "../types";
 import { goToScreen } from "../util";
@@ -120,7 +121,7 @@ export default function Register({
               }
             } catch (e) {
               console.log(e);
-              setErrors(e.message);
+              if (e instanceof Error) setErrors(e.message);
             }
           }}
           style={{ margin: 10 }}
@@ -152,11 +153,18 @@ export default function Register({
                     smsCode
                   );
                   if (authResult) {
+                    // get whether or not pixtery admin
+                    const checkGalleryAdmin = functions.httpsCallable(
+                      "checkGalleryAdmin"
+                    );
+                    const res = await checkGalleryAdmin();
+                    const isGalleryAdmin = res.data;
+
                     //back to profile
                     goToScreen(navigation, "Profile");
                   }
                 } catch (e) {
-                  setErrors(e.message);
+                  if (e instanceof Error) setErrors(e.message);
                   setResetAllowed(true);
                 }
               }}

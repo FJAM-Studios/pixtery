@@ -5,6 +5,7 @@ import {
 import { createStackNavigator } from "@react-navigation/stack";
 import * as Linking from "expo-linking";
 import * as SplashScreen from "expo-splash-screen";
+import { StatusBar } from "expo-status-bar";
 import { requestTrackingPermissionsAsync } from "expo-tracking-transparency";
 import * as Updates from "expo-updates";
 import React, { useRef, useEffect } from "react";
@@ -14,7 +15,14 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 
 import AddPuzzle from "./components/AddPuzzle";
+import AddToGallery from "./components/AddToGallery";
+import ContactUs from "./components/ContactUs";
 import CreateProfile from "./components/CreateProfile";
+import DailyCalendar from "./components/DailyCalendar";
+import Gallery from "./components/Gallery";
+import GalleryQueue from "./components/GalleryQueue";
+import GalleryReview from "./components/GalleryReview";
+import Help from "./components/Help";
 import HomeScreen from "./components/Home";
 import Profile from "./components/Profile";
 import Puzzle from "./components/Puzzle";
@@ -23,11 +31,11 @@ import Register from "./components/Register";
 import SentPuzzleList from "./components/SentPuzzleList";
 import Splash from "./components/Splash";
 import TitleScreen from "./components/TitleScreen";
+import Tutorial from "./components/Tutorial";
 import { MIN_BOTTOM_CLEARANCE } from "./constants";
 import { setDeviceSize } from "./store/reducers/screenHeight";
 import { StackScreens, RootState } from "./types";
 import { goToScreen } from "./util";
-
 //less than ideal, but idk if we have a choice right now. suppresses the firebase timeout warning
 LogBox.ignoreLogs(["Setting a timer for a long period of time"]);
 
@@ -65,19 +73,22 @@ const App = (): JSX.Element => {
   };
 
   useEffect(() => {
-    // when update is downloaded, request reload
-    Updates.addListener((event) => {
-      if (event.type === Updates.UpdateEventType.UPDATE_AVAILABLE) {
-        promptRestart();
-      }
-    });
+    //don't check for updates in dev mode
+    if (process.env.NODE_ENV !== "development") {
+      // when update is downloaded, request reload
+      Updates.addListener((event) => {
+        if (event.type === Updates.UpdateEventType.UPDATE_AVAILABLE) {
+          promptRestart();
+        }
+      });
 
-    //check for updates when app is foregrounded
-    AppState.addEventListener("change", () => {
-      if (AppState.currentState === "active") {
-        getUpdate();
-      }
-    });
+      //check for updates when app is foregrounded
+      AppState.addEventListener("change", () => {
+        if (AppState.currentState === "active") {
+          getUpdate();
+        }
+      });
+    }
 
     async function requestTrackingPermissions() {
       try {
@@ -118,6 +129,7 @@ const App = (): JSX.Element => {
       <SafeAreaProvider>
         <NavigationContainer ref={navigationRef} onReady={gotoSplash}>
           <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
+            <StatusBar style={theme.dark ? "light" : "dark"} />
             <Stack.Navigator initialRouteName="TitleScreen" headerMode="none">
               <Stack.Screen name="TitleScreen" component={TitleScreen} />
               <Stack.Screen name="Splash">
@@ -146,6 +158,30 @@ const App = (): JSX.Element => {
               </Stack.Screen>
               <Stack.Screen name="Profile">
                 {(props) => <Profile {...props} />}
+              </Stack.Screen>
+              <Stack.Screen name="ContactUs">
+                {(props) => <ContactUs {...props} />}
+              </Stack.Screen>
+              <Stack.Screen name="Tutorial">
+                {(props) => <Tutorial {...props} />}
+              </Stack.Screen>
+              <Stack.Screen name="Help">
+                {(props) => <Help {...props} />}
+              </Stack.Screen>
+              <Stack.Screen name="GalleryQueue">
+                {(props) => <GalleryQueue {...props} />}
+              </Stack.Screen>
+              <Stack.Screen name="GalleryReview">
+                {(props) => <GalleryReview {...props} />}
+              </Stack.Screen>
+              <Stack.Screen name="Gallery">
+                {(props) => <Gallery {...props} />}
+              </Stack.Screen>
+              <Stack.Screen name="AddToGallery">
+                {(props) => <AddToGallery {...props} />}
+              </Stack.Screen>
+              <Stack.Screen name="DailyCalendar">
+                {(props) => <DailyCalendar {...props} />}
               </Stack.Screen>
             </Stack.Navigator>
           </View>
