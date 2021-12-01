@@ -56,10 +56,7 @@ const anonSignIn = async (): Promise<void> => {
   }
 };
 
-const migratePuzzles = async (
-  prevUser: firebase.User,
-  currentUser: firebase.User
-): Promise<void> => {
+const migratePuzzles = async (prevUser: firebase.User): Promise<void> => {
   console.log("MIGRATE PUZZLES");
   const _migratePuzzles = functions.httpsCallable("migratePuzzles");
   _migratePuzzles(prevUser.uid);
@@ -86,13 +83,13 @@ const registerOnFirebase = async (
   if (authProvider) {
     try {
       // Get user credential using auth provider
-      const newCredential = authProvider.credential(id, verificationCode);
+      const newCredential = await authProvider.credential(id, verificationCode);
 
       const prevUser = firebase.auth().currentUser!;
       ////the below comes from https://firebase.google.com/docs/auth/web/account-linking
       let currentUser;
       // Sign in user with the account you want to link to
-      firebase
+      await firebase
         .auth()
         .signInWithCredential(newCredential)
         .then((result) => {
@@ -101,16 +98,14 @@ const registerOnFirebase = async (
           // Merge prevUser and currentUser data stored in Firebase.
           // Note: How you handle this is specific to your application
           if (currentUser && prevUser.uid !== currentUser.uid)
-            migratePuzzles(prevUser, currentUser);
-          return currentUser;
-        })
-        .catch((error) => {
-          // If there are errors we want to undo the data merge/deletion
-          console.log("Sign In Error", error);
+            migratePuzzles(prevUser);
+          // return currentUser;
         });
       return currentUser;
     } catch (error) {
       console.log(error);
+      // throwing error so the Register component has an error message to display to the user.
+      throw new Error("Could not sign in at this time. Please try again.");
     }
   }
 };
