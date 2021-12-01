@@ -49,7 +49,7 @@ export default function AddPuzzle({
       return puzzleData.data; // get just nested data from returned JSON
     } catch (error) {
       console.error(error);
-      throw new Error(error); //rethrow the error so it can be caught by outer method
+      if (error instanceof Error) throw new Error(error.message); //rethrow the error so it can be caught by outer method
     }
   };
 
@@ -78,10 +78,10 @@ export default function AddPuzzle({
       ];
       await AsyncStorage.setItem(storageItem, JSON.stringify(allPuzzles));
       dispatch(setPuzzles(allPuzzles));
-    } catch (e) {
-      console.log(e);
+    } catch (error) {
+      console.log(error);
       alert("Could not save puzzle to your phone");
-      throw new Error(e); //rethrow error for outer method
+      if (error instanceof Error) throw new Error(error.message); //rethrow error for outer method
     }
   };
 

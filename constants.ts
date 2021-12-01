@@ -45,6 +45,10 @@ const ARGUABLY_CLEVER_PHRASES = [
   "So pixterious!",
 ];
 
+const DAY_IN_MILLISECONDS = 1000 * 60 * 60 * 24;
+
+const DAILY_TIMEZONE = "America/New_York";
+
 export {
   TESTING_MODE,
   SNAP_MARGIN,
@@ -59,4 +63,6 @@ export {
   MIN_BOTTOM_CLEARANCE,
   VERSION_NUMBER,
   ARGUABLY_CLEVER_PHRASES,
+  DAY_IN_MILLISECONDS,
+  DAILY_TIMEZONE,
 };

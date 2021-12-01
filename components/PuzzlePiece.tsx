@@ -1,6 +1,6 @@
-import { Audio } from "expo-av";
+import * as Haptics from "expo-haptics";
 import * as ImageManipulator from "expo-image-manipulator";
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef } from "react";
 import { Animated } from "react-native";
 import {
   PanGestureHandler,
@@ -10,6 +10,7 @@ import {
   TapGestureHandlerStateChangeEvent,
 } from "react-native-gesture-handler";
 import { Svg, Image, Defs, ClipPath, Path, Rect } from "react-native-svg";
+import { useSelector } from "react-redux";
 
 import {
   DEGREE_CONVERSION,
@@ -17,7 +18,7 @@ import {
   USE_NATIVE_DRIVER,
 } from "../constants";
 import { getPointsDistance, snapAngle } from "../puzzleUtils";
-import { Point, Piece, BoardSpace } from "../types";
+import { Point, Piece, BoardSpace, RootState } from "../types";
 
 const AnimatedSvg = Animated.createAnimatedComponent(Svg);
 
@@ -64,7 +65,8 @@ export default function PuzzlePiece({
     x: snapOffset.x / pieceDimensions.width,
     y: snapOffset.y / pieceDimensions.height,
   };
-  const [snapSound, setSnapSound] = useState<Audio.Sound>();
+  const profile = useSelector((state: RootState) => state.profile);
+  const sound = useSelector((state: RootState) => state.sound);
 
   let isDragged = false;
 
@@ -160,7 +162,9 @@ export default function PuzzlePiece({
           const rotation = (lastRotate + initialRotation) % (Math.PI * 2);
           currentBoard.push({ pointIndex, solvedIndex, rotation });
           checkWin();
-          playSnapSound();
+          if (!profile.noVibration)
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+          if (!profile.noSound) playSnapSound();
           break;
         }
       }
@@ -198,33 +202,15 @@ export default function PuzzlePiece({
         matchingPiece.rotation = rotation;
       }
       checkWin();
-      playSnapSound();
+      if (!profile.noVibration)
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      if (!profile.noSound) playSnapSound();
     }
   };
 
-  const loadSnapSound = async () => {
-    const { sound } = await Audio.Sound.createAsync(
-      require("../assets/click.m4a")
-    );
-    setSnapSound(sound);
-  };
-
   const playSnapSound = async () => {
-    await snapSound?.replayAsync();
+    await sound?.replayAsync();
   };
-
-  useEffect(() => {
-    loadSnapSound();
-  }, []);
-
-  // unload sound to prevent memory leaks
-  useEffect(() => {
-    return snapSound
-      ? () => {
-          snapSound.unloadAsync();
-        }
-      : undefined;
-  }, [snapSound]);
 
   return (
     <PanGestureHandler

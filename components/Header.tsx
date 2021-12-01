@@ -10,11 +10,14 @@ import Title from "./Title";
 export default function Header({
   navigation,
   notifications,
+  headerStep,
 }: {
   navigation: ScreenNavigation;
   notifications: number;
+  headerStep?: boolean;
 }): JSX.Element {
   const theme = useSelector((state: RootState) => state.theme);
+  const profile = useSelector((state: RootState) => state.profile);
   const [visible, setVisible] = React.useState(false);
   const openMenu = () => setVisible(true);
   const { height } = useSelector((state: RootState) => state.screenHeight);
@@ -26,6 +29,7 @@ export default function Header({
         alignItems: "center",
         flexDirection: "row",
         height: height * 0.05,
+        zIndex: headerStep ? 3 : 0,
       }}
     >
       <View
@@ -71,6 +75,15 @@ export default function Header({
         <Menu.Item
           onPress={() => {
             closeMenu();
+            navigation.navigate("Gallery");
+          }}
+          title="Daily Pixtery"
+          icon="image-multiple"
+        />
+        <Divider />
+        <Menu.Item
+          onPress={() => {
+            closeMenu();
             navigation.navigate("PuzzleList");
           }}
           title="Solve"
@@ -94,6 +107,28 @@ export default function Header({
           title="Profile"
           icon="cog"
         />
+        <Divider />
+        <Menu.Item
+          onPress={() => {
+            closeMenu();
+            navigation.navigate("Help");
+          }}
+          title="Help"
+          icon="help-circle"
+        />
+        {profile && profile.isGalleryAdmin ? (
+          <>
+            <Divider />
+            <Menu.Item
+              onPress={() => {
+                closeMenu();
+                navigation.navigate("GalleryQueue");
+              }}
+              title="Admin"
+              icon="account-lock"
+            />
+          </>
+        ) : null}
       </Menu>
     </View>
   );

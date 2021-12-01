@@ -3,11 +3,17 @@ import firebase from "firebase";
 import React, { useState } from "react";
 import { View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { Headline, Text, TextInput, Button } from "react-native-paper";
+import {
+  Headline,
+  Text,
+  TextInput,
+  Button,
+  Switch,
+  IconButton,
+} from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 
 import { signOut } from "../FirebaseApp";
-import { VERSION_NUMBER } from "../constants";
 import { setProfile } from "../store/reducers/profile";
 import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
 import { setSentPuzzles } from "../store/reducers/sentPuzzles";
@@ -19,6 +25,7 @@ import {
 } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
+import ThemeSelector from "./ThemeSelector";
 
 export default function Profile({
   navigation,
@@ -33,8 +40,37 @@ export default function Profile({
   const sentPuzzles = useSelector((state: RootState) => state.sentPuzzles);
   const profile = useSelector((state: RootState) => state.profile);
   const [name, setName] = useState((profile && profile.name) || "");
+  const [noSound, setNoSound] = useState((profile && profile.noSound) || false);
+  const [noVibration, setNoVibration] = useState(
+    (profile && profile.noVibration) || false
+  );
   const [errors, setErrors] = useState("");
   const [restoring, setRestoring] = useState(false);
+
+  const toggleSound = async () => {
+    //save to local storage
+    await AsyncStorage.setItem(
+      "@pixteryProfile",
+      JSON.stringify({ ...profile, noSound: !noSound })
+    );
+    //update app state
+    dispatch(setProfile({ ...profile, noSound: !noSound }));
+    setNoSound(!noSound);
+  };
+
+  const toggleVibration = async () => {
+    //save to local storage
+    await AsyncStorage.setItem(
+      "@pixteryProfile",
+      JSON.stringify({ ...profile, noVibration: !noVibration })
+    );
+    //update app state
+    dispatch(setProfile({ ...profile, noVibration: !noVibration }));
+    setNoVibration(!noVibration);
+  };
+
+  const [selectingTheme, setSelectingTheme] = useState(false);
+
   return (
     <AdSafeAreaView
       style={{
@@ -66,6 +102,47 @@ export default function Profile({
         </View>
         <Text>Name</Text>
         <TextInput value={name} onChangeText={(name) => setName(name)} />
+        <View
+          style={{
+            justifyContent: "space-around",
+            alignItems: "center",
+            flexDirection: "row",
+            marginVertical: 10,
+          }}
+        >
+          <View
+            style={{
+              justifyContent: "flex-start",
+              alignItems: "center",
+              flexDirection: "row",
+            }}
+          >
+            <IconButton icon="volume-high" />
+            <Text>Off</Text>
+            <Switch value={!noSound} onValueChange={toggleSound} />
+            <Text>On</Text>
+          </View>
+          <View
+            style={{
+              justifyContent: "flex-start",
+              alignItems: "center",
+              flexDirection: "row",
+            }}
+          >
+            <IconButton icon="vibrate" />
+            <Text>Off</Text>
+            <Switch value={!noVibration} onValueChange={toggleVibration} />
+            <Text>On</Text>
+          </View>
+        </View>
+        <Button
+          icon="palette"
+          mode="contained"
+          onPress={() => setSelectingTheme(true)}
+          style={{ margin: 10 }}
+        >
+          Change Theme
+        </Button>
         <Button
           icon="camera-iris"
           mode="contained"
@@ -75,10 +152,10 @@ export default function Profile({
               //save to local storage
               await AsyncStorage.setItem(
                 "@pixteryProfile",
-                JSON.stringify({ name })
+                JSON.stringify({ name, noSound, noVibration })
               );
               //update app state
-              dispatch(setProfile({ name }));
+              dispatch(setProfile({ name, noSound, noVibration }));
               setErrors("");
             } else {
               setErrors("You must enter a name!");
@@ -193,7 +270,9 @@ export default function Profile({
         >
           Restore Puzzles
         </Button>
-        <Text>v{VERSION_NUMBER}</Text>
+        {selectingTheme ? (
+          <ThemeSelector setSelectingTheme={setSelectingTheme} />
+        ) : null}
       </KeyboardAwareScrollView>
     </AdSafeAreaView>
   );
