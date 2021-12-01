@@ -1,12 +1,9 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as FirebaseRecaptcha from "expo-firebase-recaptcha";
-import firebase from "firebase";
 import React, { useState, useRef } from "react";
 import { View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Headline, Text, TextInput, Button } from "react-native-paper";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 
 import {
   phoneProvider,
@@ -14,11 +11,12 @@ import {
   // verifySms,
   registerOnFirebase,
 } from "../FirebaseApp";
-import { setProfile } from "../store/reducers/profile";
 import { RegisterRoute, ScreenNavigation, RootState } from "../types";
 import { goToScreen } from "../util";
 import Logo from "./Logo";
 import Title from "./Title";
+import AdSafeAreaView from "./AdSafeAreaView";
+import Header from "./Header";
 
 const phoneFormat = require("phone");
 
@@ -29,12 +27,14 @@ export default function Register({
   navigation: ScreenNavigation;
   route: RegisterRoute;
 }): JSX.Element {
-  const dispatch = useDispatch();
   const recaptchaVerifier = useRef<FirebaseRecaptcha.FirebaseRecaptchaVerifierModal>(
     null
   );
   const theme = useSelector((state: RootState) => state.theme);
   const profile = useSelector((state: RootState) => state.profile);
+  const receivedPuzzles = useSelector(
+    (state: RootState) => state.receivedPuzzles
+  );
   const [name, setName] = useState((profile && profile.name) || "");
   const [phone, setPhone] = useState("");
   const [smsCode, setSmsCode] = useState("");
@@ -45,7 +45,7 @@ export default function Register({
   const [buttonHeight, setButtonHeight] = useState(0);
 
   return (
-    <SafeAreaView
+    <AdSafeAreaView
       style={{
         flex: 1,
         flexDirection: "column",
@@ -53,6 +53,12 @@ export default function Register({
         backgroundColor: theme.colors.background,
       }}
     >
+      <Header
+        notifications={
+          receivedPuzzles.filter((puzzle) => !puzzle.completed).length
+        }
+        navigation={navigation}
+      />
       <View
         style={{
           flexDirection: "column",
@@ -78,12 +84,6 @@ export default function Register({
         extraScrollHeight={verifyFocused ? buttonHeight + 40 : 0}
         enableOnAndroid
       >
-        <Text>Name</Text>
-        <TextInput
-          placeholder="Terry Pix"
-          value={name}
-          onChangeText={(name) => setName(name)}
-        />
         <Text>Phone Number</Text>
         <TextInput
           autoCompleteType="tel"
@@ -152,20 +152,8 @@ export default function Register({
                     smsCode
                   );
                   if (authResult) {
-                    console.log("GOT AUTH RESULT");
-                    //save to local storage
-                    await AsyncStorage.setItem(
-                      "@pixteryProfile",
-                      JSON.stringify({ name })
-                    );
-                    //update app state
-                    dispatch(setProfile({ name }));
-                    //send ya on your way, either home or to AddPuzzle if you were redirected here to log in first
-                    if (route.params && route.params.url)
-                      goToScreen(navigation, "Splash", {
-                        url: route.params.url,
-                      });
-                    else goToScreen(navigation, "Home");
+                    //back to profile
+                    goToScreen(navigation, "Profile");
                   }
                 } catch (e) {
                   setErrors(e.message);
@@ -195,7 +183,19 @@ export default function Register({
             Reset
           </Button>
         ) : null}
+        <Button
+          icon="close-box"
+          mode="contained"
+          style={{ margin: 10 }}
+          onLayout={(ev) => setButtonHeight(ev.nativeEvent.layout.height)}
+          onPress={() => {
+            //back to profile
+            goToScreen(navigation, "Profile");
+          }}
+        >
+          Cancel
+        </Button>
       </KeyboardAwareScrollView>
-    </SafeAreaView>
+    </AdSafeAreaView>
   );
 }
