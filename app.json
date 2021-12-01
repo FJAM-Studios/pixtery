@@ -30,6 +30,7 @@
       "bundleIdentifier": "com.fjamstudios.pixtery",
       "buildNumber": "1.2.0",
       "supportsTablet": true,
+      "appStoreUrl": "https://apps.apple.com/us/app/pixtery/id1569991739",
       "config": {
         "googleMobileAdsAppId": "ca-app-pub-5028593996211038~8814734724"
       },
@@ -43,6 +44,7 @@
     "android": {
       "package": "com.fjamstudios.pixtery",
       "versionCode": 5,
+      "playStoreUrl": "https://play.google.com/store/apps/details?id=com.fjamstudios.pixtery",
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#C490D1"

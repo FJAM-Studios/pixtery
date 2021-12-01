@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Audio } from "expo-av";
 import * as Linking from "expo-linking";
 import React, { useEffect } from "react";
 import { View } from "react-native";
@@ -9,8 +10,16 @@ import { PUBLIC_KEY_LENGTH } from "../constants";
 import { setProfile } from "../store/reducers/profile";
 import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
 import { setSentPuzzles } from "../store/reducers/sentPuzzles";
+import { setSound } from "../store/reducers/sound";
+import { setTheme } from "../store/reducers/theme";
+import { setTutorialFinished } from "../store/reducers/tutorialFinished";
+import { allThemes } from "../themes";
 import { ScreenNavigation, SplashRoute, RootState } from "../types";
-import { closeSplashAndNavigate, updateImageURIs } from "../util";
+import {
+  clearEIMcache,
+  closeSplashAndNavigate,
+  updateImageURIs,
+} from "../util";
 import Logo from "./Logo";
 import Title from "./Title";
 
@@ -42,6 +51,34 @@ export default function Splash({
         return null;
       }
     };
+
+    const loadTutorialState = async () => {
+      try {
+        const jsonValue = await AsyncStorage.getItem("@tutorialFinished");
+        const tutorialFinished =
+          jsonValue != null ? JSON.parse(jsonValue) : false;
+        return tutorialFinished;
+      } catch (e) {
+        console.log(e);
+        alert("Could not load profile.");
+        return null;
+      }
+    };
+
+    const loadTheme = async () => {
+      try {
+        const jsonValue = await AsyncStorage.getItem("@themeID");
+        const themeID = jsonValue != null ? JSON.parse(jsonValue) : 0;
+        const loadedTheme = allThemes.filter((t) => t.ID === +themeID)[0];
+        if (loadedTheme) return loadedTheme;
+        else return allThemes[0];
+      } catch (e) {
+        console.log(e);
+        alert("Could not load profile.");
+        return allThemes[0];
+      }
+    };
+
     const loadPuzzles = async () => {
       try {
         const jsonValue = await AsyncStorage.getItem("@pixteryPuzzles");
@@ -86,6 +123,17 @@ export default function Splash({
         route.params && route.params.url
           ? route.params.url
           : await getInitialUrl();
+      // load tutorial state
+      const tutorialFinished = await loadTutorialState();
+      dispatch(setTutorialFinished(tutorialFinished));
+      // load theme
+      const loadedTheme = await loadTheme();
+      dispatch(setTheme(loadedTheme));
+      // load audio
+      const { sound } = await Audio.Sound.createAsync(
+        require("../assets/click.m4a")
+      );
+      dispatch(setSound(sound));
       //if you are logged in, load local puzzles, then either navigate to AddPuzzle or Home if there is no url
       if (profile) {
         await loadPuzzles();
@@ -114,6 +162,10 @@ export default function Splash({
 
     loadAppData();
   }, [dispatch, navigation, profile, route.params]);
+
+  useEffect(() => {
+    clearEIMcache();
+  }, []);
 
   return (
     <View

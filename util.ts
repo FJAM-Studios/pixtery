@@ -12,7 +12,7 @@ import { Alert, Share } from "react-native";
 import Toast from "react-native-root-toast";
 
 import { storage, functions } from "./FirebaseApp";
-import { Puzzle, ScreenNavigation } from "./types";
+import { Puzzle, ScreenNavigation, DateObjString } from "./types";
 
 //convert URI into a blob to transmit to server
 export const createBlob = (localUri: string): Promise<Blob> => {
@@ -52,8 +52,8 @@ export const shareMessage = async (pixUrl: string): Promise<void> => {
       subject: "Someone sent you a Pixtery to solve!",
     };
     await Share.share(content, options);
-  } catch (error) {
-    alert(error.message);
+  } catch (error: unknown) {
+    if (error instanceof Error) alert(error.message);
   }
 };
 
@@ -223,7 +223,10 @@ export const checkPermission = async (camera: boolean): Promise<string> => {
   }
 };
 
-export const downloadImage = async (newPuzzle: Puzzle): Promise<number> => {
+export const downloadImage = async (
+  newPuzzle: Puzzle,
+  temporaryStorage = false
+): Promise<number> => {
   try {
     const { imageURI } = newPuzzle;
     // for now, giving image a filename based on URL from server, can change later if needed
@@ -233,7 +236,10 @@ export const downloadImage = async (newPuzzle: Puzzle): Promise<number> => {
     //but user could still download old pixtery (with no uploaded extension), so addl logic needed
     const extension = imageURI.slice(-4) === ".jpg" ? "" : ".jpg";
     newPuzzle.imageURI = fileName + extension;
-    const localURI = FileSystem.documentDirectory + fileName + extension;
+    const downloadFolder = temporaryStorage
+      ? FileSystem.cacheDirectory + "ImageManipulator"
+      : FileSystem.documentDirectory;
+    const localURI = downloadFolder + fileName + extension;
     // if you already have this image, don't download it
     const fileInfo = await FileSystem.getInfoAsync(localURI);
     if (!fileInfo.exists) {
@@ -387,3 +393,48 @@ export const deactivateAllPuzzlesOnServer = async (
     console.log(error);
   }
 };
+
+export const clearEIMcache = async (): Promise<void> => {
+  try {
+    const EIMcacheDir = FileSystem.cacheDirectory + "ImageManipulator";
+    const EIMcacheInfo = await FileSystem.getInfoAsync(EIMcacheDir);
+    if (EIMcacheInfo.exists && EIMcacheInfo.isDirectory) {
+      console.log("removing old EIM cache...");
+      await FileSystem.deleteAsync(EIMcacheDir);
+    } else {
+      console.log("No EIM cache found");
+    }
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+// converts single digit integers to double digit strings (e.g. 9 -> "09")
+export const convertIntToDoubleDigitString = (number: number): string => {
+  // return the two numbers from end of string (i.e. "09" or "10")
+  return `0${number}`.slice(-2);
+};
+
+export const convertDateStringToObject = (
+  dateString: string
+): DateObjString => {
+  // dateString passed in is "YYYY-MM-DD"
+  const dateArray = dateString.split("-");
+  return {
+    year: dateArray[0],
+    month: dateArray[1],
+    day: dateArray[2],
+  };
+};
+
+export function msToTime(duration: number): string {
+  const seconds = Math.floor((duration / 1000) % 60),
+    minutes = Math.floor((duration / (1000 * 60)) % 60),
+    hours = Math.floor((duration / (1000 * 60 * 60)) % 24);
+
+  const _hours = hours < 10 ? "0" + hours : hours;
+  const _minutes = minutes < 10 ? "0" + minutes : minutes;
+  const _seconds = seconds < 10 ? "0" + seconds : seconds;
+
+  return _hours + ":" + _minutes + ":" + _seconds;
+}

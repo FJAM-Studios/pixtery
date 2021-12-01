@@ -43,9 +43,9 @@ export default function SentPuzzleList({
     null
   );
   // the setSortBy/setSortOrder are currently unused, but set up for future sort optionality
-  const [sortBy, setSortBy] = React.useState<keyof Puzzle>("dateReceived");
+  const [sortBy] = React.useState<keyof Puzzle>("dateReceived");
   // "desc" = descending or "asc" = ascending
-  const [sortOrder, setSortOrder] = React.useState<string>("desc");
+  const [sortOrder] = React.useState<string>("desc");
 
   const showDeleteModal = (puzzle: Puzzle) => {
     setModalVisible(true);
