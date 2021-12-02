@@ -35,6 +35,9 @@ export default function AddToGallery({
   navigation: ScreenNavigation;
 }): JSX.Element {
   const theme = useSelector((state: RootState) => state.theme);
+  const notificationToken = useSelector(
+    (state: RootState) => state.notificationToken
+  );
   const receivedPuzzles = useSelector(
     (state: RootState) => state.receivedPuzzles
   );
@@ -154,11 +157,13 @@ export default function AddToGallery({
                   const addToQueue = functions.httpsCallable("addToQueue");
                   try {
                     const newPublicKey: string = shortid.generate();
+                    console.log(notificationToken);
                     await addToQueue({
                       publicKey,
                       anonymousChecked,
                       message,
                       newPublicKey,
+                      notificationToken,
                     });
                     Toast.show(
                       "Thanks for your submission! The Pixtery team will review soon!",
