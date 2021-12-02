@@ -189,8 +189,11 @@ export default function AddToGallery({
       ) : (
         <ScrollView>
           <Headline style={{ alignSelf: "center", textAlign: "center" }}>
-            Choose A Puzzle to Submit To The Daily Pixtery
+            Choose A Puzzle
           </Headline>
+          <Text style={{ alignSelf: "center", textAlign: "center" }}>
+            Edit secret message after selecting
+          </Text>
           <>
             {sentPuzzles.length ? (
               sentPuzzles.map((sentPuzzle, ix) => (

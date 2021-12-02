@@ -1,14 +1,14 @@
 import { AdMobInterstitial } from "expo-ads-admob";
 import moment from "moment-timezone";
 import React, { useState, useEffect } from "react";
-import { View, TouchableOpacity } from "react-native";
+import { View } from "react-native";
 import { ActivityIndicator, Button, Headline, Text } from "react-native-paper";
 import { useSelector } from "react-redux";
 
 import { functions } from "../FirebaseApp";
 import { INTERSTITIAL_ID, DAILY_TIMEZONE } from "../constants";
-import { Puzzle, RootState, ScreenNavigation } from "../types";
-import { msToTime, convertIntToDoubleDigitString } from "../util";
+import { RootState, ScreenNavigation } from "../types";
+import { msToTime } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 
@@ -23,20 +23,15 @@ export default function Gallery({
   const receivedPuzzles = useSelector(
     (state: RootState) => state.receivedPuzzles
   );
-  const { boardSize } = useSelector((state: RootState) => state.screenHeight);
-  const [loading, setLoading] = useState(true);
-  const [daily, setDaily] = useState<Puzzle | null>(null);
+  const [loading, setLoading] = useState(false);
   const [time, setTime] = useState<null | number>(null);
+  const [error, setError] = useState<null | string>(null);
 
   const getCountdown = () => {
-    const now = new Date();
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    tomorrow.setUTCHours(0, 0, 0, 0);
-    // uncomment the code below to test time/date change, simulates being 1 min before end of day
-    //now.setUTCHours(24, -1);
-    const time = tomorrow.getTime() - now.getTime();
-    if (time <= 1000) loadDaily();
+    const now = moment().tz(DAILY_TIMEZONE);
+    const tomorrow = now.clone().add(1, "day").startOf("day");
+    const time = tomorrow.diff(now, "milliseconds");
+    if (time <= 1000) setError(null);
     setTime(time);
   };
 
@@ -44,21 +39,50 @@ export default function Gallery({
     setLoading(true);
     const getDaily = functions.httpsCallable("getDaily");
     try {
-      // daily timezone is currently set to EST
-      const todayInDailyTimezone = moment().tz(DAILY_TIMEZONE);
-      const res = await getDaily({
-        year: todayInDailyTimezone.year().toString(),
-        // month is indexed from 0
-        month: convertIntToDoubleDigitString(todayInDailyTimezone.month() + 1),
-        day: convertIntToDoubleDigitString(todayInDailyTimezone.date()),
-      });
+      // cloud function will tell you today's Daily instead of client
+      const res = await getDaily();
       const daily = res.data;
-      if (daily) {
-        // think we don't need to do this if not showing blurred image here
-        // await downloadImage(daily);
-        setDaily(daily);
+      if (daily && daily.publicKey) {
+        const { publicKey } = daily;
+        AdMobInterstitial.addEventListener("interstitialDidClose", () => {
+          AdMobInterstitial.removeAllListeners();
+          navigation.navigate("AddPuzzle", {
+            publicKey,
+            sourceList: "received",
+          });
+        });
+        AdMobInterstitial.addEventListener("interstitialDidFailToLoad", () => {
+          AdMobInterstitial.removeAllListeners();
+          navigation.navigate("AddPuzzle", {
+            publicKey,
+            sourceList: "received",
+          });
+        });
+
+        try {
+          //make it so we don't have to watch ads in dev
+          if (process.env.NODE_ENV !== "development") {
+            await AdMobInterstitial.requestAdAsync();
+            await AdMobInterstitial.showAdAsync();
+          } else {
+            navigation.navigate("AddPuzzle", {
+              publicKey,
+              sourceList: "received",
+            });
+          }
+        } catch (error) {
+          // go to the puzzle if there's an ad error
+          navigation.navigate("AddPuzzle", {
+            publicKey,
+            sourceList: "received",
+          });
+          console.log(error);
+        }
+      } else {
+        setError("Sorry! There's no daily today.");
       }
     } catch (e) {
+      setError("Sorry! Something went wrong.");
       console.log(e);
     }
     setLoading(false);
@@ -68,9 +92,6 @@ export default function Gallery({
     const incrementTime = setInterval(() => {
       getCountdown();
     }, 1000);
-
-    loadDaily();
-
     return () => clearInterval(incrementTime);
   }, []);
   return (
@@ -101,90 +122,27 @@ export default function Gallery({
         <View style={{ flex: 1, alignContent: "center", margin: 10 }}>
           {loading ? (
             <ActivityIndicator size="large" />
-          ) : daily ? (
-            <TouchableOpacity
-              onPress={async () => {
-                setLoading(true);
-                const { publicKey } = daily;
-                AdMobInterstitial.addEventListener(
-                  "interstitialDidClose",
-                  () => {
-                    AdMobInterstitial.removeAllListeners();
-                    navigation.navigate("AddPuzzle", {
-                      publicKey,
-                      sourceList: "received",
-                    });
-                  }
-                );
-                AdMobInterstitial.addEventListener(
-                  "interstitialDidFailToLoad",
-                  () => {
-                    AdMobInterstitial.removeAllListeners();
-                    navigation.navigate("AddPuzzle", {
-                      publicKey,
-                      sourceList: "received",
-                    });
-                  }
-                );
-                try {
-                  //make it so we don't have to watch ads in dev
-                  if (process.env.NODE_ENV !== "development") {
-                    await AdMobInterstitial.requestAdAsync();
-                    await AdMobInterstitial.showAdAsync();
-                  } else {
-                    navigation.navigate("AddPuzzle", {
-                      publicKey,
-                      sourceList: "received",
-                    });
-                  }
-                } catch (error) {
-                  // go to the puzzle if there's an ad error
-                  navigation.navigate("AddPuzzle", {
-                    publicKey,
-                    sourceList: "received",
-                  });
-                  console.log(error);
-                }
-              }}
-            >
-              <View
-                style={{
-                  width: boardSize * 0.8,
-                  height: boardSize * 0.8,
-                  alignItems: "center",
-                  justifyContent: "space-evenly",
-                  backgroundColor: "grey",
-                  borderRadius: theme.roundness,
-                  opacity: 0.8,
-                }}
-              >
-                <Text style={{ fontSize: 20 }}>Touch to solve!</Text>
-                <Text style={{ fontSize: 20 }}>
-                  Today&apos;s Pixtery expires in:
-                </Text>
-                {time ? (
-                  <Text style={{ fontSize: 20 }}>{msToTime(time)}</Text>
-                ) : null}
-              </View>
-            </TouchableOpacity>
           ) : (
-            <View
-              style={{
-                width: boardSize * 0.8,
-                height: boardSize * 0.8,
-                alignItems: "center",
-                justifyContent: "space-evenly",
-                backgroundColor: "grey",
-                borderRadius: theme.roundness,
-                opacity: 0.8,
-              }}
-            >
+            <View style={{ alignItems: "center" }}>
+              {error ? (
+                <Text style={{ fontSize: 20 }}>{error}</Text>
+              ) : (
+                <Button
+                  icon="image-multiple"
+                  mode="contained"
+                  onPress={loadDaily}
+                  style={{ margin: 20, padding: 20 }}
+                >
+                  Touch to solve!
+                </Button>
+              )}
               <Text style={{ fontSize: 20 }}>
-                We must be asleep! No Daily today :(
+                {error ? "Check back in:" : "Today's Pixtery expires in:"}
               </Text>
-              <Text style={{ fontSize: 20 }}>Check back in:</Text>
               {time ? (
-                <Text style={{ fontSize: 20 }}>{msToTime(time)}</Text>
+                <Text style={{ fontSize: 20 }}>
+                  (clock animation){msToTime(time)}
+                </Text>
               ) : null}
             </View>
           )}
@@ -203,7 +161,7 @@ export default function Gallery({
             onPress={() => {
               navigation.navigate("AddToGallery");
             }}
-            // style={{ margin: 5 }}
+            style={{ margin: 20, padding: 20 }}
           >
             Suggest a Daily Pixtery!
           </Button>
