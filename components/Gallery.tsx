@@ -24,16 +24,17 @@ export default function Gallery({
     (state: RootState) => state.receivedPuzzles
   );
   const [loading, setLoading] = useState(false);
-  const [time, setTime] = useState<null | number>(null);
   const [error, setError] = useState<null | string>(null);
 
-  const getCountdown = () => {
+  const getCountdown = (): number => {
     const now = moment().tz(DAILY_TIMEZONE);
     const tomorrow = now.clone().add(1, "day").startOf("day");
     const time = tomorrow.diff(now, "milliseconds");
     if (time <= 1000) setError(null);
-    setTime(time);
+    return time;
   };
+
+  const [time, setTime] = useState<null | number>(getCountdown());
 
   const loadDaily = async () => {
     setLoading(true);
@@ -90,7 +91,7 @@ export default function Gallery({
 
   useEffect(() => {
     const incrementTime = setInterval(() => {
-      getCountdown();
+      setTime(getCountdown());
     }, 1000);
     return () => clearInterval(incrementTime);
   }, []);
