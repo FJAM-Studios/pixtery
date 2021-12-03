@@ -118,6 +118,7 @@ export default function AddToGallery({
                   // flexDirection: "row",
                   alignContent: "center",
                   margin: 10,
+                  width: "100%",
                 }}
               >
                 <Text>Edit secret message:</Text>
