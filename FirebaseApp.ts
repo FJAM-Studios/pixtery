@@ -35,10 +35,11 @@ const functions = app.functions();
 if (
   Constants.manifest &&
   Constants.manifest.extra &&
-  Constants.manifest.extra.functionEmulator
+  Constants.manifest.extra.functionEmulator &&
+  Constants.manifest.debuggerHost
 ) {
   console.log("using function emulator");
-  const { MY_LAN_IP } = require("./ip");
+  const MY_LAN_IP = "http://" + Constants.manifest.debuggerHost.split(":")[0];
   functions.useFunctionsEmulator(`${MY_LAN_IP}:5001`);
 }
 
