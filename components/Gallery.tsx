@@ -1,15 +1,14 @@
 import { AdMobInterstitial } from "expo-ads-admob";
-import moment from "moment-timezone";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { View } from "react-native";
 import { ActivityIndicator, Button, Headline, Text } from "react-native-paper";
 import { useSelector } from "react-redux";
 
 import { functions } from "../FirebaseApp";
-import { INTERSTITIAL_ID, DAILY_TIMEZONE } from "../constants";
+import { INTERSTITIAL_ID } from "../constants";
 import { RootState, ScreenNavigation } from "../types";
-import { msToTime } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
+import Clock from "./Clock";
 import Header from "./Header";
 
 AdMobInterstitial.setAdUnitID(INTERSTITIAL_ID);
@@ -25,16 +24,6 @@ export default function Gallery({
   );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<null | string>(null);
-
-  const getCountdown = (): number => {
-    const now = moment().tz(DAILY_TIMEZONE);
-    const tomorrow = now.clone().add(1, "day").startOf("day");
-    const time = tomorrow.diff(now, "milliseconds");
-    if (time <= 1000) setError(null);
-    return time;
-  };
-
-  const [time, setTime] = useState<null | number>(getCountdown());
 
   const loadDaily = async () => {
     setLoading(true);
@@ -89,12 +78,6 @@ export default function Gallery({
     setLoading(false);
   };
 
-  useEffect(() => {
-    const incrementTime = setInterval(() => {
-      setTime(getCountdown());
-    }, 1000);
-    return () => clearInterval(incrementTime);
-  }, []);
   return (
     <AdSafeAreaView
       style={{
@@ -120,11 +103,23 @@ export default function Gallery({
         }}
       >
         <Headline>Daily Pixtery</Headline>
-        <View style={{ flex: 1, alignContent: "center", margin: 10 }}>
+        <View
+          style={{
+            alignItems: "center",
+            flex: 1,
+            width: "100%",
+          }}
+        >
           {loading ? (
             <ActivityIndicator size="large" />
           ) : (
-            <View style={{ alignItems: "center" }}>
+            <View
+              style={{
+                alignItems: "center",
+                flex: 1,
+                width: "100%",
+              }}
+            >
               {error ? (
                 <Text style={{ fontSize: 20 }}>{error}</Text>
               ) : (
@@ -132,7 +127,7 @@ export default function Gallery({
                   icon="image-multiple"
                   mode="contained"
                   onPress={loadDaily}
-                  style={{ margin: 20, padding: 20 }}
+                  style={{ margin: 10, padding: 20 }}
                 >
                   Touch to solve!
                 </Button>
@@ -140,32 +135,21 @@ export default function Gallery({
               <Text style={{ fontSize: 20 }}>
                 {error ? "Check back in:" : "Today's Pixtery expires in:"}
               </Text>
-              {time ? (
-                <Text style={{ fontSize: 20 }}>
-                  (clock animation){msToTime(time)}
-                </Text>
-              ) : null}
+              <Clock setError={setError} />
             </View>
           )}
-        </View>
-        <View
-          style={{
-            flexDirection: "row",
-            position: "absolute",
-            bottom: 10,
-            alignItems: "center",
-          }}
-        >
-          <Button
-            icon="brush"
-            mode="contained"
-            onPress={() => {
-              navigation.navigate("AddToGallery");
-            }}
-            style={{ margin: 20, padding: 20 }}
-          >
-            Suggest a Daily Pixtery!
-          </Button>
+          <View>
+            <Button
+              icon="brush"
+              mode="contained"
+              onPress={() => {
+                navigation.navigate("AddToGallery");
+              }}
+              style={{ margin: 10, padding: 20 }}
+            >
+              Suggest a Daily Pixtery!
+            </Button>
+          </View>
         </View>
       </View>
     </AdSafeAreaView>

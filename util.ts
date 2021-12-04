@@ -427,10 +427,10 @@ export const convertDateStringToObject = (
   };
 };
 
-export function msToTime(duration: number): string {
-  const seconds = Math.floor((duration / 1000) % 60),
-    minutes = Math.floor((duration / (1000 * 60)) % 60),
-    hours = Math.floor((duration / (1000 * 60 * 60)) % 24);
+export function secondsToTime(duration: number): string {
+  const seconds = Math.floor(duration % 60),
+    minutes = Math.floor((duration / 60) % 60),
+    hours = Math.floor((duration / (60 * 60)) % 24);
 
   const _hours = hours < 10 ? "0" + hours : hours;
   const _minutes = minutes < 10 ? "0" + minutes : minutes;
