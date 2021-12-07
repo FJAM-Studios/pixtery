@@ -65,6 +65,8 @@ export const addToGallery = functions.https.onCall(
         .set(
           {
             ...puzzleData,
+            //figured this would be good to remove from the 'live' gallery bc it's sent out to everyone
+            notificationToken: null,
             addedBy: context.auth.uid,
             addedOn: new Date(),
             // currently will overwrite an existing daily at the date

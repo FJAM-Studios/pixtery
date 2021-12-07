@@ -36,6 +36,7 @@ export interface Puzzle {
   dateReceived?: string;
   completed?: boolean;
   dailyDate?: string;
+  notificationToken?: string;
 }
 
 export interface Profile {
@@ -118,6 +119,7 @@ export interface RootState {
   adHeight: number;
   tutorialFinished: boolean;
   sound: Audio.Sound | null;
+  notificationToken: string;
 }
 
 export type PixteryTheme = Theme & { name: string; ID: number };
