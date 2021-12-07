@@ -45,14 +45,6 @@ if (
 
 const storage = app.storage();
 const phoneProvider = new firebase.auth.PhoneAuthProvider();
-const verifySms = (
-  id: string,
-  code: string
-): Promise<firebase.auth.UserCredential | undefined> | undefined => {
-  const credential = firebase.auth.PhoneAuthProvider.credential(id, code);
-  const signInResponse = firebase.auth().signInWithCredential(credential);
-  return signInResponse;
-};
 
 const signOut = (): Promise<void> => {
   return firebase.auth().signOut();
@@ -127,7 +119,6 @@ export {
   storage,
   phoneProvider,
   firebaseConfig,
-  verifySms,
   functions,
   signOut,
   anonSignIn,
