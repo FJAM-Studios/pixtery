@@ -1,4 +1,3 @@
-/* eslint-disable no-empty */
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as FirebaseRecaptcha from "expo-firebase-recaptcha";
 import React, { useState, useRef } from "react";
@@ -10,7 +9,6 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   phoneProvider,
   firebaseConfig,
-  // verifySms,
   registerOnFirebase,
   functions,
 } from "../FirebaseApp";
@@ -48,6 +46,62 @@ export default function Register({
   const [resetAllowed, setResetAllowed] = useState(false);
   const [verifyFocused, setVerifyFocused] = useState(false);
   const [buttonHeight, setButtonHeight] = useState(0);
+  const attemptPhoneSignIn = async () => {
+    try {
+      const formattedPhone = phoneFormat(phone)[0];
+      if (formattedPhone && recaptchaVerifier && recaptchaVerifier.current) {
+        setPhone(formattedPhone);
+        const id = await phoneProvider.verifyPhoneNumber(
+          formattedPhone,
+          recaptchaVerifier.current
+        );
+        setVerificationId(id);
+        setErrors("");
+      } else {
+        throw new Error(
+          `Please check the number that you entered and try again.`
+        );
+      }
+    } catch (e) {
+      console.log(e);
+      if (e instanceof Error) setErrors(e.message);
+    }
+  };
+  const completeSignIn = async () => {
+    try {
+      const authResult = await registerOnFirebase(
+        "phone",
+        verificationId,
+        smsCode
+      );
+      if (authResult) {
+        try {
+          // get whether or not pixtery admin
+          const checkGalleryAdmin = functions.httpsCallable(
+            "checkGalleryAdmin"
+          );
+          const res = await checkGalleryAdmin();
+          const isGalleryAdmin = res.data;
+
+          //save to local storage
+          await AsyncStorage.setItem(
+            "@pixteryProfile",
+            JSON.stringify({ name, isGalleryAdmin })
+          );
+          //update app state
+          dispatch(setProfile({ name, isGalleryAdmin }));
+        } catch (e) {
+          console.log("could not verify admin status");
+        }
+
+        //back to profile
+        goToScreen(navigation, "Profile");
+      }
+    } catch (e) {
+      if (e instanceof Error) setErrors(e.message);
+      setResetAllowed(true);
+    }
+  };
 
   return (
     <AdSafeAreaView
@@ -103,31 +157,7 @@ export default function Register({
           icon="camera-iris"
           mode="contained"
           disabled={!name || !phone || verificationId.length > 0}
-          onPress={async () => {
-            try {
-              const formattedPhone = phoneFormat(phone)[0];
-              if (
-                formattedPhone &&
-                recaptchaVerifier &&
-                recaptchaVerifier.current
-              ) {
-                setPhone(formattedPhone);
-                const id = await phoneProvider.verifyPhoneNumber(
-                  formattedPhone,
-                  recaptchaVerifier.current
-                );
-                setVerificationId(id);
-                setErrors("");
-              } else {
-                throw new Error(
-                  `Please check the number that you entered and try again.`
-                );
-              }
-            } catch (e) {
-              console.log(e);
-              if (e instanceof Error) setErrors(e.message);
-            }
-          }}
+          onPress={attemptPhoneSignIn}
           style={{ margin: 10 }}
         >
           Sign In
@@ -149,39 +179,7 @@ export default function Register({
               mode="contained"
               style={{ margin: 10 }}
               onLayout={(ev) => setButtonHeight(ev.nativeEvent.layout.height)}
-              onPress={async () => {
-                try {
-                  const authResult = await registerOnFirebase(
-                    "phone",
-                    verificationId,
-                    smsCode
-                  );
-                  if (authResult) {
-                    try {
-                      // get whether or not pixtery admin
-                      const checkGalleryAdmin = functions.httpsCallable(
-                        "checkGalleryAdmin"
-                      );
-                      const res = await checkGalleryAdmin();
-                      const isGalleryAdmin = res.data;
-
-                      //save to local storage
-                      await AsyncStorage.setItem(
-                        "@pixteryProfile",
-                        JSON.stringify({ isGalleryAdmin })
-                      );
-                      //update app state
-                      dispatch(setProfile({ isGalleryAdmin }));
-                    } catch (e) {}
-
-                    //back to profile
-                    goToScreen(navigation, "Profile");
-                  }
-                } catch (e) {
-                  if (e instanceof Error) setErrors(e.message);
-                  setResetAllowed(true);
-                }
-              }}
+              onPress={completeSignIn}
             >
               Verify
             </Button>

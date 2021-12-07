@@ -1,5 +1,3 @@
-/* eslint-disable no-empty */
-
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useState } from "react";
 import { View } from "react-native";
@@ -29,6 +27,24 @@ export default function CreateProfile({
   const [name, setName] = useState((profile && profile.name) || "");
   const [verifyFocused, setVerifyFocused] = useState(false);
   const [buttonHeight, setButtonHeight] = useState(0);
+
+  const signIn = async () => {
+    try {
+      await anonSignIn();
+      //save to local storage
+      await AsyncStorage.setItem("@pixteryProfile", JSON.stringify({ name }));
+      //update app state
+      dispatch(setProfile({ name }));
+      //send ya on your way, either home or to AddPuzzle if you were redirected here to log in first
+      if (route.params && route.params.url)
+        goToScreen(navigation, "Splash", {
+          url: route.params.url,
+        });
+      else goToScreen(navigation, "Home");
+    } catch (e) {
+      console.log("error signing in anonymously");
+    }
+  };
 
   return (
     <SafeAreaView
@@ -67,24 +83,7 @@ export default function CreateProfile({
           icon="camera-iris"
           mode="contained"
           disabled={!name}
-          onPress={async () => {
-            try {
-              await anonSignIn();
-              //save to local storage
-              await AsyncStorage.setItem(
-                "@pixteryProfile",
-                JSON.stringify({ name })
-              );
-              //update app state
-              dispatch(setProfile({ name }));
-              //send ya on your way, either home or to AddPuzzle if you were redirected here to log in first
-              if (route.params && route.params.url)
-                goToScreen(navigation, "Splash", {
-                  url: route.params.url,
-                });
-              else goToScreen(navigation, "Home");
-            } catch (e) {}
-          }}
+          onPress={signIn}
           style={{ margin: 10 }}
         >
           Sign In
