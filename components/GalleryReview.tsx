@@ -14,6 +14,7 @@ import { functions } from "../FirebaseApp";
 import {
   DailyDate,
   GalleryReviewRoute,
+  Puzzle,
   RootState,
   ScreenNavigation,
   StatusOfDaily,
@@ -50,7 +51,10 @@ export default function GalleryReview({
     loadImage();
   }, [puzzle]);
 
-  const addToCalendar = (publicKey: string, callback: () => void) => {
+  const addToCalendar = (
+    { publicKey, notificationToken }: Puzzle,
+    callback: () => void
+  ) => {
     return async (dailyDate: string) => {
       try {
         const addToGallery = functions.httpsCallable("addToGallery");
@@ -58,6 +62,31 @@ export default function GalleryReview({
         // original dailyDate string is "YYYY-MM-DD"
         const { year, month, day } = convertDateStringToObject(dailyDate);
         await addToGallery({ publicKey, year, month, day });
+
+        //send a notification to the puzzle maker if there's a notificationToken with the puzzle
+        if (notificationToken) {
+          const message = {
+            to: notificationToken,
+            sound: "default",
+            title: "Your Daily Pixtery!",
+            body: `Congratulations! Your Pixtery will be featured as the Daily Pixtery on ${month}/${day}/${year}!`,
+            // we could include some data to be used by the app if we wanted
+            // data: { someData: "goes here" },
+          };
+
+          // this is an easy way to send out just some text to a specific recipient, but there's lots more we could do w/ notifications if desired
+          const res = await fetch("https://exp.host/--/api/v2/push/send", {
+            method: "POST",
+            headers: {
+              Accept: "application/json",
+              "Accept-encoding": "gzip, deflate",
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(message),
+          });
+          //notifications do not necessarily always go through. If we wanted to keep track of the "ticket", could do that here
+          console.log(res.body);
+        }
         callback();
       } catch (e) {
         console.log(e);
@@ -66,7 +95,7 @@ export default function GalleryReview({
   };
 
   const onUnmarkedDayPress = (dailyDate: string) => {
-    const addPuzzle = addToCalendar(puzzle.publicKey, () => {
+    const addPuzzle = addToCalendar(puzzle, () => {
       setModalVisible(false);
       navigation.navigate("GalleryQueue", { forceReload: true });
     });
