@@ -96,8 +96,7 @@ export const addToQueue = functions.https.onCall(
         );
       }
 
-      const { publicKey, message, newPublicKey } = data;
-
+      const { publicKey, message, newPublicKey, notificationToken } = data;
       // get the puzzle data
       const res = await db.collection("pixteries").doc(publicKey).get();
       const puzzleData = res.data();
@@ -132,6 +131,7 @@ export const addToQueue = functions.https.onCall(
           .set(
             {
               ...puzzleData,
+              notificationToken,
               publicKey: newPublicKey,
               message,
               active: true,

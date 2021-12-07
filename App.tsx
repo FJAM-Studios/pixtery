@@ -3,13 +3,22 @@ import {
   NavigationContainerRef,
 } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
+import Constants from "expo-constants";
 import * as Linking from "expo-linking";
+import * as Notifications from "expo-notifications";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { requestTrackingPermissionsAsync } from "expo-tracking-transparency";
 import * as Updates from "expo-updates";
 import React, { useRef, useEffect } from "react";
-import { Alert, AppState, View, LogBox, Dimensions } from "react-native";
+import {
+  Alert,
+  AppState,
+  View,
+  LogBox,
+  Dimensions,
+  Platform,
+} from "react-native";
 import { Provider as PaperProvider } from "react-native-paper";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
@@ -32,6 +41,7 @@ import Splash from "./components/Splash";
 import TitleScreen from "./components/TitleScreen";
 import Tutorial from "./components/Tutorial";
 import { MIN_BOTTOM_CLEARANCE } from "./constants";
+import { setNotificationToken } from "./store/reducers/notificationToken";
 import { setDeviceSize } from "./store/reducers/screenHeight";
 import { StackScreens, RootState } from "./types";
 import { goToScreen } from "./util";
@@ -41,6 +51,14 @@ LogBox.ignoreLogs(["Setting a timer for a long period of time"]);
 const Stack = createStackNavigator<StackScreens>();
 
 SplashScreen.preventAutoHideAsync().catch();
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
 
 const App = (): JSX.Element => {
   const dispatch = useDispatch();
@@ -97,6 +115,39 @@ const App = (): JSX.Element => {
       }
     }
     requestTrackingPermissions();
+
+    const registerForPushNotificationsAsync = async () => {
+      if (Constants.isDevice) {
+        const {
+          status: existingStatus,
+        } = await Notifications.getPermissionsAsync();
+        let finalStatus = existingStatus;
+        if (existingStatus !== "granted") {
+          const { status } = await Notifications.requestPermissionsAsync();
+          finalStatus = status;
+        }
+        if (finalStatus !== "granted") {
+          alert("Failed to get push token for push notification!");
+          return;
+        }
+        const token = (await Notifications.getExpoPushTokenAsync()).data;
+        dispatch(setNotificationToken(token));
+      } else {
+        alert("Must use physical device for Push Notifications");
+      }
+
+      if (Platform.OS === "android") {
+        Notifications.setNotificationChannelAsync("default", {
+          name: "default",
+          importance: Notifications.AndroidImportance.MAX,
+          vibrationPattern: [0, 250, 250, 250],
+          lightColor: "#FF231F7C",
+        });
+      }
+    };
+
+    registerForPushNotificationsAsync();
+
     const { width, height } = Dimensions.get("screen");
 
     const boardSize =
