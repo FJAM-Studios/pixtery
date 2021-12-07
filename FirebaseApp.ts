@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import Constants from "expo-constants";
 import firebase from "firebase";
 import "firebase/functions";
@@ -88,7 +89,7 @@ const registerOnFirebase = async (
       // Get user credential using auth provider
       const newCredential = await authProvider.credential(id, verificationCode);
 
-      const prevUser = firebase.auth().currentUser!;
+      const prevUser = firebase.auth().currentUser;
       ////the below comes from https://firebase.google.com/docs/auth/web/account-linking
       let currentUser;
       // Sign in user with the account you want to link to
@@ -100,7 +101,7 @@ const registerOnFirebase = async (
 
           // Merge prevUser and currentUser data stored in Firebase.
           // Note: How you handle this is specific to your application
-          if (currentUser && prevUser.uid !== currentUser.uid)
+          if (currentUser && prevUser && prevUser.uid !== currentUser.uid)
             migratePuzzles(prevUser);
           // return currentUser;
         });
@@ -110,6 +111,25 @@ const registerOnFirebase = async (
       // throwing error so the Register component has an error message to display to the user.
       throw new Error("Could not sign in at this time. Please try again.");
     }
+  }
+};
+
+const checkAdminStatus = async (name: string): Promise<boolean> => {
+  try {
+    // get whether or not pixtery admin
+    const checkGalleryAdmin = functions.httpsCallable("checkGalleryAdmin");
+    const res = await checkGalleryAdmin();
+    const isGalleryAdmin = res.data;
+
+    //save to local storage
+    await AsyncStorage.setItem(
+      "@pixteryProfile",
+      JSON.stringify({ name, isGalleryAdmin })
+    );
+    return isGalleryAdmin;
+  } catch (e) {
+    console.log("could not verify admin status");
+    return false;
   }
 };
 
@@ -123,4 +143,5 @@ export {
   signOut,
   anonSignIn,
   registerOnFirebase,
+  checkAdminStatus,
 };
