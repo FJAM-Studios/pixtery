@@ -11,6 +11,7 @@ import { setProfile } from "../store/reducers/profile";
 import { CreateProfileRoute, ScreenNavigation, RootState } from "../types";
 import { goToScreen } from "../util";
 import Logo from "./Logo";
+import PhoneSignIn from "./SignInMethods/Phone";
 import Title from "./Title";
 
 export default function CreateProfile({
@@ -65,7 +66,6 @@ export default function CreateProfile({
       >
         <Logo width="100" height="100" />
         <Title width="100" height="35" />
-        <Headline>Sign In</Headline>
       </View>
       <KeyboardAwareScrollView
         resetScrollToCoords={{ x: 0, y: 0 }}
@@ -73,9 +73,9 @@ export default function CreateProfile({
         extraScrollHeight={verifyFocused ? buttonHeight + 40 : 0}
         enableOnAndroid
       >
-        <Text>Name</Text>
+        <Text>Name*</Text>
         <TextInput
-          placeholder="Your name - will be shown on puzzles you send"
+          placeholder="Your name will be shown on puzzles you send"
           value={name}
           onChangeText={(name) => setName(name)}
         />
@@ -83,11 +83,18 @@ export default function CreateProfile({
           icon="camera-iris"
           mode="contained"
           disabled={!name}
+          onLayout={(ev) => setButtonHeight(ev.nativeEvent.layout.height)}
           onPress={signIn}
           style={{ margin: 10 }}
         >
-          Sign In
+          Continue without Sign In
         </Button>
+        <Headline>Sign In with Phone Number</Headline>
+        <PhoneSignIn
+          navigation={navigation}
+          setVerifyFocused={setVerifyFocused}
+          name={name}
+        />
       </KeyboardAwareScrollView>
     </SafeAreaView>
   );
