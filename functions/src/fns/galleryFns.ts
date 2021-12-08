@@ -180,7 +180,10 @@ export const removeDailyPuzzle = functions.https.onCall(
 );
 
 export const getDaily = functions.https.onCall(
-  async (data, context): Promise<void | FirebaseFirestore.DocumentData> => {
+  async (
+    data,
+    context
+  ): Promise<void | null | FirebaseFirestore.DocumentData> => {
     try {
       // throw error if user is not authenticated
       if (!context.auth) {
@@ -189,7 +192,17 @@ export const getDaily = functions.https.onCall(
           "user not authenticated"
         );
       }
-      const { year, month, day } = data;
+
+      //get today's date in EST and create vars
+      const today = new Date();
+      const [_month, _day, year] = today
+        .toLocaleDateString("en-us", { timeZone: "America/New_York" })
+        // test w another timezone
+        // .toLocaleDateString("en-us", { timeZone: "Pacific/Auckland" })
+        .split("/");
+      const month = `0${_month}`.slice(-2);
+      const day = `0${_day}`.slice(-2);
+
       const daily = await db
         .collection("gallery")
         .doc(year)
@@ -200,7 +213,7 @@ export const getDaily = functions.https.onCall(
       if (daily.exists) return daily.data();
       else {
         // @todo - once a day cloud function that populates from last years puzzle
-        return [];
+        return null;
       }
     } catch (error: unknown) {
       if (error instanceof Error)
