@@ -193,7 +193,7 @@ export default function AddToGallery({
             Choose A Puzzle
           </Headline>
           <Text style={{ alignSelf: "center", textAlign: "center" }}>
-            Edit secret message after selecting
+            You can edit the secret message after selecting
           </Text>
           <>
             {sentPuzzles.length ? (
