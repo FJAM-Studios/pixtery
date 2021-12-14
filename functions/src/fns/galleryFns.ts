@@ -195,20 +195,9 @@ export const getDaily = functions.https.onCall(
 
       //get today's date in EST and create vars
       const today = new Date();
-      const [_month, _day, year] = today
-        .toLocaleDateString("en-us", { timeZone: "America/New_York" })
-        // test w another timezone
-        // .toLocaleDateString("en-us", { timeZone: "Pacific/Auckland" })
-        .split("/");
-      const month = `0${_month}`.slice(-2);
-      const day = `0${_day}`.slice(-2);
+      const [month, day, year] = getESTDate(today);
 
-      const daily = await db
-        .collection("gallery")
-        .doc(year)
-        .collection(month)
-        .doc(day)
-        .get();
+      const daily = await getDailyForDate(year, month, day);
 
       if (daily.exists) return daily.data();
       else {
@@ -221,3 +210,96 @@ export const getDaily = functions.https.onCall(
     }
   }
 );
+
+exports.populateBlankDaily = functions.pubsub
+  .schedule("55 23 * * *")
+  .timeZone("America/New_York") // Users can choose timezone - default is America/Los_Angeles
+  .onRun((context) => {
+    // this is where getBackUpDaily (below) would be integrated
+    console.log("Testing daily at 11:55PM Eastern");
+    return null;
+  });
+
+// to test, cd into functions and run: node -e 'require("./lib/fns/galleryFns.js").getBackupDaily()'
+module.exports.getBackupDaily = async function getBackupDaily() {
+  try {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const [month, day, year] = getESTDate(tomorrow);
+    const lastYear = tomorrow.getFullYear() - 1;
+    console.log(`Tomorrow in EST: ${month}/${day}/${year}`);
+
+    // try to get tomorrow's Daily
+    const tomorrowDaily = await getDailyForDate(year, month, day);
+
+    // if tomorrow's Daily is not set yet
+    if (!tomorrowDaily.exists) {
+      console.log(
+        `Daily was NOT set for ${month}/${day}/${year}. Getting last year's`
+      );
+      // get the daily from a year ago from tomorrow
+      const tomorrowLastYearDaily = await getDailyForDate(
+        lastYear.toString(),
+        month,
+        day
+      );
+      // set tomorrow's Daily with last year's Daily
+      await addToGalleryForDate(
+        year,
+        month,
+        day,
+        // context, (commented out for now; will have context once integrated with scheduled function)
+        tomorrowLastYearDaily.data()
+      );
+    } else {
+      console.log(`Daily was already set for ${month}/${day}/${year}`);
+    }
+  } catch (error: any) {
+    throw new functions.https.HttpsError("unknown", error.message, error);
+  }
+};
+
+// once context is enabled, could use this for addToGallery function as well
+const addToGalleryForDate = async (
+  year: string,
+  month: string,
+  day: string,
+  // context,
+  puzzleData: any
+) => {
+  await db
+    .collection("gallery")
+    .doc(year)
+    .collection(month)
+    .doc(day)
+    .set(
+      {
+        ...puzzleData,
+        //figured this would be good to remove from the 'live' gallery bc it's sent out to everyone
+        notificationToken: null,
+        // addedBy: context.auth.uid,
+        addedBy: null,
+        addedOn: new Date(),
+      },
+      // will overwrite an existing daily at the date
+      { merge: false }
+    );
+};
+
+const getDailyForDate = async (year: string, month: string, day: string) => {
+  return await db
+    .collection("gallery")
+    .doc(year)
+    .collection(month)
+    .doc(day)
+    .get();
+};
+
+const getESTDate = (date: Date) => {
+  const [_month, _day, year] = date
+    .toLocaleDateString("en-us", { timeZone: "America/New_York" })
+    .split("/");
+  const month = `0${_month}`.slice(-2);
+  const day = `0${_day}`.slice(-2);
+  return [month, day, year];
+};
