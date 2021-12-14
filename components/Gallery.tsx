@@ -11,6 +11,7 @@ import { RootState, ScreenNavigation } from "../types";
 import { msToTime } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
+import Timer from "./Timer";
 
 AdMobInterstitial.setAdUnitID(INTERSTITIAL_ID);
 
@@ -23,6 +24,7 @@ export default function Gallery({
   const receivedPuzzles = useSelector(
     (state: RootState) => state.receivedPuzzles
   );
+  const { width } = useSelector((state: RootState) => state.screenHeight);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<null | string>(null);
 
@@ -125,6 +127,10 @@ export default function Gallery({
             <ActivityIndicator size="large" />
           ) : (
             <View style={{ alignItems: "center" }}>
+              <Text style={{ fontSize: 20, margin: 20 }}>
+                {error ? "Check back in:" : "Today's Pixtery expires in:"}
+              </Text>
+              {time ? <Timer time={time} /> : null}
               {error ? (
                 <Text style={{ fontSize: 20 }}>{error}</Text>
               ) : (
@@ -132,19 +138,11 @@ export default function Gallery({
                   icon="image-multiple"
                   mode="contained"
                   onPress={loadDaily}
-                  style={{ margin: 20, padding: 20 }}
+                  style={{ margin: 20, padding: 20, width: width * 0.8 }}
                 >
                   Touch to solve!
                 </Button>
               )}
-              <Text style={{ fontSize: 20 }}>
-                {error ? "Check back in:" : "Today's Pixtery expires in:"}
-              </Text>
-              {time ? (
-                <Text style={{ fontSize: 20 }}>
-                  (clock animation){msToTime(time)}
-                </Text>
-              ) : null}
             </View>
           )}
         </View>
@@ -162,7 +160,7 @@ export default function Gallery({
             onPress={() => {
               navigation.navigate("AddToGallery");
             }}
-            style={{ margin: 20, padding: 20 }}
+            style={{ margin: 20, padding: 20, width: width * 0.8 }}
           >
             Suggest a Daily Pixtery!
           </Button>
