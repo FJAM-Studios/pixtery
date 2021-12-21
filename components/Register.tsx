@@ -20,7 +20,6 @@ export default function Register({
   route: RegisterRoute;
 }): JSX.Element {
   const theme = useSelector((state: RootState) => state.theme);
-  const name = useSelector((state: RootState) => state.profile.name);
   const receivedPuzzles = useSelector(
     (state: RootState) => state.receivedPuzzles
   );
@@ -63,7 +62,6 @@ export default function Register({
         <PhoneSignIn
           navigation={navigation}
           setVerifyFocused={setVerifyFocused}
-          name={name || ""}
         />
         <Button
           icon="close-box"

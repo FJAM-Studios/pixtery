@@ -11,7 +11,7 @@ import { setProfile } from "../store/reducers/profile";
 import { CreateProfileRoute, ScreenNavigation, RootState } from "../types";
 import { goToScreen } from "../util";
 import Logo from "./Logo";
-import PhoneSignIn from "./SignInMethods/Phone";
+import SignInModal from "./SignInMethods/SignInModal";
 import Title from "./Title";
 
 export default function CreateProfile({
@@ -28,20 +28,29 @@ export default function CreateProfile({
   const [name, setName] = useState((profile && profile.name) || "");
   const [verifyFocused, setVerifyFocused] = useState(false);
   const [buttonHeight, setButtonHeight] = useState(0);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [errors, setErrors] = useState("");
 
   const signIn = async () => {
     try {
-      await anonSignIn();
-      //save to local storage
-      await AsyncStorage.setItem("@pixteryProfile", JSON.stringify({ name }));
-      //update app state
-      dispatch(setProfile({ name }));
-      //send ya on your way, either home or to AddPuzzle if you were redirected here to log in first
-      if (route.params && route.params.url)
-        goToScreen(navigation, "Splash", {
-          url: route.params.url,
-        });
-      else goToScreen(navigation, "Home");
+      if (name.trim().length < 1) {
+        setErrors(
+          "Enter a display name so your friends know who sent them a pixtery"
+        );
+      } else {
+        setErrors("");
+        await anonSignIn();
+        //save to local storage
+        await AsyncStorage.setItem("@pixteryProfile", JSON.stringify({ name }));
+        //update app state
+        dispatch(setProfile({ name }));
+        //send ya on your way, either home or to AddPuzzle if you were redirected here to log in first
+        if (route.params && route.params.url)
+          goToScreen(navigation, "Splash", {
+            url: route.params.url,
+          });
+        else goToScreen(navigation, "Home");
+      }
     } catch (e) {
       console.log("error signing in anonymously");
     }
@@ -73,29 +82,48 @@ export default function CreateProfile({
         extraScrollHeight={verifyFocused ? buttonHeight + 40 : 0}
         enableOnAndroid
       >
+        <Headline style={{ textAlign: "center" }}>
+          Continue Without Signing In
+        </Headline>
         <Text>Name*</Text>
         <TextInput
           placeholder="Your name will be shown on puzzles you send"
           value={name}
           onChangeText={(name) => setName(name)}
         />
+        {errors.length ? (
+          <Text style={{ color: theme.colors.accent, fontStyle: "italic" }}>
+            {errors}
+          </Text>
+        ) : null}
         <Button
           icon="camera-iris"
           mode="contained"
-          disabled={!name}
           onLayout={(ev) => setButtonHeight(ev.nativeEvent.layout.height)}
           onPress={signIn}
           style={{ margin: 10 }}
         >
           Continue without Sign In
         </Button>
-        <Headline>Sign In with Phone Number</Headline>
-        <PhoneSignIn
-          navigation={navigation}
-          setVerifyFocused={setVerifyFocused}
-          name={name}
-        />
+        <Headline style={{ textAlign: "center" }}>OR</Headline>
+        <Button
+          icon="account"
+          mode="contained"
+          onPress={() => setModalVisible(true)}
+          style={{ margin: 10 }}
+        >
+          Register/Sign In
+        </Button>
+        <Text style={{ textAlign: "center" }}>
+          Sign in to save your pixteries across devices
+        </Text>
       </KeyboardAwareScrollView>
+      <SignInModal
+        isVisible={modalVisible}
+        setModalVisible={setModalVisible}
+        navigation={navigation}
+        setVerifyFocused={setVerifyFocused}
+      />
     </SafeAreaView>
   );
 }
