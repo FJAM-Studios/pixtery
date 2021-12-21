@@ -1,8 +1,8 @@
 import * as FirebaseRecaptcha from "expo-firebase-recaptcha";
 import React, { useState, useRef } from "react";
 import { View } from "react-native";
-import { Text, TextInput, Button } from "react-native-paper";
-import { useDispatch } from "react-redux";
+import { Headline, Text, TextInput, Button } from "react-native-paper";
+import { useDispatch, useSelector } from "react-redux";
 
 import {
   phoneProvider,
@@ -11,7 +11,7 @@ import {
   checkAdminStatus,
 } from "../../FirebaseApp";
 import { setProfile } from "../../store/reducers/profile";
-import { ScreenNavigation } from "../../types";
+import { ScreenNavigation, RootState } from "../../types";
 import { goToScreen } from "../../util";
 
 const phoneFormat = require("phone");
@@ -19,15 +19,16 @@ const phoneFormat = require("phone");
 export default function PhoneSignIn({
   navigation,
   setVerifyFocused,
-  name,
 }: {
   navigation: ScreenNavigation;
   setVerifyFocused: Function;
-  name: string;
 }): JSX.Element {
   const recaptchaVerifier = useRef<FirebaseRecaptcha.FirebaseRecaptchaVerifierModal>(
     null
   );
+
+  const profile = useSelector((state: RootState) => state.profile);
+  const [name, setName] = useState((profile && profile.name) || "");
 
   const dispatch = useDispatch();
   const [phone, setPhone] = useState("");
@@ -86,7 +87,14 @@ export default function PhoneSignIn({
         // this seems to crash the app, so no luck on easy captcha
         // attemptInvisibleVerification={true}
       />
-      <Text>Phone Number</Text>
+      <Headline>Phone Number</Headline>
+      <Text>Name</Text>
+      <TextInput
+        placeholder="Your name will be shown on puzzles you send"
+        value={name}
+        onChangeText={(name) => setName(name)}
+        style={{ marginBottom: 10 }}
+      />
       <TextInput
         autoCompleteType="tel"
         keyboardType="phone-pad"
@@ -95,6 +103,7 @@ export default function PhoneSignIn({
         editable={verificationId.length === 0}
         value={phone}
         onChangeText={(phone) => setPhone(phone)}
+        style={{ marginBottom: 2 }}
       />
       <Button
         icon="camera-iris"
@@ -110,6 +119,7 @@ export default function PhoneSignIn({
           <TextInput
             value={smsCode}
             editable={!!verificationId}
+            keyboardType="numeric"
             placeholder="123456"
             onChangeText={(verificationCode: string) =>
               setSmsCode(verificationCode)
