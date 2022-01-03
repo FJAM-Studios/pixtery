@@ -1,5 +1,7 @@
 import * as functions from "firebase-functions";
 import db from "../db";
+import * as moment from "moment-timezone";
+const DAILY_TIMEZONE = "America/New_York";
 
 export const checkGalleryAdmin = functions.https.onCall(
   async (_data, context): Promise<boolean | void> => {
@@ -193,16 +195,15 @@ export const getDaily = functions.https.onCall(
         );
       }
 
-      //get today's date in EST and create vars
-      const today = new Date();
-      const [_month, _day, year] = today
-        .toLocaleDateString("en-us", { timeZone: "America/New_York" })
-        // test w another timezone
-        // .toLocaleDateString("en-us", { timeZone: "Pacific/Auckland" })
-        .split("/");
-      const month = `0${_month}`.slice(-2);
-      const day = `0${_day}`.slice(-2);
+      // get today's date in EST and create vars
+      const todayInDailyTimezone = moment().tz(DAILY_TIMEZONE);
+      const year = todayInDailyTimezone.year().toString();
+      // for month and day, return the two numbers from end of string (i.e. "09" or "10")
+      // month is indexed from 0
+      const month = `0${todayInDailyTimezone.month() + 1}`.slice(-2);
+      const day = `0${todayInDailyTimezone.date()}`.slice(-2);
 
+      // get daily for today
       const daily = await db
         .collection("gallery")
         .doc(year)
