@@ -47,6 +47,7 @@ const ARGUABLY_CLEVER_PHRASES = [
 
 const DAY_IN_MILLISECONDS = 1000 * 60 * 60 * 24;
 
+// note if we change DAILY_TIMEZONE, we also need to update the constant in functions folder (galleryFns.ts)
 const DAILY_TIMEZONE = "America/New_York";
 
 export {
