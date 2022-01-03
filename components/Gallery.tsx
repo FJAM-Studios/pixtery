@@ -8,7 +8,6 @@ import { useSelector } from "react-redux";
 import { functions } from "../FirebaseApp";
 import { INTERSTITIAL_ID, DAILY_TIMEZONE } from "../constants";
 import { RootState, ScreenNavigation } from "../types";
-import { msToTime } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 import Timer from "./Timer";
@@ -24,7 +23,9 @@ export default function Gallery({
   const receivedPuzzles = useSelector(
     (state: RootState) => state.receivedPuzzles
   );
-  const { width } = useSelector((state: RootState) => state.screenHeight);
+  const { width, height } = useSelector(
+    (state: RootState) => state.screenHeight
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<null | string>(null);
 
@@ -122,7 +123,7 @@ export default function Gallery({
         }}
       >
         <Headline>Daily Pixtery</Headline>
-        <View style={{ flex: 1, alignContent: "center", margin: 10 }}>
+        <View style={{ flex: 1, alignContent: "center" }}>
           {loading ? (
             <ActivityIndicator size="large" />
           ) : (
@@ -138,7 +139,12 @@ export default function Gallery({
                   icon="image-multiple"
                   mode="contained"
                   onPress={loadDaily}
-                  style={{ margin: 20, padding: 20, width: width * 0.8 }}
+                  style={{
+                    margin: 20,
+                    width: width * 0.8,
+                    paddingTop: height * 0.01,
+                    paddingBottom: height * 0.01,
+                  }}
                 >
                   Touch to solve!
                 </Button>
@@ -160,7 +166,12 @@ export default function Gallery({
             onPress={() => {
               navigation.navigate("AddToGallery");
             }}
-            style={{ margin: 20, padding: 20, width: width * 0.8 }}
+            style={{
+              margin: 20,
+              width: width * 0.8,
+              paddingTop: height * 0.01,
+              paddingBottom: height * 0.01,
+            }}
           >
             Suggest a Daily Pixtery!
           </Button>
