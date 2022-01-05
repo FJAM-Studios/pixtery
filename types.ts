@@ -40,7 +40,7 @@ export interface Puzzle {
 }
 
 export interface Profile {
-  name: string;
+  name?: string;
   isGalleryAdmin?: boolean;
   noSound?: boolean;
   noVibration?: boolean;
@@ -80,6 +80,7 @@ export type StackScreens = {
   Puzzle: { publicKey: string; sourceList: string };
   AddPuzzle: { publicKey: string; sourceList: string };
   Profile: undefined;
+  Register: undefined;
   ContactUs: undefined;
   Tutorial: undefined;
   Help: undefined;
@@ -100,6 +101,7 @@ export type PuzzleRoute = RouteProp<StackScreens, "Puzzle">;
 export type AddPuzzleRoute = RouteProp<StackScreens, "AddPuzzle">;
 export type CreateProfileRoute = RouteProp<StackScreens, "CreateProfile">;
 export type SplashRoute = RouteProp<StackScreens, "Splash">;
+export type RegisterRoute = RouteProp<StackScreens, "Register">;
 export type GalleryQueueRoute = RouteProp<StackScreens, "GalleryQueue">;
 export type GalleryReviewRoute = RouteProp<StackScreens, "GalleryReview">;
 
