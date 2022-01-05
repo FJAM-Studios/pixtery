@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import Constants from "expo-constants";
 import firebase from "firebase";
 import "firebase/functions";
@@ -45,17 +46,91 @@ if (
 
 const storage = app.storage();
 const phoneProvider = new firebase.auth.PhoneAuthProvider();
-const verifySms = (
-  id: string,
-  code: string
-): Promise<firebase.auth.UserCredential> => {
-  const credential = firebase.auth.PhoneAuthProvider.credential(id, code);
-  const signInResponse = firebase.auth().signInWithCredential(credential);
-  return signInResponse;
-};
 
 const signOut = (): Promise<void> => {
   return firebase.auth().signOut();
+};
+
+const anonSignIn = async (): Promise<void> => {
+  try {
+    // Anonymous sign in. This should only fire the first time someone uses the app.
+    if (!firebase.auth().currentUser) await firebase.auth().signInAnonymously();
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const migratePuzzles = async (prevUser: firebase.User): Promise<void> => {
+  console.log("MIGRATE PUZZLES");
+  const _migratePuzzles = functions.httpsCallable("migratePuzzles");
+  _migratePuzzles(prevUser.uid);
+};
+
+const registerOnFirebase = async (
+  providerType: string,
+  id: string,
+  verificationCode: string
+): Promise<firebase.User | void> => {
+  let authProvider;
+
+  switch (providerType) {
+    case "phone":
+      authProvider = firebase.auth.PhoneAuthProvider;
+      break;
+    case "google":
+      authProvider = firebase.auth.GoogleAuthProvider;
+      break;
+    default:
+      break;
+  }
+
+  if (authProvider) {
+    try {
+      // Get user credential using auth provider
+      const newCredential = await authProvider.credential(id, verificationCode);
+
+      const prevUser = firebase.auth().currentUser;
+      ////the below comes from https://firebase.google.com/docs/auth/web/account-linking
+      let currentUser;
+      // Sign in user with the account you want to link to
+      await firebase
+        .auth()
+        .signInWithCredential(newCredential)
+        .then((result) => {
+          currentUser = result.user;
+
+          // Merge prevUser and currentUser data stored in Firebase.
+          // Note: How you handle this is specific to your application
+          if (currentUser && prevUser && prevUser.uid !== currentUser.uid)
+            migratePuzzles(prevUser);
+          // return currentUser;
+        });
+      return currentUser;
+    } catch (error) {
+      console.log(error);
+      // throwing error so the Register component has an error message to display to the user.
+      throw new Error("Could not sign in at this time. Please try again.");
+    }
+  }
+};
+
+const checkAdminStatus = async (name: string): Promise<boolean> => {
+  try {
+    // get whether or not pixtery admin
+    const checkGalleryAdmin = functions.httpsCallable("checkGalleryAdmin");
+    const res = await checkGalleryAdmin();
+    const isGalleryAdmin = res.data;
+
+    //save to local storage
+    await AsyncStorage.setItem(
+      "@pixteryProfile",
+      JSON.stringify({ name, isGalleryAdmin })
+    );
+    return isGalleryAdmin;
+  } catch (e) {
+    console.log("could not verify admin status");
+    return false;
+  }
 };
 
 export {
@@ -64,7 +139,9 @@ export {
   storage,
   phoneProvider,
   firebaseConfig,
-  verifySms,
   functions,
   signOut,
+  anonSignIn,
+  registerOnFirebase,
+  checkAdminStatus,
 };
