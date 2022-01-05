@@ -35,7 +35,7 @@ export default function CreateProfile({
     try {
       if (name.trim().length < 1) {
         setErrors(
-          "Enter a display name so your friends know who sent them a pixtery"
+          "Enter a display name so your friends know who sent them a Pixtery"
         );
       } else {
         setErrors("");
@@ -105,7 +105,21 @@ export default function CreateProfile({
         >
           Continue without Sign In
         </Button>
-        <Headline style={{ textAlign: "center" }}>OR</Headline>
+        <View
+          style={{
+            borderColor: "gray",
+            borderWidth: 0.5,
+            borderRightWidth: 0,
+          }}
+        />
+        <Headline style={{ textAlign: "center" }}>or</Headline>
+        <View
+          style={{
+            borderColor: "gray",
+            borderWidth: 0.5,
+            borderRightWidth: 0,
+          }}
+        />
         <Button
           icon="account"
           mode="contained"
@@ -115,7 +129,8 @@ export default function CreateProfile({
           Register/Sign In
         </Button>
         <Text style={{ textAlign: "center" }}>
-          Sign in to save your pixteries across devices
+          Sign in to submit to Pixteries to Public Gallery and to access your
+          Pixteries across devices
         </Text>
       </KeyboardAwareScrollView>
       <SignInModal

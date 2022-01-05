@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Constants from "expo-constants";
 import firebase from "firebase";
