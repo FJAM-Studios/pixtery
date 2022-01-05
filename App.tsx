@@ -36,6 +36,7 @@ import HomeScreen from "./components/Home";
 import Profile from "./components/Profile";
 import Puzzle from "./components/Puzzle";
 import PuzzleList from "./components/PuzzleList";
+import Register from "./components/Register";
 import SentPuzzleList from "./components/SentPuzzleList";
 import Splash from "./components/Splash";
 import TitleScreen from "./components/TitleScreen";
@@ -187,6 +188,9 @@ const App = (): JSX.Element => {
               </Stack.Screen>
               <Stack.Screen name="CreateProfile">
                 {(props) => <CreateProfile {...props} />}
+              </Stack.Screen>
+              <Stack.Screen name="Register">
+                {(props) => <Register {...props} />}
               </Stack.Screen>
               <Stack.Screen name="Home">
                 {(props) => <HomeScreen {...props} />}

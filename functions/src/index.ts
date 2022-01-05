@@ -16,4 +16,5 @@ export {
   fetchPuzzles,
   deactivateAllUserPuzzles,
   deactivateUserPuzzle,
+  migratePuzzles,
 } from "./fns/userFns";

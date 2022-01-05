@@ -87,3 +87,47 @@ export const deactivateUserPuzzle = functions.https.onCall(
     }
   }
 );
+
+const copyList = async (
+  sourceUser: string,
+  targetUser: string,
+  listType: string
+) => {
+  const puzzleCollection = await db
+    .collection("userPixteries")
+    .doc(sourceUser)
+    .collection(listType)
+    .get();
+
+  puzzleCollection.forEach((puzzle: any) => {
+    const puzzleData = puzzle.data();
+    if (puzzleData && puzzleData.publicKey) {
+      db.collection("userPixteries")
+        .doc(targetUser)
+        .collection(listType)
+        .doc(puzzleData.publicKey)
+        // adding the full puzzle to make it faster to retrieve later
+        .set({ ...puzzleData });
+    }
+  });
+};
+
+export const migratePuzzles = functions.https.onCall(
+  async (prevUserId: string, context) => {
+    try {
+      // throw error if user is not authenticated
+      if (!context.auth) {
+        throw new functions.https.HttpsError(
+          "permission-denied",
+          "user not authenticated"
+        );
+      }
+      copyList(prevUserId, context!.auth!.uid, "sent");
+      copyList(prevUserId, context!.auth!.uid, "received");
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new functions.https.HttpsError("unknown", error.message, error);
+      }
+    }
+  }
+);
