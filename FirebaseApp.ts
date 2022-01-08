@@ -183,7 +183,6 @@ const sendResetEmail = async (email: string): Promise<void> => {
     await auth.sendPasswordResetEmail(email);
   } catch (e) {
     console.log(e);
-    console.log("HERE");
     throw new Error(
       "Could not send reset email. Check email address or try again later."
     );
