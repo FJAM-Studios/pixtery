@@ -192,7 +192,7 @@ export default function Profile({
             mode="contained"
             onPress={async () => {
               //send you to register
-              navigation.navigate("Register");
+              navigation.navigate("CreateProfile", { url: undefined });
             }}
             style={{ margin: 10 }}
           >

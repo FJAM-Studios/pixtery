@@ -140,3 +140,9 @@ export interface DateObjString {
   month: string;
   day: string;
 }
+
+export enum SignInOptions {
+  ANON,
+  PHONE,
+  EMAIL,
+}
