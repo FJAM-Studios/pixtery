@@ -83,7 +83,7 @@ export default function Gallery({
           console.log(error);
         }
       } else {
-        setError("Sorry! There's no daily today.");
+        setError("Sorry! No Daily Pixtery today.");
       }
     } catch (e) {
       setError("Sorry! Something went wrong.");
@@ -129,25 +129,21 @@ export default function Gallery({
           ) : (
             <View style={{ alignItems: "center" }}>
               <Text style={{ fontSize: 20, margin: 20 }}>
-                {error ? "Check back in:" : "Today's Pixtery expires in:"}
+                {error ? (
+                  <Text
+                    style={{ fontSize: 20, textAlign: "center" }}
+                  >{`${error}\nCheck back in:`}</Text>
+                ) : (
+                  "Today's Pixtery expires in:"
+                )}
               </Text>
-              {time ? <Timer time={time} /> : null}
-              {error ? (
-                <Text style={{ fontSize: 20 }}>{error}</Text>
-              ) : (
-                <Button
-                  icon="image-multiple"
-                  mode="contained"
-                  onPress={loadDaily}
-                  style={{
-                    margin: 20,
-                    width: width * 0.8,
-                    paddingTop: height * 0.01,
-                    paddingBottom: height * 0.01,
-                  }}
-                >
-                  Touch to solve!
+              {time ? (
+                <Button onPress={loadDaily}>
+                  <Timer time={time} />
                 </Button>
+              ) : null}
+              {error ? null : (
+                <Text style={{ fontSize: 20 }}>Touch the Circle To Solve!</Text>
               )}
             </View>
           )}
