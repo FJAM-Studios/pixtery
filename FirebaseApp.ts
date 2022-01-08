@@ -177,6 +177,19 @@ const checkAdminStatus = async (name: string): Promise<boolean> => {
   }
 };
 
+const sendResetEmail = async (email: string): Promise<void> => {
+  try {
+    const auth = firebase.auth();
+    await auth.sendPasswordResetEmail(email);
+  } catch (e) {
+    console.log(e);
+    console.log("HERE");
+    throw new Error(
+      "Could not send reset email. Check email address or try again later."
+    );
+  }
+};
+
 export {
   app,
   db,
@@ -189,4 +202,5 @@ export {
   signInOnFireBase,
   checkAdminStatus,
   signUpEmail,
+  sendResetEmail,
 };

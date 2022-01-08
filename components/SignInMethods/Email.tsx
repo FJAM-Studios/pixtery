@@ -1,36 +1,31 @@
 import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
-import { View } from "react-native";
-import { Text, TextInput, Button, Subheading } from "react-native-paper";
 import { useDispatch } from "react-redux";
 
 import {
   checkAdminStatus,
+  sendResetEmail,
   signInOnFireBase,
   signUpEmail,
 } from "../../FirebaseApp";
 import { setProfile } from "../../store/reducers/profile";
 import { ScreenNavigation, SignInOptions } from "../../types";
 import { goToScreen } from "../../util";
+import ForgotScreen from "./ForgotScreen";
+import RegisterScreen from "./RegisterScreen";
+import SignInScreen from "./SignInScreen";
 
-// for some reason, app kept crashing when I split these screens into separate components.
-// figure it has something to do w/ Modals.
-
-function SignInScreen({
-  name,
-  setScreen,
-}: {
-  name: string;
-  setScreen: React.Dispatch<React.SetStateAction<string>>;
-}): JSX.Element {
+export default function Email({ name }: { name: string }): JSX.Element {
   const navigation = useNavigation<ScreenNavigation>();
   const dispatch = useDispatch();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [errors, setErrors] = useState("");
+  const [screen, setScreen] = useState("SignIn");
 
-  const attemptEmailSignIn = async () => {
+  const attemptEmailSignIn = async (
+    email: string,
+    password: string,
+    setErrors: (errors: string) => void
+  ) => {
     try {
       if (!email.length || !email.includes("@"))
         throw new Error("Valid email required");
@@ -55,75 +50,11 @@ function SignInScreen({
     }
   };
 
-  return (
-    <View>
-      <Subheading>Enter Email and Password</Subheading>
-      <TextInput
-        autoCompleteType="email"
-        keyboardType="email-address"
-        textContentType="emailAddress"
-        placeholder="Email Address"
-        value={email}
-        onChangeText={(email) => setEmail(email)}
-        style={{ marginBottom: 10 }}
-      />
-      <TextInput
-        placeholder="Password"
-        returnKeyType="done"
-        textContentType="password"
-        secureTextEntry
-        value={password}
-        onChangeText={(t) => setPassword(t)}
-        style={{ marginBottom: 2 }}
-      />
-      <Button
-        icon="camera-iris"
-        mode="contained"
-        onPress={attemptEmailSignIn}
-        style={{ margin: 10 }}
-      >
-        Sign In
-      </Button>
-      {errors.length ? <Text style={{ color: "red" }}>{errors}</Text> : null}
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          marginTop: 3,
-        }}
-      >
-        <Text
-          style={{ textDecorationLine: "underline" }}
-          onPress={() => setScreen("Forgot")}
-        >
-          Forgot Password
-        </Text>
-        <Text
-          style={{ textDecorationLine: "underline" }}
-          onPress={() => setScreen("Register")}
-        >
-          Create an Account
-        </Text>
-      </View>
-    </View>
-  );
-}
-
-function RegisterScreen({
-  name,
-  setScreen,
-}: {
-  name: string;
-  setScreen: React.Dispatch<React.SetStateAction<string>>;
-}): JSX.Element {
-  const navigation = useNavigation<ScreenNavigation>();
-  const dispatch = useDispatch();
-
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [errors, setErrors] = useState("");
-
-  const registerAccount = async () => {
+  const registerAccount = async (
+    email: string,
+    password: string,
+    setErrors: (errors: string) => void
+  ) => {
     if (!email.length || !email.includes("@"))
       throw new Error("Valid email required");
     if (password.length < 6) throw new Error("Password too short");
@@ -144,111 +75,42 @@ function RegisterScreen({
     }
   };
 
-  return (
-    <View>
-      <Subheading>Create Account</Subheading>
-      <TextInput
-        autoCompleteType="email"
-        keyboardType="email-address"
-        textContentType="emailAddress"
-        placeholder="Email Address"
-        value={email}
-        onChangeText={(email) => setEmail(email)}
-        style={{ marginBottom: 10 }}
-      />
-      <TextInput
-        placeholder="Password"
-        returnKeyType="done"
-        textContentType="password"
-        secureTextEntry
-        value={password}
-        onChangeText={(t) => setPassword(t)}
-        style={{ marginBottom: 2 }}
-      />
-      <Button
-        icon="camera-iris"
-        mode="contained"
-        onPress={registerAccount}
-        style={{ margin: 10 }}
-      >
-        Create Account
-      </Button>
-      {errors.length ? <Text style={{ color: "red" }}>{errors}</Text> : null}
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "flex-end",
-          marginTop: 3,
-        }}
-      >
-        <Text
-          style={{ textDecorationLine: "underline" }}
-          onPress={() => setScreen("SignIn")}
-        >
-          Back To Sign In
-        </Text>
-      </View>
-    </View>
-  );
-}
-
-function ForgotScreen({
-  name,
-  setScreen,
-}: {
-  name: string;
-  setScreen: React.Dispatch<React.SetStateAction<string>>;
-}): JSX.Element {
-  const [email, setEmail] = useState("");
-  const [errors, setErrors] = useState("");
-  const sendReset = () => {
-    console.log("reset email");
+  const resetPassword = async (
+    email: string,
+    setErrors: (errors: string) => void,
+    setMessage: (message: string) => void
+  ) => {
+    if (!email.length || !email.includes("@"))
+      throw new Error("Valid email required");
+    try {
+      await sendResetEmail(email);
+      setErrors("");
+      setMessage("A link to reset your password has been sent.");
+    } catch (e) {
+      // @todo nicer errors
+      console.log("ERRORS");
+      console.log(e);
+      if (e instanceof Error) setErrors(e.message);
+    }
   };
 
-  return (
-    <View>
-      <Subheading>Forgot Password</Subheading>
-      <TextInput
-        autoCompleteType="email"
-        keyboardType="email-address"
-        textContentType="emailAddress"
-        placeholder="Email Address"
-        value={email}
-        onChangeText={(email) => setEmail(email)}
-        style={{ marginBottom: 10 }}
-      />
-      <Button
-        icon="camera-iris"
-        mode="contained"
-        onPress={sendReset}
-        style={{ margin: 10 }}
-      >
-        Send Password Reset Email
-      </Button>
-      {errors.length ? <Text style={{ color: "red" }}>{errors}</Text> : null}
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "flex-start",
-          marginTop: 3,
-        }}
-      >
-        <Text
-          style={{ textDecorationLine: "underline" }}
-          onPress={() => setScreen("SignIn")}
-        >
-          Back To Sign In
-        </Text>
-      </View>
-    </View>
-  );
-}
-
-export default function Email({ name }: { name: string }): JSX.Element {
-  const [screen, setScreen] = useState("SignIn");
   if (screen === "Register")
-    return <RegisterScreen name={name} setScreen={setScreen} />;
+    return (
+      <RegisterScreen
+        name={name}
+        setScreen={setScreen}
+        onPress={registerAccount}
+      />
+    );
   if (screen === "Forgot")
-    return <ForgotScreen name={name} setScreen={setScreen} />;
-  return <SignInScreen name={name} setScreen={setScreen} />;
+    return (
+      <ForgotScreen name={name} setScreen={setScreen} onPress={resetPassword} />
+    );
+  return (
+    <SignInScreen
+      name={name}
+      setScreen={setScreen}
+      onPress={attemptEmailSignIn}
+    />
+  );
 }
