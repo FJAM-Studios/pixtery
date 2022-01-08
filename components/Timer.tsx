@@ -21,7 +21,7 @@ export default function Timer({ time }: { time: number }): JSX.Element {
       ]}
       size={width * 0.6}
     >
-      {({ remainingTime, animatedColor }) => (
+      {({ remainingTime }) => (
         <Animated.Text style={{ color: "#FFFFFF", fontSize: 40 }}>
           {secondsToTime(remainingTime)}
         </Animated.Text>
