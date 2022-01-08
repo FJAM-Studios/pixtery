@@ -87,8 +87,6 @@ export default function Email({ name }: { name: string }): JSX.Element {
       setErrors("");
       setMessage("A link to reset your password has been sent.");
     } catch (e) {
-      // @todo nicer errors
-      console.log("ERRORS");
       console.log(e);
       if (e instanceof Error) setErrors(e.message);
     }

@@ -145,7 +145,7 @@ export default function CreateProfile({
           onPress={() => signIn(SignInOptions.EMAIL)}
           style={{ margin: 10 }}
         >
-          Sign In With Email
+          Sign In / Register By Email
         </Button>
         <Button
           icon="phone"
@@ -153,7 +153,7 @@ export default function CreateProfile({
           onPress={() => signIn(SignInOptions.PHONE)}
           style={{ margin: 10 }}
         >
-          Sign In With Phone
+          Sign In / Register By Phone
         </Button>
         <Text style={{ textAlign: "center" }}>
           Sign In to submit Daily Pixteries and access your account across
