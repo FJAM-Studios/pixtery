@@ -1,9 +1,13 @@
+/* eslint-disable no-case-declarations */
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Constants from "expo-constants";
 import firebase from "firebase";
+
+import "firebase/auth";
 import "firebase/functions";
 import "firebase/firestore";
 import "firebase/storage"; // for jest testing purposes
+import { SignInOptions } from "./types";
 
 const firebaseConfig = {
   apiKey: "AIzaSyANqRXsUQIKxT9HtG4gIQ6EmsKEMCzCyuo",
@@ -28,6 +32,14 @@ const app = initializeApp();
 const db = app.firestore();
 
 const functions = app.functions();
+
+// couldn't find FB Error typescript? this is workaround for try/catch
+interface FBError {
+  code: string;
+}
+function isFBError(value: unknown): value is FBError {
+  return !!value && !!(value as FBError).code;
+}
 
 // uncomment if not using block below for func emu testing
 // import { MY_LAN_IP } from "./ip";
@@ -60,35 +72,32 @@ const anonSignIn = async (): Promise<void> => {
   }
 };
 
-const migratePuzzles = async (prevUser: firebase.User): Promise<void> => {
+const migratePuzzles = async (prevUserId: string): Promise<void> => {
   console.log("MIGRATE PUZZLES");
   const _migratePuzzles = functions.httpsCallable("migratePuzzles");
-  _migratePuzzles(prevUser.uid);
+  _migratePuzzles(prevUserId);
 };
 
-const registerOnFirebase = async (
-  providerType: string,
+const signInOnFireBase = async (
+  providerType: SignInOptions,
   id: string,
   verificationCode: string
 ): Promise<firebase.User | void> => {
-  let authProvider;
+  let newCredential: firebase.auth.AuthCredential | null = null;
 
-  switch (providerType) {
-    case "phone":
-      authProvider = firebase.auth.PhoneAuthProvider;
-      break;
-    case "google":
-      authProvider = firebase.auth.GoogleAuthProvider;
-      break;
-    default:
-      break;
+  if (providerType === SignInOptions.PHONE) {
+    const authProvider = firebase.auth.PhoneAuthProvider;
+    newCredential = await authProvider.credential(id, verificationCode);
   }
 
-  if (authProvider) {
+  if (providerType === SignInOptions.EMAIL) {
+    const authProvider = firebase.auth.EmailAuthProvider;
+    newCredential = await authProvider.credential(id, verificationCode);
+  }
+
+  if (newCredential) {
     try {
       // Get user credential using auth provider
-      const newCredential = await authProvider.credential(id, verificationCode);
-
       const prevUser = firebase.auth().currentUser;
       ////the below comes from https://firebase.google.com/docs/auth/web/account-linking
       let currentUser;
@@ -102,13 +111,48 @@ const registerOnFirebase = async (
           // Merge prevUser and currentUser data stored in Firebase.
           // Note: How you handle this is specific to your application
           if (currentUser && prevUser && prevUser.uid !== currentUser.uid)
-            migratePuzzles(prevUser);
+            migratePuzzles(prevUser.uid);
           // return currentUser;
         });
       return currentUser;
     } catch (error) {
-      console.log(error);
       // throwing error so the Register component has an error message to display to the user.
+      if (isFBError(error)) {
+        if (error.code === "auth/wrong-password")
+          throw new Error("Incorrect password.");
+        else if (error.code === "auth/user-not-found")
+          throw new Error("User not found.");
+      } else {
+        throw new Error("Could not sign in at this time. Please try again.");
+      }
+    }
+  }
+};
+
+const signUpEmail = async (
+  email: string,
+  password: string
+): Promise<firebase.User | void> => {
+  try {
+    const auth = firebase.auth();
+    const prevUid = auth.currentUser?.uid;
+    const newCredential = await auth.createUserWithEmailAndPassword(
+      email,
+      password
+    );
+
+    if (newCredential && newCredential.user && prevUid) migratePuzzles(prevUid);
+    // return new user
+    if (newCredential.user) return newCredential.user;
+    throw new Error("Something went wrong");
+  } catch (error) {
+    // throwing error so the Register component has an error message to display to the user.
+    if (isFBError(error)) {
+      if (error.code === "auth/wrong-password")
+        throw new Error("Incorrect password.");
+      else if (error.code === "auth/user-not-found")
+        throw new Error("User not found.");
+    } else {
       throw new Error("Could not sign in at this time. Please try again.");
     }
   }
@@ -142,6 +186,7 @@ export {
   functions,
   signOut,
   anonSignIn,
-  registerOnFirebase,
+  signInOnFireBase,
   checkAdminStatus,
+  signUpEmail,
 };
