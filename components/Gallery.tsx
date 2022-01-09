@@ -140,14 +140,20 @@ export default function Gallery({
               {time ? (
                 <TouchableOpacity
                   onPress={loadDaily}
-                  style={{ marginBottom: 15 }}
+                  style={{
+                    backgroundColor: theme.colors.primary,
+                    padding: 15,
+                    borderRadius: theme.roundness,
+                  }}
                 >
                   <Timer time={time} />
+                  <Text
+                    style={{ fontSize: 20, marginTop: 15, textAlign: "center" }}
+                  >
+                    Touch To Solve!
+                  </Text>
                 </TouchableOpacity>
               ) : null}
-              {error ? null : (
-                <Text style={{ fontSize: 20 }}>Touch the Circle To Solve!</Text>
-              )}
             </View>
           )}
         </View>
