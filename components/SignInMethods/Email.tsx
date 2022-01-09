@@ -15,7 +15,13 @@ import ForgotScreen from "./ForgotScreen";
 import RegisterScreen from "./RegisterScreen";
 import SignInScreen from "./SignInScreen";
 
-export default function Email({ name }: { name: string }): JSX.Element {
+export default function Email({
+  name,
+  setModalVisible,
+}: {
+  name: string;
+  setModalVisible?: React.Dispatch<React.SetStateAction<boolean>>;
+}): JSX.Element {
   const navigation = useNavigation<ScreenNavigation>();
   const dispatch = useDispatch();
 
@@ -41,8 +47,13 @@ export default function Email({ name }: { name: string }): JSX.Element {
           setProfile({ name, isGalleryAdmin, loginMethod: SignInOptions.EMAIL })
         );
 
-        //to Home
-        goToScreen(navigation, "Home");
+        // if from profile page, don't nav, just set modal invisible:
+        if (setModalVisible) {
+          setModalVisible(false);
+        } else {
+          //to Home
+          goToScreen(navigation, "Home");
+        }
       }
     } catch (e) {
       // @todo nicer errors
@@ -70,8 +81,13 @@ export default function Email({ name }: { name: string }): JSX.Element {
           setProfile({ name, isGalleryAdmin, loginMethod: SignInOptions.EMAIL })
         );
 
-        //to Home
-        goToScreen(navigation, "Home");
+        // if from profile page, don't nav, just set modal invisible:
+        if (setModalVisible) {
+          setModalVisible(false);
+        } else {
+          //to Home
+          goToScreen(navigation, "Home");
+        }
       }
     } catch (e) {
       // @todo nicer errors
