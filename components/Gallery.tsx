@@ -1,7 +1,7 @@
 import { AdMobInterstitial } from "expo-ads-admob";
 import moment from "moment-timezone";
 import React, { useState, useEffect } from "react";
-import { View } from "react-native";
+import { View, TouchableOpacity } from "react-native";
 import { ActivityIndicator, Button, Headline, Text } from "react-native-paper";
 import { useSelector } from "react-redux";
 
@@ -138,9 +138,12 @@ export default function Gallery({
                 )}
               </Text>
               {time ? (
-                <Button onPress={loadDaily}>
+                <TouchableOpacity
+                  onPress={loadDaily}
+                  style={{ marginBottom: 15 }}
+                >
                   <Timer time={time} />
-                </Button>
+                </TouchableOpacity>
               ) : null}
               {error ? null : (
                 <Text style={{ fontSize: 20 }}>Touch the Circle To Solve!</Text>
@@ -169,7 +172,7 @@ export default function Gallery({
               paddingBottom: height * 0.01,
             }}
           >
-            Suggest a Daily Pixtery!
+            Submit a Daily Pixtery!
           </Button>
         </View>
       </View>
