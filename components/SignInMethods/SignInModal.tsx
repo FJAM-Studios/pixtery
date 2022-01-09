@@ -14,7 +14,7 @@ export default function SignInModal({
   name,
 }: {
   isVisible: boolean;
-  setModalVisible: Function;
+  setModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
   signInType: SignInOptions | null;
   name: string;
 }): JSX.Element {

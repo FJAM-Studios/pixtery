@@ -23,7 +23,13 @@ import { goToScreen } from "../../util";
 
 const phoneFormat = require("phone");
 
-export default function Phone({ name }: { name: string }): JSX.Element {
+export default function Phone({
+  name,
+  setModalVisible,
+}: {
+  name: string;
+  setModalVisible?: React.Dispatch<React.SetStateAction<boolean>>;
+}): JSX.Element {
   const navigation = useNavigation<ScreenNavigation>();
   const recaptchaVerifier = useRef<FirebaseRecaptcha.FirebaseRecaptchaVerifierModal>(
     null
@@ -70,8 +76,13 @@ export default function Phone({ name }: { name: string }): JSX.Element {
           setProfile({ name, isGalleryAdmin, loginMethod: SignInOptions.PHONE })
         );
 
-        //to Home
-        goToScreen(navigation, "Home");
+        // if from profile page, don't nav, just set modal invisible:
+        if (setModalVisible) {
+          setModalVisible(false);
+        } else {
+          //to Home
+          goToScreen(navigation, "Home");
+        }
       }
     } catch (e) {
       if (e instanceof Error) setErrors(e.message);
