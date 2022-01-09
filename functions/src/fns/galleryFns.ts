@@ -195,21 +195,10 @@ export const getDaily = functions.https.onCall(
         );
       }
 
-      // get today's date in EST and create vars
-      const todayInDailyTimezone = moment().tz(DAILY_TIMEZONE);
-      const year = todayInDailyTimezone.year().toString();
-      // for month and day, return the two numbers from end of string (i.e. "09" or "10")
-      // month is indexed from 0
-      const month = `0${todayInDailyTimezone.month() + 1}`.slice(-2);
-      const day = `0${todayInDailyTimezone.date()}`.slice(-2);
+      //get today's date in EST and create vars
+      const [year, month, day] = getESTDate();
 
-      // get daily for today
-      const daily = await db
-        .collection("gallery")
-        .doc(year)
-        .collection(month)
-        .doc(day)
-        .get();
+      const daily = await getDailyForDate(year, month, day);
 
       if (daily.exists) return daily.data();
       else {
@@ -222,3 +211,22 @@ export const getDaily = functions.https.onCall(
     }
   }
 );
+
+const getDailyForDate = async (year: string, month: string, day: string) => {
+  return await db
+    .collection("gallery")
+    .doc(year)
+    .collection(month)
+    .doc(day)
+    .get();
+};
+
+const getESTDate = () => {
+  const todayInDailyTimezone = moment().tz(DAILY_TIMEZONE);
+  const year = todayInDailyTimezone.year().toString();
+  // for month and day, return the two numbers from end of string (i.e. "09" or "10")
+  // month is indexed from 0
+  const month = `0${todayInDailyTimezone.month() + 1}`.slice(-2);
+  const day = `0${todayInDailyTimezone.date()}`.slice(-2);
+  return [year, month, day];
+};
