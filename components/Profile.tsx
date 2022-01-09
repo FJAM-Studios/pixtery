@@ -25,6 +25,7 @@ import {
 } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
+import ProfileModal from "./SignInMethods/ProfileModal";
 import ThemeSelector from "./ThemeSelector";
 
 export default function Profile({
@@ -46,6 +47,7 @@ export default function Profile({
   );
   const [errors, setErrors] = useState("");
   const [restoring, setRestoring] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
 
   const toggleSound = async () => {
     //save to local storage
@@ -192,7 +194,8 @@ export default function Profile({
             mode="contained"
             onPress={async () => {
               //send you to register
-              navigation.navigate("CreateProfile", { url: undefined });
+              // navigation.navigate("CreateProfile", { url: undefined });
+              setModalVisible(true);
             }}
             style={{ margin: 10 }}
           >
@@ -274,6 +277,11 @@ export default function Profile({
           <ThemeSelector setSelectingTheme={setSelectingTheme} />
         ) : null}
       </KeyboardAwareScrollView>
+      <ProfileModal
+        isVisible={modalVisible}
+        setModalVisible={setModalVisible}
+        name={name}
+      />
     </AdSafeAreaView>
   );
 }
