@@ -40,7 +40,8 @@ export interface Puzzle {
 }
 
 export interface Profile {
-  name?: string;
+  name: string;
+  loginMethod: SignInOptions;
   isGalleryAdmin?: boolean;
   noSound?: boolean;
   noVibration?: boolean;

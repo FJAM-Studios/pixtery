@@ -1,6 +1,12 @@
 import React, { useState } from "react";
 import { View } from "react-native";
-import { Text, TextInput, Button, Subheading } from "react-native-paper";
+import {
+  Text,
+  TextInput,
+  Button,
+  Subheading,
+  Headline,
+} from "react-native-paper";
 
 export default function ForgotScreen({
   name,
@@ -21,7 +27,8 @@ export default function ForgotScreen({
 
   return (
     <View>
-      <Subheading>Forgot Password</Subheading>
+      <Headline style={{ textAlign: "center" }}>Forgot Password</Headline>
+      <Subheading>Enter Email</Subheading>
       <TextInput
         autoCompleteType="email"
         keyboardType="email-address"
@@ -34,7 +41,7 @@ export default function ForgotScreen({
       <Button
         icon="email"
         mode="contained"
-        disabled={message.length > 0}
+        disabled={message.length > 0 || email.length === 0}
         onPress={() => onPress(email, setErrors, setMessage)}
         style={{ margin: 10 }}
       >

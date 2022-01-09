@@ -155,7 +155,7 @@ export default function Profile({
                 JSON.stringify({ name, noSound, noVibration })
               );
               //update app state
-              dispatch(setProfile({ name, noSound, noVibration }));
+              dispatch(setProfile({ ...profile, name, noSound, noVibration }));
               setErrors("");
             } else {
               setErrors("You must enter a name!");
