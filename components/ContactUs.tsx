@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 
 import { functions } from "../FirebaseApp";
 import { ScreenNavigation, RootState } from "../types";
+import { isEmail } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 
@@ -27,7 +28,7 @@ export default function ContactUs({
     Keyboard.dismiss();
     const submitFeedbackCallable = functions.httpsCallable("submitFeedback");
     try {
-      if (email.length && (!email.includes(".") || !email.includes("@"))) {
+      if (isEmail(email)) {
         alert("Please type in a valid email.");
         return;
       }

@@ -2,7 +2,13 @@ import { useNavigation } from "@react-navigation/native";
 import * as FirebaseRecaptcha from "expo-firebase-recaptcha";
 import React, { useState, useRef } from "react";
 import { View } from "react-native";
-import { Text, TextInput, Button, Subheading } from "react-native-paper";
+import {
+  Text,
+  TextInput,
+  Button,
+  Subheading,
+  Headline,
+} from "react-native-paper";
 import { useDispatch } from "react-redux";
 
 import {
@@ -60,7 +66,9 @@ export default function Phone({ name }: { name: string }): JSX.Element {
       if (authResult) {
         const isGalleryAdmin = await checkAdminStatus(name);
         //update app state
-        dispatch(setProfile({ name, isGalleryAdmin }));
+        dispatch(
+          setProfile({ name, isGalleryAdmin, loginMethod: SignInOptions.PHONE })
+        );
 
         //to Home
         goToScreen(navigation, "Home");
@@ -73,6 +81,7 @@ export default function Phone({ name }: { name: string }): JSX.Element {
 
   return (
     <View>
+      <Headline style={{ textAlign: "center" }}>Sign In</Headline>
       <FirebaseRecaptcha.FirebaseRecaptchaVerifierModal
         // firebase requires recaptcha for SMS verification.
         ref={recaptchaVerifier}

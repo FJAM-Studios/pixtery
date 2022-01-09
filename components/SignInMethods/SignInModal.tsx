@@ -1,7 +1,6 @@
 import React from "react";
 import { View } from "react-native";
 import Modal from "react-native-modal";
-import { Headline } from "react-native-paper";
 import { useSelector } from "react-redux";
 
 import { RootState, SignInOptions } from "../../types";
@@ -39,7 +38,6 @@ export default function SignInModal({
           padding: 20,
         }}
       >
-        <Headline style={{ textAlign: "center" }}>Sign In</Headline>
         {signInType === SignInOptions.EMAIL ? <Email name={name} /> : null}
         {signInType === SignInOptions.PHONE ? <Phone name={name} /> : null}
       </View>

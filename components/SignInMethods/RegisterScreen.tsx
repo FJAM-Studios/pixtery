@@ -1,6 +1,12 @@
 import React, { useState } from "react";
 import { View } from "react-native";
-import { Text, TextInput, Button, Subheading } from "react-native-paper";
+import {
+  Text,
+  TextInput,
+  Button,
+  Subheading,
+  Headline,
+} from "react-native-paper";
 
 export default function RegisterScreen({
   name,
@@ -12,16 +18,19 @@ export default function RegisterScreen({
   onPress: (
     email: string,
     password: string,
+    confirmPassword: string,
     errorCallback: React.Dispatch<React.SetStateAction<string>>
   ) => void;
 }): JSX.Element {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState("");
 
   return (
     <View>
-      <Subheading>Create Account</Subheading>
+      <Headline style={{ textAlign: "center" }}>Create Account</Headline>
+      <Subheading>Enter Email and Password</Subheading>
       <TextInput
         autoCompleteType="email"
         keyboardType="email-address"
@@ -38,12 +47,21 @@ export default function RegisterScreen({
         secureTextEntry
         value={password}
         onChangeText={(t) => setPassword(t)}
-        style={{ marginBottom: 2 }}
+        style={{ marginBottom: 10 }}
+      />
+      <TextInput
+        placeholder="Confirm Password"
+        returnKeyType="done"
+        textContentType="password"
+        secureTextEntry
+        value={confirmPassword}
+        onChangeText={(t) => setConfirmPassword(t)}
+        style={{ marginBottom: 10 }}
       />
       <Button
         icon="account"
         mode="contained"
-        onPress={() => onPress(email, password, setErrors)}
+        onPress={() => onPress(email, password, confirmPassword, setErrors)}
         style={{ margin: 10 }}
         disabled={email.length === 0 || password.length === 0}
       >

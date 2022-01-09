@@ -1,6 +1,12 @@
 import React, { useState } from "react";
 import { View } from "react-native";
-import { Text, TextInput, Button, Subheading } from "react-native-paper";
+import {
+  Text,
+  TextInput,
+  Button,
+  Subheading,
+  Headline,
+} from "react-native-paper";
 
 export default function SignInScreen({
   name,
@@ -21,6 +27,7 @@ export default function SignInScreen({
 
   return (
     <View>
+      <Headline style={{ textAlign: "center" }}>Sign In</Headline>
       <Subheading>Enter Email and Password</Subheading>
       <TextInput
         autoCompleteType="email"
@@ -61,7 +68,7 @@ export default function SignInScreen({
           style={{ textDecorationLine: "underline" }}
           onPress={() => setScreen("Forgot")}
         >
-          Forgot Password
+          Forgot Password?
         </Text>
         <Text
           style={{ textDecorationLine: "underline" }}

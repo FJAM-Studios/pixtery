@@ -438,3 +438,7 @@ export function msToTime(duration: number): string {
 
   return _hours + ":" + _minutes + ":" + _seconds;
 }
+
+export const isEmail = (email: string): boolean => {
+  return email.length > 0 && (!email.includes(".") || !email.includes("@"));
+};
