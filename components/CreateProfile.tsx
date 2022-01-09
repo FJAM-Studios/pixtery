@@ -67,7 +67,7 @@ export default function CreateProfile({
         //save to local storage
         await AsyncStorage.setItem("@pixteryProfile", JSON.stringify({ name }));
         //update app state
-        dispatch(setProfile({ name }));
+        dispatch(setProfile({ name, loginMethod: SignInOptions.ANON }));
         //send ya on your way, either home or to AddPuzzle if you were redirected here to log in first
         if (route.params && route.params.url)
           goToScreen(navigation, "Splash", {
