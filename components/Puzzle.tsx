@@ -363,6 +363,11 @@ export default function PuzzleComponent({
               />
               <View style={styles(styleProps).winContainer}>
                 <Text style={styles(styleProps).winText}>{winMessage}</Text>
+                <Text style={styles(styleProps).creatorText}>
+                  {winMessage.length
+                    ? `created by: ${puzzle.senderName}`
+                    : null}
+                </Text>
               </View>
               <Button
                 icon="download-circle"
@@ -445,14 +450,22 @@ const styles = (props: { theme: Theme; boardSize: number }) =>
       zIndex: -1,
     },
     winContainer: {
-      flexDirection: "row",
+      flexDirection: "column",
       zIndex: 1,
     },
     winText: {
       fontSize: 25,
       flexWrap: "wrap",
       textAlign: "center",
-      flex: 1,
+      // flex: 1,
+      color: props.theme.colors.text,
+      marginTop: 20,
+    },
+    creatorText: {
+      fontSize: 15,
+      flexWrap: "wrap",
+      textAlign: "right",
+      // flex: 1,
       color: props.theme.colors.text,
       marginTop: 20,
     },
