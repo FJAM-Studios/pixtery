@@ -40,7 +40,8 @@ export interface Puzzle {
 }
 
 export interface Profile {
-  name?: string;
+  name: string;
+  loginMethod: SignInOptions;
   isGalleryAdmin?: boolean;
   noSound?: boolean;
   noVibration?: boolean;
@@ -139,4 +140,10 @@ export interface DateObjString {
   year: string;
   month: string;
   day: string;
+}
+
+export enum SignInOptions {
+  ANON,
+  PHONE,
+  EMAIL,
 }
