@@ -1,34 +1,39 @@
+import { useNavigation } from "@react-navigation/native";
 import * as FirebaseRecaptcha from "expo-firebase-recaptcha";
 import React, { useState, useRef } from "react";
 import { View } from "react-native";
-import { Headline, Text, TextInput, Button } from "react-native-paper";
-import { useDispatch, useSelector } from "react-redux";
+import {
+  Text,
+  TextInput,
+  Button,
+  Subheading,
+  Headline,
+} from "react-native-paper";
+import { useDispatch } from "react-redux";
 
 import {
   phoneProvider,
   firebaseConfig,
-  registerOnFirebase,
+  signInOnFireBase,
   checkAdminStatus,
 } from "../../FirebaseApp";
 import { setProfile } from "../../store/reducers/profile";
-import { ScreenNavigation, RootState } from "../../types";
+import { ScreenNavigation, SignInOptions } from "../../types";
 import { goToScreen } from "../../util";
 
 const phoneFormat = require("phone");
 
-export default function PhoneSignIn({
-  navigation,
-  setVerifyFocused,
+export default function Phone({
+  name,
+  setModalVisible,
 }: {
-  navigation: ScreenNavigation;
-  setVerifyFocused: Function;
+  name: string;
+  setModalVisible?: React.Dispatch<React.SetStateAction<boolean>>;
 }): JSX.Element {
+  const navigation = useNavigation<ScreenNavigation>();
   const recaptchaVerifier = useRef<FirebaseRecaptcha.FirebaseRecaptchaVerifierModal>(
     null
   );
-
-  const profile = useSelector((state: RootState) => state.profile);
-  const [name, setName] = useState((profile && profile.name) || "");
 
   const dispatch = useDispatch();
   const [phone, setPhone] = useState("");
@@ -59,18 +64,25 @@ export default function PhoneSignIn({
   };
   const completeSignIn = async () => {
     try {
-      const authResult = await registerOnFirebase(
-        "phone",
+      const authResult = await signInOnFireBase(
+        SignInOptions.PHONE,
         verificationId,
         smsCode
       );
       if (authResult) {
         const isGalleryAdmin = await checkAdminStatus(name);
         //update app state
-        dispatch(setProfile({ name, isGalleryAdmin }));
+        dispatch(
+          setProfile({ name, isGalleryAdmin, loginMethod: SignInOptions.PHONE })
+        );
 
-        //to Home
-        goToScreen(navigation, "Home");
+        // if from profile page, don't nav, just set modal invisible:
+        if (setModalVisible) {
+          setModalVisible(false);
+        } else {
+          //to Home
+          goToScreen(navigation, "Home");
+        }
       }
     } catch (e) {
       if (e instanceof Error) setErrors(e.message);
@@ -80,6 +92,7 @@ export default function PhoneSignIn({
 
   return (
     <View>
+      <Headline style={{ textAlign: "center" }}>Sign In</Headline>
       <FirebaseRecaptcha.FirebaseRecaptchaVerifierModal
         // firebase requires recaptcha for SMS verification.
         ref={recaptchaVerifier}
@@ -87,14 +100,7 @@ export default function PhoneSignIn({
         // this seems to crash the app, so no luck on easy captcha
         // attemptInvisibleVerification={true}
       />
-      <Headline>Phone Number</Headline>
-      <Text>Name</Text>
-      <TextInput
-        placeholder="Your name will be shown on puzzles you send"
-        value={name}
-        onChangeText={(name) => setName(name)}
-        style={{ marginBottom: 10 }}
-      />
+      <Subheading>Phone Number</Subheading>
       <TextInput
         autoCompleteType="tel"
         keyboardType="phone-pad"
@@ -108,7 +114,7 @@ export default function PhoneSignIn({
       <Button
         icon="camera-iris"
         mode="contained"
-        disabled={!name || !phone || verificationId.length > 0}
+        disabled={!phone || verificationId.length > 0}
         onPress={attemptPhoneSignIn}
         style={{ margin: 10 }}
       >
@@ -124,8 +130,6 @@ export default function PhoneSignIn({
             onChangeText={(verificationCode: string) =>
               setSmsCode(verificationCode)
             }
-            onFocus={() => setVerifyFocused(true)}
-            onBlur={() => setVerifyFocused(false)}
           />
           <Button
             icon="check-decagram"
