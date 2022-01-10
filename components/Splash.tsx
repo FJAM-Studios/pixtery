@@ -151,6 +151,9 @@ export default function Splash({
       } else {
         //otherwise, load profile from local storage if it exists
         const loadedProfile = await loadProfile();
+        // we should check that the profile loaded from disk is actually an object of the Profile type and not something else
+        // in a future PR, we should validate that the loadedProfile is an object in the right shape, and, if not, we direct them to log in again
+        // this will be releveant for the loginMethod property of Profile, which no current Pixtery user has but will be needed to limit Daily submissions to logged in users
         if (loadedProfile) {
           dispatch(setProfile(loadedProfile));
         } else {

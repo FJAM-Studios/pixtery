@@ -2,13 +2,18 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useState } from "react";
 import { View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { Headline, Text, TextInput, Button } from "react-native-paper";
+import { Text, TextInput, Button } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 
 import { anonSignIn } from "../FirebaseApp";
 import { setProfile } from "../store/reducers/profile";
-import { CreateProfileRoute, ScreenNavigation, RootState } from "../types";
+import {
+  CreateProfileRoute,
+  ScreenNavigation,
+  RootState,
+  SignInOptions,
+} from "../types";
 import { goToScreen } from "../util";
 import Logo from "./Logo";
 import SignInModal from "./SignInMethods/SignInModal";
@@ -26,12 +31,31 @@ export default function CreateProfile({
   const theme = useSelector((state: RootState) => state.theme);
   const profile = useSelector((state: RootState) => state.profile);
   const [name, setName] = useState((profile && profile.name) || "");
-  const [verifyFocused, setVerifyFocused] = useState(false);
-  const [buttonHeight, setButtonHeight] = useState(0);
   const [modalVisible, setModalVisible] = useState(false);
   const [errors, setErrors] = useState("");
+  const [signInType, setSignInType] = useState<SignInOptions | null>(null);
 
-  const signIn = async () => {
+  const signIn = (signInType: SignInOptions) => {
+    if (name.trim().length < 1) {
+      setErrors(
+        "Enter a display name so your friends know who sent them a Pixtery"
+      );
+    } else {
+      switch (signInType) {
+        case SignInOptions.ANON:
+          signInAnonymously();
+          break;
+        case SignInOptions.EMAIL:
+          signInWithEmail();
+          break;
+        case SignInOptions.PHONE:
+          signInWithPhone();
+          break;
+      }
+    }
+  };
+
+  const signInAnonymously = async () => {
     try {
       if (name.trim().length < 1) {
         setErrors(
@@ -43,7 +67,7 @@ export default function CreateProfile({
         //save to local storage
         await AsyncStorage.setItem("@pixteryProfile", JSON.stringify({ name }));
         //update app state
-        dispatch(setProfile({ name }));
+        dispatch(setProfile({ name, loginMethod: SignInOptions.ANON }));
         //send ya on your way, either home or to AddPuzzle if you were redirected here to log in first
         if (route.params && route.params.url)
           goToScreen(navigation, "Splash", {
@@ -56,12 +80,22 @@ export default function CreateProfile({
     }
   };
 
+  const signInWithEmail = async () => {
+    setModalVisible(true);
+    setSignInType(SignInOptions.EMAIL);
+  };
+
+  const signInWithPhone = async () => {
+    setModalVisible(true);
+    setSignInType(SignInOptions.PHONE);
+  };
+
   return (
     <SafeAreaView
       style={{
         flex: 1,
         flexDirection: "column",
-        padding: 10,
+        padding: 20,
         backgroundColor: theme.colors.background,
       }}
     >
@@ -79,18 +113,10 @@ export default function CreateProfile({
       <KeyboardAwareScrollView
         resetScrollToCoords={{ x: 0, y: 0 }}
         keyboardShouldPersistTaps="handled"
-        extraScrollHeight={verifyFocused ? buttonHeight + 40 : 0}
         enableOnAndroid
       >
-        <Headline style={{ textAlign: "center" }}>
-          Continue Without Signing In
-        </Headline>
-        <Text>Name*</Text>
-        <TextInput
-          placeholder="Your name will be shown on puzzles you send"
-          value={name}
-          onChangeText={(name) => setName(name)}
-        />
+        <Text style={{ marginTop: 10 }}>Display Name (Required)</Text>
+        <TextInput value={name} onChangeText={(name) => setName(name)} />
         {errors.length ? (
           <Text style={{ color: theme.colors.accent, fontStyle: "italic" }}>
             {errors}
@@ -99,45 +125,46 @@ export default function CreateProfile({
         <Button
           icon="camera-iris"
           mode="contained"
-          onLayout={(ev) => setButtonHeight(ev.nativeEvent.layout.height)}
-          onPress={signIn}
+          onPress={() => signIn(SignInOptions.ANON)}
           style={{ margin: 10 }}
         >
-          Continue without Sign In
+          Continue Without Sign In
         </Button>
-        <View
-          style={{
-            borderColor: "gray",
-            borderWidth: 0.5,
-            borderRightWidth: 0,
-          }}
-        />
-        <Headline style={{ textAlign: "center" }}>or</Headline>
-        <View
-          style={{
-            borderColor: "gray",
-            borderWidth: 0.5,
-            borderRightWidth: 0,
-          }}
-        />
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <View style={{ flex: 1, height: 1, backgroundColor: "grey" }} />
+          <View>
+            <Text style={{ marginHorizontal: 20, textAlign: "center" }}>
+              or
+            </Text>
+          </View>
+          <View style={{ flex: 1, height: 1, backgroundColor: "gray" }} />
+        </View>
         <Button
-          icon="account"
+          icon="email"
           mode="contained"
-          onPress={() => setModalVisible(true)}
+          onPress={() => signIn(SignInOptions.EMAIL)}
           style={{ margin: 10 }}
         >
-          Register/Sign In
+          Sign In / Register By Email
+        </Button>
+        <Button
+          icon="phone"
+          mode="contained"
+          onPress={() => signIn(SignInOptions.PHONE)}
+          style={{ margin: 10 }}
+        >
+          Sign In / Register By Phone
         </Button>
         <Text style={{ textAlign: "center" }}>
-          Sign in to submit to Pixteries to Public Gallery and to access your
-          Pixteries across devices
+          Sign In to submit Daily Pixteries and access your account across
+          devices
         </Text>
       </KeyboardAwareScrollView>
       <SignInModal
         isVisible={modalVisible}
         setModalVisible={setModalVisible}
-        navigation={navigation}
-        setVerifyFocused={setVerifyFocused}
+        signInType={signInType}
+        name={name}
       />
     </SafeAreaView>
   );
