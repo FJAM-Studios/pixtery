@@ -1,24 +1,44 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useState } from "react";
 import { View } from "react-native";
 import Modal from "react-native-modal";
 import { Button } from "react-native-paper";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
+import { checkAdminStatus } from "../../FirebaseApp";
+import { setProfile } from "../../store/reducers/profile";
 import { RootState, SignInOptions } from "../../types";
 import Email from "./Email";
 import Phone from "./Phone";
 
-export default function SignInModal({
+export default function ProfileModal({
   isVisible,
   setModalVisible,
-  name,
 }: {
   isVisible: boolean;
   setModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
-  name: string;
 }): JSX.Element {
+  const dispatch = useDispatch();
   const theme = useSelector((state: RootState) => state.theme);
+  const profile = useSelector((state: RootState) => state.profile);
   const [signInType, setSignInType] = useState<SignInOptions | null>(null);
+
+  const onFinish = async (loginMethod: SignInOptions) => {
+    try {
+      const isGalleryAdmin = await checkAdminStatus();
+      dispatch(setProfile({ ...profile, isGalleryAdmin, loginMethod }));
+      //save to local storage
+      await AsyncStorage.setItem(
+        "@pixteryProfile",
+        JSON.stringify({ ...profile, isGalleryAdmin, loginMethod })
+      );
+    } catch (e) {
+      console.log(e);
+      if (e instanceof Error) alert(e.message);
+    }
+    setModalVisible(false);
+  };
+
   return (
     <Modal
       isVisible={isVisible}
@@ -59,10 +79,10 @@ export default function SignInModal({
           </>
         ) : null}
         {signInType === SignInOptions.EMAIL ? (
-          <Email name={name} setModalVisible={setModalVisible} />
+          <Email onFinish={() => onFinish(SignInOptions.EMAIL)} />
         ) : null}
         {signInType === SignInOptions.PHONE ? (
-          <Phone name={name} setModalVisible={setModalVisible} />
+          <Phone onFinish={() => onFinish(SignInOptions.PHONE)} />
         ) : null}
       </View>
     </Modal>
