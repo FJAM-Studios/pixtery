@@ -1,9 +1,10 @@
+import { useNavigation } from "@react-navigation/native";
 import React from "react";
 import { View } from "react-native";
 import Modal from "react-native-modal";
 import { useSelector } from "react-redux";
 
-import { RootState, SignInOptions } from "../../types";
+import { RootState, ScreenNavigation, SignInOptions } from "../../types";
 import Email from "./Email";
 import Phone from "./Phone";
 
@@ -11,14 +12,25 @@ export default function SignInModal({
   isVisible,
   setModalVisible,
   signInType,
-  name,
+  url,
 }: {
   isVisible: boolean;
   setModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
   signInType: SignInOptions | null;
-  name: string;
+  url?: string;
 }): JSX.Element {
+  const navigation = useNavigation<ScreenNavigation>();
   const theme = useSelector((state: RootState) => state.theme);
+
+  const finishPhone = () => {
+    const loginMethod = SignInOptions.PHONE;
+    navigation.navigate("EnterName", { loginMethod, url });
+  };
+
+  const finishEmail = () => {
+    const loginMethod = SignInOptions.EMAIL;
+    navigation.navigate("EnterName", { loginMethod, url });
+  };
 
   return (
     <Modal
@@ -38,8 +50,12 @@ export default function SignInModal({
           padding: 20,
         }}
       >
-        {signInType === SignInOptions.EMAIL ? <Email name={name} /> : null}
-        {signInType === SignInOptions.PHONE ? <Phone name={name} /> : null}
+        {signInType === SignInOptions.EMAIL ? (
+          <Email onFinish={finishEmail} />
+        ) : null}
+        {signInType === SignInOptions.PHONE ? (
+          <Phone onFinish={finishPhone} />
+        ) : null}
       </View>
     </Modal>
   );
