@@ -94,6 +94,10 @@ export type StackScreens = {
     publishedDate?: string;
   };
   DailyCalendar: undefined;
+  EnterName: {
+    loginMethod: SignInOptions;
+    url?: string;
+  };
 };
 
 export type ScreenNavigation = StackNavigationProp<StackScreens>;
@@ -105,6 +109,7 @@ export type SplashRoute = RouteProp<StackScreens, "Splash">;
 export type RegisterRoute = RouteProp<StackScreens, "Register">;
 export type GalleryQueueRoute = RouteProp<StackScreens, "GalleryQueue">;
 export type GalleryReviewRoute = RouteProp<StackScreens, "GalleryReview">;
+export type EnterNameRoute = RouteProp<StackScreens, "EnterName">;
 
 //// STORE /////
 export interface ScreenHeight {

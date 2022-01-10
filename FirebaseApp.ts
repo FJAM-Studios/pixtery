@@ -1,5 +1,4 @@
 /* eslint-disable no-case-declarations */
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import Constants from "expo-constants";
 import firebase from "firebase";
 
@@ -158,18 +157,12 @@ const signUpEmail = async (
   }
 };
 
-const checkAdminStatus = async (name: string): Promise<boolean> => {
+const checkAdminStatus = async (): Promise<boolean> => {
   try {
     // get whether or not pixtery admin
     const checkGalleryAdmin = functions.httpsCallable("checkGalleryAdmin");
     const res = await checkGalleryAdmin();
     const isGalleryAdmin = res.data;
-
-    //save to local storage
-    await AsyncStorage.setItem(
-      "@pixteryProfile",
-      JSON.stringify({ name, isGalleryAdmin })
-    );
     return isGalleryAdmin;
   } catch (e) {
     console.log("could not verify admin status");

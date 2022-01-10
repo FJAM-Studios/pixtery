@@ -3,11 +3,12 @@ import moment from "moment-timezone";
 import React, { useState, useEffect } from "react";
 import { View } from "react-native";
 import { ActivityIndicator, Button, Headline, Text } from "react-native-paper";
+import Toast from "react-native-root-toast";
 import { useSelector } from "react-redux";
 
 import { functions } from "../FirebaseApp";
 import { INTERSTITIAL_ID, DAILY_TIMEZONE } from "../constants";
-import { RootState, ScreenNavigation } from "../types";
+import { RootState, ScreenNavigation, SignInOptions } from "../types";
 import { msToTime } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
@@ -20,11 +21,26 @@ export default function Gallery({
   navigation: ScreenNavigation;
 }): JSX.Element {
   const theme = useSelector((state: RootState) => state.theme);
+  const profile = useSelector((state: RootState) => state.profile);
   const receivedPuzzles = useSelector(
     (state: RootState) => state.receivedPuzzles
   );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<null | string>(null);
+
+  const suggestPixtery = () => {
+    if (profile.loginMethod === SignInOptions.ANON) {
+      Toast.show(
+        "You must be signed in to submit a Daily Pixtery. Go to the Profile menu to sign in.",
+        {
+          duration: Toast.durations.LONG,
+          position: Toast.positions.CENTER,
+        }
+      );
+    } else {
+      navigation.navigate("AddToGallery");
+    }
+  };
 
   const getCountdown = (): number => {
     const now = moment().tz(DAILY_TIMEZONE);
@@ -159,9 +175,7 @@ export default function Gallery({
           <Button
             icon="brush"
             mode="contained"
-            onPress={() => {
-              navigation.navigate("AddToGallery");
-            }}
+            onPress={suggestPixtery}
             style={{ margin: 20, padding: 20 }}
           >
             Suggest a Daily Pixtery!

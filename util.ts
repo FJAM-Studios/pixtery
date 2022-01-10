@@ -12,7 +12,7 @@ import { Alert, Share } from "react-native";
 import Toast from "react-native-root-toast";
 
 import { storage, functions } from "./FirebaseApp";
-import { Puzzle, ScreenNavigation, DateObjString } from "./types";
+import { Puzzle, ScreenNavigation, DateObjString, Profile } from "./types";
 
 //convert URI into a blob to transmit to server
 export const createBlob = (localUri: string): Promise<Blob> => {
@@ -441,4 +441,13 @@ export function msToTime(duration: number): string {
 
 export const isEmail = (email: string): boolean => {
   return email.length > 0 && (!email.includes(".") || !email.includes("@"));
+};
+
+export const isProfile = (profile: unknown): profile is Profile => {
+  return (
+    profile !== undefined &&
+    profile !== null &&
+    (profile as Profile).name !== undefined &&
+    (profile as Profile).loginMethod !== undefined
+  );
 };
