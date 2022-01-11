@@ -24,11 +24,13 @@ export default function SignInModal({
 
   const finishPhone = () => {
     const loginMethod = SignInOptions.PHONE;
+    setModalVisible(false);
     navigation.navigate("EnterName", { loginMethod, url });
   };
 
   const finishEmail = () => {
     const loginMethod = SignInOptions.EMAIL;
+    setModalVisible(false);
     navigation.navigate("EnterName", { loginMethod, url });
   };
 
