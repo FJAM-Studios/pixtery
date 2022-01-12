@@ -1,30 +1,23 @@
-import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
 
 import {
-  checkAdminStatus,
   sendResetEmail,
   signInOnFireBase,
   signUpEmail,
 } from "../../FirebaseApp";
-import { setProfile } from "../../store/reducers/profile";
-import { ScreenNavigation, SignInOptions } from "../../types";
-import { goToScreen, isEmail } from "../../util";
+import { SignInOptions } from "../../types";
+import { isEmail } from "../../util";
 import ForgotScreen from "./ForgotScreen";
 import RegisterScreen from "./RegisterScreen";
 import SignInScreen from "./SignInScreen";
 
 export default function Email({
-  name,
-  setModalVisible,
+  onFinish,
+  url,
 }: {
-  name: string;
-  setModalVisible?: React.Dispatch<React.SetStateAction<boolean>>;
+  onFinish: () => void;
+  url?: string;
 }): JSX.Element {
-  const navigation = useNavigation<ScreenNavigation>();
-  const dispatch = useDispatch();
-
   const [screen, setScreen] = useState("SignIn");
 
   const attemptEmailSignIn = async (
@@ -35,26 +28,8 @@ export default function Email({
     try {
       if (isEmail(email)) throw new Error("Valid email required");
       if (password.length < 6) throw new Error("Password too short");
-      const authResult = await signInOnFireBase(
-        SignInOptions.EMAIL,
-        email,
-        password
-      );
-      if (authResult) {
-        const isGalleryAdmin = await checkAdminStatus(name);
-        //update app state
-        dispatch(
-          setProfile({ name, isGalleryAdmin, loginMethod: SignInOptions.EMAIL })
-        );
-
-        // if from profile page, don't nav, just set modal invisible:
-        if (setModalVisible) {
-          setModalVisible(false);
-        } else {
-          //to Home
-          goToScreen(navigation, "Home");
-        }
-      }
+      await signInOnFireBase(SignInOptions.EMAIL, email, password);
+      onFinish();
     } catch (e) {
       // @todo nicer errors
       console.log(e);
@@ -73,22 +48,8 @@ export default function Email({
       if (password.length < 6) throw new Error("Password too short");
       if (confirmPassword !== password)
         throw new Error("Passwords do not match");
-      const authResult = await signUpEmail(email, password);
-      if (authResult) {
-        const isGalleryAdmin = await checkAdminStatus(name);
-        //update app state
-        dispatch(
-          setProfile({ name, isGalleryAdmin, loginMethod: SignInOptions.EMAIL })
-        );
-
-        // if from profile page, don't nav, just set modal invisible:
-        if (setModalVisible) {
-          setModalVisible(false);
-        } else {
-          //to Home
-          goToScreen(navigation, "Home");
-        }
-      }
+      await signUpEmail(email, password);
+      onFinish();
     } catch (e) {
       // @todo nicer errors
       console.log(e);
@@ -113,22 +74,8 @@ export default function Email({
   };
 
   if (screen === "Register")
-    return (
-      <RegisterScreen
-        name={name}
-        setScreen={setScreen}
-        onPress={registerAccount}
-      />
-    );
+    return <RegisterScreen setScreen={setScreen} onPress={registerAccount} />;
   if (screen === "Forgot")
-    return (
-      <ForgotScreen name={name} setScreen={setScreen} onPress={resetPassword} />
-    );
-  return (
-    <SignInScreen
-      name={name}
-      setScreen={setScreen}
-      onPress={attemptEmailSignIn}
-    />
-  );
+    return <ForgotScreen setScreen={setScreen} onPress={resetPassword} />;
+  return <SignInScreen setScreen={setScreen} onPress={attemptEmailSignIn} />;
 }
