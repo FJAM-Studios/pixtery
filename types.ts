@@ -41,7 +41,6 @@ export interface Puzzle {
 
 export interface Profile {
   name: string;
-  loginMethod: SignInOptions;
   isGalleryAdmin?: boolean;
   noSound?: boolean;
   noVibration?: boolean;
@@ -95,7 +94,6 @@ export type StackScreens = {
   };
   DailyCalendar: undefined;
   EnterName: {
-    loginMethod: SignInOptions;
     url?: string;
   };
 };

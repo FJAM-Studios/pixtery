@@ -23,14 +23,14 @@ export default function ProfileModal({
   const profile = useSelector((state: RootState) => state.profile);
   const [signInType, setSignInType] = useState<SignInOptions | null>(null);
 
-  const onFinish = async (loginMethod: SignInOptions) => {
+  const onFinish = async () => {
     try {
       const isGalleryAdmin = await checkAdminStatus();
-      dispatch(setProfile({ ...profile, isGalleryAdmin, loginMethod }));
+      dispatch(setProfile({ ...profile, isGalleryAdmin }));
       //save to local storage
       await AsyncStorage.setItem(
         "@pixteryProfile",
-        JSON.stringify({ ...profile, isGalleryAdmin, loginMethod })
+        JSON.stringify({ ...profile, isGalleryAdmin })
       );
     } catch (e) {
       console.log(e);
@@ -79,10 +79,10 @@ export default function ProfileModal({
           </>
         ) : null}
         {signInType === SignInOptions.EMAIL ? (
-          <Email onFinish={() => onFinish(SignInOptions.EMAIL)} />
+          <Email onFinish={() => onFinish()} />
         ) : null}
         {signInType === SignInOptions.PHONE ? (
-          <Phone onFinish={() => onFinish(SignInOptions.PHONE)} />
+          <Phone onFinish={() => onFinish()} />
         ) : null}
       </View>
     </Modal>

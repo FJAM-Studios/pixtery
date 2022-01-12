@@ -23,15 +23,13 @@ export default function SignInModal({
   const theme = useSelector((state: RootState) => state.theme);
 
   const finishPhone = () => {
-    const loginMethod = SignInOptions.PHONE;
     setModalVisible(false);
-    navigation.navigate("EnterName", { loginMethod, url });
+    navigation.navigate("EnterName", { url });
   };
 
   const finishEmail = () => {
-    const loginMethod = SignInOptions.EMAIL;
     setModalVisible(false);
-    navigation.navigate("EnterName", { loginMethod, url });
+    navigation.navigate("EnterName", { url });
   };
 
   return (
