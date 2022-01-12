@@ -280,7 +280,6 @@ export default function Profile({
       <ProfileModal
         isVisible={modalVisible}
         setModalVisible={setModalVisible}
-        name={name}
       />
     </AdSafeAreaView>
   );
