@@ -106,6 +106,15 @@ export default function CreateProfile({
         >
           Sign In / Register By Phone
         </Button>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <View style={{ flex: 1, height: 1, backgroundColor: "grey" }} />
+          <View>
+            <Text style={{ marginHorizontal: 20, textAlign: "center" }}>
+              or
+            </Text>
+          </View>
+          <View style={{ flex: 1, height: 1, backgroundColor: "gray" }} />
+        </View>
         <Button
           icon="camera-iris"
           mode="contained"
