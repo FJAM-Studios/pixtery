@@ -9,10 +9,10 @@ import {
   RootState,
   ScreenNavigation,
   StatusOfDaily,
-} from "../types";
-import AdSafeAreaView from "./AdSafeAreaView";
+} from "../../types";
+import AdSafeAreaView from "../AdSafeAreaView";
 import DateSelect from "./DateSelect";
-import Header from "./Header";
+import Header from "../Header";
 
 export default function DailyCalendar({
   navigation,

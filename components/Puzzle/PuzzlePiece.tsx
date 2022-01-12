@@ -16,9 +16,9 @@ import {
   DEGREE_CONVERSION,
   SNAP_MARGIN,
   USE_NATIVE_DRIVER,
-} from "../constants";
-import { getPointsDistance, snapAngle } from "../puzzleUtils";
-import { Point, Piece, BoardSpace, RootState } from "../types";
+} from "../../constants";
+import { getPointsDistance, snapAngle } from "../../puzzleUtils";
+import { Point, Piece, BoardSpace, RootState } from "../../types";
 
 const AnimatedSvg = Animated.createAnimatedComponent(Svg);
 

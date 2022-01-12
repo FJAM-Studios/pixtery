@@ -13,17 +13,17 @@ import {
 } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 
-import { sortPuzzles } from "../puzzleUtils";
-import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
-import { Puzzle, ScreenNavigation, RootState } from "../types";
+import { sortPuzzles } from "../../puzzleUtils";
+import { setReceivedPuzzles } from "../../store/reducers/receivedPuzzles";
+import { Puzzle, ScreenNavigation, RootState } from "../../types";
 import {
   saveToLibrary,
   safelyDeletePuzzleImage,
   deactivatePuzzleOnServer,
   goToScreen,
-} from "../util";
-import AdSafeAreaView from "./AdSafeAreaView";
-import Header from "./Header";
+} from "../../util";
+import AdSafeAreaView from "../AdSafeAreaView";
+import Header from "../Header";
 
 export default function PuzzleList({
   navigation,

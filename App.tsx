@@ -24,21 +24,20 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 
 import AddPuzzle from "./components/AddPuzzle";
-import AddToGallery from "./components/AddToGallery";
 import ContactUs from "./components/ContactUs";
 import CreateProfile from "./components/CreateProfile";
-import DailyCalendar from "./components/DailyCalendar";
 import EnterName from "./components/EnterName";
-import Gallery from "./components/Gallery";
-import GalleryQueue from "./components/GalleryQueue";
-import GalleryReview from "./components/GalleryReview";
+import AddToGallery from "./components/Gallery/AddToGallery";
+import DailyCalendar from "./components/Gallery/DailyCalendar";
+import Gallery from "./components/Gallery/Gallery";
+import GalleryQueue from "./components/Gallery/GalleryQueue";
+import GalleryReview from "./components/Gallery/GalleryReview";
 import Help from "./components/Help";
 import HomeScreen from "./components/Home";
 import Profile from "./components/Profile";
-import Puzzle from "./components/Puzzle";
-import PuzzleList from "./components/PuzzleList";
-import Register from "./components/Register";
-import SentPuzzleList from "./components/SentPuzzleList";
+import Puzzle from "./components/Puzzle/Puzzle";
+import PuzzleList from "./components/PuzzleLists/PuzzleList";
+import SentPuzzleList from "./components/PuzzleLists/SentPuzzleList";
 import Splash from "./components/Splash";
 import TitleScreen from "./components/TitleScreen";
 import Tutorial from "./components/Tutorial";
@@ -189,9 +188,6 @@ const App = (): JSX.Element => {
               </Stack.Screen>
               <Stack.Screen name="CreateProfile">
                 {(props) => <CreateProfile {...props} />}
-              </Stack.Screen>
-              <Stack.Screen name="Register">
-                {(props) => <Register {...props} />}
               </Stack.Screen>
               <Stack.Screen name="Home">
                 {(props) => <HomeScreen {...props} />}

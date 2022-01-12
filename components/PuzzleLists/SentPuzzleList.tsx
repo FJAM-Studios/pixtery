@@ -13,17 +13,17 @@ import Modal from "react-native-modal";
 import { Card, IconButton, Button, Headline } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 
-import { sortPuzzles } from "../puzzleUtils";
-import { setSentPuzzles } from "../store/reducers/sentPuzzles";
-import { Puzzle, ScreenNavigation, RootState } from "../types";
+import { sortPuzzles } from "../../puzzleUtils";
+import { setSentPuzzles } from "../../store/reducers/sentPuzzles";
+import { Puzzle, ScreenNavigation, RootState } from "../../types";
 import {
   saveToLibrary,
   safelyDeletePuzzleImage,
   shareMessage,
   deactivatePuzzleOnServer,
-} from "../util";
-import AdSafeAreaView from "./AdSafeAreaView";
-import Header from "./Header";
+} from "../../util";
+import AdSafeAreaView from "../AdSafeAreaView";
+import Header from "../Header";
 
 export default function SentPuzzleList({
   navigation,
