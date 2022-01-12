@@ -11,7 +11,7 @@ import {
   cleanup,
 } from "@testing-library/react-native";
 import { theme } from "../App.tsx";
-import Puzzle from "../components/Puzzle";
+import Puzzle from "../components/Puzzle/Puzzle";
 import {
   Button,
   IconButton,
