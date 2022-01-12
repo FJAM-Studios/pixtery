@@ -22,12 +22,7 @@ export default function SignInModal({
   const navigation = useNavigation<ScreenNavigation>();
   const theme = useSelector((state: RootState) => state.theme);
 
-  const finishPhone = () => {
-    setModalVisible(false);
-    navigation.navigate("EnterName", { url });
-  };
-
-  const finishEmail = () => {
+  const onFinish = () => {
     setModalVisible(false);
     navigation.navigate("EnterName", { url });
   };
@@ -51,10 +46,10 @@ export default function SignInModal({
         }}
       >
         {signInType === SignInOptions.EMAIL ? (
-          <Email onFinish={finishEmail} />
+          <Email onFinish={onFinish} />
         ) : null}
         {signInType === SignInOptions.PHONE ? (
-          <Phone onFinish={finishPhone} />
+          <Phone onFinish={onFinish} />
         ) : null}
       </View>
     </Modal>
