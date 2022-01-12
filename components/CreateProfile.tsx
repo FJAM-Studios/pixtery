@@ -45,7 +45,6 @@ export default function CreateProfile({
     try {
       await anonSignIn();
       navigation.navigate("EnterName", {
-        loginMethod: SignInOptions.ANON,
         url: route.params.url,
       });
     } catch (e) {
