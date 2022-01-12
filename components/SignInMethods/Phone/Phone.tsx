@@ -13,14 +13,13 @@ import {
   phoneProvider,
   firebaseConfig,
   signInOnFireBase,
-} from "../../FirebaseApp";
-import { SignInOptions } from "../../types";
+} from "../../../FirebaseApp";
+import { SignInOptions } from "../../../types";
 
 const phoneFormat = require("phone");
 
 export default function Phone({
   onFinish,
-  url,
 }: {
   onFinish: () => void;
   url?: string;

@@ -9,15 +9,13 @@ import { goToScreen } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 import Logo from "./Logo";
-import PhoneSignIn from "./SignInMethods/Phone";
+import PhoneSignIn from "./SignInMethods/Phone/Phone";
 import Title from "./Title";
 
 export default function Register({
   navigation,
-  route,
 }: {
   navigation: ScreenNavigation;
-  route: RegisterRoute;
 }): JSX.Element {
   const theme = useSelector((state: RootState) => state.theme);
   const receivedPuzzles = useSelector(
