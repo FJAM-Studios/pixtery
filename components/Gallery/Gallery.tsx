@@ -2,7 +2,7 @@ import { AdMobInterstitial } from "expo-ads-admob";
 import firebase from "firebase";
 import moment from "moment-timezone";
 import React, { useState, useEffect } from "react";
-import { View } from "react-native";
+import { View, TouchableOpacity } from "react-native";
 import { ActivityIndicator, Button, Headline, Text } from "react-native-paper";
 import Toast from "react-native-root-toast";
 import { useSelector } from "react-redux";
@@ -10,10 +10,9 @@ import { useSelector } from "react-redux";
 import { functions } from "../../FirebaseApp";
 import { INTERSTITIAL_ID, DAILY_TIMEZONE } from "../../constants";
 import { RootState, ScreenNavigation } from "../../types";
-import { msToTime } from "../../util";
 import AdSafeAreaView from "../AdSafeAreaView";
 import Header from "../Header";
-
+import Timer from "./Timer";
 AdMobInterstitial.setAdUnitID(INTERSTITIAL_ID);
 
 export default function Gallery({
@@ -24,6 +23,9 @@ export default function Gallery({
   const theme = useSelector((state: RootState) => state.theme);
   const receivedPuzzles = useSelector(
     (state: RootState) => state.receivedPuzzles
+  );
+  const { width, height } = useSelector(
+    (state: RootState) => state.screenHeight
   );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<null | string>(null);
@@ -99,7 +101,7 @@ export default function Gallery({
           console.log(error);
         }
       } else {
-        setError("Sorry! There's no daily today.");
+        setError("Sorry! No Daily Pixtery today.");
       }
     } catch (e) {
       setError("Sorry! Something went wrong.");
@@ -139,30 +141,36 @@ export default function Gallery({
         }}
       >
         <Headline>Daily Pixtery</Headline>
-        <View style={{ flex: 1, alignContent: "center", margin: 10 }}>
+        <View style={{ flex: 1, alignContent: "center" }}>
           {loading ? (
             <ActivityIndicator size="large" />
           ) : (
             <View style={{ alignItems: "center" }}>
-              {error ? (
-                <Text style={{ fontSize: 20 }}>{error}</Text>
-              ) : (
-                <Button
-                  icon="image-multiple"
-                  mode="contained"
-                  onPress={loadDaily}
-                  style={{ margin: 20, padding: 20 }}
-                >
-                  Touch to solve!
-                </Button>
-              )}
-              <Text style={{ fontSize: 20 }}>
-                {error ? "Check back in:" : "Today's Pixtery expires in:"}
+              <Text style={{ fontSize: 20, margin: 20 }}>
+                {error ? (
+                  <Text
+                    style={{ fontSize: 20, textAlign: "center" }}
+                  >{`${error}\nCheck back in:`}</Text>
+                ) : (
+                  "Today's Pixtery expires in:"
+                )}
               </Text>
               {time ? (
-                <Text style={{ fontSize: 20 }}>
-                  (clock animation){msToTime(time)}
-                </Text>
+                <TouchableOpacity
+                  onPress={loadDaily}
+                  style={{
+                    backgroundColor: theme.colors.primary,
+                    padding: 15,
+                    borderRadius: theme.roundness,
+                  }}
+                >
+                  <Timer time={time} />
+                  <Text
+                    style={{ fontSize: 20, marginTop: 15, textAlign: "center" }}
+                  >
+                    Touch To Solve!
+                  </Text>
+                </TouchableOpacity>
               ) : null}
             </View>
           )}
@@ -179,9 +187,14 @@ export default function Gallery({
             icon="brush"
             mode="contained"
             onPress={suggestPixtery}
-            style={{ margin: 20, padding: 20 }}
+            style={{
+              margin: 20,
+              width: width * 0.8,
+              paddingTop: height * 0.01,
+              paddingBottom: height * 0.01,
+            }}
           >
-            Suggest a Daily Pixtery!
+            Submit a Daily Pixtery!
           </Button>
         </View>
       </View>
