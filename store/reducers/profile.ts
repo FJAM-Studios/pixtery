@@ -25,7 +25,8 @@ function reducer(
 ): Profile | null {
   switch (action.type) {
     case SET_PROFILE:
-      return action.profile;
+      if (!action.profile) return initialState;
+      else return { ...state, ...action.profile };
     default:
       return state;
   }

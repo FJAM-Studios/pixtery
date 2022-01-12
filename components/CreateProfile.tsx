@@ -1,25 +1,20 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as FirebaseRecaptcha from "expo-firebase-recaptcha";
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import { View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { Headline, Text, TextInput, Button } from "react-native-paper";
+import { Text, Button, Headline } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 
+import { anonSignIn } from "../FirebaseApp";
 import {
-  phoneProvider,
-  firebaseConfig,
-  verifySms,
-  functions,
-} from "../FirebaseApp";
-import { setProfile } from "../store/reducers/profile";
-import { CreateProfileRoute, ScreenNavigation, RootState } from "../types";
-import { goToScreen } from "../util";
+  CreateProfileRoute,
+  ScreenNavigation,
+  RootState,
+  SignInOptions,
+} from "../types";
 import Logo from "./Logo";
+import SignInModal from "./SignInMethods/SignInModal";
 import Title from "./Title";
-
-const phoneFormat = require("phone");
 
 export default function CreateProfile({
   navigation,
@@ -28,27 +23,52 @@ export default function CreateProfile({
   navigation: ScreenNavigation;
   route: CreateProfileRoute;
 }): JSX.Element {
-  const dispatch = useDispatch();
-  const recaptchaVerifier = useRef<FirebaseRecaptcha.FirebaseRecaptchaVerifierModal>(
-    null
-  );
   const theme = useSelector((state: RootState) => state.theme);
-  const profile = useSelector((state: RootState) => state.profile);
-  const [name, setName] = useState((profile && profile.name) || "");
-  const [phone, setPhone] = useState("");
-  const [smsCode, setSmsCode] = useState("");
-  const [verificationId, setVerificationId] = useState("");
-  const [errors, setErrors] = useState("");
-  const [resetAllowed, setResetAllowed] = useState(false);
-  const [verifyFocused, setVerifyFocused] = useState(false);
-  const [buttonHeight, setButtonHeight] = useState(0);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [signInType, setSignInType] = useState<SignInOptions | null>(null);
+
+  const signIn = (signInType: SignInOptions) => {
+    switch (signInType) {
+      case SignInOptions.ANON:
+        signInAnonymously();
+        break;
+      case SignInOptions.EMAIL:
+        signInWithEmail();
+        break;
+      case SignInOptions.PHONE:
+        signInWithPhone();
+        break;
+    }
+  };
+
+  const signInAnonymously = async () => {
+    try {
+      await anonSignIn();
+      navigation.navigate("EnterName", {
+        loginMethod: SignInOptions.ANON,
+        url: route.params.url,
+      });
+    } catch (e) {
+      console.log("error signing in anonymously");
+    }
+  };
+
+  const signInWithEmail = async () => {
+    setModalVisible(true);
+    setSignInType(SignInOptions.EMAIL);
+  };
+
+  const signInWithPhone = async () => {
+    setModalVisible(true);
+    setSignInType(SignInOptions.PHONE);
+  };
 
   return (
     <SafeAreaView
       style={{
         flex: 1,
         flexDirection: "column",
-        padding: 10,
+        padding: 20,
         backgroundColor: theme.colors.background,
       }}
     >
@@ -60,142 +80,64 @@ export default function CreateProfile({
           alignItems: "center",
         }}
       >
-        <FirebaseRecaptcha.FirebaseRecaptchaVerifierModal
-          // firebase requires recaptcha for SMS verification.
-          ref={recaptchaVerifier}
-          firebaseConfig={firebaseConfig}
-          // this seems to crash the app, so no luck on easy captcha
-          // attemptInvisibleVerification={true}
-        />
         <Logo width="100" height="100" />
         <Title width="100" height="35" />
-        <Headline>Sign In</Headline>
       </View>
       <KeyboardAwareScrollView
         resetScrollToCoords={{ x: 0, y: 0 }}
         keyboardShouldPersistTaps="handled"
-        extraScrollHeight={verifyFocused ? buttonHeight + 40 : 0}
         enableOnAndroid
       >
-        <Text>Name</Text>
-        <TextInput
-          placeholder="Terry Pix"
-          value={name}
-          onChangeText={(name) => setName(name)}
-        />
-        <Text>Phone Number</Text>
-        <TextInput
-          autoCompleteType="tel"
-          keyboardType="phone-pad"
-          textContentType="telephoneNumber"
-          placeholder="+1 999 999 9999"
-          editable={verificationId.length === 0}
-          value={phone}
-          onChangeText={(phone) => setPhone(phone)}
-        />
+        <Headline style={{ textAlign: "center" }}>Welcome to Pixtery!</Headline>
+
+        <Button
+          icon="email"
+          mode="contained"
+          onPress={() => signIn(SignInOptions.EMAIL)}
+          style={{ margin: 10 }}
+        >
+          Sign In / Register By Email
+        </Button>
+        <Button
+          icon="phone"
+          mode="contained"
+          onPress={() => signIn(SignInOptions.PHONE)}
+          style={{ margin: 10 }}
+        >
+          Sign In / Register By Phone
+        </Button>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <View style={{ flex: 1, height: 1, backgroundColor: "grey" }} />
+          <View>
+            <Text style={{ marginHorizontal: 20, textAlign: "center" }}>
+              or
+            </Text>
+          </View>
+          <View style={{ flex: 1, height: 1, backgroundColor: "gray" }} />
+        </View>
         <Button
           icon="camera-iris"
           mode="contained"
-          disabled={!name || !phone || verificationId.length > 0}
-          onPress={async () => {
-            try {
-              const formattedPhone = phoneFormat(phone)[0];
-              if (
-                formattedPhone &&
-                recaptchaVerifier &&
-                recaptchaVerifier.current
-              ) {
-                setPhone(formattedPhone);
-                const id = await phoneProvider.verifyPhoneNumber(
-                  formattedPhone,
-                  recaptchaVerifier.current
-                );
-                setVerificationId(id);
-                setErrors("");
-              } else {
-                throw new Error(
-                  `Please check the number that you entered and try again.`
-                );
-              }
-            } catch (e) {
-              console.log(e);
-              if (e instanceof Error) setErrors(e.message);
-            }
-          }}
+          onPress={() => signIn(SignInOptions.ANON)}
           style={{ margin: 10 }}
         >
-          Sign In
+          Continue Without Sign In
         </Button>
-        {verificationId.length ? (
-          <View>
-            <TextInput
-              value={smsCode}
-              editable={!!verificationId}
-              placeholder="123456"
-              onChangeText={(verificationCode: string) =>
-                setSmsCode(verificationCode)
-              }
-              onFocus={() => setVerifyFocused(true)}
-              onBlur={() => setVerifyFocused(false)}
-            />
-            <Button
-              icon="check-decagram"
-              mode="contained"
-              style={{ margin: 10 }}
-              onLayout={(ev) => setButtonHeight(ev.nativeEvent.layout.height)}
-              onPress={async () => {
-                try {
-                  const authResult = await verifySms(verificationId, smsCode);
-                  if (authResult) {
-                    // get whether or not pixtery admin
-                    const checkGalleryAdmin = functions.httpsCallable(
-                      "checkGalleryAdmin"
-                    );
-                    const res = await checkGalleryAdmin();
-                    const isGalleryAdmin = res.data;
-                    //save to local storage
-                    await AsyncStorage.setItem(
-                      "@pixteryProfile",
-                      JSON.stringify({ name, isGalleryAdmin })
-                    );
-                    //update app state
-                    dispatch(setProfile({ name, isGalleryAdmin }));
-                    //send ya on your way, either home or to AddPuzzle if you were redirected here to log in first
-                    if (route.params && route.params.url)
-                      goToScreen(navigation, "Splash", {
-                        url: route.params.url,
-                      });
-                    else goToScreen(navigation, "Home");
-                  }
-                } catch (e) {
-                  if (e instanceof Error) setErrors(e.message);
-                  setResetAllowed(true);
-                }
-              }}
-            >
-              Verify
-            </Button>
-          </View>
-        ) : null}
-        {errors.length ? <Text>{errors}</Text> : null}
-        {resetAllowed ? (
-          <Button
-            icon="repeat"
-            mode="contained"
-            style={{ margin: 10 }}
-            onPress={() => {
-              setName("");
-              setPhone("");
-              setVerificationId("");
-              setErrors("");
-              setSmsCode("");
-              setResetAllowed(false);
-            }}
-          >
-            Reset
-          </Button>
-        ) : null}
+        <Text style={{ textAlign: "center" }}>
+          Signing in allows you to submit Daily Pixteries and access your
+          account across devices.
+        </Text>
+        <Text style={{ textAlign: "center" }}>
+          If you don&apos;t want to create an account now, you can register
+          later from the Profile menu.
+        </Text>
       </KeyboardAwareScrollView>
+      <SignInModal
+        isVisible={modalVisible}
+        setModalVisible={setModalVisible}
+        signInType={signInType}
+        url={route.params.url}
+      />
     </SafeAreaView>
   );
 }
