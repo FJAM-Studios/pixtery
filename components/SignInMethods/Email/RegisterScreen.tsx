@@ -8,7 +8,7 @@ import {
   Headline,
 } from "react-native-paper";
 
-export default function SignInScreen({
+export default function RegisterScreen({
   setScreen,
   onPress,
 }: {
@@ -16,16 +16,19 @@ export default function SignInScreen({
   onPress: (
     email: string,
     password: string,
-    errorCallback: React.Dispatch<React.SetStateAction<string>>
+    confirmPassword: string | null,
+    errorCallback: React.Dispatch<React.SetStateAction<string>>,
+    isRegister: boolean
   ) => void;
 }): JSX.Element {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState("");
 
   return (
     <View>
-      <Headline style={{ textAlign: "center" }}>Sign In</Headline>
+      <Headline style={{ textAlign: "center" }}>Create Account</Headline>
       <Subheading>Enter Email and Password</Subheading>
       <TextInput
         autoCompleteType="email"
@@ -43,36 +46,41 @@ export default function SignInScreen({
         secureTextEntry
         value={password}
         onChangeText={(t) => setPassword(t)}
-        style={{ marginBottom: 2 }}
+        style={{ marginBottom: 10 }}
+      />
+      <TextInput
+        placeholder="Confirm Password"
+        returnKeyType="done"
+        textContentType="password"
+        secureTextEntry
+        value={confirmPassword}
+        onChangeText={(t) => setConfirmPassword(t)}
+        style={{ marginBottom: 10 }}
       />
       <Button
-        icon="camera-iris"
+        icon="account"
         mode="contained"
-        onPress={() => onPress(email, password, setErrors)}
+        onPress={() =>
+          onPress(email, password, confirmPassword, setErrors, true)
+        }
         style={{ margin: 10 }}
         disabled={email.length === 0 || password.length === 0}
       >
-        Sign In
+        Create Account
       </Button>
       {errors.length ? <Text style={{ color: "red" }}>{errors}</Text> : null}
       <View
         style={{
           flexDirection: "row",
-          justifyContent: "space-between",
+          justifyContent: "flex-end",
           marginTop: 3,
         }}
       >
         <Text
           style={{ textDecorationLine: "underline" }}
-          onPress={() => setScreen("Forgot")}
+          onPress={() => setScreen("SignIn")}
         >
-          Forgot Password?
-        </Text>
-        <Text
-          style={{ textDecorationLine: "underline" }}
-          onPress={() => setScreen("Register")}
-        >
-          Create an Account
+          Back To Sign In
         </Text>
       </View>
     </View>

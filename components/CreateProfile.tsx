@@ -13,6 +13,7 @@ import {
   SignInOptions,
 } from "../types";
 import Logo from "./Logo";
+import SignInMenu from "./SignInMethods/SignInMenu";
 import SignInModal from "./SignInMethods/SignInModal";
 import Title from "./Title";
 
@@ -89,22 +90,7 @@ export default function CreateProfile({
       >
         <Headline style={{ textAlign: "center" }}>Welcome to Pixtery!</Headline>
 
-        <Button
-          icon="email"
-          mode="contained"
-          onPress={() => signIn(SignInOptions.EMAIL)}
-          style={{ margin: 10 }}
-        >
-          Sign In / Register By Email
-        </Button>
-        <Button
-          icon="phone"
-          mode="contained"
-          onPress={() => signIn(SignInOptions.PHONE)}
-          style={{ margin: 10 }}
-        >
-          Sign In / Register By Phone
-        </Button>
+        <SignInMenu onPress={signIn} />
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <View style={{ flex: 1, height: 1, backgroundColor: "grey" }} />
           <View>

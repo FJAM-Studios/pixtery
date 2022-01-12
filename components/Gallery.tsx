@@ -9,7 +9,7 @@ import { useSelector } from "react-redux";
 
 import { functions } from "../FirebaseApp";
 import { INTERSTITIAL_ID, DAILY_TIMEZONE } from "../constants";
-import { RootState, ScreenNavigation, SignInOptions } from "../types";
+import { RootState, ScreenNavigation } from "../types";
 import { msToTime } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
@@ -22,7 +22,6 @@ export default function Gallery({
   navigation: ScreenNavigation;
 }): JSX.Element {
   const theme = useSelector((state: RootState) => state.theme);
-  const profile = useSelector((state: RootState) => state.profile);
   const receivedPuzzles = useSelector(
     (state: RootState) => state.receivedPuzzles
   );
