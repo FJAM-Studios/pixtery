@@ -28,6 +28,7 @@ import AddToGallery from "./components/AddToGallery";
 import ContactUs from "./components/ContactUs";
 import CreateProfile from "./components/CreateProfile";
 import DailyCalendar from "./components/DailyCalendar";
+import EnterName from "./components/EnterName";
 import Gallery from "./components/Gallery";
 import GalleryQueue from "./components/GalleryQueue";
 import GalleryReview from "./components/GalleryReview";
@@ -36,6 +37,7 @@ import HomeScreen from "./components/Home";
 import Profile from "./components/Profile";
 import Puzzle from "./components/Puzzle";
 import PuzzleList from "./components/PuzzleList";
+import Register from "./components/Register";
 import SentPuzzleList from "./components/SentPuzzleList";
 import Splash from "./components/Splash";
 import TitleScreen from "./components/TitleScreen";
@@ -188,6 +190,9 @@ const App = (): JSX.Element => {
               <Stack.Screen name="CreateProfile">
                 {(props) => <CreateProfile {...props} />}
               </Stack.Screen>
+              <Stack.Screen name="Register">
+                {(props) => <Register {...props} />}
+              </Stack.Screen>
               <Stack.Screen name="Home">
                 {(props) => <HomeScreen {...props} />}
               </Stack.Screen>
@@ -229,6 +234,9 @@ const App = (): JSX.Element => {
               </Stack.Screen>
               <Stack.Screen name="DailyCalendar">
                 {(props) => <DailyCalendar {...props} />}
+              </Stack.Screen>
+              <Stack.Screen name="EnterName">
+                {(props) => <EnterName {...props} />}
               </Stack.Screen>
             </Stack.Navigator>
           </View>

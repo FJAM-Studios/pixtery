@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import firebase from "firebase";
 import React, { useState } from "react";
 import { View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -24,6 +25,7 @@ import {
 } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
+import ProfileModal from "./SignInMethods/ProfileModal";
 import ThemeSelector from "./ThemeSelector";
 
 export default function Profile({
@@ -45,6 +47,7 @@ export default function Profile({
   );
   const [errors, setErrors] = useState("");
   const [restoring, setRestoring] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
 
   const toggleSound = async () => {
     //save to local storage
@@ -154,33 +157,51 @@ export default function Profile({
                 JSON.stringify({ name, noSound, noVibration })
               );
               //update app state
-              dispatch(setProfile({ name, noSound, noVibration }));
+              dispatch(setProfile({ ...profile, name, noSound, noVibration }));
+              setErrors("");
             } else {
               setErrors("You must enter a name!");
             }
           }}
           style={{ margin: 10 }}
         >
-          Save
+          Change Name
         </Button>
         {errors.length ? <Text>{errors}</Text> : null}
-        <Button
-          icon="logout"
-          mode="contained"
-          onPress={async () => {
-            //delete local storage
-            await AsyncStorage.removeItem("@pixteryProfile");
-            //sign out of Firebase account
-            await signOut();
-            //update app state
-            dispatch(setProfile(null));
-            //send you to splash
-            navigation.navigate("Splash");
-          }}
-          style={{ margin: 10 }}
-        >
-          Log Out
-        </Button>
+        {/*we can't let people sign out if they're logged in anonymously.
+        otherwise they'll lose their puzzles forever */}
+        {!firebase.auth().currentUser?.isAnonymous ? (
+          <Button
+            icon="logout"
+            mode="contained"
+            onPress={async () => {
+              //delete local storage
+              await AsyncStorage.removeItem("@pixteryProfile");
+              //sign out of Firebase account
+              await signOut();
+              //update app state
+              dispatch(setProfile(null));
+              //send you to splash
+              navigation.navigate("Splash");
+            }}
+            style={{ margin: 10 }}
+          >
+            Log Out
+          </Button>
+        ) : (
+          <Button
+            icon="logout"
+            mode="contained"
+            onPress={async () => {
+              //send you to register
+              // navigation.navigate("CreateProfile", { url: undefined });
+              setModalVisible(true);
+            }}
+            style={{ margin: 10 }}
+          >
+            Sign In / Register Account
+          </Button>
+        )}
         <Button
           icon="delete"
           mode="contained"
@@ -256,6 +277,10 @@ export default function Profile({
           <ThemeSelector setSelectingTheme={setSelectingTheme} />
         ) : null}
       </KeyboardAwareScrollView>
+      <ProfileModal
+        isVisible={modalVisible}
+        setModalVisible={setModalVisible}
+      />
     </AdSafeAreaView>
   );
 }

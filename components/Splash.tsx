@@ -18,6 +18,7 @@ import { ScreenNavigation, SplashRoute, RootState } from "../types";
 import {
   clearEIMcache,
   closeSplashAndNavigate,
+  isProfile,
   updateImageURIs,
 } from "../util";
 import Logo from "./Logo";
@@ -151,7 +152,12 @@ export default function Splash({
       } else {
         //otherwise, load profile from local storage if it exists
         const loadedProfile = await loadProfile();
-        if (loadedProfile) {
+        // we should check that the profile loaded from disk is actually an object of the Profile type and not something else
+        // in a future PR, we should validate that the loadedProfile is an object in the right shape, and, if not, we direct them to log in again
+        // this will be relevant for the loginMethod property of Profile, which no current Pixtery user has but will be needed to limit Daily submissions to logged in users
+
+        // this is a partial solution to above; still doesn't validate that name and loginmethod follow proper rules but better than nothing
+        if (isProfile(loadedProfile)) {
           dispatch(setProfile(loadedProfile));
         } else {
           //or navigate to createprofile if it doesn't exist, passing the url to create profile so it can be forwarded along, and you can go directly to the puzzle after signing in.

@@ -1,8 +1,12 @@
+/* eslint-disable no-case-declarations */
 import Constants from "expo-constants";
 import firebase from "firebase";
+
+import "firebase/auth";
 import "firebase/functions";
 import "firebase/firestore";
 import "firebase/storage"; // for jest testing purposes
+import { SignInOptions } from "./types";
 
 const firebaseConfig = {
   apiKey: "AIzaSyANqRXsUQIKxT9HtG4gIQ6EmsKEMCzCyuo",
@@ -28,6 +32,14 @@ const db = app.firestore();
 
 const functions = app.functions();
 
+// couldn't find FB Error typescript? this is workaround for try/catch
+interface FBError {
+  code: string;
+}
+function isFBError(value: unknown): value is FBError {
+  return !!value && !!(value as FBError).code;
+}
+
 // uncomment if not using block below for func emu testing
 // import { MY_LAN_IP } from "./ip";
 // functions.useFunctionsEmulator(`${MY_LAN_IP}:5001`);
@@ -45,17 +57,129 @@ if (
 
 const storage = app.storage();
 const phoneProvider = new firebase.auth.PhoneAuthProvider();
-const verifySms = (
-  id: string,
-  code: string
-): Promise<firebase.auth.UserCredential> => {
-  const credential = firebase.auth.PhoneAuthProvider.credential(id, code);
-  const signInResponse = firebase.auth().signInWithCredential(credential);
-  return signInResponse;
-};
 
 const signOut = (): Promise<void> => {
   return firebase.auth().signOut();
+};
+
+const anonSignIn = async (): Promise<void> => {
+  try {
+    // Anonymous sign in. This should only fire the first time someone uses the app.
+    if (!firebase.auth().currentUser) await firebase.auth().signInAnonymously();
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const migratePuzzles = async (prevUserId: string): Promise<void> => {
+  console.log("MIGRATE PUZZLES");
+  const _migratePuzzles = functions.httpsCallable("migratePuzzles");
+  _migratePuzzles(prevUserId);
+};
+
+const signInOnFireBase = async (
+  providerType: SignInOptions,
+  id: string,
+  verificationCode: string
+): Promise<firebase.User | void> => {
+  let newCredential: firebase.auth.AuthCredential | null = null;
+
+  if (providerType === SignInOptions.PHONE) {
+    const authProvider = firebase.auth.PhoneAuthProvider;
+    newCredential = await authProvider.credential(id, verificationCode);
+  }
+
+  if (providerType === SignInOptions.EMAIL) {
+    const authProvider = firebase.auth.EmailAuthProvider;
+    newCredential = await authProvider.credential(id, verificationCode);
+  }
+
+  if (newCredential) {
+    try {
+      // Get user credential using auth provider
+      const prevUser = firebase.auth().currentUser;
+      ////the below comes from https://firebase.google.com/docs/auth/web/account-linking
+      let currentUser;
+      // Sign in user with the account you want to link to
+      await firebase
+        .auth()
+        .signInWithCredential(newCredential)
+        .then((result) => {
+          currentUser = result.user;
+
+          // Merge prevUser and currentUser data stored in Firebase.
+          // Note: How you handle this is specific to your application
+          if (currentUser && prevUser && prevUser.uid !== currentUser.uid)
+            migratePuzzles(prevUser.uid);
+          // return currentUser;
+        });
+      return currentUser;
+    } catch (error) {
+      // throwing error so the Register component has an error message to display to the user.
+      if (isFBError(error)) {
+        if (error.code === "auth/wrong-password")
+          throw new Error("Incorrect password.");
+        else if (error.code === "auth/user-not-found")
+          throw new Error("User not found.");
+      } else {
+        throw new Error("Could not sign in at this time. Please try again.");
+      }
+    }
+  }
+};
+
+const signUpEmail = async (
+  email: string,
+  password: string
+): Promise<firebase.User | void> => {
+  try {
+    const auth = firebase.auth();
+    const prevUid = auth.currentUser?.uid;
+    const newCredential = await auth.createUserWithEmailAndPassword(
+      email,
+      password
+    );
+
+    if (newCredential && newCredential.user && prevUid) migratePuzzles(prevUid);
+    // return new user
+    if (newCredential.user) return newCredential.user;
+    throw new Error("Something went wrong");
+  } catch (error) {
+    // throwing error so the Register component has an error message to display to the user.
+    if (isFBError(error)) {
+      if (error.code === "auth/wrong-password")
+        throw new Error("Incorrect password.");
+      else if (error.code === "auth/user-not-found")
+        throw new Error("User not found.");
+    } else {
+      throw new Error("Could not sign in at this time. Please try again.");
+    }
+  }
+};
+
+const checkAdminStatus = async (): Promise<boolean> => {
+  try {
+    // get whether or not pixtery admin
+    const checkGalleryAdmin = functions.httpsCallable("checkGalleryAdmin");
+    const res = await checkGalleryAdmin();
+    const isGalleryAdmin = res.data;
+    return isGalleryAdmin;
+  } catch (e) {
+    console.log("could not verify admin status");
+    return false;
+  }
+};
+
+const sendResetEmail = async (email: string): Promise<void> => {
+  try {
+    const auth = firebase.auth();
+    await auth.sendPasswordResetEmail(email);
+  } catch (e) {
+    console.log(e);
+    throw new Error(
+      "Could not send reset email. Check email address or try again later."
+    );
+  }
 };
 
 export {
@@ -64,7 +188,11 @@ export {
   storage,
   phoneProvider,
   firebaseConfig,
-  verifySms,
   functions,
   signOut,
+  anonSignIn,
+  signInOnFireBase,
+  checkAdminStatus,
+  signUpEmail,
+  sendResetEmail,
 };
