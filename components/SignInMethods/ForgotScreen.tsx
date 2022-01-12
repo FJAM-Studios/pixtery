@@ -9,11 +9,9 @@ import {
 } from "react-native-paper";
 
 export default function ForgotScreen({
-  name,
   setScreen,
   onPress,
 }: {
-  name: string;
   setScreen: React.Dispatch<React.SetStateAction<string>>;
   onPress: (
     email: string,

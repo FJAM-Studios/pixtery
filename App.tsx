@@ -28,6 +28,7 @@ import AddToGallery from "./components/AddToGallery";
 import ContactUs from "./components/ContactUs";
 import CreateProfile from "./components/CreateProfile";
 import DailyCalendar from "./components/DailyCalendar";
+import EnterName from "./components/EnterName";
 import Gallery from "./components/Gallery";
 import GalleryQueue from "./components/GalleryQueue";
 import GalleryReview from "./components/GalleryReview";
@@ -233,6 +234,9 @@ const App = (): JSX.Element => {
               </Stack.Screen>
               <Stack.Screen name="DailyCalendar">
                 {(props) => <DailyCalendar {...props} />}
+              </Stack.Screen>
+              <Stack.Screen name="EnterName">
+                {(props) => <EnterName {...props} />}
               </Stack.Screen>
             </Stack.Navigator>
           </View>
