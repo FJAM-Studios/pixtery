@@ -60,10 +60,10 @@ export default function ProfileModal({
       >
         {signInType === null ? <SignInMenu onPress={setSignInType} /> : null}
         {signInType === SignInOptions.EMAIL ? (
-          <Email onFinish={() => onFinish()} />
+          <Email onFinish={onFinish} />
         ) : null}
         {signInType === SignInOptions.PHONE ? (
-          <Phone onFinish={() => onFinish()} />
+          <Phone onFinish={onFinish} />
         ) : null}
       </View>
     </Modal>
