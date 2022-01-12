@@ -447,7 +447,6 @@ export const isProfile = (profile: unknown): profile is Profile => {
   return (
     profile !== undefined &&
     profile !== null &&
-    (profile as Profile).name !== undefined &&
-    (profile as Profile).loginMethod !== undefined
+    (profile as Profile).name !== undefined
   );
 };

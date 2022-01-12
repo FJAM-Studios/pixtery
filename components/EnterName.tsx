@@ -26,18 +26,18 @@ export default function EnterName({
   const [name, setName] = useState("");
   const [errors, setErrors] = useState("");
 
-  const { url, loginMethod } = route.params;
+  const { url } = route.params;
 
   const confirmName = async () => {
     try {
       if (name.trim().length < 1)
         throw new Error("A display name is required.");
       const isGalleryAdmin = await checkAdminStatus();
-      dispatch(setProfile({ ...profile, name, isGalleryAdmin, loginMethod }));
+      dispatch(setProfile({ ...profile, name, isGalleryAdmin }));
       //save to local storage
       await AsyncStorage.setItem(
         "@pixteryProfile",
-        JSON.stringify({ ...profile, name, isGalleryAdmin, loginMethod })
+        JSON.stringify({ ...profile, name, isGalleryAdmin })
       );
       if (url) navigation.navigate("Splash", { url });
       else navigation.navigate("Home");

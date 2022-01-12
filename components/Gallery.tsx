@@ -1,4 +1,5 @@
 import { AdMobInterstitial } from "expo-ads-admob";
+import firebase from "firebase";
 import moment from "moment-timezone";
 import React, { useState, useEffect } from "react";
 import { View } from "react-native";
@@ -29,7 +30,12 @@ export default function Gallery({
   const [error, setError] = useState<null | string>(null);
 
   const suggestPixtery = () => {
-    if (profile.loginMethod === SignInOptions.ANON) {
+    if (
+      firebase.auth().currentUser &&
+      !firebase.auth().currentUser?.isAnonymous
+    ) {
+      navigation.navigate("AddToGallery");
+    } else {
       Toast.show(
         "You must be signed in to submit a Daily Pixtery. Go to the Profile menu to sign in.",
         {
@@ -37,8 +43,6 @@ export default function Gallery({
           position: Toast.positions.CENTER,
         }
       );
-    } else {
-      navigation.navigate("AddToGallery");
     }
   };
 
