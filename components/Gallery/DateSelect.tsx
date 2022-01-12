@@ -3,9 +3,9 @@ import { Calendar } from "react-native-calendars";
 import { DateData } from "react-native-calendars/src/types";
 import { ActivityIndicator, Text } from "react-native-paper";
 
-import { functions } from "../FirebaseApp";
-import { DailyDate, Puzzle } from "../types";
-import { convertIntToDoubleDigitString } from "../util";
+import { functions } from "../../FirebaseApp";
+import { DailyDate, Puzzle } from "../../types";
+import { convertIntToDoubleDigitString } from "../../util";
 
 export default function DateSelect({
   onMarkedDayPress,

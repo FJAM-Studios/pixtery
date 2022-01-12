@@ -10,7 +10,7 @@ import {
 } from "react-native-paper";
 import { useSelector } from "react-redux";
 
-import { functions } from "../FirebaseApp";
+import { functions } from "../../FirebaseApp";
 import {
   DailyDate,
   GalleryReviewRoute,
@@ -18,11 +18,11 @@ import {
   RootState,
   ScreenNavigation,
   StatusOfDaily,
-} from "../types";
-import { downloadImage, convertDateStringToObject } from "../util";
-import AdSafeAreaView from "./AdSafeAreaView";
+} from "../../types";
+import { downloadImage, convertDateStringToObject } from "../../util";
+import AdSafeAreaView from "../AdSafeAreaView";
 import DateSelect from "./DateSelect";
-import Header from "./Header";
+import Header from "../Header";
 
 export default function GalleryReview({
   navigation,

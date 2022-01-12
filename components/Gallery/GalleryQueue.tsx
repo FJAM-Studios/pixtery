@@ -11,16 +11,16 @@ import {
 } from "react-native-paper";
 import { useSelector } from "react-redux";
 
-import { functions } from "../FirebaseApp";
+import { functions } from "../../FirebaseApp";
 import {
   ScreenNavigation,
   RootState,
   Puzzle,
   GalleryQueueRoute,
   StatusOfDaily,
-} from "../types";
-import AdSafeAreaView from "./AdSafeAreaView";
-import Header from "./Header";
+} from "../../types";
+import AdSafeAreaView from "../AdSafeAreaView";
+import Header from "../Header";
 
 export default function GalleryQueue({
   navigation,

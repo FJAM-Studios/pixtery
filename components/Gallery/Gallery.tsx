@@ -7,12 +7,12 @@ import { ActivityIndicator, Button, Headline, Text } from "react-native-paper";
 import Toast from "react-native-root-toast";
 import { useSelector } from "react-redux";
 
-import { functions } from "../FirebaseApp";
-import { INTERSTITIAL_ID, DAILY_TIMEZONE } from "../constants";
-import { RootState, ScreenNavigation } from "../types";
-import { msToTime } from "../util";
-import AdSafeAreaView from "./AdSafeAreaView";
-import Header from "./Header";
+import { functions } from "../../FirebaseApp";
+import { INTERSTITIAL_ID, DAILY_TIMEZONE } from "../../constants";
+import { RootState, ScreenNavigation } from "../../types";
+import { msToTime } from "../../util";
+import AdSafeAreaView from "../AdSafeAreaView";
+import Header from "../Header";
 
 AdMobInterstitial.setAdUnitID(INTERSTITIAL_ID);
 

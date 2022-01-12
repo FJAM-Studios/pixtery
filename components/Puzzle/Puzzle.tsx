@@ -10,7 +10,7 @@ import { Theme } from "react-native-paper/lib/typescript/types";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 
-import { DEGREE_CONVERSION, TESTING_MODE } from "../constants";
+import { DEGREE_CONVERSION, TESTING_MODE } from "../../constants";
 import {
   shuffle,
   generateJigsawPiecePaths,
@@ -18,9 +18,9 @@ import {
   fillArray,
   getInitialDimensions,
   validateBoard,
-} from "../puzzleUtils";
-import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
-import { setSentPuzzles } from "../store/reducers/sentPuzzles";
+} from "../../puzzleUtils";
+import { setReceivedPuzzles } from "../../store/reducers/receivedPuzzles";
+import { setSentPuzzles } from "../../store/reducers/sentPuzzles";
 import {
   Puzzle,
   Piece,
@@ -29,10 +29,10 @@ import {
   ScreenNavigation,
   PuzzleRoute,
   RootState,
-} from "../types";
-import { saveToLibrary } from "../util";
-import AdSafeAreaView from "./AdSafeAreaView";
-import Header from "./Header";
+} from "../../types";
+import { saveToLibrary } from "../../util";
+import AdSafeAreaView from "../AdSafeAreaView";
+import Header from "../Header";
 import PuzzlePiece from "./PuzzlePiece";
 
 //disable shuffling for testing
@@ -93,7 +93,7 @@ export default function PuzzleComponent({
   useEffect(() => {
     const initializeSound = async () => {
       const { sound } = await Audio.Sound.createAsync(
-        require("../assets/camera-click.wav")
+        require("../../assets/camera-click.wav")
       );
       setSound(sound);
     };

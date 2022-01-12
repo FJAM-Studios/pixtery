@@ -24,10 +24,10 @@ import Toast from "react-native-root-toast";
 import { useSelector } from "react-redux";
 import shortid from "shortid";
 
-import { functions } from "../FirebaseApp";
-import { ScreenNavigation, RootState } from "../types";
-import AdSafeAreaView from "./AdSafeAreaView";
-import Header from "./Header";
+import { functions } from "../../FirebaseApp";
+import { ScreenNavigation, RootState } from "../../types";
+import AdSafeAreaView from "../AdSafeAreaView";
+import Header from "../Header";
 
 export default function AddToGallery({
   navigation,
