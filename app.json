@@ -43,6 +43,7 @@
     },
     "android": {
       "package": "com.fjamstudios.pixtery",
+      "googleServicesFile": "./google-services.json",
       "versionCode": 5,
       "playStoreUrl": "https://play.google.com/store/apps/details?id=com.fjamstudios.pixtery",
       "adaptiveIcon": {

@@ -132,7 +132,11 @@ const App = (): JSX.Element => {
           alert("Failed to get push token for push notification!");
           return;
         }
-        const token = (await Notifications.getExpoPushTokenAsync()).data;
+        const token = (
+          await Notifications.getExpoPushTokenAsync({
+            experienceId: "@fjam-studios/pixtery",
+          })
+        ).data;
         dispatch(setNotificationToken(token));
       } else {
         alert("Must use physical device for Push Notifications");
