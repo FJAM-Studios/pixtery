@@ -158,7 +158,6 @@ export default function AddToGallery({
                   const addToQueue = functions.httpsCallable("addToQueue");
                   try {
                     const newPublicKey: string = shortid.generate();
-                    console.log(notificationToken);
                     await addToQueue({
                       publicKey,
                       anonymousChecked,
