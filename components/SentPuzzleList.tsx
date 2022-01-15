@@ -1,7 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as FileSystem from "expo-file-system";
 import * as Linking from "expo-linking";
-import moment from "moment";
 import * as React from "react";
 import {
   ImageBackground,
@@ -21,6 +20,7 @@ import {
   safelyDeletePuzzleImage,
   shareMessage,
   deactivatePuzzleOnServer,
+  formatDateFromISO,
 } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
@@ -156,7 +156,11 @@ export default function SentPuzzleList({
                   >
                     <Card.Title
                       title={sentPuzzle.message || ""}
-                      subtitle={moment(sentPuzzle.dateReceived).calendar()}
+                      subtitle={
+                        sentPuzzle.dateReceived
+                          ? formatDateFromISO(sentPuzzle.dateReceived)
+                          : null
+                      }
                       right={() => (
                         <View
                           style={{ flexDirection: "row", alignItems: "center" }}

@@ -8,10 +8,12 @@ import * as ImagePicker from "expo-image-picker";
 import * as Linking from "expo-linking";
 import * as MediaLibrary from "expo-media-library";
 import * as SplashScreen from "expo-splash-screen";
+import { DateTime } from "luxon";
 import { Alert, Share } from "react-native";
 import Toast from "react-native-root-toast";
 
 import { storage, functions } from "./FirebaseApp";
+import { DATE_FORMAT } from "./constants";
 import { Puzzle, ScreenNavigation, DateObjString, Profile } from "./types";
 
 //convert URI into a blob to transmit to server
@@ -461,3 +463,7 @@ export const isProfile = (profile: unknown): profile is Profile => {
     (profile as Profile).name !== undefined
   );
 };
+// formats date from date in ISO format
+export function formatDateFromISO(isoDate: string): string {
+  return DateTime.fromISO(isoDate).toFormat(DATE_FORMAT);
+}

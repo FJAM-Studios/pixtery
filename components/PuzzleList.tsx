@@ -1,5 +1,4 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import moment from "moment";
 import * as React from "react";
 import { View, ScrollView, TouchableOpacity } from "react-native";
 import Modal from "react-native-modal";
@@ -21,6 +20,7 @@ import {
   safelyDeletePuzzleImage,
   deactivatePuzzleOnServer,
   goToScreen,
+  formatDateFromISO,
 } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
@@ -191,7 +191,11 @@ export default function PuzzleList({
                             receivedPuzzle.message
                           : receivedPuzzle.senderName
                       }
-                      subtitle={moment(receivedPuzzle.dateReceived).calendar()}
+                      subtitle={
+                        receivedPuzzle.dateReceived
+                          ? formatDateFromISO(receivedPuzzle.dateReceived)
+                          : null
+                      }
                       right={() => (
                         <View
                           style={{ flexDirection: "row", alignItems: "center" }}
