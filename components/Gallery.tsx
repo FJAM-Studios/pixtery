@@ -1,5 +1,5 @@
 import { AdMobInterstitial } from "expo-ads-admob";
-import moment from "moment-timezone";
+import { DateTime } from "luxon";
 import React, { useState, useEffect } from "react";
 import { View } from "react-native";
 import { ActivityIndicator, Button, Headline, Text } from "react-native-paper";
@@ -27,9 +27,9 @@ export default function Gallery({
   const [error, setError] = useState<null | string>(null);
 
   const getCountdown = (): number => {
-    const now = moment().tz(DAILY_TIMEZONE);
-    const tomorrow = now.clone().add(1, "day").startOf("day");
-    const time = tomorrow.diff(now, "milliseconds");
+    const now = DateTime.now().setZone(DAILY_TIMEZONE);
+    const tomorrow = now.plus({ days: 1 }).startOf("day");
+    const time = tomorrow.diff(now, "milliseconds").toMillis();
     if (time <= 1000) setError(null);
     return time;
   };
