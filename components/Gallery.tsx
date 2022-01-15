@@ -190,7 +190,7 @@ export default function Gallery({
             mode="contained"
             onPress={suggestPixtery}
             style={{
-              margin: 20,
+              margin: 10,
               width: width * 0.8,
               paddingTop: height * 0.01,
               paddingBottom: height * 0.01,
