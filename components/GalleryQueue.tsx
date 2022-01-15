@@ -1,4 +1,3 @@
-import moment from "moment";
 import React, { useState, useEffect } from "react";
 import { View, ScrollView, TouchableOpacity } from "react-native";
 import {
@@ -19,6 +18,7 @@ import {
   GalleryQueueRoute,
   StatusOfDaily,
 } from "../types";
+import { formatDateFromISO } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 
@@ -135,11 +135,11 @@ export default function GalleryQueue({
               <Card style={{ margin: 5 }}>
                 <Card.Title
                   title={puzzle.message || ""}
-                  subtitle={
-                    puzzle.senderName +
-                    " - " +
-                    moment(puzzle.dateReceived).calendar()
-                  }
+                  subtitle={`${puzzle.senderName} - ${
+                    puzzle.dateReceived
+                      ? formatDateFromISO(puzzle.dateReceived)
+                      : null
+                  }`}
                   right={() => (
                     <View
                       style={{ flexDirection: "row", alignItems: "center" }}
