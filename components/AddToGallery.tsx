@@ -1,5 +1,4 @@
 import * as FileSystem from "expo-file-system";
-import moment from "moment";
 import * as React from "react";
 import { useState } from "react";
 import {
@@ -26,6 +25,7 @@ import shortid from "shortid";
 
 import { functions } from "../FirebaseApp";
 import { ScreenNavigation, RootState } from "../types";
+import { formatDateFromISO } from "../util";
 import AdSafeAreaView from "./AdSafeAreaView";
 import Header from "./Header";
 
@@ -219,7 +219,11 @@ export default function AddToGallery({
                   >
                     <Card.Title
                       title={sentPuzzle.message || ""}
-                      subtitle={moment(sentPuzzle.dateReceived).calendar()}
+                      subtitle={
+                        sentPuzzle.dateReceived
+                          ? formatDateFromISO(sentPuzzle.dateReceived)
+                          : null
+                      }
                       right={() => (
                         <View
                           style={{ flexDirection: "row", alignItems: "center" }}

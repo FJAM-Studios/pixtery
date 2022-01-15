@@ -1,7 +1,7 @@
 import * as functions from "firebase-functions";
 import db from "../db";
-import * as moment from "moment-timezone";
 const DAILY_TIMEZONE = "America/New_York";
+import * as luxon from "luxon";
 
 export const checkGalleryAdmin = functions.https.onCall(
   async (_data, context): Promise<boolean | void> => {
@@ -196,7 +196,9 @@ export const getDaily = functions.https.onCall(
       }
 
       //get today's date in EST and create vars
-      const [year, month, day] = getESTDate();
+      const now = luxon.DateTime.now().setZone(DAILY_TIMEZONE);
+
+      const [year, month, day] = getESTDate(now);
 
       const daily = await getDailyForDate(year, month, day);
 
@@ -221,12 +223,10 @@ const getDailyForDate = async (year: string, month: string, day: string) => {
     .get();
 };
 
-const getESTDate = () => {
-  const todayInDailyTimezone = moment().tz(DAILY_TIMEZONE);
-  const year = todayInDailyTimezone.year().toString();
+const getESTDate = (date: luxon.DateTime): string[] => {
+  const year = date.year.toString();
   // for month and day, return the two numbers from end of string (i.e. "09" or "10")
-  // month is indexed from 0
-  const month = `0${todayInDailyTimezone.month() + 1}`.slice(-2);
-  const day = `0${todayInDailyTimezone.date()}`.slice(-2);
+  const month = `0${date.month}`.slice(-2);
+  const day = `0${date.day}`.slice(-2);
   return [year, month, day];
 };

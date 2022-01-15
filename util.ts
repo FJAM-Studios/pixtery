@@ -8,10 +8,12 @@ import * as ImagePicker from "expo-image-picker";
 import * as Linking from "expo-linking";
 import * as MediaLibrary from "expo-media-library";
 import * as SplashScreen from "expo-splash-screen";
+import { DateTime } from "luxon";
 import { Alert, Share } from "react-native";
 import Toast from "react-native-root-toast";
 
 import { storage, functions } from "./FirebaseApp";
+import { DATE_FORMAT } from "./constants";
 import { Puzzle, ScreenNavigation, DateObjString } from "./types";
 
 //convert URI into a blob to transmit to server
@@ -437,4 +439,9 @@ export function msToTime(duration: number): string {
   const _seconds = seconds < 10 ? "0" + seconds : seconds;
 
   return _hours + ":" + _minutes + ":" + _seconds;
+}
+
+// formats date from date in ISO format
+export function formatDateFromISO(isoDate: string): string {
+  return DateTime.fromISO(isoDate).toFormat(DATE_FORMAT);
 }
