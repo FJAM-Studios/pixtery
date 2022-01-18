@@ -206,7 +206,7 @@ export default function Home({
       return newPuzzle;
     } catch (error) {
       console.error(error);
-      throw new Error(error);
+      if (error instanceof Error) throw new Error(error.message);
     }
   };
 
@@ -479,9 +479,10 @@ export default function Home({
           </Surface>
         </View>
         <MessageInput
-          height={height * 0.09}
-          margin={height * 0.01}
-          theme={theme}
+          style={{
+            height: height * 0.09,
+            margin: height * 0.01,
+          }}
         />
         <Button
           icon="send"
