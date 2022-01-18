@@ -1,31 +1,33 @@
 import * as React from "react";
-import { View } from "react-native";
-import { IconButton, Text, TextInput } from "react-native-paper";
+import { View, TextInput } from "react-native";
+import { IconButton, Text } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 
 import { setMessage } from "../store/reducers/message";
-import { PixteryTheme, RootState } from "../types";
+import { RootState } from "../types";
 
 export default function MessageInput({
-  height,
-  margin,
-  theme,
+  style,
 }: {
-  height: number;
-  margin: number;
-  theme: PixteryTheme;
+  style: {
+    height: number;
+    margin: number;
+  };
 }): JSX.Element {
   const dispatch = useDispatch();
   const message = useSelector((state: RootState) => state.message);
+  const theme = useSelector((state: RootState) => state.theme);
+  const [messageFocus, setMessageFocus] = React.useState(false);
   const messageLimit = 70;
   const messageDraft = message.length > 0;
 
   return (
     <View
       style={{
-        marginTop: margin,
-        marginLeft: margin,
-        marginRight: margin,
+        marginTop: style.margin,
+        marginLeft: style.margin,
+        marginRight: style.margin,
+        maxHeight: style.height,
         justifyContent: "center",
       }}
     >
@@ -34,7 +36,6 @@ export default function MessageInput({
           flexDirection: "row",
           justifyContent: "space-between",
           alignItems: "center",
-          height: height * 0.25,
         }}
       >
         <Text
@@ -57,35 +58,48 @@ export default function MessageInput({
           >
             {message.length}/{messageLimit} characters
           </Text>
-          <IconButton
-            icon="delete-circle-outline"
-            style={{
-              margin: 0,
-            }}
-            size={20}
-            color={messageDraft ? theme.colors.primary : theme.colors.disabled}
-            disabled={!messageDraft}
-            onPress={() => {
-              dispatch(setMessage(""));
-            }}
-          />
         </View>
       </View>
-      <TextInput
-        placeholder="Congrats! You solved the puzzle!"
-        multiline
-        maxLength={messageLimit}
-        mode="outlined"
-        value={message}
-        onChangeText={(message) => dispatch(setMessage(message))}
-        outlineColor={theme.colors.primary}
-        placeholderTextColor={theme.colors.primary}
+      <View
         style={{
-          minHeight: height * 0.75,
-          marginTop: 0,
-          justifyContent: "center",
+          flexDirection: "row",
+          justifyContent: "space-between",
+          borderWidth: messageFocus ? 2.5 : 1,
+          borderRadius: theme.roundness,
+          borderColor: theme.colors.primary,
+          padding: 5,
+          marginTop: 2.5,
         }}
-      />
+      >
+        <TextInput
+          placeholder="Congrats! You solved the puzzle!"
+          multiline
+          maxLength={messageLimit}
+          value={message}
+          onChangeText={(message) => dispatch(setMessage(message))}
+          placeholderTextColor={theme.colors.primary}
+          onFocus={() => setMessageFocus(true)}
+          onBlur={() => setMessageFocus(false)}
+          style={{
+            color: theme.colors.text,
+            margin: 0,
+            justifyContent: "center",
+            backgroundColor: theme.colors.background,
+            width: "90%",
+          }}
+        />
+        <IconButton
+          icon="close-circle-outline"
+          style={{
+            margin: 0,
+          }}
+          color={messageDraft ? theme.colors.primary : theme.colors.disabled}
+          disabled={!messageDraft}
+          onPress={() => {
+            dispatch(setMessage(""));
+          }}
+        />
+      </View>
     </View>
   );
 }

@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Audio } from "expo-av";
 import * as Linking from "expo-linking";
 import React, { useEffect } from "react";
 import { View } from "react-native";
@@ -9,11 +10,17 @@ import { PUBLIC_KEY_LENGTH } from "../constants";
 import { setProfile } from "../store/reducers/profile";
 import { setReceivedPuzzles } from "../store/reducers/receivedPuzzles";
 import { setSentPuzzles } from "../store/reducers/sentPuzzles";
+import { setSound } from "../store/reducers/sound";
 import { setTheme } from "../store/reducers/theme";
 import { setTutorialFinished } from "../store/reducers/tutorialFinished";
 import { allThemes } from "../themes";
 import { ScreenNavigation, SplashRoute, RootState } from "../types";
-import { closeSplashAndNavigate, updateImageURIs } from "../util";
+import {
+  clearEIMcache,
+  closeSplashAndNavigate,
+  isProfile,
+  updateImageURIs,
+} from "../util";
 import Logo from "./Logo";
 import Title from "./Title";
 
@@ -123,6 +130,11 @@ export default function Splash({
       // load theme
       const loadedTheme = await loadTheme();
       dispatch(setTheme(loadedTheme));
+      // load audio
+      const { sound } = await Audio.Sound.createAsync(
+        require("../assets/click.m4a")
+      );
+      dispatch(setSound(sound));
       //if you are logged in, load local puzzles, then either navigate to AddPuzzle or Home if there is no url
       if (profile) {
         await loadPuzzles();
@@ -140,7 +152,11 @@ export default function Splash({
       } else {
         //otherwise, load profile from local storage if it exists
         const loadedProfile = await loadProfile();
-        if (loadedProfile) {
+        // we should check that the profile loaded from disk is actually an object of the Profile type and not something else
+        // in a future PR, we should validate that the loadedProfile is an object in the right shape, and, if not, we direct them to log in again
+
+        // this is a partial solution to above; still doesn't validate that name follow proper rules but better than nothing
+        if (isProfile(loadedProfile)) {
           dispatch(setProfile(loadedProfile));
         } else {
           //or navigate to createprofile if it doesn't exist, passing the url to create profile so it can be forwarded along, and you can go directly to the puzzle after signing in.
@@ -151,6 +167,10 @@ export default function Splash({
 
     loadAppData();
   }, [dispatch, navigation, profile, route.params]);
+
+  useEffect(() => {
+    clearEIMcache();
+  }, []);
 
   return (
     <View
