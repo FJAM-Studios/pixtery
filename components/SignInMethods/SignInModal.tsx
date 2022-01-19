@@ -5,8 +5,8 @@ import Modal from "react-native-modal";
 import { useSelector } from "react-redux";
 
 import { RootState, ScreenNavigation, SignInOptions } from "../../types";
-import Email from "./Email";
-import Phone from "./Phone";
+import Email from "./Email/Email";
+import Phone from "./Phone/Phone";
 
 export default function SignInModal({
   isVisible,
