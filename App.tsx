@@ -23,24 +23,26 @@ import { Provider as PaperProvider } from "react-native-paper";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 
-import AddPuzzle from "./components/AddPuzzle";
-import ContactUs from "./components/ContactUs";
-import CreateProfile from "./components/CreateProfile";
-import EnterName from "./components/EnterName";
-import AddToGallery from "./components/Gallery/AddToGallery";
-import DailyCalendar from "./components/Gallery/DailyCalendar";
-import Gallery from "./components/Gallery/Gallery";
-import GalleryQueue from "./components/Gallery/GalleryQueue";
-import GalleryReview from "./components/Gallery/GalleryReview";
-import Help from "./components/Help";
-import HomeScreen from "./components/Home";
-import Profile from "./components/Profile";
-import Puzzle from "./components/Puzzle/Puzzle";
-import PuzzleList from "./components/PuzzleLists/PuzzleList";
-import SentPuzzleList from "./components/PuzzleLists/SentPuzzleList";
-import Splash from "./components/Splash";
-import TitleScreen from "./components/TitleScreen";
-import Tutorial from "./components/Tutorial";
+import {
+  AddToGallery,
+  DailyCalendar,
+  GalleryQueue,
+  GalleryReview,
+} from "./components/AdminScreens";
+import { AddPuzzle, Splash, TitleScreen } from "./components/TransitionScreens";
+import {
+  ContactUs,
+  CreateProfile,
+  EnterName,
+  Gallery,
+  Help,
+  Home,
+  Profile,
+  Puzzle,
+  PuzzleList,
+  SentPuzzleList,
+  Tutorial,
+} from "./components/UserScreens";
 import { MIN_BOTTOM_CLEARANCE } from "./constants";
 import { setNotificationToken } from "./store/reducers/notificationToken";
 import { setDeviceSize } from "./store/reducers/screenHeight";
@@ -190,7 +192,7 @@ const App = (): JSX.Element => {
                 {(props) => <CreateProfile {...props} />}
               </Stack.Screen>
               <Stack.Screen name="Home">
-                {(props) => <HomeScreen {...props} />}
+                {(props) => <Home {...props} />}
               </Stack.Screen>
               <Stack.Screen name="PuzzleList">
                 {(props) => <PuzzleList {...props} />}
