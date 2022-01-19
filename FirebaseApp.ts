@@ -35,7 +35,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
-const functions = getFunctions();
+const functions = getFunctions(app);
 
 // couldn't find FB Error typescript? this is workaround for try/catch
 interface FBError {
@@ -75,7 +75,11 @@ const signOut = (): Promise<void> => {
 const anonSignIn = async (): Promise<void> => {
   try {
     // Anonymous sign in. This should only fire the first time someone uses the app.
-    if (auth.currentUser) await signInAnonymously(auth);
+
+    // why only if auth.currentUser? This seems to create a problem if you're signed in then sign out and try to sign in anon
+    // if (auth.currentUser) await signInAnonymously(auth);
+
+    await signInAnonymously(auth);
   } catch (error) {
     console.log(error);
   }
@@ -188,8 +192,7 @@ const sendResetEmail = async (email: string): Promise<void> => {
   }
 };
 
-const db = getFirestore();
-const storage = getStorage();
+const storage = getStorage(app);
 
 const addToQueue = httpsCallable(functions, "addToQueue");
 const fetchPuzzles = httpsCallable(functions, "fetchPuzzles");
@@ -217,12 +220,14 @@ const getPixteryURL = async (str: string): Promise<string> => {
 };
 
 const uploadBlob = async (fileName: string, blob: Blob): Promise<void> => {
-  await uploadBytes(ref(storage, fileName), blob);
+  try {
+    await uploadBytes(ref(storage, fileName), blob);
+  } catch (e) {
+    console.log(e);
+  }
 };
 
 export {
-  app,
-  db,
   auth,
   phoneProvider,
   firebaseConfig,
