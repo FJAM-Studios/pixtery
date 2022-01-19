@@ -1,5 +1,5 @@
 import Constants from "expo-constants";
-import { initializeApp } from "firebase/app";
+import { FirebaseError, initializeApp } from "firebase/app";
 import {
   PhoneAuthProvider,
   getAuth,
@@ -36,14 +36,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 const functions = getFunctions(app);
-
-// couldn't find FB Error typescript? this is workaround for try/catch
-interface FBError {
-  code: string;
-}
-function isFBError(value: unknown): value is FBError {
-  return !!value && !!(value as FBError).code;
-}
 
 // uncomment if not using block below for func emu testing
 // import { MY_LAN_IP } from "./ip";
@@ -127,7 +119,7 @@ const signInOnFireBase = async (
       return currentUser;
     } catch (error) {
       // throwing error so the Register component has an error message to display to the user.
-      if (isFBError(error)) {
+      if (error instanceof FirebaseError) {
         if (error.code === "auth/wrong-password")
           throw new Error("Incorrect password.");
         else if (error.code === "auth/user-not-found")
@@ -157,7 +149,7 @@ const signUpEmail = async (
     throw new Error("Something went wrong");
   } catch (error) {
     // throwing error so the Register component has an error message to display to the user.
-    if (isFBError(error)) {
+    if (error instanceof FirebaseError) {
       if (error.code === "auth/wrong-password")
         throw new Error("Incorrect password.");
       else if (error.code === "auth/user-not-found")
