@@ -1,11 +1,25 @@
-/* eslint-disable no-case-declarations */
 import Constants from "expo-constants";
-import firebase from "firebase";
+import { initializeApp } from "firebase/app";
+import {
+  PhoneAuthProvider,
+  getAuth,
+  signOut as signOutFB,
+  signInAnonymously,
+  User,
+  AuthCredential,
+  EmailAuthProvider,
+  signInWithCredential,
+  createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
+} from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
+import {
+  getFunctions,
+  connectFunctionsEmulator,
+  httpsCallable,
+} from "firebase/functions";
+import { getStorage, ref, getDownloadURL, uploadBytes } from "firebase/storage";
 
-import "firebase/auth";
-import "firebase/functions";
-import "firebase/firestore";
-import "firebase/storage"; // for jest testing purposes
 import { SignInOptions } from "./types";
 
 const firebaseConfig = {
@@ -17,20 +31,11 @@ const firebaseConfig = {
   messagingSenderId: "503392467903",
   appId: "1:503392467903:web:6283d87be13230e6caff0a",
   measurementId: "G-5XDDLZ009P",
-  //doesn't seem to be used, can't find in FB console, but FB config interface wants it. May be obsolete?
-  trackingId: "",
 };
 
-const initializeApp = (): firebase.app.App => {
-  if (firebase.apps && firebase.apps.length > 0) {
-    return firebase.apps[0];
-  } else return firebase.initializeApp(firebaseConfig);
-};
+const app = initializeApp(firebaseConfig);
 
-const app = initializeApp();
-const db = app.firestore();
-
-const functions = app.functions();
+const functions = getFunctions();
 
 // couldn't find FB Error typescript? this is workaround for try/catch
 interface FBError {
@@ -50,22 +55,27 @@ if (
   Constants.manifest.extra.functionEmulator &&
   Constants.manifest.debuggerHost
 ) {
-  console.log("using function emulator");
-  const MY_LAN_IP = "http://" + Constants.manifest.debuggerHost.split(":")[0];
-  functions.useFunctionsEmulator(`${MY_LAN_IP}:5001`);
+  const host = `${Constants.manifest.debuggerHost.split(":")[0]}`;
+  const port = 5001;
+  console.log(
+    "\x1b[34m%s\x1b[0m",
+    `using functions emulator on ${host}:${port}`
+  );
+  connectFunctionsEmulator(functions, host, port);
 }
 
-const storage = app.storage();
-const phoneProvider = new firebase.auth.PhoneAuthProvider();
+// const storage = app.storage();
+const auth = getAuth();
+const phoneProvider = new PhoneAuthProvider(auth);
 
 const signOut = (): Promise<void> => {
-  return firebase.auth().signOut();
+  return signOutFB(auth);
 };
 
 const anonSignIn = async (): Promise<void> => {
   try {
     // Anonymous sign in. This should only fire the first time someone uses the app.
-    if (!firebase.auth().currentUser) await firebase.auth().signInAnonymously();
+    if (auth.currentUser) await signInAnonymously(auth);
   } catch (error) {
     console.log(error);
   }
@@ -73,7 +83,7 @@ const anonSignIn = async (): Promise<void> => {
 
 const migratePuzzles = async (prevUserId: string): Promise<void> => {
   console.log("MIGRATE PUZZLES");
-  const _migratePuzzles = functions.httpsCallable("migratePuzzles");
+  const _migratePuzzles = httpsCallable(functions, "migratePuzzles");
   _migratePuzzles(prevUserId);
 };
 
@@ -81,38 +91,35 @@ const signInOnFireBase = async (
   providerType: SignInOptions,
   id: string,
   verificationCode: string
-): Promise<firebase.User | void> => {
-  let newCredential: firebase.auth.AuthCredential | null = null;
+): Promise<User | void> => {
+  let newCredential: AuthCredential | null = null;
 
   if (providerType === SignInOptions.PHONE) {
-    const authProvider = firebase.auth.PhoneAuthProvider;
+    const authProvider = PhoneAuthProvider;
     newCredential = await authProvider.credential(id, verificationCode);
   }
 
   if (providerType === SignInOptions.EMAIL) {
-    const authProvider = firebase.auth.EmailAuthProvider;
+    const authProvider = EmailAuthProvider;
     newCredential = await authProvider.credential(id, verificationCode);
   }
 
   if (newCredential) {
     try {
       // Get user credential using auth provider
-      const prevUser = firebase.auth().currentUser;
+      const prevUser = auth.currentUser;
       ////the below comes from https://firebase.google.com/docs/auth/web/account-linking
       let currentUser;
       // Sign in user with the account you want to link to
-      await firebase
-        .auth()
-        .signInWithCredential(newCredential)
-        .then((result) => {
-          currentUser = result.user;
+      await signInWithCredential(auth, newCredential).then((result) => {
+        currentUser = result.user;
 
-          // Merge prevUser and currentUser data stored in Firebase.
-          // Note: How you handle this is specific to your application
-          if (currentUser && prevUser && prevUser.uid !== currentUser.uid)
-            migratePuzzles(prevUser.uid);
-          // return currentUser;
-        });
+        // Merge prevUser and currentUser data stored in Firebase.
+        // Note: How you handle this is specific to your application
+        if (currentUser && prevUser && prevUser.uid !== currentUser.uid)
+          migratePuzzles(prevUser.uid);
+        // return currentUser;
+      });
       return currentUser;
     } catch (error) {
       // throwing error so the Register component has an error message to display to the user.
@@ -131,11 +138,11 @@ const signInOnFireBase = async (
 const signUpEmail = async (
   email: string,
   password: string
-): Promise<firebase.User | void> => {
+): Promise<User | void> => {
   try {
-    const auth = firebase.auth();
     const prevUid = auth.currentUser?.uid;
-    const newCredential = await auth.createUserWithEmailAndPassword(
+    const newCredential = await createUserWithEmailAndPassword(
+      auth,
       email,
       password
     );
@@ -160,10 +167,10 @@ const signUpEmail = async (
 const checkAdminStatus = async (): Promise<boolean> => {
   try {
     // get whether or not pixtery admin
-    const checkGalleryAdmin = functions.httpsCallable("checkGalleryAdmin");
+    const checkGalleryAdmin = httpsCallable(functions, "checkGalleryAdmin");
     const res = await checkGalleryAdmin();
     const isGalleryAdmin = res.data;
-    return isGalleryAdmin;
+    return isGalleryAdmin as boolean;
   } catch (e) {
     console.log("could not verify admin status");
     return false;
@@ -172,8 +179,7 @@ const checkAdminStatus = async (): Promise<boolean> => {
 
 const sendResetEmail = async (email: string): Promise<void> => {
   try {
-    const auth = firebase.auth();
-    await auth.sendPasswordResetEmail(email);
+    await sendPasswordResetEmail(auth, email);
   } catch (e) {
     console.log(e);
     throw new Error(
@@ -182,17 +188,63 @@ const sendResetEmail = async (email: string): Promise<void> => {
   }
 };
 
+const db = getFirestore();
+const storage = getStorage();
+
+const addToQueue = httpsCallable(functions, "addToQueue");
+const fetchPuzzles = httpsCallable(functions, "fetchPuzzles");
+const deactivateUserPuzzle = httpsCallable(functions, "deactivateUserPuzzle");
+const deactivateAllUserPuzzles = httpsCallable(
+  functions,
+  "deactivateAllUserPuzzles"
+);
+const queryPuzzleCallable = httpsCallable(functions, "queryPuzzle");
+const uploadPuzzleSettingsCallable = httpsCallable(
+  functions,
+  "uploadPuzzleSettings"
+);
+const getGalleryQueue = httpsCallable(functions, "getGalleryQueue");
+const addToGallery = httpsCallable(functions, "addToGallery");
+const removeDailyPuzzle = httpsCallable(functions, "removeDailyPuzzle");
+const deactivateInQueue = httpsCallable(functions, "deactivateInQueue");
+const getDailyDates = httpsCallable(functions, "getDailyDates");
+const submitFeedbackCallable = httpsCallable(functions, "submitFeedback");
+const getDaily = httpsCallable(functions, "getDaily");
+
+const getPixteryURL = async (str: string): Promise<string> => {
+  const url = await getDownloadURL(ref(storage, str));
+  return url;
+};
+
+const uploadBlob = async (fileName: string, blob: Blob): Promise<void> => {
+  await uploadBytes(ref(storage, fileName), blob);
+};
+
 export {
   app,
   db,
-  storage,
+  auth,
   phoneProvider,
   firebaseConfig,
-  functions,
+  addToQueue,
+  fetchPuzzles,
+  deactivateUserPuzzle,
+  deactivateAllUserPuzzles,
+  queryPuzzleCallable,
+  uploadPuzzleSettingsCallable,
+  uploadBlob,
+  getGalleryQueue,
+  addToGallery,
+  removeDailyPuzzle,
+  deactivateInQueue,
+  getDailyDates,
+  submitFeedbackCallable,
+  getDaily,
   signOut,
   anonSignIn,
   signInOnFireBase,
   checkAdminStatus,
   signUpEmail,
   sendResetEmail,
+  getPixteryURL,
 };

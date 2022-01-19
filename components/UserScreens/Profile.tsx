@@ -1,5 +1,4 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import firebase from "firebase";
 import React, { useState } from "react";
 import { View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -13,7 +12,7 @@ import {
 } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 
-import { signOut } from "../../FirebaseApp";
+import { auth, signOut } from "../../FirebaseApp";
 import { setProfile } from "../../store/reducers/profile";
 import { setReceivedPuzzles } from "../../store/reducers/receivedPuzzles";
 import { setSentPuzzles } from "../../store/reducers/sentPuzzles";
@@ -169,7 +168,7 @@ export default function Profile({
         {errors.length ? <Text>{errors}</Text> : null}
         {/*we can't let people sign out if they're logged in anonymously.
         otherwise they'll lose their puzzles forever */}
-        {!firebase.auth().currentUser?.isAnonymous ? (
+        {!auth.currentUser?.isAnonymous ? (
           <Button
             icon="logout"
             mode="contained"

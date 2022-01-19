@@ -2,7 +2,7 @@ import {
   NavigationContainer,
   NavigationContainerRef,
 } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Constants from "expo-constants";
 import * as Linking from "expo-linking";
 import * as Notifications from "expo-notifications";
@@ -57,7 +57,7 @@ import { goToScreen } from "./util";
 //less than ideal, but idk if we have a choice right now. suppresses the firebase timeout warning
 LogBox.ignoreLogs(["Setting a timer for a long period of time"]);
 
-const Stack = createStackNavigator<StackScreens>();
+const Stack = createNativeStackNavigator<StackScreens>();
 
 SplashScreen.preventAutoHideAsync().catch();
 
@@ -71,7 +71,9 @@ Notifications.setNotificationHandler({
 
 const App = (): JSX.Element => {
   const dispatch = useDispatch();
-  const navigationRef = useRef<NavigationContainerRef | null>(null);
+  const navigationRef = useRef<NavigationContainerRef<StackScreens> | null>(
+    null
+  );
   const theme = useSelector((state: RootState) => state.theme);
 
   const promptRestart = () => {
@@ -193,7 +195,7 @@ const App = (): JSX.Element => {
         <NavigationContainer ref={navigationRef} onReady={gotoSplash}>
           <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
             <StatusBar style={theme.dark ? "light" : "dark"} />
-            <Stack.Navigator initialRouteName="TitleScreen" headerMode="none">
+            <Stack.Navigator initialRouteName="TitleScreen">
               <Stack.Screen name="TitleScreen" component={TitleScreen} />
               <Stack.Screen name="Splash">
                 {(props) => <Splash {...props} />}
