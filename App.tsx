@@ -20,8 +20,13 @@ import {
   Platform,
 } from "react-native";
 import { Provider as PaperProvider } from "react-native-paper";
+import { RootSiblingParent } from "react-native-root-siblings";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { useDispatch, useSelector } from "react-redux";
+import {
+  Provider as StoreProvider,
+  useDispatch,
+  useSelector,
+} from "react-redux";
 
 import {
   AddToGallery,
@@ -44,6 +49,7 @@ import {
   Tutorial,
 } from "./components/UserScreens";
 import { MIN_BOTTOM_CLEARANCE } from "./constants";
+import store from "./store";
 import { setNotificationToken } from "./store/reducers/notificationToken";
 import { setDeviceSize } from "./store/reducers/screenHeight";
 import { StackScreens, RootState } from "./types";
@@ -248,4 +254,14 @@ const App = (): JSX.Element => {
   );
 };
 
-export default App;
+const AppWrapper = (): JSX.Element => {
+  return (
+    <StoreProvider store={store}>
+      <RootSiblingParent>
+        <App />
+      </RootSiblingParent>
+    </StoreProvider>
+  );
+};
+
+export default AppWrapper;
