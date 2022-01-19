@@ -28,7 +28,7 @@ export default function ForgotScreen({
       <Headline style={{ textAlign: "center" }}>Forgot Password</Headline>
       <Subheading>Enter Email</Subheading>
       <TextInput
-        autoCompleteType="email"
+        autoComplete="email"
         keyboardType="email-address"
         textContentType="emailAddress"
         placeholder="Email Address"
