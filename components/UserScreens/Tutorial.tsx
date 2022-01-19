@@ -13,8 +13,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { setTutorialFinished } from "../../store/reducers/tutorialFinished";
 import { ScreenNavigation, RootState } from "../../types";
-import AdSafeAreaView from "../Layout/AdSafeAreaView";
-import Header from "../Layout/Header";
+import { AdSafeAreaView, Header } from "../Layout";
 
 const emptyImage = require("../../assets/blank.jpg");
 
