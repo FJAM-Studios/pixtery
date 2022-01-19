@@ -77,7 +77,7 @@ export default function Phone({
       />
       <Subheading>Phone Number</Subheading>
       <TextInput
-        autoCompleteType="tel"
+        autoComplete="tel"
         keyboardType="phone-pad"
         textContentType="telephoneNumber"
         placeholder="+1 999 999 9999"

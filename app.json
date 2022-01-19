@@ -5,7 +5,7 @@
     "description": "A fun app that lets you turn your own pictures into jigsaw puzzles and share them with friends!",
     "slug": "pixtery",
     "privacy": "unlisted",
-    "sdkVersion": "41.0.0",
+    "sdkVersion": "44.0.0",
     "version": "1.2.0",
     "platforms": ["android", "ios"],
     "orientation": "portrait",

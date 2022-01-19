@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { storage, functions } from "../FirebaseApp";
+import { getPixteryURL, queryPuzzleCallable } from "../FirebaseApp";
 import { PUBLIC_KEY_LENGTH } from "../constants";
 import { Puzzle as PuzzleType } from "../types";
 import Puzzle from "./Puzzle";
@@ -17,12 +17,12 @@ export default function App(): JSX.Element {
   }, []);
 
   const fetchPuzzle = async (publicKey: string): Promise<PuzzleType | void> => {
-    const queryPuzzleCallable = functions.httpsCallable("queryPuzzle");
     if (publicKey.length === PUBLIC_KEY_LENGTH) {
       try {
-        const puzzleData = (await queryPuzzleCallable({ publicKey })).data;
+        const puzzleData = (await queryPuzzleCallable({ publicKey }))
+          .data as Puzzle;
         const imageURI = puzzleData.imageURI;
-        const downloadURL = await storage.ref("/" + imageURI).getDownloadURL();
+        const downloadURL = await getPixteryURL("/" + imageURI);
         puzzleData.imageURI = downloadURL;
         setPuzzle(puzzleData);
       } catch (error) {
