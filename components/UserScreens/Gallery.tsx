@@ -1,5 +1,4 @@
 import { AdMobInterstitial } from "expo-ads-admob";
-import firebase from "firebase";
 import moment from "moment-timezone";
 import React, { useState, useEffect } from "react";
 import { View, TouchableOpacity } from "react-native";
@@ -7,7 +6,7 @@ import { ActivityIndicator, Button, Headline, Text } from "react-native-paper";
 import Toast from "react-native-root-toast";
 import { useSelector } from "react-redux";
 
-import { functions } from "../../FirebaseApp";
+import { auth, getDaily } from "../../FirebaseApp";
 import { INTERSTITIAL_ID, DAILY_TIMEZONE } from "../../constants";
 import { RootState, ScreenNavigation } from "../../types";
 import { Timer } from "../InteractiveElements";
@@ -30,10 +29,7 @@ export default function Gallery({
   const [error, setError] = useState<null | string>(null);
 
   const suggestPixtery = () => {
-    if (
-      firebase.auth().currentUser &&
-      !firebase.auth().currentUser?.isAnonymous
-    ) {
+    if (auth.currentUser && !auth.currentUser?.isAnonymous) {
       navigation.navigate("AddToGallery");
     } else {
       Toast.show(
@@ -58,11 +54,9 @@ export default function Gallery({
 
   const loadDaily = async () => {
     setLoading(true);
-    const getDaily = functions.httpsCallable("getDaily");
     try {
       // cloud function will tell you today's Daily instead of client
-      const res = await getDaily();
-      const daily = res.data;
+      const daily = (await getDaily()).data as Puzzle;
       if (daily && daily.publicKey) {
         const { publicKey } = daily;
         AdMobInterstitial.addEventListener("interstitialDidClose", () => {

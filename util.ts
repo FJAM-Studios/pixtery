@@ -11,8 +11,19 @@ import * as SplashScreen from "expo-splash-screen";
 import { Alert, Share } from "react-native";
 import Toast from "react-native-root-toast";
 
-import { storage, functions } from "./FirebaseApp";
-import { Puzzle, ScreenNavigation, DateObjString, Profile } from "./types";
+import {
+  deactivateAllUserPuzzles,
+  deactivateUserPuzzle,
+  fetchPuzzles,
+  getPixteryURL,
+} from "./FirebaseApp";
+import {
+  Puzzle,
+  ScreenNavigation,
+  DateObjString,
+  Profile,
+  StackScreens,
+} from "./types";
 
 //convert URI into a blob to transmit to server
 export const createBlob = (localUri: string): Promise<Blob> => {
@@ -58,7 +69,7 @@ export const shareMessage = async (pixUrl: string): Promise<void> => {
 };
 
 export const goToScreen = (
-  navigation: ScreenNavigation | NavigationContainerRef,
+  navigation: ScreenNavigation | NavigationContainerRef<StackScreens>,
   screen: string,
   options: { url?: string | null; publicKey?: string; sourceList?: string } = {
     url: "",
@@ -75,7 +86,7 @@ export const goToScreen = (
 };
 
 export const closeSplashAndNavigate = async (
-  navigation: ScreenNavigation | NavigationContainerRef,
+  navigation: ScreenNavigation | NavigationContainerRef<StackScreens>,
   screen: string,
   options: { url?: string | null; publicKey?: string; sourceList?: string } = {
     url: "",
@@ -231,7 +242,7 @@ export const downloadImage = async (
     const { imageURI } = newPuzzle;
     // for now, giving image a filename based on URL from server, can change later if needed
     const fileName = imageURI.slice(imageURI.lastIndexOf("/") + 1);
-    const downloadURL = await storage.ref("/" + imageURI).getDownloadURL();
+    const downloadURL = await getPixteryURL("/" + imageURI);
     //put jpg in upload instead of here
     //but user could still download old pixtery (with no uploaded extension), so addl logic needed
     const extension = imageURI.slice(-4) === ".jpg" ? "" : ".jpg";
@@ -284,9 +295,8 @@ const fetchAllPuzzleData = async (): Promise<Puzzle[][]> => {
 };
 
 const fetchCollection = async (listType: string): Promise<Puzzle[]> => {
-  const fetchPuzzles = functions.httpsCallable("fetchPuzzles");
   const puzzles = await fetchPuzzles(listType);
-  return puzzles.data;
+  return puzzles.data as Puzzle[];
 };
 
 const mergePuzzles = async (
@@ -372,9 +382,6 @@ export const deactivatePuzzleOnServer = async (
   list: string
 ): Promise<void> => {
   try {
-    const deactivateUserPuzzle = functions.httpsCallable(
-      "deactivateUserPuzzle"
-    );
     await deactivateUserPuzzle({ publicKey, list });
   } catch (error) {
     console.log(error);
@@ -385,9 +392,6 @@ export const deactivateAllPuzzlesOnServer = async (
   list: string
 ): Promise<void> => {
   try {
-    const deactivateAllUserPuzzles = functions.httpsCallable(
-      "deactivateAllUserPuzzles"
-    );
     await deactivateAllUserPuzzles(list);
   } catch (error) {
     console.log(error);
