@@ -35,9 +35,19 @@ export default function Splash({
   const profile = useSelector((state: RootState) => state.profile);
 
   useEffect(() => {
-    const getInitialUrl = async () => {
-      const url = await Linking.getInitialURL();
-      return url;
+    const getInitialUrl = async (): Promise<string | null> => {
+      // https://github.com/facebook/react-native/issues/26947
+      // linking is sometimes broken on android, so this lets it go for 2 seconds
+      // stupid af
+      return new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => {
+          resolve(null);
+        }, 2000);
+        Linking.getInitialURL()
+          .then((url) => resolve(url))
+          .catch((err) => reject(err))
+          .finally(() => clearTimeout(timeout));
+      });
     };
 
     const loadProfile = async () => {

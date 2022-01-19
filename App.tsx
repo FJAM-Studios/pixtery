@@ -19,6 +19,7 @@ import {
   Dimensions,
   Platform,
 } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Provider as PaperProvider } from "react-native-paper";
 import { RootSiblingParent } from "react-native-root-siblings";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -195,7 +196,10 @@ const App = (): JSX.Element => {
         <NavigationContainer ref={navigationRef} onReady={gotoSplash}>
           <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
             <StatusBar style={theme.dark ? "light" : "dark"} />
-            <Stack.Navigator initialRouteName="TitleScreen">
+            <Stack.Navigator
+              initialRouteName="TitleScreen"
+              screenOptions={{ headerShown: false }}
+            >
               <Stack.Screen name="TitleScreen" component={TitleScreen} />
               <Stack.Screen name="Splash">
                 {(props) => <Splash {...props} />}
@@ -258,11 +262,13 @@ const App = (): JSX.Element => {
 
 const AppWrapper = (): JSX.Element => {
   return (
-    <StoreProvider store={store}>
-      <RootSiblingParent>
-        <App />
-      </RootSiblingParent>
-    </StoreProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <StoreProvider store={store}>
+        <RootSiblingParent>
+          <App />
+        </RootSiblingParent>
+      </StoreProvider>
+    </GestureHandlerRootView>
   );
 };
 
