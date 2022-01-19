@@ -26,8 +26,7 @@ import shortid from "shortid";
 
 import { functions } from "../../FirebaseApp";
 import { ScreenNavigation, RootState } from "../../types";
-import AdSafeAreaView from "../Layout/AdSafeAreaView";
-import Header from "../Layout/Header";
+import { AdSafeAreaView, Header } from "../Layout";
 
 export default function AddToGallery({
   navigation,
