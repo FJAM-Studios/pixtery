@@ -1,7 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React from "react";
-import { ScrollView, View } from "react-native";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import { ScrollView, View, TouchableOpacity } from "react-native";
 import { Headline, Text } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 

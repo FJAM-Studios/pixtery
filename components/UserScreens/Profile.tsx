@@ -168,7 +168,7 @@ export default function Profile({
         {errors.length ? <Text>{errors}</Text> : null}
         {/*we can't let people sign out if they're logged in anonymously.
         otherwise they'll lose their puzzles forever */}
-        {!auth.currentUser?.isAnonymous ? (
+        {auth.currentUser && !auth.currentUser.isAnonymous ? (
           <Button
             icon="logout"
             mode="contained"
