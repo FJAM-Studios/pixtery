@@ -23,7 +23,7 @@ export default function Email({
     password: string,
     confirmPassword: string | null,
     setErrors: (errors: string) => void,
-    isRegister?: string | null
+    isRegister?: boolean | null
   ) => {
     try {
       if (isEmail(email)) throw new Error("Valid email required");
