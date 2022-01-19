@@ -31,7 +31,7 @@ export default function RegisterScreen({
       <Headline style={{ textAlign: "center" }}>Create Account</Headline>
       <Subheading>Enter Email and Password</Subheading>
       <TextInput
-        autoCompleteType="email"
+        autoComplete="email"
         keyboardType="email-address"
         textContentType="emailAddress"
         placeholder="Email Address"
