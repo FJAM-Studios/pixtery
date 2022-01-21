@@ -71,7 +71,7 @@ export default function Home({
   const [imageURI, setImageURI] = React.useState("");
   const [puzzleType, setPuzzleType] = React.useState("jigsaw");
   const [gridSize, setGridSize] = React.useState(3);
-  const [message, setMessage] = React.useState(""); 
+  const [message, setMessage] = React.useState("");
   const [modalVisible, setModalVisible] = React.useState(false);
 
   const [paths, setPaths] = React.useState(
