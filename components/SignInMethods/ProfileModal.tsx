@@ -2,14 +2,14 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useState } from "react";
 import { View } from "react-native";
 import Modal from "react-native-modal";
-import { Button } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 
 import { checkAdminStatus } from "../../FirebaseApp";
 import { setProfile } from "../../store/reducers/profile";
 import { RootState, SignInOptions } from "../../types";
-import Email from "./Email";
-import Phone from "./Phone";
+import Email from "./Email/Email";
+import Phone from "./Phone/Phone";
+import SignInMenu from "./SignInMenu";
 
 export default function ProfileModal({
   isVisible,
@@ -58,26 +58,7 @@ export default function ProfileModal({
           padding: 20,
         }}
       >
-        {signInType === null ? (
-          <>
-            <Button
-              icon="email"
-              mode="contained"
-              onPress={() => setSignInType(SignInOptions.EMAIL)}
-              style={{ margin: 10 }}
-            >
-              Sign In / Register By Email
-            </Button>
-            <Button
-              icon="phone"
-              mode="contained"
-              onPress={() => setSignInType(SignInOptions.PHONE)}
-              style={{ margin: 10 }}
-            >
-              Sign In / Register By Phone
-            </Button>
-          </>
-        ) : null}
+        {signInType === null ? <SignInMenu onPress={setSignInType} /> : null}
         {signInType === SignInOptions.EMAIL ? (
           <Email onFinish={onFinish} />
         ) : null}
