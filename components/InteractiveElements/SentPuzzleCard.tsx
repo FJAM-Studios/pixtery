@@ -1,11 +1,12 @@
+import dayjs from "dayjs";
 import * as FileSystem from "expo-file-system";
 import * as Linking from "expo-linking";
-import moment from "moment";
 import * as React from "react";
 import { ImageBackground, View, TouchableOpacity } from "react-native";
 import { Card, IconButton } from "react-native-paper";
 import { useSelector } from "react-redux";
 
+import { DATE_FORMAT } from "../../constants";
 import { Puzzle, ScreenNavigation, RootState } from "../../types";
 import { saveToLibrary, shareMessage } from "../../util";
 
@@ -44,7 +45,7 @@ export default function SentPuzzleCard({
       >
         <Card.Title
           title={puzzle.message || ""}
-          subtitle={moment(puzzle.dateReceived).calendar()}
+          subtitle={dayjs(puzzle.dateReceived).format(DATE_FORMAT)}
           right={() => (
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               <IconButton

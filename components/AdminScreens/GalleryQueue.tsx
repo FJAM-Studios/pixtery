@@ -1,4 +1,4 @@
-import moment from "moment";
+import dayjs from "dayjs";
 import React, { useState, useEffect } from "react";
 import { View, ScrollView, TouchableOpacity } from "react-native";
 import {
@@ -12,6 +12,7 @@ import {
 import { useSelector } from "react-redux";
 
 import { functions } from "../../FirebaseApp";
+import { DATE_FORMAT } from "../../constants";
 import {
   ScreenNavigation,
   RootState,
@@ -137,7 +138,7 @@ export default function GalleryQueue({
                   subtitle={
                     puzzle.senderName +
                     " - " +
-                    moment(puzzle.dateReceived).calendar()
+                    dayjs(puzzle.dateReceived).format(DATE_FORMAT)
                   }
                   right={() => (
                     <View
