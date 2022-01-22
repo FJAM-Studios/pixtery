@@ -1,5 +1,5 @@
+import dayjs from "dayjs";
 import * as FileSystem from "expo-file-system";
-import moment from "moment";
 import * as React from "react";
 import { useState } from "react";
 import {
@@ -25,6 +25,7 @@ import { useSelector } from "react-redux";
 import shortid from "shortid";
 
 import { functions } from "../../FirebaseApp";
+import { DATE_FORMAT } from "../../constants";
 import { ScreenNavigation, RootState } from "../../types";
 import { AdSafeAreaView, Header } from "../Layout";
 
@@ -217,7 +218,9 @@ export default function AddToGallery({
                   >
                     <Card.Title
                       title={sentPuzzle.message || ""}
-                      subtitle={moment(sentPuzzle.dateReceived).calendar()}
+                      subtitle={dayjs(sentPuzzle.dateReceived).format(
+                        DATE_FORMAT
+                      )}
                       right={() => (
                         <View
                           style={{ flexDirection: "row", alignItems: "center" }}

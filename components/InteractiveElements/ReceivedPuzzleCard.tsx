@@ -1,9 +1,10 @@
-import moment from "moment";
+import dayjs from "dayjs";
 import * as React from "react";
 import { View, TouchableOpacity } from "react-native";
 import { Text, Card, IconButton } from "react-native-paper";
 import { useSelector } from "react-redux";
 
+import { DATE_FORMAT } from "../../constants";
 import { Puzzle, ScreenNavigation, RootState } from "../../types";
 import { saveToLibrary } from "../../util";
 
@@ -41,7 +42,7 @@ export default function ReceivedPuzzleCard({
               ? puzzle.senderName + " - " + puzzle.message
               : puzzle.senderName
           }
-          subtitle={moment(puzzle.dateReceived).calendar()}
+          subtitle={dayjs(puzzle.dateReceived).format(DATE_FORMAT)}
           right={() => (
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               <Text>{puzzle.gridSize}</Text>

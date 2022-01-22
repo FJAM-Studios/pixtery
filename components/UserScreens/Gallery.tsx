@@ -3,7 +3,6 @@ import timezone from "dayjs/plugin/timezone"; // dependent on utc plugin
 import utc from "dayjs/plugin/utc";
 import { AdMobInterstitial } from "expo-ads-admob";
 import firebase from "firebase";
-// import moment from "moment-timezone";
 import React, { useState, useEffect } from "react";
 import { View, TouchableOpacity } from "react-native";
 import { ActivityIndicator, Button, Headline, Text } from "react-native-paper";
@@ -192,7 +191,7 @@ export default function Gallery({
             mode="contained"
             onPress={suggestPixtery}
             style={{
-              margin: 20,
+              margin: 10,
               width: width * 0.8,
               paddingTop: height * 0.01,
               paddingBottom: height * 0.01,
