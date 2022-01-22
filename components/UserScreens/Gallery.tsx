@@ -62,7 +62,6 @@ export default function Gallery({
   const [time, setTime] = useState<null | number>(getCountdown());
 
   const loadDaily = async () => {
-    console.log('here')
     setLoading(true);
     const getDaily = functions.httpsCallable("getDaily");
     try {
