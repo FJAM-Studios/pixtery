@@ -185,6 +185,7 @@ export const getDaily = functions.https.onCall(
     context
   ): Promise<void | null | FirebaseFirestore.DocumentData> => {
     try {
+      console.log('context', context)
       // throw error if user is not authenticated
       if (!context.auth) {
         throw new functions.https.HttpsError(
