@@ -203,7 +203,6 @@ export const getDaily = functions.https.onCall(
       const now = dayjs().tz(DAILY_TIMEZONE);
 
       const [year, month, day] = getESTDate(now);
-      // console.log(year, month, day)
       const daily = await getDailyForDate(year, month, day);
 
       if (daily.exists) return daily.data();
