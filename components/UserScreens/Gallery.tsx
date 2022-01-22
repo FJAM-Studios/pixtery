@@ -1,6 +1,9 @@
+import dayjs from "dayjs";
+import timezone from "dayjs/plugin/timezone"; // dependent on utc plugin
+import utc from "dayjs/plugin/utc";
 import { AdMobInterstitial } from "expo-ads-admob";
 import firebase from "firebase";
-import moment from "moment-timezone";
+// import moment from "moment-timezone";
 import React, { useState, useEffect } from "react";
 import { View, TouchableOpacity } from "react-native";
 import { ActivityIndicator, Button, Headline, Text } from "react-native-paper";
@@ -19,6 +22,8 @@ export default function Gallery({
 }: {
   navigation: ScreenNavigation;
 }): JSX.Element {
+  dayjs.extend(utc);
+  dayjs.extend(timezone);
   const theme = useSelector((state: RootState) => state.theme);
   const receivedPuzzles = useSelector(
     (state: RootState) => state.receivedPuzzles
@@ -47,7 +52,7 @@ export default function Gallery({
   };
 
   const getCountdown = (): number => {
-    const now = moment().tz(DAILY_TIMEZONE);
+    const now = dayjs().tz(DAILY_TIMEZONE);
     const tomorrow = now.clone().add(1, "day").startOf("day");
     const time = tomorrow.diff(now, "milliseconds");
     if (time <= 1000) setError(null);
@@ -57,6 +62,7 @@ export default function Gallery({
   const [time, setTime] = useState<null | number>(getCountdown());
 
   const loadDaily = async () => {
+    console.log('here')
     setLoading(true);
     const getDaily = functions.httpsCallable("getDaily");
     try {
