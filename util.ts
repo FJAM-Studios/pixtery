@@ -3,6 +3,8 @@ import {
   CommonActions,
   NavigationContainerRef,
 } from "@react-navigation/native";
+import dayjs from "dayjs";
+import calendar from "dayjs/plugin/calendar";
 import * as FileSystem from "expo-file-system";
 import * as ImagePicker from "expo-image-picker";
 import * as Linking from "expo-linking";
@@ -17,6 +19,7 @@ import {
   fetchPuzzles,
   getPixteryURL,
 } from "./FirebaseApp";
+import { DATE_FORMAT } from "./constants";
 import {
   Puzzle,
   ScreenNavigation,
@@ -24,6 +27,8 @@ import {
   Profile,
   StackScreens,
 } from "./types";
+
+dayjs.extend(calendar);
 
 //convert URI into a blob to transmit to server
 export const createBlob = (localUri: string): Promise<Blob> => {
@@ -464,4 +469,24 @@ export const isProfile = (profile: unknown): profile is Profile => {
     profile !== null &&
     (profile as Profile).name !== undefined
   );
+};
+
+export const formatDateFromString = (date: string): string => {
+  return dayjs(date).calendar(null, dateFormatOptions);
+};
+
+export const formatDateFromTimestamp = (date: {
+  _nanoseconds?: number;
+  _seconds: number;
+}): string => {
+  return dayjs.unix(date._seconds).calendar(null, dateFormatOptions);
+};
+
+const dateFormatOptions = {
+  sameDay: "[Today at] h:mm A", // The same day ( Today at 2:30 AM )
+  nextDay: "[Tomorrow at] h:mm A", // The next day ( Tomorrow at 2:30 AM )
+  nextWeek: "dddd [at] h:mm A", // The next week ( Sunday at 2:30 AM )
+  lastDay: "[Yesterday at] h:mm A", // The day before ( Yesterday at 2:30 AM )
+  lastWeek: "[Last] dddd [at] h:mm A", // Last week ( Last Monday at 2:30 AM )
+  sameElse: DATE_FORMAT, // Everything else ( Jan 23 2022 )
 };
