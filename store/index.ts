@@ -12,13 +12,13 @@ import theme from "./reducers/theme";
 import tutorialFinished from "./reducers/tutorialFinished";
 
 const reducer = combineReducers({
-  notificationToken,
-  screenHeight,
-  receivedPuzzles,
-  sentPuzzles,
-  profile,
-  theme,
   adHeight,
+  profile,
+  notificationToken,
+  receivedPuzzles,
+  screenHeight,
+  sentPuzzles,
+  theme,
   tutorialFinished,
   sound,
 });
