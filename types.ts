@@ -118,7 +118,6 @@ export interface ScreenHeight {
 
 export interface RootState {
   adHeight: number;
-  message: string;
   profile: Profile;
   receivedPuzzles: Puzzle[];
   sentPuzzles: Puzzle[];
