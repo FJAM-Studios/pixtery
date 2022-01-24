@@ -44,9 +44,8 @@ import {
   goToScreen,
   checkPermission,
 } from "../../util";
-import { IosCamera } from "../InteractiveElements";
+import { IosCamera, MessageInput } from "../InteractiveElements";
 import { AdSafeAreaView, Header } from "../Layout";
-import MessageInput from "./MessageInput";
 
 const emptyImage = require("../../assets/blank.jpg");
 
@@ -67,7 +66,6 @@ export default function Home({
   );
   const sentPuzzles = useSelector((state: RootState) => state.sentPuzzles);
   const profile = useSelector((state: RootState) => state.profile);
-  // const message = useSelector((state: RootState) => state.message);
   const [imageURI, setImageURI] = React.useState("");
   const [puzzleType, setPuzzleType] = React.useState("jigsaw");
   const [gridSize, setGridSize] = React.useState(3);
@@ -483,14 +481,7 @@ export default function Home({
             </Button>
           </Surface>
         </View>
-        <MessageInput
-          style={{
-            height: height * 0.09,
-            margin: height * 0.01,
-          }}
-          message={message}
-          setMessage={setMessage}
-        />
+        <MessageInput message={message} setMessage={setMessage} />
         <Button
           icon="send"
           mode="contained"
