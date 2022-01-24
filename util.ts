@@ -479,7 +479,7 @@ export const formatDateFromString = (date: string): string => {
 };
 
 export const formatDateFromTimestamp = (date): string => {
-  console.log('date', date)
+  console.log("date", date);
   return dayjs.unix(date._seconds).calendar(null, {
     sameDay: "[Today at] h:mm A", // The same day ( Today at 2:30 AM )
     nextDay: "[Tomorrow at] h:mm A", // The next day ( Tomorrow at 2:30 AM )
