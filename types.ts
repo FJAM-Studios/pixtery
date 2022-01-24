@@ -37,6 +37,7 @@ export interface Puzzle {
   completed?: boolean;
   dailyDate?: string;
   notificationToken?: string;
+  dateQueued?: { _nanoseconds: number; _seconds: number };
 }
 
 export interface Profile {
