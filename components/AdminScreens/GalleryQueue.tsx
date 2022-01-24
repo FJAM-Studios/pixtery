@@ -12,7 +12,6 @@ import {
 import { useSelector } from "react-redux";
 
 import { functions } from "../../FirebaseApp";
-import { DATE_FORMAT } from "../../constants";
 import {
   ScreenNavigation,
   RootState,
@@ -20,6 +19,7 @@ import {
   GalleryQueueRoute,
   StatusOfDaily,
 } from "../../types";
+import { formatDateFromTimestamp } from "../../util";
 import { AdSafeAreaView, Header } from "../Layout";
 
 export default function GalleryQueue({
@@ -135,11 +135,13 @@ export default function GalleryQueue({
               <Card style={{ margin: 5 }}>
                 <Card.Title
                   title={puzzle.message || ""}
-                  subtitle={
-                    puzzle.senderName +
-                    " - " +
-                    dayjs(puzzle.dateReceived).format(DATE_FORMAT)
-                  }
+                  subtitle={`${puzzle.senderName} - ${
+                    puzzle.dateQueued
+                      ? formatDateFromTimestamp(
+                          new Date(puzzle.dateQueued.toDate())
+                        )
+                      : null
+                  }`}
                   right={() => (
                     <View
                       style={{ flexDirection: "row", alignItems: "center" }}
