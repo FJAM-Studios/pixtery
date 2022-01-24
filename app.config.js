@@ -1,5 +1,4 @@
 export default ({ config }) => {
-  console.log("Loading custom config...");
   return {
     ...config,
     extra: {
