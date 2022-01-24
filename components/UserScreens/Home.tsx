@@ -14,7 +14,6 @@ import {
   Text,
   Surface,
   Headline,
-  TextInput,
   ActivityIndicator,
   Modal,
   Portal,
@@ -44,7 +43,7 @@ import {
   goToScreen,
   checkPermission,
 } from "../../util";
-import { IosCamera } from "../InteractiveElements";
+import { IosCamera, MessageInput } from "../InteractiveElements";
 import { AdSafeAreaView, Header } from "../Layout";
 
 const emptyImage = require("../../assets/blank.jpg");
@@ -69,14 +68,13 @@ export default function Home({
   const [imageURI, setImageURI] = React.useState("");
   const [puzzleType, setPuzzleType] = React.useState("jigsaw");
   const [gridSize, setGridSize] = React.useState(3);
-  const [modalVisible, setModalVisible] = React.useState(false);
   const [message, setMessage] = React.useState("");
-  const messageLimit = 70;
+  const [modalVisible, setModalVisible] = React.useState(false);
+
   const [paths, setPaths] = React.useState(
     generateJigsawPiecePaths(gridSize, boardSize / (1.6 * gridSize), true)
   );
   const [buttonHeight, setButtonHeight] = React.useState(0);
-  const [textFocus, setTextFocus] = React.useState(false);
   const [iOSCameraLaunch, setiOSCameraLaunch] = React.useState(false);
 
   const selectImage = async (camera: boolean) => {
@@ -478,27 +476,7 @@ export default function Home({
             </Button>
           </Surface>
         </View>
-        <TextInput
-          placeholder="Message (optional, shows when solved)"
-          multiline
-          maxLength={messageLimit}
-          mode="outlined"
-          value={message}
-          onChangeText={(message) => setMessage(message)}
-          onFocus={() => setTextFocus(true)}
-          onBlur={() => setTextFocus(false)}
-          outlineColor={theme.colors.primary}
-          placeholderTextColor={theme.colors.primary}
-          style={{
-            minHeight: height * 0.09,
-            justifyContent: "center",
-          }}
-        />
-        {textFocus ? (
-          <Text style={{ textAlign: "right" }}>
-            {message.length}/{messageLimit} characters
-          </Text>
-        ) : null}
+        <MessageInput message={message} setMessage={setMessage} />
         <Button
           icon="send"
           mode="contained"
