@@ -137,9 +137,7 @@ export default function GalleryQueue({
                   title={puzzle.message || ""}
                   subtitle={`${puzzle.senderName} - ${
                     puzzle.dateQueued
-                      ? formatDateFromTimestamp(
-                          new Date(puzzle.dateQueued.toDate())
-                        )
+                      ? formatDateFromTimestamp(puzzle.dateQueued)
                       : null
                   }`}
                   right={() => (
