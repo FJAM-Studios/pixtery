@@ -226,7 +226,7 @@ const getDailyForDate = async (year: string, month: string, day: string) => {
     .get();
 };
 
-const getESTDate = (date: any): string[] => {
+const getESTDate = (date: dayjs.Dayjs): string[] => {
   const year = date.get("year").toString();
   // for month and day, return the two numbers from end of string (i.e. "09" or "10")
   const month = `0${date.get("month") + 1}`.slice(-2); // month is indexed to 0, so add 1
