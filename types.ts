@@ -1,3 +1,4 @@
+import { Timestamp } from "@google-cloud/firestore";
 import { RouteProp } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { Audio } from "expo-av";
@@ -37,6 +38,8 @@ export interface Puzzle {
   completed?: boolean;
   dailyDate?: string;
   notificationToken?: string;
+  dateQueued?: Timestamp;
+  // { _nanoseconds: bigint; _seconds: bigint };
 }
 
 export interface Profile {
