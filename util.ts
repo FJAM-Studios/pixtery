@@ -468,26 +468,21 @@ export const isProfile = (profile: unknown): profile is Profile => {
 };
 
 export const formatDateFromString = (date: string): string => {
-  return dayjs(date).calendar(null, {
-    sameDay: "[Today at] h:mm A", // The same day ( Today at 2:30 AM )
-    nextDay: "[Tomorrow at] h:mm A", // The next day ( Tomorrow at 2:30 AM )
-    nextWeek: "dddd [at] h:mm A", // The next week ( Sunday at 2:30 AM )
-    lastDay: "[Yesterday at] h:mm A", // The day before ( Yesterday at 2:30 AM )
-    lastWeek: "[Last] dddd [at] h:mm A", // Last week ( Last Monday at 2:30 AM )
-    sameElse: DATE_FORMAT, // Everything else ( Jan 23 2022 )
-  });
+  return dayjs(date).calendar(null, dateFormatOptions);
 };
 
 export const formatDateFromTimestamp = (date: {
   _nanoseconds?: number;
   _seconds: number;
 }): string => {
-  return dayjs.unix(date._seconds).calendar(null, {
-    sameDay: "[Today at] h:mm A", // The same day ( Today at 2:30 AM )
-    nextDay: "[Tomorrow at] h:mm A", // The next day ( Tomorrow at 2:30 AM )
-    nextWeek: "dddd [at] h:mm A", // The next week ( Sunday at 2:30 AM )
-    lastDay: "[Yesterday at] h:mm A", // The day before ( Yesterday at 2:30 AM )
-    lastWeek: "[Last] dddd [at] h:mm A", // Last week ( Last Monday at 2:30 AM )
-    sameElse: DATE_FORMAT, // Everything else ( Jan 23 2022 )
-  });
+  return dayjs.unix(date._seconds).calendar(null, dateFormatOptions);
+};
+
+const dateFormatOptions = {
+  sameDay: "[Today at] h:mm A", // The same day ( Today at 2:30 AM )
+  nextDay: "[Tomorrow at] h:mm A", // The next day ( Tomorrow at 2:30 AM )
+  nextWeek: "dddd [at] h:mm A", // The next week ( Sunday at 2:30 AM )
+  lastDay: "[Yesterday at] h:mm A", // The day before ( Yesterday at 2:30 AM )
+  lastWeek: "[Last] dddd [at] h:mm A", // Last week ( Last Monday at 2:30 AM )
+  sameElse: DATE_FORMAT, // Everything else ( Jan 23 2022 )
 };
