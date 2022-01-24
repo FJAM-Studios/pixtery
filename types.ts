@@ -1,4 +1,3 @@
-import { Timestamp } from "@google-cloud/firestore";
 import { RouteProp } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { Audio } from "expo-av";
