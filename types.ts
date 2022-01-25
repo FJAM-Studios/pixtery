@@ -117,12 +117,12 @@ export interface ScreenHeight {
 }
 
 export interface RootState {
+  adHeight: number;
   profile: Profile;
   receivedPuzzles: Puzzle[];
   sentPuzzles: Puzzle[];
   screenHeight: ScreenHeight;
   theme: PixteryTheme;
-  adHeight: number;
   tutorialFinished: boolean;
   sound: Audio.Sound | null;
   notificationToken: string;
