@@ -1,4 +1,3 @@
-import dayjs from "dayjs";
 import React, { useState, useEffect } from "react";
 import { View, ScrollView, TouchableOpacity } from "react-native";
 import {
@@ -19,7 +18,7 @@ import {
   GalleryQueueRoute,
   StatusOfDaily,
 } from "../../types";
-import { formatDateFromTimestamp } from "../../util";
+import { formatDateFromString } from "../../util";
 import { AdSafeAreaView, Header } from "../Layout";
 
 export default function GalleryQueue({
@@ -137,7 +136,7 @@ export default function GalleryQueue({
                   title={puzzle.message || ""}
                   subtitle={`${puzzle.senderName} - ${
                     puzzle.dateQueued
-                      ? formatDateFromTimestamp(puzzle.dateQueued)
+                      ? formatDateFromString(puzzle.dateQueued)
                       : null
                   }`}
                   right={() => (
