@@ -30,13 +30,13 @@ import {
 } from "react-redux";
 
 import {
-  AddToGallery,
   DailyCalendar,
   GalleryQueue,
   GalleryReview,
 } from "./components/AdminScreens";
 import { AddPuzzle, Splash, TitleScreen } from "./components/TransitionScreens";
 import {
+  AddToGallery,
   ContactUs,
   CreateProfile,
   EnterName,
