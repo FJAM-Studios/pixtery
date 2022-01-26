@@ -65,7 +65,7 @@ export default function Header({
         <Menu.Item
           onPress={() => {
             closeMenu();
-            navigation.navigate("Home");
+            navigation.navigate("Make");
           }}
           title="Make"
           icon="camera-iris"

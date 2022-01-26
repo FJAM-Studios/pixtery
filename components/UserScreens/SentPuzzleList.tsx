@@ -108,12 +108,6 @@ export default function SentPuzzleList({
           </View>
         </View>
       </Modal>
-      <Header
-        notifications={
-          receivedPuzzles.filter((puzzle) => !puzzle.completed).length
-        }
-        navigation={navigation}
-      />
       <ScrollView>
         <>
           {sentPuzzles.length ? (

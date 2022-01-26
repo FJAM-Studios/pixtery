@@ -125,12 +125,6 @@ export default function GalleryReview({
         backgroundColor: theme.colors.background,
       }}
     >
-      <Header
-        notifications={
-          receivedPuzzles.filter((puzzle) => !puzzle.completed).length
-        }
-        navigation={navigation}
-      />
       <View
         style={{
           flex: 1,

@@ -289,12 +289,6 @@ export default function PuzzleComponent({
   if (!puzzleAreaDimensions.puzzleAreaHeight)
     return (
       <AdSafeAreaView style={styles(styleProps).parentContainer}>
-        <Header
-          notifications={
-            receivedPuzzles.filter((puzzle) => !puzzle.completed).length
-          }
-          navigation={navigation}
-        />
         <View
           onLayout={(ev) => measurePuzzleArea(ev)}
           style={{
@@ -314,12 +308,6 @@ export default function PuzzleComponent({
       />
     ) : (
       <AdSafeAreaView style={styles(styleProps).parentContainer}>
-        <Header
-          notifications={
-            receivedPuzzles.filter((puzzle) => !puzzle.completed).length
-          }
-          navigation={navigation}
-        />
         <View
           style={{
             flex: 1,
@@ -388,7 +376,7 @@ export default function PuzzleComponent({
           isVisible={modalVisible}
           onBackdropPress={() => {
             setModalVisible(false);
-            navigation.navigate("Home");
+            navigation.navigate("Make");
           }}
           animationIn="fadeIn"
           animationOut="fadeOut"
@@ -427,7 +415,7 @@ export default function PuzzleComponent({
                 onPress={async () => {
                   await removeMissingPuzzle(publicKey, sourceList);
                   setModalVisible(false);
-                  navigation.navigate("Home");
+                  navigation.navigate("Make");
                 }}
                 style={{ margin: 5 }}
               >

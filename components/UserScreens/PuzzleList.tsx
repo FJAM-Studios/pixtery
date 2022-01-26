@@ -115,12 +115,6 @@ export default function PuzzleList({
           </View>
         </View>
       </Modal>
-      <Header
-        notifications={
-          receivedPuzzles.filter((puzzle) => !puzzle.completed).length
-        }
-        navigation={navigation}
-      />
       <View
         style={{
           flexDirection: "row",
