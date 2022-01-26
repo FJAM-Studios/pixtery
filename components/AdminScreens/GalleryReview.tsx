@@ -10,7 +10,11 @@ import {
 } from "react-native-paper";
 import { useSelector } from "react-redux";
 
-import { functions } from "../../FirebaseApp";
+import {
+  addToGallery,
+  deactivateInQueue,
+  removeDailyPuzzle,
+} from "../../FirebaseApp";
 import {
   DailyDate,
   GalleryReviewRoute,
@@ -56,7 +60,6 @@ export default function GalleryReview({
   ) => {
     return async (dailyDate: string) => {
       try {
-        const addToGallery = functions.httpsCallable("addToGallery");
         setLoading(true);
         // original dailyDate string is "YYYY-MM-DD"
         const { year, month, day } = convertDateStringToObject(dailyDate);
@@ -229,18 +232,12 @@ export default function GalleryReview({
                     const { publicKey } = puzzle;
                     setLoading(true);
                     if (statusOfDaily === PUBLISHED && publishedDate) {
-                      const removeDailyPuzzle = functions.httpsCallable(
-                        "removeDailyPuzzle"
-                      );
                       // publishedDate format "YYYY-MM-DD"
                       const { year, month, day } = convertDateStringToObject(
                         publishedDate
                       );
                       await removeDailyPuzzle({ publicKey, year, month, day });
                     } else {
-                      const deactivateInQueue = functions.httpsCallable(
-                        "deactivateInQueue"
-                      );
                       await deactivateInQueue({ publicKey });
                     }
                     setModalVisible(false);

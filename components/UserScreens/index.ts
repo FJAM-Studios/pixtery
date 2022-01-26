@@ -1,3 +1,4 @@
+import AddToGallery from "./AddToGallery";
 import ContactUs from "./ContactUs";
 import CreateProfile from "./CreateProfile";
 import EnterName from "./EnterName";
@@ -11,6 +12,7 @@ import SentPuzzleList from "./SentPuzzleList";
 import Tutorial from "./Tutorial";
 
 export {
+  AddToGallery,
   ContactUs,
   CreateProfile,
   EnterName,
