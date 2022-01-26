@@ -15,6 +15,7 @@ import {
   signInOnFireBase,
 } from "../../../FirebaseApp";
 import { SignInOptions } from "../../../types";
+import { UserAgreements } from "../../StaticElements";
 
 const phoneFormat = require("phone");
 
@@ -95,6 +96,7 @@ export default function Phone({
       >
         Sign In
       </Button>
+      <UserAgreements buttonText="Sign In" />
       {verificationId.length ? (
         <View>
           <TextInput

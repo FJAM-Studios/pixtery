@@ -7,6 +7,7 @@ import {
   Subheading,
   Headline,
 } from "react-native-paper";
+import { UserAgreements } from "../../StaticElements";
 
 export default function SignInScreen({
   setScreen,
@@ -56,6 +57,7 @@ export default function SignInScreen({
       >
         Sign In
       </Button>
+      <UserAgreements buttonText="Sign In" />
       {errors.length ? <Text style={{ color: "red" }}>{errors}</Text> : null}
       <View
         style={{

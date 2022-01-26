@@ -7,6 +7,7 @@ import {
   Subheading,
   Headline,
 } from "react-native-paper";
+import { UserAgreements } from "../../StaticElements";
 
 export default function RegisterScreen({
   setScreen,
@@ -68,6 +69,7 @@ export default function RegisterScreen({
       >
         Create Account
       </Button>
+      <UserAgreements buttonText="Create Account" />
       {errors.length ? <Text style={{ color: "red" }}>{errors}</Text> : null}
       <View
         style={{
@@ -82,6 +84,7 @@ export default function RegisterScreen({
         >
           Back To Sign In
         </Text>
+
       </View>
     </View>
   );
