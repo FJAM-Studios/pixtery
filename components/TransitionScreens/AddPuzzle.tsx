@@ -6,7 +6,7 @@ import { Headline, ActivityIndicator } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 import { AnyAction } from "redux";
 
-import { functions } from "../../FirebaseApp";
+import { queryPuzzleCallable } from "../../FirebaseApp";
 import { setReceivedPuzzles } from "../../store/reducers/receivedPuzzles";
 import { setSentPuzzles } from "../../store/reducers/sentPuzzles";
 import {
@@ -46,11 +46,10 @@ export default function AddPuzzle({
   }
 
   const fetchPuzzle = async (publicKey: string): Promise<Puzzle | void> => {
-    const queryPuzzleCallable = functions.httpsCallable("queryPuzzle");
     let puzzleData;
     try {
-      puzzleData = await queryPuzzleCallable({ publicKey });
-      return puzzleData.data; // get just nested data from returned JSON
+      puzzleData = (await queryPuzzleCallable({ publicKey })).data as Puzzle;
+      return puzzleData; // get just nested data from returned JSON
     } catch (error) {
       console.error(error);
       if (error instanceof Error) throw new Error(error.message); //rethrow the error so it can be caught by outer method

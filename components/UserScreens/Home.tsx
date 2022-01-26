@@ -4,7 +4,6 @@ import { AdMobInterstitial } from "expo-ads-admob";
 import * as FileSystem from "expo-file-system";
 import * as ImageManipulator from "expo-image-manipulator";
 import * as ImagePicker from "expo-image-picker";
-import { ImageInfo } from "expo-image-picker/build/ImagePicker.types";
 import * as Linking from "expo-linking";
 import * as React from "react";
 import { Image, View, Platform, Keyboard } from "react-native";
@@ -24,7 +23,7 @@ import { useDispatch, useSelector } from "react-redux";
 import shortid from "shortid";
 import uuid from "uuid";
 
-import { storage, functions } from "../../FirebaseApp";
+import { uploadBlob, uploadPuzzleSettingsCallable } from "../../FirebaseApp";
 import {
   DEFAULT_IMAGE_SIZE,
   COMPRESSION,
@@ -104,7 +103,7 @@ export default function Home({
   };
 
   const cropToSquare = async (
-    image: { cancelled: false } & ImageInfo
+    image: ImagePicker.ImageInfo
   ): Promise<string> => {
     const { uri, width, height } = image;
     const lengthOfSquare = Math.min(width, height);
@@ -183,8 +182,7 @@ export default function Home({
       { compress: COMPRESSION, format: ImageManipulator.SaveFormat.JPEG }
     );
     const blob: Blob = await createBlob(resizedCompressedImage.uri);
-    const ref = storage.ref().child(fileName);
-    await ref.put(blob);
+    await uploadBlob(fileName, blob);
     return resizedCompressedImage.uri;
   };
 
@@ -192,9 +190,6 @@ export default function Home({
     fileName: string
   ): Promise<Puzzle | undefined> => {
     const publicKey: string = shortid.generate();
-    const uploadPuzzleSettingsCallable = functions.httpsCallable(
-      "uploadPuzzleSettings"
-    );
     const newPuzzle = {
       puzzleType,
       gridSize,

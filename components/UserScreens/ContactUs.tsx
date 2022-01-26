@@ -4,7 +4,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import { Button, TextInput } from "react-native-paper";
 import { useSelector } from "react-redux";
 
-import { functions } from "../../FirebaseApp";
+import { submitFeedbackCallable } from "../../FirebaseApp";
 import { ScreenNavigation, RootState } from "../../types";
 import { isEmail } from "../../util";
 import { AdSafeAreaView, Header } from "../Layout";
@@ -25,7 +25,6 @@ export default function ContactUs({
 
   const submit = async () => {
     Keyboard.dismiss();
-    const submitFeedbackCallable = functions.httpsCallable("submitFeedback");
     try {
       if (isEmail(email)) {
         alert("Please type in a valid email.");

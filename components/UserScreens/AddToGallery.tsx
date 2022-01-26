@@ -23,7 +23,7 @@ import Toast from "react-native-root-toast";
 import { useSelector } from "react-redux";
 import shortid from "shortid";
 
-import { functions } from "../../FirebaseApp";
+import { addToQueue } from "../../FirebaseApp";
 import { ScreenNavigation, RootState } from "../../types";
 import { formatDateFromString } from "../../util";
 import { AdSafeAreaView, Header } from "../Layout";
@@ -154,7 +154,6 @@ export default function AddToGallery({
                 icon="check"
                 onPress={async () => {
                   setLoading(true);
-                  const addToQueue = functions.httpsCallable("addToQueue");
                   try {
                     const newPublicKey: string = shortid.generate();
                     await addToQueue({
