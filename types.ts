@@ -37,6 +37,7 @@ export interface Puzzle {
   completed?: boolean;
   dailyDate?: string;
   notificationToken?: string;
+  dateQueued?: string;
 }
 
 export interface Profile {
