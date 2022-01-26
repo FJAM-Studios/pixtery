@@ -121,7 +121,7 @@ export const addToQueue = functions.https.onCall(
           );
 
         // add it to the gallery queue
-        const dateQueued = new Date();
+        const dateQueued = new Date().toISOString();
         const senderName = data.anonymousChecked
           ? "Anonymous"
           : puzzleData.senderName;
@@ -145,9 +145,9 @@ export const addToQueue = functions.https.onCall(
         try {
           const mailOptions = {
             to: adminKey.queueNotificationEmail,
-            subject: `New Queue Submission - ${dateQueued.toString()}`,
+            subject: `New Queue Submission - ${dateQueued}`,
             text: `
-            New Queue Submission - ${dateQueued.toString()} \n
+            New Queue Submission - ${dateQueued} \n
             https://www.pixtery.io/p/${newPublicKey} \n
             sender: ${senderName} \n
             message: ${message}
