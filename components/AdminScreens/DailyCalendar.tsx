@@ -48,12 +48,6 @@ export default function DailyCalendar({
         backgroundColor: theme.colors.background,
       }}
     >
-      <Header
-        notifications={
-          receivedPuzzles.filter((puzzle) => !puzzle.completed).length
-        }
-        navigation={navigation}
-      />
       <View
         style={{
           flexDirection: "column",

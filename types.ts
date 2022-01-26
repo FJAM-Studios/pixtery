@@ -75,7 +75,7 @@ export type StackScreens = {
   TitleScreen: undefined;
   Splash: { url: string | undefined } | undefined;
   CreateProfile: { url: string | undefined };
-  Home: undefined;
+  Make: undefined;
   PuzzleList: undefined;
   SentPuzzleList: undefined;
   Puzzle: { publicKey: string; sourceList: string };
@@ -97,6 +97,7 @@ export type StackScreens = {
   EnterName: {
     url?: string;
   };
+  TabContainer: undefined;
 };
 
 export type ScreenNavigation = NativeStackNavigationProp<StackScreens>;

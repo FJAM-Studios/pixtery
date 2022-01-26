@@ -54,7 +54,7 @@ export default function Tutorial({
     );
     setStep(0);
     dispatch(setTutorialFinished(true));
-    navigation.navigate("Home");
+    navigation.navigate("Make");
   };
   return (
     <AdSafeAreaView
@@ -78,13 +78,6 @@ export default function Tutorial({
           justifyContent: "center",
           zIndex: 1,
         }}
-      />
-      <Header
-        notifications={
-          receivedPuzzles.filter((puzzle) => !puzzle.completed).length
-        }
-        navigation={navigation}
-        headerStep={step === 5}
       />
 
       {/* instructions */}
