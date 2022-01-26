@@ -49,6 +49,8 @@ const DAY_IN_MILLISECONDS = 1000 * 60 * 60 * 24;
 
 const DAILY_TIMEZONE = "America/New_York";
 
+const DATE_FORMAT = "MMM D YYYY";
+
 export {
   TESTING_MODE,
   SNAP_MARGIN,
@@ -65,4 +67,5 @@ export {
   ARGUABLY_CLEVER_PHRASES,
   DAY_IN_MILLISECONDS,
   DAILY_TIMEZONE,
+  DATE_FORMAT,
 };

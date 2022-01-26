@@ -1,11 +1,10 @@
-import moment from "moment";
 import * as React from "react";
 import { View, TouchableOpacity } from "react-native";
 import { Text, Card, IconButton } from "react-native-paper";
 import { useSelector } from "react-redux";
 
 import { Puzzle, ScreenNavigation, RootState } from "../../types";
-import { saveToLibrary } from "../../util";
+import { saveToLibrary, formatDateFromString } from "../../util";
 
 export default function ReceivedPuzzleCard({
   puzzle,
@@ -41,7 +40,11 @@ export default function ReceivedPuzzleCard({
               ? puzzle.senderName + " - " + puzzle.message
               : puzzle.senderName
           }
-          subtitle={moment(puzzle.dateReceived).calendar()}
+          subtitle={
+            puzzle.dateReceived
+              ? formatDateFromString(puzzle.dateReceived)
+              : null
+          }
           right={() => (
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               <Text>{puzzle.gridSize}</Text>

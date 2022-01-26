@@ -1,5 +1,11 @@
 import * as functions from "firebase-functions";
 import db from "../db";
+const DAILY_TIMEZONE = "America/New_York";
+import * as dayjs from "dayjs";
+import * as timezone from "dayjs/plugin/timezone"; // dependent on utc plugin
+import * as utc from "dayjs/plugin/utc";
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 export const checkGalleryAdmin = functions.https.onCall(
   async (_data, context): Promise<boolean | void> => {
@@ -194,21 +200,10 @@ export const getDaily = functions.https.onCall(
       }
 
       //get today's date in EST and create vars
-      const today = new Date();
-      const [_month, _day, year] = today
-        .toLocaleDateString("en-us", { timeZone: "America/New_York" })
-        // test w another timezone
-        // .toLocaleDateString("en-us", { timeZone: "Pacific/Auckland" })
-        .split("/");
-      const month = `0${_month}`.slice(-2);
-      const day = `0${_day}`.slice(-2);
+      const now = dayjs().tz(DAILY_TIMEZONE);
 
-      const daily = await db
-        .collection("gallery")
-        .doc(year)
-        .collection(month)
-        .doc(day)
-        .get();
+      const [year, month, day] = getESTDate(now);
+      const daily = await getDailyForDate(year, month, day);
 
       if (daily.exists) return daily.data();
       else {
@@ -221,3 +216,20 @@ export const getDaily = functions.https.onCall(
     }
   }
 );
+
+const getDailyForDate = async (year: string, month: string, day: string) => {
+  return await db
+    .collection("gallery")
+    .doc(year)
+    .collection(month)
+    .doc(day)
+    .get();
+};
+
+const getESTDate = (date: dayjs.Dayjs): string[] => {
+  const year = date.get("year").toString();
+  // for month and day, return the two numbers from end of string (i.e. "09" or "10")
+  const month = `0${date.get("month") + 1}`.slice(-2); // month is indexed to 0, so add 1
+  const day = `0${date.get("date")}`.slice(-2);
+  return [year, month, day];
+};
