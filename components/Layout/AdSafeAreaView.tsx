@@ -3,7 +3,6 @@ import { AdMobBanner } from "expo-ads-admob";
 import * as StoreReview from "expo-store-review";
 import React, { useEffect } from "react";
 import { StyleProp, ViewStyle, View, LayoutChangeEvent } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 
 import { BANNER_ID, DAY_IN_MILLISECONDS } from "../../constants";
@@ -56,7 +55,7 @@ export default function AdSafeAreaView(props: {
   }, []);
 
   return (
-    <SafeAreaView {...props.style}>
+    <View {...props.style}>
       {props.children}
       <View onLayout={(ev) => measureAdArea(ev)}>
         <AdMobBanner
@@ -65,6 +64,6 @@ export default function AdSafeAreaView(props: {
           style={{ marginTop: "auto", alignSelf: "center" }}
         />
       </View>
-    </SafeAreaView>
+    </View>
   );
 }

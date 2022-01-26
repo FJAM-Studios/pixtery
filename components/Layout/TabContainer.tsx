@@ -12,8 +12,18 @@ export default function TabContainer(): JSX.Element {
   const theme = useSelector((state: RootState) => state.theme);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "red" }}>
-      <Tab.Navigator initialRouteName="Gallery">
+    <SafeAreaView style={{ flex: 1 }}>
+      <Tab.Navigator
+        initialRouteName="Gallery"
+        screenOptions={{
+          tabBarContentContainerStyle: {
+            backgroundColor: theme.colors.primary,
+          },
+          tabBarLabelStyle: {
+            color: theme.colors.text,
+          },
+        }}
+      >
         <Tab.Screen
           name="Gallery"
           component={Gallery}
