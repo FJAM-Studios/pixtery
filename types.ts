@@ -1,5 +1,5 @@
 import { RouteProp } from "@react-navigation/native";
-import { StackNavigationProp } from "@react-navigation/stack";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Audio } from "expo-av";
 import * as ImageManipulator from "expo-image-manipulator";
 import { Theme } from "react-native-paper/lib/typescript/types";
@@ -99,7 +99,7 @@ export type StackScreens = {
   };
 };
 
-export type ScreenNavigation = StackNavigationProp<StackScreens>;
+export type ScreenNavigation = NativeStackNavigationProp<StackScreens>;
 
 export type PuzzleRoute = RouteProp<StackScreens, "Puzzle">;
 export type AddPuzzleRoute = RouteProp<StackScreens, "AddPuzzle">;

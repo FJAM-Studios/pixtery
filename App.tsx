@@ -2,7 +2,7 @@ import {
   NavigationContainer,
   NavigationContainerRef,
 } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Constants from "expo-constants";
 import * as Linking from "expo-linking";
 import * as Notifications from "expo-notifications";
@@ -19,18 +19,24 @@ import {
   Dimensions,
   Platform,
 } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Provider as PaperProvider } from "react-native-paper";
+import { RootSiblingParent } from "react-native-root-siblings";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { useDispatch, useSelector } from "react-redux";
+import {
+  Provider as StoreProvider,
+  useDispatch,
+  useSelector,
+} from "react-redux";
 
 import {
-  AddToGallery,
   DailyCalendar,
   GalleryQueue,
   GalleryReview,
 } from "./components/AdminScreens";
 import { AddPuzzle, Splash, TitleScreen } from "./components/TransitionScreens";
 import {
+  AddToGallery,
   ContactUs,
   CreateProfile,
   EnterName,
@@ -44,6 +50,7 @@ import {
   Tutorial,
 } from "./components/UserScreens";
 import { MIN_BOTTOM_CLEARANCE } from "./constants";
+import store from "./store";
 import { setNotificationToken } from "./store/reducers/notificationToken";
 import { setDeviceSize } from "./store/reducers/screenHeight";
 import { StackScreens, RootState } from "./types";
@@ -51,7 +58,7 @@ import { goToScreen } from "./util";
 //less than ideal, but idk if we have a choice right now. suppresses the firebase timeout warning
 LogBox.ignoreLogs(["Setting a timer for a long period of time"]);
 
-const Stack = createStackNavigator<StackScreens>();
+const Stack = createNativeStackNavigator<StackScreens>();
 
 SplashScreen.preventAutoHideAsync().catch();
 
@@ -65,7 +72,9 @@ Notifications.setNotificationHandler({
 
 const App = (): JSX.Element => {
   const dispatch = useDispatch();
-  const navigationRef = useRef<NavigationContainerRef | null>(null);
+  const navigationRef = useRef<NavigationContainerRef<StackScreens> | null>(
+    null
+  );
   const theme = useSelector((state: RootState) => state.theme);
 
   const promptRestart = () => {
@@ -187,7 +196,10 @@ const App = (): JSX.Element => {
         <NavigationContainer ref={navigationRef} onReady={gotoSplash}>
           <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
             <StatusBar style={theme.dark ? "light" : "dark"} />
-            <Stack.Navigator initialRouteName="TitleScreen" headerMode="none">
+            <Stack.Navigator
+              initialRouteName="TitleScreen"
+              screenOptions={{ headerShown: false }}
+            >
               <Stack.Screen name="TitleScreen" component={TitleScreen} />
               <Stack.Screen name="Splash">
                 {(props) => <Splash {...props} />}
@@ -248,4 +260,16 @@ const App = (): JSX.Element => {
   );
 };
 
-export default App;
+const AppWrapper = (): JSX.Element => {
+  return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <StoreProvider store={store}>
+        <RootSiblingParent>
+          <App />
+        </RootSiblingParent>
+      </StoreProvider>
+    </GestureHandlerRootView>
+  );
+};
+
+export default AppWrapper;

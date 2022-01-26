@@ -30,7 +30,7 @@ export default function SignInScreen({
       <Headline style={{ textAlign: "center" }}>Sign In</Headline>
       <Subheading>Enter Email and Password</Subheading>
       <TextInput
-        autoCompleteType="email"
+        autoComplete="email"
         keyboardType="email-address"
         textContentType="emailAddress"
         placeholder="Email Address"

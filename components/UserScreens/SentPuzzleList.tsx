@@ -1,5 +1,4 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as Linking from "expo-linking";
 import * as React from "react";
 import { View, ScrollView } from "react-native";
 import Modal from "react-native-modal";
@@ -9,11 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { sortPuzzles } from "../../puzzleUtils";
 import { setSentPuzzles } from "../../store/reducers/sentPuzzles";
 import { Puzzle, ScreenNavigation, RootState } from "../../types";
-import {
-  safelyDeletePuzzleImage,
-  shareMessage,
-  deactivatePuzzleOnServer,
-} from "../../util";
+import { safelyDeletePuzzleImage, deactivatePuzzleOnServer } from "../../util";
 import { SentPuzzleCard } from "../InteractiveElements";
 import { AdSafeAreaView, Header } from "../Layout";
 
@@ -44,12 +39,6 @@ export default function SentPuzzleList({
     setPuzzleToDelete(puzzle);
   };
 
-  const sendPuzzle = (publicKey: string | undefined) => {
-    const deepLink = Linking.createURL(`pixtery.io/p/${publicKey}`, {
-      scheme: "https",
-    });
-    shareMessage(deepLink);
-  };
   const deletePuzzle = async (puzzle: Puzzle | null) => {
     if (puzzle) {
       const newPuzzles = [
