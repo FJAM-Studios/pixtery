@@ -10,7 +10,7 @@ import {
 } from "react-native-paper";
 import { useSelector } from "react-redux";
 
-import { functions } from "../../FirebaseApp";
+import { getGalleryQueue } from "../../FirebaseApp";
 import {
   ScreenNavigation,
   RootState,
@@ -43,16 +43,17 @@ export default function GalleryQueue({
     try {
       setQueue([]);
       setLoading(true);
-      const getGalleryQueue = functions.httpsCallable("getGalleryQueue");
-      const res = await getGalleryQueue({
-        active,
-        startAt,
-        limit,
-      });
-      if (res.data.length === 0) setMessage("Nothing in Gallery Queue.");
+      const res = (
+        await getGalleryQueue({
+          active,
+          startAt,
+          limit,
+        })
+      ).data as Puzzle[];
+      if (res.length === 0) setMessage("Nothing in Gallery Queue.");
       else {
         setMessage("");
-        setQueue(res.data);
+        setQueue(res);
       }
     } catch (e) {
       if (e instanceof Error) {
