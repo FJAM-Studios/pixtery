@@ -4,7 +4,7 @@ import CreateProfile from "./CreateProfile";
 import EnterName from "./EnterName";
 import Gallery from "./Gallery";
 import Help from "./Help";
-import Home from "./Home";
+import Make from "./Make";
 import Profile from "./Profile";
 import Puzzle from "./Puzzle";
 import PuzzleList from "./PuzzleList";
@@ -18,7 +18,7 @@ export {
   EnterName,
   Gallery,
   Help,
-  Home,
+  Make,
   Profile,
   Puzzle,
   PuzzleList,

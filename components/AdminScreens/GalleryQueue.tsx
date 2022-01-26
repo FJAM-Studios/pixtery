@@ -75,12 +75,6 @@ export default function GalleryQueue({
         backgroundColor: theme.colors.background,
       }}
     >
-      <Header
-        notifications={
-          receivedPuzzles.filter((puzzle) => !puzzle.completed).length
-        }
-        navigation={navigation}
-      />
       <View
         style={{
           flexDirection: "column",

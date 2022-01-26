@@ -7,7 +7,6 @@ import Constants from "expo-constants";
 import * as Linking from "expo-linking";
 import * as Notifications from "expo-notifications";
 import * as SplashScreen from "expo-splash-screen";
-import { StatusBar } from "expo-status-bar";
 import { requestTrackingPermissionsAsync } from "expo-tracking-transparency";
 import * as Updates from "expo-updates";
 import React, { useRef, useEffect } from "react";
@@ -34,6 +33,7 @@ import {
   GalleryQueue,
   GalleryReview,
 } from "./components/AdminScreens";
+import TabContainer from "./components/Layout/TabContainer";
 import { AddPuzzle, Splash, TitleScreen } from "./components/TransitionScreens";
 import {
   AddToGallery,
@@ -42,7 +42,7 @@ import {
   EnterName,
   Gallery,
   Help,
-  Home,
+  Make,
   Profile,
   Puzzle,
   PuzzleList,
@@ -194,66 +194,66 @@ const App = (): JSX.Element => {
     <PaperProvider theme={theme}>
       <SafeAreaProvider>
         <NavigationContainer ref={navigationRef} onReady={gotoSplash}>
-          <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
-            <StatusBar style={theme.dark ? "light" : "dark"} />
-            <Stack.Navigator
-              initialRouteName="TitleScreen"
-              screenOptions={{ headerShown: false }}
-            >
-              <Stack.Screen name="TitleScreen" component={TitleScreen} />
-              <Stack.Screen name="Splash">
-                {(props) => <Splash {...props} />}
-              </Stack.Screen>
-              <Stack.Screen name="CreateProfile">
-                {(props) => <CreateProfile {...props} />}
-              </Stack.Screen>
-              <Stack.Screen name="Home">
-                {(props) => <Home {...props} />}
-              </Stack.Screen>
-              <Stack.Screen name="PuzzleList">
-                {(props) => <PuzzleList {...props} />}
-              </Stack.Screen>
-              <Stack.Screen name="SentPuzzleList">
-                {(props) => <SentPuzzleList {...props} />}
-              </Stack.Screen>
-              <Stack.Screen name="Puzzle">
-                {(props) => <Puzzle {...props} />}
-              </Stack.Screen>
-              <Stack.Screen name="AddPuzzle">
-                {(props) => <AddPuzzle {...props} />}
-              </Stack.Screen>
-              <Stack.Screen name="Profile">
-                {(props) => <Profile {...props} />}
-              </Stack.Screen>
-              <Stack.Screen name="ContactUs">
-                {(props) => <ContactUs {...props} />}
-              </Stack.Screen>
-              <Stack.Screen name="Tutorial">
-                {(props) => <Tutorial {...props} />}
-              </Stack.Screen>
-              <Stack.Screen name="Help">
-                {(props) => <Help {...props} />}
-              </Stack.Screen>
-              <Stack.Screen name="GalleryQueue">
-                {(props) => <GalleryQueue {...props} />}
-              </Stack.Screen>
-              <Stack.Screen name="GalleryReview">
-                {(props) => <GalleryReview {...props} />}
-              </Stack.Screen>
-              <Stack.Screen name="Gallery">
-                {(props) => <Gallery {...props} />}
-              </Stack.Screen>
-              <Stack.Screen name="AddToGallery">
-                {(props) => <AddToGallery {...props} />}
-              </Stack.Screen>
-              <Stack.Screen name="DailyCalendar">
-                {(props) => <DailyCalendar {...props} />}
-              </Stack.Screen>
-              <Stack.Screen name="EnterName">
-                {(props) => <EnterName {...props} />}
-              </Stack.Screen>
-            </Stack.Navigator>
-          </View>
+          {/* <View style={{ flex: 1, backgroundColor: theme.colors.background }}> */}
+          <Stack.Navigator
+            initialRouteName="TitleScreen"
+            screenOptions={{ headerShown: false }}
+          >
+            <Stack.Screen name="TitleScreen" component={TitleScreen} />
+            <Stack.Screen name="Splash">
+              {(props) => <Splash {...props} />}
+            </Stack.Screen>
+            <Stack.Screen name="TabContainer" component={TabContainer} />
+            <Stack.Screen name="CreateProfile">
+              {(props) => <CreateProfile {...props} />}
+            </Stack.Screen>
+            <Stack.Screen name="Make">
+              {(props) => <Make {...props} />}
+            </Stack.Screen>
+            <Stack.Screen name="PuzzleList">
+              {(props) => <PuzzleList {...props} />}
+            </Stack.Screen>
+            <Stack.Screen name="SentPuzzleList">
+              {(props) => <SentPuzzleList {...props} />}
+            </Stack.Screen>
+            <Stack.Screen name="Puzzle">
+              {(props) => <Puzzle {...props} />}
+            </Stack.Screen>
+            <Stack.Screen name="AddPuzzle">
+              {(props) => <AddPuzzle {...props} />}
+            </Stack.Screen>
+            <Stack.Screen name="Profile">
+              {(props) => <Profile {...props} />}
+            </Stack.Screen>
+            <Stack.Screen name="ContactUs">
+              {(props) => <ContactUs {...props} />}
+            </Stack.Screen>
+            <Stack.Screen name="Tutorial">
+              {(props) => <Tutorial {...props} />}
+            </Stack.Screen>
+            <Stack.Screen name="Help">
+              {(props) => <Help {...props} />}
+            </Stack.Screen>
+            <Stack.Screen name="GalleryQueue">
+              {(props) => <GalleryQueue {...props} />}
+            </Stack.Screen>
+            <Stack.Screen name="GalleryReview">
+              {(props) => <GalleryReview {...props} />}
+            </Stack.Screen>
+            <Stack.Screen name="Gallery">
+              {(props) => <Gallery {...props} />}
+            </Stack.Screen>
+            <Stack.Screen name="AddToGallery">
+              {(props) => <AddToGallery {...props} />}
+            </Stack.Screen>
+            <Stack.Screen name="DailyCalendar">
+              {(props) => <DailyCalendar {...props} />}
+            </Stack.Screen>
+            <Stack.Screen name="EnterName">
+              {(props) => <EnterName {...props} />}
+            </Stack.Screen>
+          </Stack.Navigator>
+          {/* </View> */}
         </NavigationContainer>
       </SafeAreaProvider>
     </PaperProvider>
