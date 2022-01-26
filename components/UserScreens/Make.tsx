@@ -261,7 +261,7 @@ export default function Make({
         flex: 1,
         flexDirection: "column",
         padding: height * 0.015,
-        backgroundColor: "green", // theme.colors.background,
+        backgroundColor: theme.colors.background,
         justifyContent: "space-between",
       }}
     >
@@ -295,7 +295,6 @@ export default function Make({
           Platform.OS === "ios" ? 0 : buttonHeight + height * 0.2
         }
         enableOnAndroid
-        contentContainerStyle={{ backgroundColor: "pink" }}
       >
         <View
           style={{
