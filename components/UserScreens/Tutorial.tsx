@@ -45,7 +45,7 @@ export default function Tutorial({
     "Choose your puzzle type and size",
     "Enter an optional secret message to be revealed when the puzzle is solved",
     "Send your Pixtery to a friend!",
-    "Touch the Menu to view sent and received Pixteries, your profile, the Pixtery Gallery and more!",
+    "Touch the Menu to play the Daily Pixtery, view Pixteries you have sent and received, change your profile and more!",
   ];
   const finishTutorial = async () => {
     await AsyncStorage.setItem(
