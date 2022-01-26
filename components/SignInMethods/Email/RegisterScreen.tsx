@@ -84,7 +84,6 @@ export default function RegisterScreen({
         >
           Back To Sign In
         </Text>
-
       </View>
     </View>
   );
