@@ -155,9 +155,9 @@ export default function Splash({
               publicKey,
               sourceList: "received",
             });
-          } else closeSplashAndNavigate(navigation, "Home");
+          } else closeSplashAndNavigate(navigation, "TabContainer");
           // if there's no url bc the app was reloaded by Android OTA update, navigate to Home
-        } else closeSplashAndNavigate(navigation, "Home");
+        } else closeSplashAndNavigate(navigation, "TabContainer");
       } else {
         //otherwise, load profile from local storage if it exists
         const loadedProfile = await loadProfile();

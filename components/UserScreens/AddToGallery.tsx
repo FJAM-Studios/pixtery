@@ -58,12 +58,6 @@ export default function AddToGallery({
         justifyContent: "flex-start",
       }}
     >
-      <Header
-        notifications={
-          receivedPuzzles.filter((puzzle) => !puzzle.completed).length
-        }
-        navigation={navigation}
-      />
       {modalVisible ? (
         <KeyboardAwareScrollView
           resetScrollToCoords={{ x: 0, y: 0 }}
