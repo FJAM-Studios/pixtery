@@ -17,4 +17,5 @@ export {
   deactivateAllUserPuzzles,
   deactivateUserPuzzle,
   migratePuzzles,
+  deleteUser,
 } from "./fns/userFns";
