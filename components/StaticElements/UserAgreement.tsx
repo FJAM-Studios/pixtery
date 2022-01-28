@@ -5,15 +5,19 @@ import { Text } from "react-native-paper";
 export default function UserAgreements({
   buttonText,
 }: {
-  buttonText: string;
+  buttonText?: string;
 }): JSX.Element {
+  let conditionText = buttonText
+    ? `By clicking ${buttonText}`
+    : `By using this app`;
+  conditionText += `,\n you agree to our `;
   return (
     <Text
       style={{
         textAlign: "center",
       }}
     >
-      By clicking {buttonText},{"\n"} you agree to our{" "}
+      {conditionText}
       <Text
         style={{
           color: "blue",
