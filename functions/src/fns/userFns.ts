@@ -110,17 +110,41 @@ const copyList = async (
   });
 };
 
+const emptyList = async (uid: string, listType: string) => {
+  const puzzleCollection = await db
+    .collection("userPixteries")
+    .doc(uid)
+    .collection(listType)
+    .get();
+
+  puzzleCollection.forEach((puzzle: any) => {
+    try {
+      const puzzleData = puzzle.data();
+      if (puzzleData && puzzleData.publicKey) {
+        db.collection("userPixteries")
+          .doc(uid)
+          .collection(listType)
+          .doc(puzzleData.publicKey)
+          .delete();
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  });
+};
+
 const deleteUserDoc = async (uid: string) => {
   try {
-    db.collection("userPixteries")
-      .doc(uid)
-      .delete()
-      .then(function () {
-        console.log("Document successfully deleted!");
-      })
-      .catch(function (error) {
-        throw new functions.https.HttpsError("unknown", error.message, error);
-      });
+    console.log("DELETING", uid);
+    const userDocRef = db.collection("userPixteries").doc(uid);
+
+    const collections = await userDocRef.listCollections();
+    collections.forEach((collection) => {
+      emptyList(uid, collection.id);
+    });
+    // We have to delete sub-documents first, but Firebase won't let us delete empty documents, so setting this dummy field to let us delete. It's stupid I hate it.
+    await userDocRef.set({ delete: true });
+    await userDocRef.delete();
   } catch (error) {
     if (error instanceof Error) {
       throw new functions.https.HttpsError("unknown", error.message, error);
@@ -141,10 +165,13 @@ const deleteUserAuth = (uid: string) => {
 export const migratePuzzles = functions.https.onCall(
   async (prevUserId: string, context) => {
     try {
-      // throw error if user is not authenticated
       blockIfNotAuthenticated(context);
-      copyList(prevUserId, context!.auth!.uid, "sent");
-      copyList(prevUserId, context!.auth!.uid, "received");
+      const userDocRef = db.collection("userPixteries").doc(prevUserId);
+
+      const collections = await userDocRef.listCollections();
+      collections.forEach((collection) => {
+        copyList(prevUserId, context!.auth!.uid, collection.id);
+      });
       console.log("MIGRATING!");
       deleteUserDoc(prevUserId);
       deleteUserAuth(prevUserId);
@@ -157,7 +184,7 @@ export const migratePuzzles = functions.https.onCall(
 );
 
 export const deleteUser = functions.https.onCall(
-  async (context: functions.https.CallableContext) => {
+  async (data: undefined, context: functions.https.CallableContext) => {
     try {
       blockIfNotAuthenticated(context);
       deleteUserDoc(context!.auth!.uid);
