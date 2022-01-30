@@ -6,6 +6,7 @@ export {
   getDailyDates,
   removeDailyPuzzle,
   getDaily,
+  populateBlankDaily,
 } from "./fns/galleryFns";
 
 export { uploadPuzzleSettings, queryPuzzle } from "./fns/puzzleFns";
