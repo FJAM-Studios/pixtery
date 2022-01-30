@@ -217,6 +217,100 @@ export const getDaily = functions.https.onCall(
   }
 );
 
+exports.populateBlankDaily = functions.pubsub
+  .schedule("55 23 * * *")
+  .timeZone(DAILY_TIMEZONE) // Users can choose timezone - default is America/Los_Angeles
+  .onRun((context) => {
+    // this is where getBackUpDaily (below) would be integrated
+    console.log("Testing daily at 11:55PM Eastern");
+    return null;
+  });
+
+// to test, cd into functions and run: node -e 'require("./lib/fns/galleryFns.js").getBackupDaily()'
+module.exports.getBackupDaily = async function getBackupDaily() {
+  try {
+    const now = dayjs().tz(DAILY_TIMEZONE);
+    const tomorrow = now.clone().add(1, "day");
+    // const tomorrow = new Date();
+    // tomorrow.setDate(tomorrow.getDate() + 1);
+    const [year, month, day] = getESTDate(tomorrow);
+    console.log(`Tomorrow in EST: ${month}/${day}/${year}`);
+
+    // try to get tomorrow's Daily
+    const tomorrowDaily = await getDailyForDate(year, month, day);
+
+    // if tomorrow's Daily is not set yet
+    if (!tomorrowDaily.exists) {
+      // TODO: update base year to 2022; currently 2020 for testing purposes
+      const BASE_YEAR = 2020;
+      // choose random year between base year (inclusive) and tomorrow's year (exclusive) to get the Daily from
+      // this is to avoid the same Daily from the last year from being pulled forward in perpetuity
+      const randomPastYear = getRandomIntInRange(
+        BASE_YEAR,
+        tomorrow.get("year")
+      );
+      console.log(
+        `Daily was NOT set for ${month}/${day}/${year}. Getting the Daily from ${month}/${day}/${randomPastYear}`
+      );
+      // get the daily for the randomPastYear with tomorrow's month and day
+      const tomorrowDailyFromRandomYear = await getDailyForDate(
+        randomPastYear.toString(),
+        month,
+        day
+      );
+      // if the Daily from the previous random year exists (it should), set tomorrow's Daily with the Daily from randomPastYear with tomorrow's month and day
+      if (tomorrowDailyFromRandomYear.exists)
+        await addToGalleryForDate(
+          year,
+          month,
+          day,
+          // context, (commented out for now; will have context once integrated with scheduled function)
+          tomorrowDailyFromRandomYear.data(),
+          "auto populated"
+        );
+      else console.log("No backup Daily found");
+    } else {
+      console.log(`Daily was already set for ${month}/${day}/${year}`);
+    }
+  } catch (error: unknown) {
+    if (error instanceof Error)
+      throw new functions.https.HttpsError("unknown", error.message, error);
+  }
+};
+
+// once context is enabled, could use this for addToGallery function as well
+const addToGalleryForDate = async (
+  year: string,
+  month: string,
+  day: string,
+  // context,
+  puzzleData: any,
+  addedBy: string
+) => {
+  await db
+    .collection("gallery")
+    .doc(year)
+    .collection(month)
+    .doc(day)
+    .set(
+      {
+        ...puzzleData,
+        //figured this would be good to remove from the 'live' gallery bc it's sent out to everyone
+        notificationToken: null,
+        addedBy,
+        addedOn: new Date(),
+      },
+      // will overwrite an existing daily at the date
+      { merge: false }
+    );
+};
+
+const getRandomIntInRange = (min: number, max: number): number => {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min) + min); //The maximum is exclusive and the minimum is inclusive
+};
+
 const getDailyForDate = async (year: string, month: string, day: string) => {
   return await db
     .collection("gallery")
