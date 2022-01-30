@@ -63,23 +63,7 @@ export const addToGallery = functions.https.onCall(
       const puzzleData = res.data();
 
       // set puzzle for that date on firestore
-      await db
-        .collection("gallery")
-        .doc(year)
-        .collection(month)
-        .doc(day)
-        .set(
-          {
-            ...puzzleData,
-            //figured this would be good to remove from the 'live' gallery bc it's sent out to everyone
-            notificationToken: null,
-            addedBy: context.auth.uid,
-            addedOn: new Date(),
-            // currently will overwrite an existing daily at the date
-            // before overwrite, could move existing Daily to a retired folder
-          },
-          { merge: false }
-        );
+      addToGalleryForDate(year, month, day, puzzleData, context.auth.uid);
 
       //make the puzzle inactive in the queue
       await db
@@ -207,7 +191,7 @@ export const getDaily = functions.https.onCall(
 
       if (daily.exists) return daily.data();
       else {
-        // @todo - once a day cloud function that populates from last years puzzle
+        // once a day cloud function will populate from previous years' puzzle
         return null;
       }
     } catch (error: unknown) {
@@ -217,22 +201,19 @@ export const getDaily = functions.https.onCall(
   }
 );
 
-exports.populateBlankDaily = functions.pubsub
+export const populateBlankDaily = functions.pubsub
   .schedule("55 23 * * *")
-  .timeZone(DAILY_TIMEZONE) // Users can choose timezone - default is America/Los_Angeles
-  .onRun((context) => {
-    // this is where getBackUpDaily (below) would be integrated
+  .timeZone(DAILY_TIMEZONE) // can choose timezone - default is America/Los_Angeles
+  .onRun(() => {
     console.log("Testing daily at 11:55PM Eastern");
+    getBackupDaily();
     return null;
   });
 
-// to test, cd into functions and run: node -e 'require("./lib/fns/galleryFns.js").getBackupDaily()'
-module.exports.getBackupDaily = async function getBackupDaily() {
+const getBackupDaily = async () => {
   try {
     const now = dayjs().tz(DAILY_TIMEZONE);
     const tomorrow = now.clone().add(1, "day");
-    // const tomorrow = new Date();
-    // tomorrow.setDate(tomorrow.getDate() + 1);
     const [year, month, day] = getESTDate(tomorrow);
     console.log(`Tomorrow in EST: ${month}/${day}/${year}`);
 
@@ -264,10 +245,10 @@ module.exports.getBackupDaily = async function getBackupDaily() {
           year,
           month,
           day,
-          // context, (commented out for now; will have context once integrated with scheduled function)
           tomorrowDailyFromRandomYear.data(),
-          "auto populated"
+          `auto populated from ${month}/${day}/${randomPastYear}`
         );
+      // could potentially trigger error email to us if there is no back up daily
       else console.log("No backup Daily found");
     } else {
       console.log(`Daily was already set for ${month}/${day}/${year}`);
@@ -278,13 +259,11 @@ module.exports.getBackupDaily = async function getBackupDaily() {
   }
 };
 
-// once context is enabled, could use this for addToGallery function as well
 const addToGalleryForDate = async (
   year: string,
   month: string,
   day: string,
-  // context,
-  puzzleData: any,
+  puzzleData: FirebaseFirestore.DocumentData | undefined,
   addedBy: string
 ) => {
   await db
