@@ -113,7 +113,7 @@ export default function CreateProfile({
         >
           Continue Without Sign In
         </Button>
-        <UserAgreements buttonText="Continue Without Sign In" />
+        <UserAgreements />
       </KeyboardAwareScrollView>
       <SignInModal
         isVisible={modalVisible}
