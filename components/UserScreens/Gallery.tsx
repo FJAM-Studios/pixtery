@@ -13,6 +13,7 @@ import { INTERSTITIAL_ID, DAILY_TIMEZONE } from "../../constants";
 import { RootState, ScreenNavigation } from "../../types";
 import { Timer } from "../InteractiveElements";
 import { AdSafeAreaView, Header } from "../Layout";
+import { UserAgreements } from "../StaticElements";
 AdMobInterstitial.setAdUnitID(INTERSTITIAL_ID);
 
 export default function Gallery({
@@ -174,7 +175,6 @@ export default function Gallery({
         </View>
         <View
           style={{
-            flexDirection: "row",
             position: "absolute",
             bottom: 10,
             alignItems: "center",
@@ -193,6 +193,7 @@ export default function Gallery({
           >
             Submit a Daily Pixtery!
           </Button>
+          <UserAgreements buttonText="Submit a Daily Pixtery!" />
         </View>
       </View>
     </AdSafeAreaView>
