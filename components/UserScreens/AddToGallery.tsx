@@ -26,7 +26,7 @@ import shortid from "shortid";
 import { addToQueue } from "../../FirebaseApp";
 import { ScreenNavigation, RootState } from "../../types";
 import { formatDateFromString } from "../../util";
-import { AdSafeAreaView, Header } from "../Layout";
+import { AdSafeAreaView } from "../Layout";
 
 export default function AddToGallery({
   navigation,
@@ -37,9 +37,7 @@ export default function AddToGallery({
   const notificationToken = useSelector(
     (state: RootState) => state.notificationToken
   );
-  const receivedPuzzles = useSelector(
-    (state: RootState) => state.receivedPuzzles
-  );
+
   const { height } = useSelector((state: RootState) => state.screenHeight);
   const sentPuzzles = useSelector((state: RootState) => state.sentPuzzles);
   const [modalVisible, setModalVisible] = useState(false);
@@ -185,9 +183,6 @@ export default function AddToGallery({
         </KeyboardAwareScrollView>
       ) : (
         <ScrollView>
-          <Headline style={{ alignSelf: "center", textAlign: "center" }}>
-            Choose A Puzzle
-          </Headline>
           <Text style={{ alignSelf: "center", textAlign: "center" }}>
             You can edit the secret message after selecting
           </Text>

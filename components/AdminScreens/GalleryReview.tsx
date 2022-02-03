@@ -25,7 +25,7 @@ import {
 } from "../../types";
 import { downloadImage, convertDateStringToObject } from "../../util";
 import { DateSelect } from "../InteractiveElements";
-import { AdSafeAreaView, Header } from "../Layout";
+import { AdSafeAreaView } from "../Layout";
 
 export default function GalleryReview({
   navigation,
@@ -41,9 +41,7 @@ export default function GalleryReview({
   const [actionType, setActionType] = useState<"delete" | "confirm">();
   const { boardSize } = useSelector((state: RootState) => state.screenHeight);
   const theme = useSelector((state: RootState) => state.theme);
-  const receivedPuzzles = useSelector(
-    (state: RootState) => state.receivedPuzzles
-  );
+
   useEffect(() => {
     setLoading(true);
     setModalVisible(false);

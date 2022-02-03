@@ -3,7 +3,6 @@ import ContactUs from "./ContactUs";
 import CreateProfile from "./CreateProfile";
 import EnterName from "./EnterName";
 import Gallery from "./Gallery";
-import Help from "./Help";
 import Make from "./Make";
 import Profile from "./Profile";
 import Puzzle from "./Puzzle";
@@ -17,7 +16,6 @@ export {
   CreateProfile,
   EnterName,
   Gallery,
-  Help,
   Make,
   Profile,
   Puzzle,

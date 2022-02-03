@@ -7,7 +7,7 @@ import { useSelector } from "react-redux";
 import { submitFeedbackCallable } from "../../FirebaseApp";
 import { ScreenNavigation, RootState } from "../../types";
 import { isEmail } from "../../util";
-import { AdSafeAreaView, Header } from "../Layout";
+import { AdSafeAreaView } from "../Layout";
 
 export default function ContactUs({
   navigation,
@@ -16,9 +16,7 @@ export default function ContactUs({
 }): JSX.Element {
   const theme = useSelector((state: RootState) => state.theme);
   const { height } = useSelector((state: RootState) => state.screenHeight);
-  const receivedPuzzles = useSelector(
-    (state: RootState) => state.receivedPuzzles
-  );
+
   const [message, setMessage] = useState("");
   const [subject, setSubject] = useState("");
   const [email, setEmail] = useState("");
@@ -34,7 +32,7 @@ export default function ContactUs({
       setMessage("");
       setEmail("");
       setSubject("");
-      navigation.navigate("Make");
+      navigation.navigate("Profile");
       alert("Thank you! Your message has been successfully sent.");
     } catch (error) {
       console.error(error);

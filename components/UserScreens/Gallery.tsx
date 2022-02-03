@@ -4,7 +4,7 @@ import utc from "dayjs/plugin/utc";
 import { AdMobInterstitial } from "expo-ads-admob";
 import React, { useState, useEffect } from "react";
 import { View, TouchableOpacity } from "react-native";
-import { ActivityIndicator, Button, Headline, Text } from "react-native-paper";
+import { ActivityIndicator, Button, Text } from "react-native-paper";
 import Toast from "react-native-root-toast";
 import { useSelector } from "react-redux";
 
@@ -12,7 +12,7 @@ import { auth, getDaily } from "../../FirebaseApp";
 import { INTERSTITIAL_ID, DAILY_TIMEZONE } from "../../constants";
 import { RootState, ScreenNavigation } from "../../types";
 import { Timer } from "../InteractiveElements";
-import { AdSafeAreaView, Header } from "../Layout";
+import { AdSafeAreaView } from "../Layout";
 AdMobInterstitial.setAdUnitID(INTERSTITIAL_ID);
 
 export default function Gallery({
@@ -23,9 +23,6 @@ export default function Gallery({
   dayjs.extend(utc);
   dayjs.extend(timezone);
   const theme = useSelector((state: RootState) => state.theme);
-  const receivedPuzzles = useSelector(
-    (state: RootState) => state.receivedPuzzles
-  );
   const { width, height } = useSelector(
     (state: RootState) => state.screenHeight
   );
@@ -131,7 +128,6 @@ export default function Gallery({
           flexGrow: 1,
         }}
       >
-        <Headline>Daily Pixtery</Headline>
         <View style={{ flex: 1, alignContent: "center" }}>
           {loading ? (
             <ActivityIndicator size="large" />

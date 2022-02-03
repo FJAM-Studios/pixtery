@@ -13,7 +13,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { setTutorialFinished } from "../../store/reducers/tutorialFinished";
 import { ScreenNavigation, RootState } from "../../types";
-import { AdSafeAreaView, Header } from "../Layout";
+import { AdSafeAreaView } from "../Layout";
 
 const emptyImage = require("../../assets/blank.jpg");
 
@@ -26,9 +26,7 @@ export default function Tutorial({
   const { height, boardSize } = useSelector(
     (state: RootState) => state.screenHeight
   );
-  const receivedPuzzles = useSelector(
-    (state: RootState) => state.receivedPuzzles
-  );
+
   const [step, setStep] = useState(0);
   const dispatch = useDispatch();
 
@@ -71,7 +69,7 @@ export default function Tutorial({
         style={{
           position: "absolute",
           width: "120%",
-          height: "100%",
+          height: "120%",
           backgroundColor: "rgba(0,0,0,0.5)",
           alignSelf: "center",
           alignItems: "center",
@@ -85,7 +83,7 @@ export default function Tutorial({
         style={{
           width: "80%",
           position: "absolute",
-          top: height * 0.14,
+          top: "5%",
           alignSelf: "center",
           zIndex: 3,
         }}
@@ -123,7 +121,21 @@ export default function Tutorial({
           </Text>
         </Button>
 
-        {step === 0 ? null : (
+        {step === 0 ? (
+          <Button
+            style={{
+              // position: "absolute",
+              // top: height * 0.65,
+              alignSelf: "center",
+              borderRadius: theme.roundness,
+              backgroundColor: theme.colors.onSurface,
+              zIndex: 3,
+            }}
+            onPress={finishTutorial}
+          >
+            <Text>Skip Tutorial</Text>
+          </Button>
+        ) : (
           <Button
             style={{
               marginHorizontal: 20,
@@ -137,22 +149,6 @@ export default function Tutorial({
         )}
       </View>
 
-      {/* skip tutorial button */}
-      {step === 0 ? (
-        <Button
-          style={{
-            position: "absolute",
-            top: height * 0.75,
-            alignSelf: "center",
-            borderRadius: theme.roundness,
-            backgroundColor: theme.colors.onSurface,
-            zIndex: 3,
-          }}
-          onPress={finishTutorial}
-        >
-          <Text>Skip Tutorial</Text>
-        </Button>
-      ) : null}
       <View
         style={{
           alignSelf: "center",
