@@ -11,7 +11,7 @@ import {
   StatusOfDaily,
 } from "../../types";
 import { DateSelect } from "../InteractiveElements";
-import { AdSafeAreaView, Header } from "../Layout";
+import { AdSafeAreaView } from "../Layout";
 
 export default function DailyCalendar({
   navigation,
@@ -19,9 +19,6 @@ export default function DailyCalendar({
   navigation: ScreenNavigation;
 }): JSX.Element {
   const theme = useSelector((state: RootState) => state.theme);
-  const receivedPuzzles = useSelector(
-    (state: RootState) => state.receivedPuzzles
-  );
 
   const onUnmarkedDayPress = (dailyDate: string) => {
     Toast.show("Nothing on that date", {
