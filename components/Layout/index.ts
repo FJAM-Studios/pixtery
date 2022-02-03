@@ -1,4 +1,4 @@
 import AdSafeAreaView from "./AdSafeAreaView";
-import Header from "./Header";
+import Subheader from "./Subheader";
 
-export { AdSafeAreaView, Header };
+export { AdSafeAreaView, Subheader };

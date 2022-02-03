@@ -10,7 +10,7 @@ import { setSentPuzzles } from "../../store/reducers/sentPuzzles";
 import { Puzzle, ScreenNavigation, RootState } from "../../types";
 import { safelyDeletePuzzleImage, deactivatePuzzleOnServer } from "../../util";
 import { SentPuzzleCard } from "../InteractiveElements";
-import { AdSafeAreaView, Header } from "../Layout";
+import { AdSafeAreaView } from "../Layout";
 
 export default function SentPuzzleList({
   navigation,

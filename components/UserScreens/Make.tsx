@@ -300,7 +300,6 @@ export default function Make({
           style={{
             alignSelf: "center",
             alignItems: "center",
-            backgroundColor: "blue",
           }}
         >
           <Surface

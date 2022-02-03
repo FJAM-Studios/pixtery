@@ -14,7 +14,7 @@ import {
   goToScreen,
 } from "../../util";
 import { ReceivedPuzzleCard } from "../InteractiveElements";
-import { AdSafeAreaView, Header } from "../Layout";
+import { AdSafeAreaView } from "../Layout";
 
 export default function PuzzleList({
   navigation,

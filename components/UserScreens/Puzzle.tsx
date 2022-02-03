@@ -32,7 +32,7 @@ import {
 } from "../../types";
 import { saveToLibrary } from "../../util";
 import { PuzzlePiece } from "../InteractiveElements";
-import { AdSafeAreaView, Header } from "../Layout";
+import { AdSafeAreaView } from "../Layout";
 
 //disable shuffling for testing
 const disableShuffle = TESTING_MODE;
