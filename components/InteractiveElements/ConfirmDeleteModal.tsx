@@ -1,12 +1,20 @@
 import { useNavigation } from "@react-navigation/native";
-import React from "react";
+import React, { useState } from "react";
 import { AsyncStorage, View } from "react-native";
 import Modal from "react-native-modal";
-import { Button, Headline, Text } from "react-native-paper";
+import {
+  Button,
+  Headline,
+  Subheading,
+  Text,
+  TextInput,
+} from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 
 import { deleteUserCallable, signOut } from "../../FirebaseApp";
 import { setProfile } from "../../store/reducers/profile";
+import { setReceivedPuzzles } from "../../store/reducers/receivedPuzzles";
+import { setSentPuzzles } from "../../store/reducers/sentPuzzles";
 import { RootState, ScreenNavigation } from "../../types";
 
 export default function SignInModal({
@@ -19,15 +27,24 @@ export default function SignInModal({
   const dispatch = useDispatch();
   const navigation = useNavigation<ScreenNavigation>();
   const theme = useSelector((state: RootState) => state.theme);
+  const [confirmText, setConfirmText] = useState("");
 
   const deleteUser = async () => {
+    // //delete local storage
+    const keys = await AsyncStorage.getAllKeys();
+    await AsyncStorage.multiRemove(keys);
+
+    //delete user from server
     await deleteUserCallable();
-    //delete local storage
-    await AsyncStorage.removeItem("@pixteryProfile");
-    //sign out of Firebase account
+
+    //sign out of Firebase account locally
     await signOut();
-    //update app state
+
+    //clear app state
+    dispatch(setReceivedPuzzles([]));
+    dispatch(setSentPuzzles([]));
     dispatch(setProfile(null));
+
     //send you to splash
     navigation.navigate("Splash");
   };
@@ -57,34 +74,42 @@ export default function SignInModal({
         >
           Are you sure you want to delete your account?
         </Headline>
-        <Text
+        <Subheading
           style={{
             textAlign: "center",
           }}
         >
           This cannot be undone.
-        </Text>
-        <View
+        </Subheading>
+        <Text
           style={{
-            backgroundColor: theme.colors.backdrop,
-            borderRadius: theme.roundness,
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-around",
+            marginTop: 15,
+          }}
+        >
+          Type <Text style={{ fontWeight: "bold" }}>delete</Text> to confirm.
+        </Text>
+        <TextInput
+          value={confirmText}
+          onChangeText={(confirmText) => setConfirmText(confirmText)}
+          placeholderTextColor={theme.colors.primary}
+          style={{
+            color: theme.colors.text,
+            justifyContent: "center",
+            backgroundColor: theme.colors.background,
+            marginTop: 5,
+          }}
+        />
+        <Button
+          disabled={confirmText.toLowerCase() !== "delete"}
+          icon="account-cancel"
+          mode="contained"
+          onPress={deleteUser}
+          style={{
             marginTop: 10,
           }}
         >
-          <Button
-            icon="cancel"
-            mode="contained"
-            onPress={() => setModalVisible(false)}
-          >
-            Cancel
-          </Button>
-          <Button icon="account-cancel" mode="contained" onPress={deleteUser}>
-            Delete
-          </Button>
-        </View>
+          Delete
+        </Button>
       </View>
     </Modal>
   );
