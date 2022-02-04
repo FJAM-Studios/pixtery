@@ -1,5 +1,4 @@
-import Constants from "expo-constants";
-import { FirebaseError, initializeApp } from "firebase/app";
+import { FirebaseError } from "firebase/app";
 import {
   PhoneAuthProvider,
   getAuth,
@@ -12,80 +11,9 @@ import {
   createUserWithEmailAndPassword,
   sendPasswordResetEmail,
 } from "firebase/auth";
-import {
-  getFunctions,
-  connectFunctionsEmulator,
-  httpsCallable,
-} from "firebase/functions";
-import { getStorage, ref, getDownloadURL, uploadBytes } from "firebase/storage";
 
-import { SignInOptions } from "./types";
-
-export const firebaseConfig = {
-  apiKey: "***REMOVED***",
-  authDomain: "pixtery.io",
-  databaseURL: "https://pixstery-7c9b9-default-rtdb.firebaseio.com",
-  projectId: "pixstery-7c9b9",
-  storageBucket: "pixstery-7c9b9.appspot.com",
-  messagingSenderId: "503392467903",
-  appId: "1:503392467903:web:6283d87be13230e6caff0a",
-  measurementId: "G-5XDDLZ009P",
-};
-
-const app = initializeApp(firebaseConfig);
-
-const functions = getFunctions(app);
-
-// uncomment if not using block below for func emu testing
-// import { MY_LAN_IP } from "./ip";
-// functions.useFunctionsEmulator(`${MY_LAN_IP}:5001`);
-
-if (
-  Constants.manifest &&
-  Constants.manifest.extra &&
-  Constants.manifest.extra.functionEmulator &&
-  Constants.manifest.debuggerHost
-) {
-  const host = `${Constants.manifest.debuggerHost.split(":")[0]}`;
-  const port = 5001;
-  console.log(
-    "\x1b[34m%s\x1b[0m",
-    `using functions emulator on ${host}:${port}`
-  );
-  connectFunctionsEmulator(functions, host, port);
-}
-
-// all firebase cloud functions ///////////////
-
-export const addToQueue = httpsCallable(functions, "addToQueue");
-export const fetchPuzzles = httpsCallable(functions, "fetchPuzzles");
-export const deactivateUserPuzzle = httpsCallable(
-  functions,
-  "deactivateUserPuzzle"
-);
-export const deactivateAllUserPuzzles = httpsCallable(
-  functions,
-  "deactivateAllUserPuzzles"
-);
-export const queryPuzzleCallable = httpsCallable(functions, "queryPuzzle");
-export const uploadPuzzleSettingsCallable = httpsCallable(
-  functions,
-  "uploadPuzzleSettings"
-);
-export const getGalleryQueue = httpsCallable(functions, "getGalleryQueue");
-export const addToGallery = httpsCallable(functions, "addToGallery");
-export const removeDailyPuzzle = httpsCallable(functions, "removeDailyPuzzle");
-export const deactivateInQueue = httpsCallable(functions, "deactivateInQueue");
-export const getDailyDates = httpsCallable(functions, "getDailyDates");
-export const submitFeedbackCallable = httpsCallable(
-  functions,
-  "submitFeedback"
-);
-export const getDaily = httpsCallable(functions, "getDaily");
-export const migratePuzzles = httpsCallable(functions, "migratePuzzles");
-export const checkGalleryAdmin = httpsCallable(functions, "checkGalleryAdmin");
-
-//////////////////////////////////////////////
+import { SignInOptions } from "../types";
+import { migratePuzzles, checkGalleryAdmin } from "./CloudFunctions";
 
 export const auth = getAuth();
 export const phoneProvider = new PhoneAuthProvider(auth);
@@ -192,23 +120,5 @@ export const sendResetEmail = async (email: string): Promise<void> => {
     throw new Error(
       "Could not send reset email. Check email address or try again later."
     );
-  }
-};
-
-const storage = getStorage(app);
-
-export const getPixteryURL = async (str: string): Promise<string> => {
-  const url = await getDownloadURL(ref(storage, str));
-  return url;
-};
-
-export const uploadBlob = async (
-  fileName: string,
-  blob: Blob
-): Promise<void> => {
-  try {
-    await uploadBytes(ref(storage, fileName), blob);
-  } catch (e) {
-    console.log(e);
   }
 };

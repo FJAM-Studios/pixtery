@@ -29,6 +29,7 @@ import {
   useSelector,
 } from "react-redux";
 
+import "./FirebaseApp/FireBaseEmulator";
 import {
   DailyCalendar,
   GalleryQueue,
