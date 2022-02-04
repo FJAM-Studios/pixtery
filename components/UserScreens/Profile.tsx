@@ -25,6 +25,7 @@ import {
 import { ThemeSelector } from "../InteractiveElements";
 import { AdSafeAreaView, Header } from "../Layout";
 import { ProfileModal } from "../SignInMethods";
+import { LoadingModal } from "../StaticElements";
 
 export default function Profile({
   navigation,
@@ -46,6 +47,7 @@ export default function Profile({
   const [errors, setErrors] = useState("");
   const [restoring, setRestoring] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const [loadingModalVisible, setLoadingModalVisible] = useState(false);
 
   const toggleSound = async () => {
     //save to local storage
@@ -278,7 +280,9 @@ export default function Profile({
       <ProfileModal
         isVisible={modalVisible}
         setModalVisible={setModalVisible}
+        setLoadingModalVisible={setLoadingModalVisible}
       />
+      <LoadingModal isVisible={loadingModalVisible} />
     </AdSafeAreaView>
   );
 }
