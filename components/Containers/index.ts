@@ -1,5 +1,5 @@
 import MakeContainer from "../Containers/MakeContainer";
-import ProfileContainer from "./ProfileContainer";
+import SettingsContainer from "./SettingsContainer";
 import TabContainer from "./TabContainer";
 
-export { ProfileContainer, TabContainer, MakeContainer };
+export { SettingsContainer, TabContainer, MakeContainer };

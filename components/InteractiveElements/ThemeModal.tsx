@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React from "react";
 import { ScrollView, View, TouchableOpacity } from "react-native";
+import Modal from "react-native-modal";
 import { Headline, Text } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -11,22 +12,17 @@ import { PixteryTheme, RootState } from "../../types";
 function ThemeDisplay({
   theme,
   pixTheme,
-  setSelectingTheme,
+  onPress,
 }: {
   theme: PixteryTheme;
   pixTheme: PixteryTheme;
-  setSelectingTheme: (value: React.SetStateAction<boolean>) => void;
+  onPress: (pixTheme: PixteryTheme) => Promise<void>;
 }): JSX.Element {
   const { height } = useSelector((state: RootState) => state.screenHeight);
-  const dispatch = useDispatch();
   return (
     <TouchableOpacity
       style={{ alignItems: "center" }}
-      onPress={async () => {
-        dispatch(setTheme(pixTheme));
-        await AsyncStorage.setItem("@themeID", JSON.stringify(pixTheme.ID));
-        setSelectingTheme(false);
-      }}
+      onPress={() => onPress(pixTheme)}
     >
       <View
         style={{
@@ -92,22 +88,36 @@ function ThemeDisplay({
   );
 }
 
-export default function ThemeSelector({
-  setSelectingTheme,
+export default function ThemeModal({
+  isVisible,
+  setModalVisible,
+  setLoadingModalVisible,
 }: {
-  setSelectingTheme: (value: React.SetStateAction<boolean>) => void;
+  isVisible: boolean;
+  setModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  setLoadingModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
 }): JSX.Element {
   const theme = useSelector((state: RootState) => state.theme);
+  const dispatch = useDispatch();
+
+  const onPress = async (pixTheme: PixteryTheme) => {
+    setLoadingModalVisible(true);
+    dispatch(setTheme(pixTheme));
+    await AsyncStorage.setItem("@themeID", JSON.stringify(pixTheme.ID));
+    setLoadingModalVisible(false);
+    setModalVisible(false);
+  };
+
   return (
-    <View
-      style={{
-        position: "absolute",
-        width: "100%",
-        height: "100%",
-        backgroundColor: "rgba(0,0,0,0)",
-        elevation: 100,
-        alignSelf: "center",
+    <Modal
+      isVisible={isVisible}
+      onBackdropPress={() => {
+        setModalVisible(false);
       }}
+      animationIn="fadeIn"
+      animationOut="fadeOut"
+      backdropTransitionOutTiming={0}
+      avoidKeyboard
     >
       <ScrollView
         style={{
@@ -129,11 +139,11 @@ export default function ThemeSelector({
           <ThemeDisplay
             theme={theme}
             pixTheme={pixTheme}
-            setSelectingTheme={setSelectingTheme}
             key={pixTheme.name}
+            onPress={onPress}
           />
         ))}
       </ScrollView>
-    </View>
+    </Modal>
   );
 }
