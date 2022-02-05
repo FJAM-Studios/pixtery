@@ -14,7 +14,7 @@ import {
 } from "../../types";
 import SignInMenu from "../SignInMethods/SignInMenu";
 import SignInModal from "../SignInMethods/SignInModal";
-import { Logo, Title, UserAgreements } from "../StaticElements";
+import { LoadingModal, Logo, Title, UserAgreements } from "../StaticElements";
 
 export default function CreateProfile({
   navigation,
@@ -25,6 +25,7 @@ export default function CreateProfile({
 }): JSX.Element {
   const theme = useSelector((state: RootState) => state.theme);
   const [modalVisible, setModalVisible] = useState(false);
+  const [loadingModalVisible, setLoadingModalVisible] = useState(false);
   const [signInType, setSignInType] = useState<SignInOptions | null>(null);
 
   const signIn = (signInType: SignInOptions) => {
@@ -42,6 +43,7 @@ export default function CreateProfile({
   };
 
   const signInAnonymously = async () => {
+    setLoadingModalVisible(true);
     try {
       await anonSignIn();
       navigation.navigate("EnterName", {
@@ -50,6 +52,7 @@ export default function CreateProfile({
     } catch (e) {
       console.log("error signing in anonymously");
     }
+    setLoadingModalVisible(false);
   };
 
   const signInWithEmail = async () => {
@@ -118,9 +121,11 @@ export default function CreateProfile({
       <SignInModal
         isVisible={modalVisible}
         setModalVisible={setModalVisible}
+        setLoadingModalVisible={setLoadingModalVisible}
         signInType={signInType}
         url={route.params.url}
       />
+      <LoadingModal isVisible={loadingModalVisible} />
     </SafeAreaView>
   );
 }
