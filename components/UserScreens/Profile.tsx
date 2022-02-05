@@ -24,6 +24,7 @@ import {
   deactivateAllPuzzlesOnServer,
 } from "../../util";
 import { ThemeSelector } from "../InteractiveElements";
+import ConfirmDeleteModal from "../InteractiveElements/ConfirmDeleteModal";
 import { AdSafeAreaView } from "../Layout";
 import { ProfileModal } from "../SignInMethods";
 import { LoadingModal } from "../StaticElements";
@@ -48,6 +49,7 @@ export default function Profile({
   const [errors, setErrors] = useState("");
   const [restoring, setRestoring] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [loadingModalVisible, setLoadingModalVisible] = useState(false);
 
   const toggleSound = async () => {
@@ -277,6 +279,16 @@ export default function Profile({
         >
           Contact Us
         </Button>
+        <Button
+          icon="cloud-download"
+          mode="contained"
+          onPress={() => {
+            setDeleteModalVisible(true);
+          }}
+          style={{ margin: 10 }}
+        >
+          Delete Account
+        </Button>
         {selectingTheme ? (
           <ThemeSelector setSelectingTheme={setSelectingTheme} />
         ) : null}
@@ -286,6 +298,10 @@ export default function Profile({
         isVisible={modalVisible}
         setModalVisible={setModalVisible}
         setLoadingModalVisible={setLoadingModalVisible}
+      />
+      <ConfirmDeleteModal
+        isVisible={deleteModalVisible}
+        setModalVisible={setDeleteModalVisible}
       />
       <LoadingModal isVisible={loadingModalVisible} />
     </AdSafeAreaView>
