@@ -174,7 +174,6 @@ export default function Gallery({
         </View>
         <View
           style={{
-            flexDirection: "row",
             position: "absolute",
             bottom: 10,
             alignItems: "center",
