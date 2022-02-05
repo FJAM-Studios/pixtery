@@ -15,15 +15,15 @@ import {
   signInOnFireBase,
 } from "../../../FirebaseApp";
 import { SignInOptions } from "../../../types";
-import { UserAgreements } from "../../StaticElements";
 
 const phoneFormat = require("phone");
 
 export default function Phone({
   onFinish,
+  setLoadingModalVisible,
 }: {
   onFinish: () => void;
-  url?: string;
+  setLoadingModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
 }): JSX.Element {
   const recaptchaVerifier = useRef<FirebaseRecaptcha.FirebaseRecaptchaVerifierModal>(
     null
@@ -57,6 +57,7 @@ export default function Phone({
     }
   };
   const completeSignIn = async () => {
+    setLoadingModalVisible(true);
     try {
       await signInOnFireBase(SignInOptions.PHONE, verificationId, smsCode);
       onFinish();
@@ -64,6 +65,7 @@ export default function Phone({
       if (e instanceof Error) setErrors(e.message);
       setResetAllowed(true);
     }
+    setLoadingModalVisible(false);
   };
 
   return (
@@ -96,7 +98,6 @@ export default function Phone({
       >
         Sign In
       </Button>
-      <UserAgreements buttonText="Sign In" />
       {verificationId.length ? (
         <View>
           <TextInput
