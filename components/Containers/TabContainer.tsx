@@ -1,4 +1,4 @@
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -9,7 +9,7 @@ import AdminContainer from "./AdminContainer";
 import DailyContainer from "./DailyContainer";
 import LibraryContainer from "./LibraryContainer";
 import MakeContainer from "./MakeContainer";
-import ProfileContainer from "./ProfileContainer";
+import SettingsContainer from "./SettingsContainer";
 
 const Tab = createMaterialTopTabNavigator<StackScreens>();
 
@@ -36,7 +36,14 @@ export default function TabContainer(): JSX.Element {
             if (route.name === "DailyContainer")
               iconName = "white-balance-sunny";
             if (route.name === "LibraryContainer") iconName = "book-multiple";
-            if (route.name === "ProfileContainer") iconName = "account";
+            if (route.name === "SettingsContainer")
+              return (
+                <Ionicons
+                  size={24}
+                  name="settings"
+                  color={focused ? theme.colors.text : theme.colors.onSurface}
+                />
+              );
             if (route.name === "AdminContainer") iconName = "lock";
             return (
               <MaterialCommunityIcons
@@ -64,9 +71,9 @@ export default function TabContainer(): JSX.Element {
           options={{ tabBarLabel: "Library" }}
         />
         <Tab.Screen
-          name="ProfileContainer"
-          component={ProfileContainer}
-          options={{ tabBarLabel: "Profile" }}
+          name="SettingsContainer"
+          component={SettingsContainer}
+          options={{ tabBarLabel: "Settings" }}
         />
         {profile && profile.isGalleryAdmin ? (
           <Tab.Screen

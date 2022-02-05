@@ -1,6 +1,7 @@
 import * as React from "react";
 
-import { getPixteryURL, queryPuzzleCallable } from "../FirebaseApp";
+import { queryPuzzleCallable } from "../FirebaseApp/CloudFunctions";
+import { getPixteryURL } from "../FirebaseApp/StorageFunctions";
 import { PUBLIC_KEY_LENGTH } from "../constants";
 import { Puzzle as PuzzleType } from "../types";
 import Puzzle from "./Puzzle";
@@ -53,11 +54,16 @@ export default function App(): JSX.Element {
       <StoreLinks />
       <div id="web-footer">
         <div id="web-footer-contents">
-          <a href="https://pixtery.io/privacy.html">Privacy policy</a>
+          <a href="https://pixtery.io/privacy.html">Privacy Policy</a>
+          <span className="dot">&nbsp;&#x2022;&nbsp;</span>
+          <a href="https://pixtery.io/community.html">Community Guidelines</a>
+          <span className="dot">&nbsp;&#x2022;&nbsp;</span>
+          <a href="https://pixtery.io/terms.html">Terms</a>
           <span className="dot">&nbsp;&#x2022;&nbsp;</span>
           <a href="mailto:contact@pixtery.io">contact@pixtery.io</a>
-          <span className="dot">&nbsp;&#x2022;&nbsp;</span>
-          <span className="studio">© 2021 FJAM Studios</span>
+          <div>
+            <span className="studio">© 2021 FJAM Studios</span>
+          </div>
         </div>
       </div>
     </div>
