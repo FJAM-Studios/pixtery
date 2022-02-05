@@ -119,7 +119,7 @@ export default function PuzzleComponent({
         setWinMessage(winMessage);
         setOpaque(false);
       }, 100);
-      if (sound && !profile.noSound) sound.playAsync();
+      if (sound && !profile?.noSound) sound.playAsync();
     }, 100);
   };
 
