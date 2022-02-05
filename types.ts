@@ -84,7 +84,7 @@ export type StackScreens = {
   MakeContainer: undefined;
   DailyContainer: undefined;
   LibraryContainer: undefined;
-  ProfileContainer: undefined;
+  SettingsContainer: undefined;
   AdminContainer: undefined;
 
   Make: undefined;
@@ -100,7 +100,9 @@ export type StackScreens = {
   PuzzleList: undefined;
   SentPuzzleList: undefined;
 
+  Settings: undefined;
   Profile: undefined;
+  ManagePuzzles: undefined;
   ContactUs: undefined;
 
   GalleryQueue: undefined | { forceReload: boolean };
@@ -131,7 +133,7 @@ export interface ScreenHeight {
 
 export interface RootState {
   adHeight: number;
-  profile: Profile;
+  profile: Profile | null;
   receivedPuzzles: Puzzle[];
   sentPuzzles: Puzzle[];
   screenHeight: ScreenHeight;
