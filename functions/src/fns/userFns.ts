@@ -49,17 +49,19 @@ export const deactivateAllUserPuzzles = functions.https.onCall(
     try {
       blockIfNotAuthenticated(context);
       // mark userPuzzle as removed from user's list
-      db.collection("userPixteries")
-        .doc(context!.auth!.uid)
-        .collection(list)
-        .get()
-        .then(function (querySnapshot) {
-          querySnapshot.forEach(function (doc) {
-            doc.ref.update({
-              active: false,
+      if (context && context.auth) {
+        db.collection("userPixteries")
+          .doc(context.auth.uid)
+          .collection(list)
+          .get()
+          .then(function (querySnapshot) {
+            querySnapshot.forEach(function (doc) {
+              doc.ref.update({
+                active: false,
+              });
             });
           });
-        });
+      }
     } catch (error: unknown) {
       if (error instanceof Error)
         throw new functions.https.HttpsError("unknown", error.message, error);
@@ -74,11 +76,13 @@ export const deactivateUserPuzzle = functions.https.onCall(
     try {
       blockIfNotAuthenticated(context);
       // mark userPuzzle as removed from user's list
-      db.collection("userPixteries")
-        .doc(context!.auth!.uid)
-        .collection(list)
-        .doc(publicKey)
-        .set({ active: false }, { merge: true });
+      if (context && context.auth) {
+        db.collection("userPixteries")
+          .doc(context.auth.uid)
+          .collection(list)
+          .doc(publicKey)
+          .set({ active: false }, { merge: true });
+      }
     } catch (error: unknown) {
       if (error instanceof Error)
         throw new functions.https.HttpsError("unknown", error.message, error);
@@ -97,7 +101,7 @@ const copyList = async (
     .collection(listType)
     .get();
 
-  puzzleCollection.forEach((puzzle: any) => {
+  puzzleCollection.forEach((puzzle: FirebaseFirestore.DocumentData) => {
     const puzzleData = puzzle.data();
     if (puzzleData && puzzleData.publicKey) {
       db.collection("userPixteries")
@@ -117,7 +121,7 @@ const emptyList = async (uid: string, listType: string) => {
     .collection(listType)
     .get();
 
-  puzzleCollection.forEach((puzzle: any) => {
+  puzzleCollection.forEach((puzzle: FirebaseFirestore.DocumentData) => {
     try {
       const puzzleData = puzzle.data();
       if (puzzleData && puzzleData.publicKey) {
@@ -158,7 +162,9 @@ const deleteUserAuth = (uid: string) => {
     admin.auth().deleteUser(uid);
     console.log("DELETED");
   } catch (error) {
-    throw new functions.https.HttpsError("unknown", error.message, error);
+    if (error instanceof Error) {
+      throw new functions.https.HttpsError("unknown", error.message, error);
+    }
   }
 };
 
@@ -170,7 +176,9 @@ export const migratePuzzles = functions.https.onCall(
 
       const collections = await userDocRef.listCollections();
       collections.forEach((collection) => {
-        copyList(prevUserId, context!.auth!.uid, collection.id);
+        if (context && context.auth) {
+          copyList(prevUserId, context.auth.uid, collection.id);
+        }
       });
       console.log("MIGRATING!");
       deleteUserDoc(prevUserId);
@@ -187,8 +195,10 @@ export const deleteUser = functions.https.onCall(
   async (data: undefined, context: functions.https.CallableContext) => {
     try {
       blockIfNotAuthenticated(context);
-      deleteUserDoc(context!.auth!.uid);
-      deleteUserAuth(context!.auth!.uid);
+      if (context && context.auth) {
+        deleteUserDoc(context.auth.uid);
+        deleteUserAuth(context.auth.uid);
+      }
     } catch (error) {
       if (error instanceof Error) {
         throw new functions.https.HttpsError("unknown", error.message, error);
