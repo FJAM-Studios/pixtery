@@ -14,7 +14,7 @@ import {
 } from "../../types";
 import SignInMenu from "../SignInMethods/SignInMenu";
 import SignInModal from "../SignInMethods/SignInModal";
-import { Logo, Title } from "../StaticElements";
+import { LoadingModal, Logo, Title, UserAgreements } from "../StaticElements";
 
 export default function CreateProfile({
   navigation,
@@ -25,6 +25,7 @@ export default function CreateProfile({
 }): JSX.Element {
   const theme = useSelector((state: RootState) => state.theme);
   const [modalVisible, setModalVisible] = useState(false);
+  const [loadingModalVisible, setLoadingModalVisible] = useState(false);
   const [signInType, setSignInType] = useState<SignInOptions | null>(null);
 
   const signIn = (signInType: SignInOptions) => {
@@ -42,6 +43,7 @@ export default function CreateProfile({
   };
 
   const signInAnonymously = async () => {
+    setLoadingModalVisible(true);
     try {
       await anonSignIn();
       navigation.navigate("EnterName", {
@@ -50,6 +52,7 @@ export default function CreateProfile({
     } catch (e) {
       console.log("error signing in anonymously");
     }
+    setLoadingModalVisible(false);
   };
 
   const signInWithEmail = async () => {
@@ -90,6 +93,12 @@ export default function CreateProfile({
         <Headline style={{ textAlign: "center" }}>Welcome to Pixtery!</Headline>
 
         <SignInMenu onPress={signIn} />
+        <Text style={{ textAlign: "center" }}>
+          Signing in allows you to submit Daily Pixteries and access your
+          account across devices.{"\n\n"}
+          If you don&apos;t want to create an account now, you can register
+          later from the Profile menu.
+        </Text>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <View style={{ flex: 1, height: 1, backgroundColor: "grey" }} />
           <View>
@@ -107,21 +116,16 @@ export default function CreateProfile({
         >
           Continue Without Sign In
         </Button>
-        <Text style={{ textAlign: "center" }}>
-          Signing in allows you to submit Daily Pixteries and access your
-          account across devices.
-        </Text>
-        <Text style={{ textAlign: "center" }}>
-          If you don&apos;t want to create an account now, you can register
-          later from the Profile menu.
-        </Text>
+        <UserAgreements />
       </KeyboardAwareScrollView>
       <SignInModal
         isVisible={modalVisible}
         setModalVisible={setModalVisible}
+        setLoadingModalVisible={setLoadingModalVisible}
         signInType={signInType}
         url={route.params.url}
       />
+      <LoadingModal isVisible={loadingModalVisible} />
     </SafeAreaView>
   );
 }

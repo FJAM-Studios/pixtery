@@ -1,5 +1,5 @@
 import React from "react";
-import { View } from "react-native";
+import { View, Linking } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Headline, Text, Button } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
@@ -69,6 +69,24 @@ export default function Help({
           style={{ margin: 10 }}
         >
           Contact Us
+        </Button>
+        <Button
+          mode="contained"
+          onPress={() => {
+            Linking.openURL("https://www.pixtery.io/terms.html");
+          }}
+          style={{ margin: 10 }}
+        >
+          Terms
+        </Button>
+        <Button
+          mode="contained"
+          onPress={() => {
+            Linking.openURL("https://www.pixtery.io/privacy.html");
+          }}
+          style={{ margin: 10 }}
+        >
+          Privacy Policy
         </Button>
         <Text>v{VERSION_NUMBER}</Text>
       </KeyboardAwareScrollView>
