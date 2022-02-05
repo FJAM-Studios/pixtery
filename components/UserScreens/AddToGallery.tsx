@@ -27,6 +27,7 @@ import { addToQueue } from "../../FirebaseApp";
 import { ScreenNavigation, RootState } from "../../types";
 import { formatDateFromString } from "../../util";
 import { AdSafeAreaView, Header } from "../Layout";
+import DailyAgreement from "../StaticElements/DailyAgreement";
 
 export default function AddToGallery({
   navigation,
@@ -93,10 +94,6 @@ export default function AddToGallery({
           ) : (
             <>
               <Headline>Confirm?</Headline>
-              <Text style={{ textAlign: "center" }}>
-                This is legalese that says we can use your Pixtery. But also we
-                might not.
-              </Text>
               <View
                 style={{
                   flexDirection: "row",
@@ -104,7 +101,7 @@ export default function AddToGallery({
                   margin: 10,
                 }}
               >
-                <Checkbox
+                <Checkbox.Android // Checkbox is invisible on iOS when unchecked, which is very confusing. Specifying .Android forces iOS to use Android style boxes instead.
                   status={anonymousChecked ? "checked" : "unchecked"}
                   color={theme.colors.surface}
                   onPress={() => {
@@ -186,6 +183,7 @@ export default function AddToGallery({
               >
                 Submit To Daily Pixtery
               </Button>
+              <DailyAgreement />
             </>
           )}
         </KeyboardAwareScrollView>
