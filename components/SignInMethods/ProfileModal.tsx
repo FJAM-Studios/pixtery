@@ -14,9 +14,11 @@ import SignInMenu from "./SignInMenu";
 export default function ProfileModal({
   isVisible,
   setModalVisible,
+  setLoadingModalVisible,
 }: {
   isVisible: boolean;
   setModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  setLoadingModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
 }): JSX.Element {
   const dispatch = useDispatch();
   const theme = useSelector((state: RootState) => state.theme);
@@ -60,10 +62,16 @@ export default function ProfileModal({
       >
         {signInType === null ? <SignInMenu onPress={setSignInType} /> : null}
         {signInType === SignInOptions.EMAIL ? (
-          <Email onFinish={onFinish} />
+          <Email
+            onFinish={onFinish}
+            setLoadingModalVisible={setLoadingModalVisible}
+          />
         ) : null}
         {signInType === SignInOptions.PHONE ? (
-          <Phone onFinish={onFinish} />
+          <Phone
+            onFinish={onFinish}
+            setLoadingModalVisible={setLoadingModalVisible}
+          />
         ) : null}
       </View>
     </Modal>

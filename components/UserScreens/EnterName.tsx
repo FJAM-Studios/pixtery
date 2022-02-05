@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { checkAdminStatus } from "../../FirebaseApp";
 import { setProfile } from "../../store/reducers/profile";
 import { ScreenNavigation, RootState, EnterNameRoute } from "../../types";
-import { Logo, Title } from "../StaticElements";
+import { LoadingModal, Logo, Title } from "../StaticElements";
 
 export default function EnterName({
   navigation,
@@ -24,10 +24,12 @@ export default function EnterName({
   const profile = useSelector((state: RootState) => state.profile);
   const [name, setName] = useState("");
   const [errors, setErrors] = useState("");
+  const [loadingModalVisible, setLoadingModalVisible] = useState(false);
 
   const { url } = route.params;
 
   const confirmName = async () => {
+    setLoadingModalVisible(true);
     try {
       if (name.trim().length < 1)
         throw new Error("A display name is required.");
@@ -44,6 +46,7 @@ export default function EnterName({
       console.log(e);
       if (e instanceof Error) setErrors(e.message);
     }
+    setLoadingModalVisible(false);
   };
 
   return (
@@ -91,6 +94,7 @@ export default function EnterName({
           Enter a display name so your friends know who sent them a Pixtery
         </Text>
       </KeyboardAwareScrollView>
+      <LoadingModal isVisible={loadingModalVisible} />
     </SafeAreaView>
   );
 }
