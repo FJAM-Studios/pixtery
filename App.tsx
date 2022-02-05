@@ -168,7 +168,6 @@ const App = (): JSX.Element => {
 
   return (
     <PaperProvider theme={theme}>
-
       <SafeAreaProvider>
         <NavigationContainer ref={navigationRef} onReady={gotoSplash}>
           <Stack.Navigator
