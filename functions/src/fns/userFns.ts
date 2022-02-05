@@ -5,7 +5,9 @@ import db from "../db";
 // throw error if user is not authenticated
 const blockIfNotAuthenticated = (context: functions.https.CallableContext) => {
   console.log("CHECK IF AUTHENTICATED");
-  if (!context.auth) {
+  if (context.auth) {
+    return context.auth;
+  } else {
     throw new functions.https.HttpsError(
       "permission-denied",
       "user not authenticated"
@@ -47,21 +49,19 @@ export const deactivateAllUserPuzzles = functions.https.onCall(
   async (list, context) => {
     console.log("deactivating user puzzle");
     try {
-      blockIfNotAuthenticated(context);
+      const user = blockIfNotAuthenticated(context);
       // mark userPuzzle as removed from user's list
-      if (context && context.auth) {
-        db.collection("userPixteries")
-          .doc(context.auth.uid)
-          .collection(list)
-          .get()
-          .then(function (querySnapshot) {
-            querySnapshot.forEach(function (doc) {
-              doc.ref.update({
-                active: false,
-              });
+      db.collection("userPixteries")
+        .doc(user.uid)
+        .collection(list)
+        .get()
+        .then(function (querySnapshot) {
+          querySnapshot.forEach(function (doc) {
+            doc.ref.update({
+              active: false,
             });
           });
-      }
+        });
     } catch (error: unknown) {
       if (error instanceof Error)
         throw new functions.https.HttpsError("unknown", error.message, error);
@@ -74,15 +74,13 @@ export const deactivateUserPuzzle = functions.https.onCall(
     const { publicKey, list } = data;
     console.log("deactivating user puzzle");
     try {
-      blockIfNotAuthenticated(context);
+      const user = blockIfNotAuthenticated(context);
       // mark userPuzzle as removed from user's list
-      if (context && context.auth) {
-        db.collection("userPixteries")
-          .doc(context.auth.uid)
-          .collection(list)
-          .doc(publicKey)
-          .set({ active: false }, { merge: true });
-      }
+      db.collection("userPixteries")
+        .doc(user.uid)
+        .collection(list)
+        .doc(publicKey)
+        .set({ active: false }, { merge: true });
     } catch (error: unknown) {
       if (error instanceof Error)
         throw new functions.https.HttpsError("unknown", error.message, error);
@@ -171,14 +169,12 @@ const deleteUserAuth = (uid: string) => {
 export const migratePuzzles = functions.https.onCall(
   async (prevUserId: string, context) => {
     try {
-      blockIfNotAuthenticated(context);
+      const user = blockIfNotAuthenticated(context);
       const userDocRef = db.collection("userPixteries").doc(prevUserId);
 
       const collections = await userDocRef.listCollections();
       collections.forEach((collection) => {
-        if (context && context.auth) {
-          copyList(prevUserId, context.auth.uid, collection.id);
-        }
+        copyList(prevUserId, user.uid, collection.id);
       });
       console.log("MIGRATING!");
       deleteUserDoc(prevUserId);
@@ -194,11 +190,9 @@ export const migratePuzzles = functions.https.onCall(
 export const deleteUser = functions.https.onCall(
   async (data: undefined, context: functions.https.CallableContext) => {
     try {
-      blockIfNotAuthenticated(context);
-      if (context && context.auth) {
-        deleteUserDoc(context.auth.uid);
-        deleteUserAuth(context.auth.uid);
-      }
+      const user = blockIfNotAuthenticated(context);
+      deleteUserDoc(user.uid);
+      deleteUserAuth(user.uid);
     } catch (error) {
       if (error instanceof Error) {
         throw new functions.https.HttpsError("unknown", error.message, error);
