@@ -13,8 +13,10 @@ import SignInScreen from "./SignInScreen";
 
 export default function Email({
   onFinish,
+  setLoadingModalVisible,
 }: {
   onFinish: () => void;
+  setLoadingModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
 }): JSX.Element {
   const [screen, setScreen] = useState("SignIn");
 
@@ -25,6 +27,7 @@ export default function Email({
     setErrors: (errors: string) => void,
     isRegister?: boolean | null
   ) => {
+    setLoadingModalVisible(true);
     try {
       if (isEmail(email)) throw new Error("Valid email required");
       if (password.length < 6) throw new Error("Password too short");
@@ -38,6 +41,7 @@ export default function Email({
       console.log(e);
       if (e instanceof Error) setErrors(e.message);
     }
+    setLoadingModalVisible(false);
   };
 
   const resetPassword = async (
@@ -45,6 +49,7 @@ export default function Email({
     setErrors: (errors: string) => void,
     setMessage: (message: string) => void
   ) => {
+    setLoadingModalVisible(true);
     try {
       if (isEmail(email)) throw new Error("Valid email required");
       await sendResetEmail(email);
@@ -54,6 +59,7 @@ export default function Email({
       console.log(e);
       if (e instanceof Error) setErrors(e.message);
     }
+    setLoadingModalVisible(false);
   };
 
   if (screen === "Register")

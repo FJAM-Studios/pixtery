@@ -11,11 +11,13 @@ import Phone from "./Phone/Phone";
 export default function SignInModal({
   isVisible,
   setModalVisible,
+  setLoadingModalVisible,
   signInType,
   url,
 }: {
   isVisible: boolean;
   setModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  setLoadingModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
   signInType: SignInOptions | null;
   url?: string;
 }): JSX.Element {
@@ -46,10 +48,16 @@ export default function SignInModal({
         }}
       >
         {signInType === SignInOptions.EMAIL ? (
-          <Email onFinish={onFinish} />
+          <Email
+            onFinish={onFinish}
+            setLoadingModalVisible={setLoadingModalVisible}
+          />
         ) : null}
         {signInType === SignInOptions.PHONE ? (
-          <Phone onFinish={onFinish} />
+          <Phone
+            onFinish={onFinish}
+            setLoadingModalVisible={setLoadingModalVisible}
+          />
         ) : null}
       </View>
     </Modal>
