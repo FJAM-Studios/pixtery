@@ -168,10 +168,6 @@ const App = (): JSX.Element => {
 
   return (
     <PaperProvider theme={theme}>
-      <StatusBar
-        style={theme.dark ? "light" : "dark"}
-        backgroundColor={theme.colors.primary}
-      />
       <SafeAreaProvider>
         <NavigationContainer ref={navigationRef} onReady={gotoSplash}>
           <Stack.Navigator
@@ -191,6 +187,10 @@ const App = (): JSX.Element => {
           </Stack.Navigator>
         </NavigationContainer>
       </SafeAreaProvider>
+      <StatusBar
+        style={theme.dark ? "light" : "dark"}
+        backgroundColor={theme.colors.primary}
+      />
     </PaperProvider>
   );
 };
