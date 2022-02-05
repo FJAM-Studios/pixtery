@@ -2,7 +2,10 @@ import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import React from "react";
 import { View } from "react-native";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import { useSelector } from "react-redux";
 
 import { RootState, StackScreens } from "../../types";
@@ -35,7 +38,7 @@ export default function TabContainer(): JSX.Element {
               backgroundColor: theme.colors.primary,
             },
             tabBarLabelStyle: {
-              color: theme.colors.text,
+              color: theme.dark ? "#FFFFFF" : "#000000",
             },
             tabBarIcon: ({ focused }) => {
               let iconName: React.ComponentProps<
