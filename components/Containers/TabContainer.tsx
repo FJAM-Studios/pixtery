@@ -17,7 +17,7 @@ export default function TabContainer(): JSX.Element {
   const theme = useSelector((state: RootState) => state.theme);
   const profile = useSelector((state: RootState) => state.profile);
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.primary }}>
       <Tab.Navigator
         initialRouteName="MakeContainer"
         screenOptions={({ route }) => ({
@@ -83,6 +83,9 @@ export default function TabContainer(): JSX.Element {
           />
         ) : null}
       </Tab.Navigator>
+      <SafeAreaView
+        style={{ flex: 0, backgroundColor: theme.colors.background }}
+      />
     </SafeAreaView>
   );
 }
