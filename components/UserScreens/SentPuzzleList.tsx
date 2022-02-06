@@ -134,6 +134,12 @@ export default function SentPuzzleList({
               >
                 You haven&apos;t sent any puzzles!
               </Headline>
+              <Button
+                mode="contained"
+                onPress={() => navigation.navigate("Make")}
+              >
+                Make a Puzzle
+              </Button>
             </View>
           )}
         </>
