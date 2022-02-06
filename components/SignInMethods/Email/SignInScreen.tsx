@@ -1,3 +1,4 @@
+import { ThemeProvider } from "@react-navigation/native";
 import React, { useState } from "react";
 import { View } from "react-native";
 import {
@@ -7,6 +8,8 @@ import {
   Subheading,
   Headline,
 } from "react-native-paper";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../types";
 
 export default function SignInScreen({
   setScreen,
@@ -24,6 +27,7 @@ export default function SignInScreen({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState("");
+  const theme = useSelector((state: RootState) => state.theme);
 
   return (
     <View>
@@ -37,6 +41,7 @@ export default function SignInScreen({
         value={email}
         onChangeText={(email) => setEmail(email)}
         style={{ marginBottom: 10 }}
+        placeholderTextColor={theme.colors.text}
       />
       <TextInput
         placeholder="Password"
@@ -46,6 +51,7 @@ export default function SignInScreen({
         value={password}
         onChangeText={(t) => setPassword(t)}
         style={{ marginBottom: 2 }}
+        placeholderTextColor={theme.colors.text}
       />
       <Button
         icon="camera-iris"
