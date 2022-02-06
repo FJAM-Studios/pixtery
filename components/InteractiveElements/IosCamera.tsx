@@ -3,13 +3,7 @@ import * as ImageManipulator from "expo-image-manipulator";
 import * as ImagePicker from "expo-image-picker";
 import { ImageInfo } from "expo-image-picker/build/ImagePicker.types";
 import React, { useEffect, useState, useRef } from "react";
-import {
-  Animated,
-  ImageBackground,
-  View,
-  Button,
-  Dimensions,
-} from "react-native";
+import { Animated, ImageBackground, View, Dimensions } from "react-native";
 import {
   PanGestureHandler,
   State,
@@ -17,6 +11,7 @@ import {
   PinchGestureHandler,
   PinchGestureHandlerStateChangeEvent,
 } from "react-native-gesture-handler";
+import { Button } from "react-native-paper";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSelector } from "react-redux";
 
@@ -35,7 +30,7 @@ export default function IosCamera({
   setiOSCameraLaunch: (camera: boolean) => void;
   availableHeight: number;
 }): JSX.Element | null {
-  const { width, height, boardSize } = useSelector(
+  const { width, boardSize } = useSelector(
     (state: RootState) => state.screenHeight
   );
   const [imageBeforeCrop, setImageBeforeCrop] = useState<ImageInfo>();
@@ -472,12 +467,17 @@ export default function IosCamera({
         </PanGestureHandler>
         <View
           style={{
-            top: availableHeight - safeAreaViewInsets.top,
+            top:
+              availableHeight -
+              safeAreaViewInsets.top -
+              safeAreaViewInsets.bottom,
             position: "absolute",
             alignSelf: "center",
           }}
         >
-          <Button color="white" onPress={setCrop} title="Crop" />
+          <Button mode="contained" onPress={setCrop}>
+            Crop
+          </Button>
         </View>
       </View>
     );

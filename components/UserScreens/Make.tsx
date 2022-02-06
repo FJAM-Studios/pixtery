@@ -44,7 +44,6 @@ import {
   checkPermission,
 } from "../../util";
 import { IosCamera, MessageInput } from "../InteractiveElements";
-import { AdSafeAreaView } from "../Layout";
 
 const emptyImage = require("../../assets/blank.jpg");
 
