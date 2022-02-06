@@ -8,13 +8,14 @@ import {
   Subheading,
   Headline,
 } from "react-native-paper";
+import { useSelector } from "react-redux";
 
 import {
   phoneProvider,
   firebaseConfig,
   signInOnFireBase,
 } from "../../../FirebaseApp";
-import { SignInOptions } from "../../../types";
+import { RootState, SignInOptions } from "../../../types";
 
 const phoneFormat = require("phone");
 
@@ -34,6 +35,7 @@ export default function Phone({
   const [verificationId, setVerificationId] = useState("");
   const [errors, setErrors] = useState("");
   const [resetAllowed, setResetAllowed] = useState(false);
+  const theme = useSelector((state: RootState) => state.theme);
 
   const attemptPhoneSignIn = async () => {
     try {
@@ -88,6 +90,7 @@ export default function Phone({
         value={phone}
         onChangeText={(phone) => setPhone(phone)}
         style={{ marginBottom: 2 }}
+        placeholderTextColor={theme.colors.text}
       />
       <Button
         icon="camera-iris"
@@ -108,6 +111,7 @@ export default function Phone({
             onChangeText={(verificationCode: string) =>
               setSmsCode(verificationCode)
             }
+            placeholderTextColor={theme.colors.text}
           />
           <Button
             icon="check-decagram"
