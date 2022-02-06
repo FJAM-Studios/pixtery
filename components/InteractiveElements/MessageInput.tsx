@@ -52,7 +52,7 @@ export default function MessageInput({
           maxLength={messageLimit}
           value={message}
           onChangeText={(message) => setMessage(message)}
-          placeholderTextColor={theme.colors.primary}
+          placeholderTextColor={theme.colors.text}
           onFocus={() => setMessageFocus(true)}
           onBlur={() => setMessageFocus(false)}
           style={{

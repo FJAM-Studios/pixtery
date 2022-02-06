@@ -7,6 +7,8 @@ import {
   Subheading,
   Headline,
 } from "react-native-paper";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../types";
 
 export default function ForgotScreen({
   setScreen,
@@ -22,6 +24,7 @@ export default function ForgotScreen({
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [errors, setErrors] = useState("");
+  const theme = useSelector((state: RootState) => state.theme);
 
   return (
     <View>
@@ -35,6 +38,7 @@ export default function ForgotScreen({
         value={email}
         onChangeText={(email) => setEmail(email)}
         style={{ marginBottom: 10 }}
+        placeholderTextColor={theme.colors.text}
       />
       <Button
         icon="email"

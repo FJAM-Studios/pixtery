@@ -93,7 +93,7 @@ export default function Tutorial({
             padding: height * 0.03,
             height: height * 0.15,
             borderRadius: theme.roundness,
-            backgroundColor: "rgba(0,0,0,0.5)",
+            backgroundColor: theme.colors.surface,
             justifyContent: "center",
           }}
         >
@@ -109,7 +109,7 @@ export default function Tutorial({
           style={{
             margin: 20,
             borderRadius: theme.roundness,
-            backgroundColor: theme.colors.onSurface,
+            backgroundColor: theme.colors.surface,
           }}
           onPress={() => {
             if (step === 5) finishTutorial();
@@ -128,7 +128,7 @@ export default function Tutorial({
               // top: height * 0.65,
               alignSelf: "center",
               borderRadius: theme.roundness,
-              backgroundColor: theme.colors.onSurface,
+              backgroundColor: theme.colors.surface,
               zIndex: 3,
             }}
             onPress={finishTutorial}
@@ -140,7 +140,7 @@ export default function Tutorial({
             style={{
               marginHorizontal: 20,
               borderRadius: theme.roundness,
-              backgroundColor: theme.colors.onSurface,
+              backgroundColor: theme.colors.surface,
             }}
             onPress={() => setStep(step - 1)}
           >
