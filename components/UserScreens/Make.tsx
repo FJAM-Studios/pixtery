@@ -73,6 +73,7 @@ export default function Make({
   );
   const [buttonHeight, setButtonHeight] = React.useState(0);
   const [iOSCameraLaunch, setiOSCameraLaunch] = React.useState(false);
+  const [availableHeight, setAvailableHeight] = React.useState(0);
 
   const selectImage = async (camera: boolean) => {
     const permission = await checkPermission(camera);
@@ -252,11 +253,13 @@ export default function Make({
       <IosCamera
         setImageURI={setImageURI}
         setiOSCameraLaunch={setiOSCameraLaunch}
+        availableHeight={availableHeight}
       />
     );
 
   return (
-    <AdSafeAreaView
+    <View
+      onLayout={(event) => setAvailableHeight(event.nativeEvent.layout.height)}
       style={{
         flex: 1,
         flexDirection: "column",
@@ -479,6 +482,6 @@ export default function Make({
           Send
         </Button>
       </KeyboardAwareScrollView>
-    </AdSafeAreaView>
+    </View>
   );
 }

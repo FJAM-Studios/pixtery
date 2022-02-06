@@ -3,7 +3,13 @@ import * as ImageManipulator from "expo-image-manipulator";
 import * as ImagePicker from "expo-image-picker";
 import { ImageInfo } from "expo-image-picker/build/ImagePicker.types";
 import React, { useEffect, useState, useRef } from "react";
-import { Animated, ImageBackground, View, Button } from "react-native";
+import {
+  Animated,
+  ImageBackground,
+  View,
+  Button,
+  Dimensions,
+} from "react-native";
 import {
   PanGestureHandler,
   State,
@@ -11,10 +17,7 @@ import {
   PinchGestureHandler,
   PinchGestureHandlerStateChangeEvent,
 } from "react-native-gesture-handler";
-import {
-  SafeAreaView,
-  useSafeAreaInsets,
-} from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSelector } from "react-redux";
 
 import { USE_NATIVE_DRIVER, COMPRESSION } from "../../constants";
@@ -26,10 +29,12 @@ const emptyImage = require("../../assets/blank.jpg");
 export default function IosCamera({
   setImageURI,
   setiOSCameraLaunch,
+  availableHeight,
 }: {
   setImageURI: (uri: string) => void;
   setiOSCameraLaunch: (camera: boolean) => void;
-}): JSX.Element {
+  availableHeight: number;
+}): JSX.Element | null {
   const { width, height, boardSize } = useSelector(
     (state: RootState) => state.screenHeight
   );
@@ -41,13 +46,14 @@ export default function IosCamera({
 
   const safeAreaViewInsets = useSafeAreaInsets();
   // calculate status bar height (bar at top with clock, etc)
-  const statusBarHeight = safeAreaViewInsets.top;
+  const statusBarHeight =
+    Dimensions.get("screen").height - availableHeight + safeAreaViewInsets.top;
 
   // absolute X Y coordinates (upper left coordinates) of cropbox
   const boxX = (width - boardSize) / 2;
   const boxY = (initialImageHeightOnScreen - boardSize) / 2;
   // absolute Y position of crop box, including status bar
-  const boxYPlusStatusBar = boxY + statusBarHeight;
+  const boxYPlusStatusBar = statusBarHeight;
   // right side of crop box
   const rightBoxPos = boxX + boardSize;
   // bottom of crop box
@@ -409,7 +415,7 @@ export default function IosCamera({
 
   if (imageBeforeCrop && initialImageHeightOnScreen)
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: "black" }}>
+      <View style={{ flex: 1, backgroundColor: "black" }}>
         <PanGestureHandler
           onGestureEvent={onPanGestureEvent}
           onHandlerStateChange={onPanHandlerStateChange}
@@ -466,14 +472,14 @@ export default function IosCamera({
         </PanGestureHandler>
         <View
           style={{
-            top: height - 80,
+            top: availableHeight - safeAreaViewInsets.top,
             position: "absolute",
             alignSelf: "center",
           }}
         >
           <Button color="white" onPress={setCrop} title="Crop" />
         </View>
-      </SafeAreaView>
+      </View>
     );
   return null;
 }
