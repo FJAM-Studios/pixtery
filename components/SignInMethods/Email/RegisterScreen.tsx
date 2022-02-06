@@ -7,6 +7,8 @@ import {
   Subheading,
   Headline,
 } from "react-native-paper";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../types";
 
 export default function RegisterScreen({
   setScreen,
@@ -25,6 +27,7 @@ export default function RegisterScreen({
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState("");
+  const theme = useSelector((state: RootState) => state.theme);
 
   return (
     <View>
@@ -38,6 +41,7 @@ export default function RegisterScreen({
         value={email}
         onChangeText={(email) => setEmail(email)}
         style={{ marginBottom: 10 }}
+        placeholderTextColor={theme.colors.text}
       />
       <TextInput
         placeholder="Password"
@@ -47,6 +51,7 @@ export default function RegisterScreen({
         value={password}
         onChangeText={(t) => setPassword(t)}
         style={{ marginBottom: 10 }}
+        placeholderTextColor={theme.colors.text}
       />
       <TextInput
         placeholder="Confirm Password"
@@ -56,6 +61,7 @@ export default function RegisterScreen({
         value={confirmPassword}
         onChangeText={(t) => setConfirmPassword(t)}
         style={{ marginBottom: 10 }}
+        placeholderTextColor={theme.colors.text}
       />
       <Button
         icon="account"
