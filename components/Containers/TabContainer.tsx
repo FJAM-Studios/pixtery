@@ -38,7 +38,7 @@ export default function TabContainer(): JSX.Element {
               backgroundColor: theme.colors.primary,
             },
             tabBarLabelStyle: {
-              color: theme.colors.text,
+              color: theme.dark ? "#FFFFFF" : "#000000",
             },
             tabBarIcon: ({ focused }) => {
               let iconName: React.ComponentProps<

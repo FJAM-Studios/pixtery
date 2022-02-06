@@ -35,7 +35,7 @@ const darkTheme: PixteryTheme = {
     text: "#f8f8ff",
     disabled: "#808080",
     placeholder: "#191102",
-    backdrop: "#191102",
+    backdrop: "#ACACAC",
   },
 };
 
@@ -82,7 +82,7 @@ const forestTheme: PixteryTheme = {
   roundness: 10,
   name: "Conifer",
   ID: 4,
-  dark: true,
+  dark: false,
   colors: {
     ...DefaultTheme.colors,
     primary: "#B4E6B1",
@@ -92,7 +92,7 @@ const forestTheme: PixteryTheme = {
     text: "#f8f8ff",
     disabled: "#808080",
     placeholder: "#8BFF87",
-    backdrop: "#8BFF87",
+    backdrop: "#2B5729",
   },
 };
 
@@ -101,7 +101,7 @@ const neonTheme: PixteryTheme = {
   roundness: 10,
   name: "Nightlife",
   ID: 5,
-  dark: true,
+  dark: false,
   colors: {
     ...DefaultTheme.colors,
     primary: "#00D90E",
