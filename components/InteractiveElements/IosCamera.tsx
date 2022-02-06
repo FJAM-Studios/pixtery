@@ -45,7 +45,7 @@ export default function IosCamera({
     : 0;
 
   const safeAreaViewInsets = useSafeAreaInsets();
-  // calculate status bar height (bar at top with clock, etc)
+  // calculate top padding - tab height + status bar height (bar at top with clock, etc)
   const statusBarHeight =
     Dimensions.get("screen").height - availableHeight + safeAreaViewInsets.top;
 
