@@ -32,10 +32,8 @@ import { setDeviceSize } from "./store/reducers/screenHeight";
 import { StackScreens, RootState } from "./types";
 import { goToScreen } from "./util";
 //less than ideal, but idk if we have a choice right now. suppresses the firebase timeout warning
-// LogBox.ignoreLogs(["Setting a timer for a long period of time"]);
-LogBox.ignoreLogs([
-  "AsyncStorage has been extracted from react-native core and will be removed in a future release",
-]);
+LogBox.ignoreLogs(["Setting a timer for a long period of time"]);
+
 const Stack = createNativeStackNavigator<StackScreens>();
 
 SplashScreen.preventAutoHideAsync().catch();
