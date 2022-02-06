@@ -16,7 +16,8 @@
     "emulate-host": "firebase emulators:start --only hosting",
     "web-dev": "npm run build && npm run emulate-host",
     "func-dev": "concurrently \"cd functions && npm run build:watch\" \"cd functions && firebase emulators:start --only functions\" \"npm run func-env\"",
-    "func-env": "cross-env FUNC=true npm start"
+    "func-env": "cross-env FUNC=true npm start",
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "~1.15.0",
@@ -42,7 +43,7 @@
     "expo-store-review": "~5.1.0",
     "expo-tracking-transparency": "~2.1.0",
     "expo-updates": "~0.11.6",
-    "firebase": "^9.6.5",
+    "firebase": "^9.6.6",
     "phone": "^2.4.22",
     "react": "17.0.1",
     "react-dom": "17.0.1",
@@ -53,6 +54,7 @@
     "react-native-get-random-values": "~1.7.0",
     "react-native-keyboard-aware-scroll-view": "^0.9.5",
     "react-native-modal": "^11.10.0",
+    "react-native-pager-view": "5.4.9",
     "react-native-paper": "^4.9.2",
     "react-native-reanimated": "~2.3.1",
     "react-native-root-siblings": "^4.1.1",
@@ -68,8 +70,7 @@
     "redux-thunk": "^2.4.1",
     "shortid": "^2.2.16",
     "tslib": "^2.3.1",
-    "uuid": "^3.4.0",
-    "react-native-pager-view": "5.4.9"
+    "uuid": "^3.4.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
@@ -96,6 +97,7 @@
     "husky": "^6.0.0",
     "identity-obj-proxy": "^3.0.0",
     "metro-react-native-babel-preset": "^0.66.2",
+    "patch-package": "^6.4.7",
     "prettier": "^2.2.1",
     "typescript": "~4.3.5",
     "webpack": "^5.66.0",
