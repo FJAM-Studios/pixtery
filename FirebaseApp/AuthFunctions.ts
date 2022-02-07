@@ -1,7 +1,8 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { FirebaseError } from "firebase/app";
 import {
   PhoneAuthProvider,
-  getAuth,
+  initializeAuth,
   signOut as signOutFB,
   signInAnonymously,
   User,
@@ -11,11 +12,15 @@ import {
   createUserWithEmailAndPassword,
   sendPasswordResetEmail,
 } from "firebase/auth";
+import { getReactNativePersistence } from "firebase/auth/react-native";
 
 import { SignInOptions } from "../types";
 import { migratePuzzles, checkGalleryAdmin } from "./CloudFunctions";
+import { app } from "./InitializeFirebase";
 
-export const auth = getAuth();
+export const auth = initializeAuth(app, {
+  persistence: getReactNativePersistence(AsyncStorage),
+});
 export const phoneProvider = new PhoneAuthProvider(auth);
 
 export const signOut = (): Promise<void> => {
