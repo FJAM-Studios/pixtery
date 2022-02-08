@@ -3,7 +3,7 @@ import * as ImageManipulator from "expo-image-manipulator";
 import * as ImagePicker from "expo-image-picker";
 import { ImageInfo } from "expo-image-picker/build/ImagePicker.types";
 import React, { useEffect, useState, useRef } from "react";
-import { Animated, ImageBackground, View, Button } from "react-native";
+import { Animated, ImageBackground, View, Button, Modal } from "react-native";
 import {
   PanGestureHandler,
   State,
@@ -409,71 +409,73 @@ export default function IosCamera({
 
   if (imageBeforeCrop && initialImageHeightOnScreen)
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: "black" }}>
-        <PanGestureHandler
-          onGestureEvent={onPanGestureEvent}
-          onHandlerStateChange={onPanHandlerStateChange}
-        >
-          <Animated.View>
-            <PinchGestureHandler
-              onGestureEvent={onPinchGestureEvent}
-              onHandlerStateChange={onPinchHandlerStateChange}
-            >
-              <Animated.View>
-                <Animated.View
-                  ref={imageView}
-                  style={[
-                    {
-                      left: lastOffset.current.x,
-                      top: lastOffset.current.y,
-                      transform: [
-                        { scale: _scale },
-                        { translateX },
-                        { translateY },
-                      ],
-                    },
-                  ]}
-                >
-                  <ImageBackground
-                    source={
-                      imageBeforeCrop
-                        ? { uri: imageBeforeCrop.uri }
-                        : emptyImage
-                    }
+      <Modal>
+        <SafeAreaView style={{ flex: 1, backgroundColor: "black" }}>
+          <PanGestureHandler
+            onGestureEvent={onPanGestureEvent}
+            onHandlerStateChange={onPanHandlerStateChange}
+          >
+            <Animated.View>
+              <PinchGestureHandler
+                onGestureEvent={onPinchGestureEvent}
+                onHandlerStateChange={onPinchHandlerStateChange}
+              >
+                <Animated.View>
+                  <Animated.View
+                    ref={imageView}
                     style={[
                       {
-                        width: "100%",
-                        height: initialImageHeightOnScreen,
+                        left: lastOffset.current.x,
+                        top: lastOffset.current.y,
+                        transform: [
+                          { scale: _scale },
+                          { translateX },
+                          { translateY },
+                        ],
                       },
                     ]}
+                  >
+                    <ImageBackground
+                      source={
+                        imageBeforeCrop
+                          ? { uri: imageBeforeCrop.uri }
+                          : emptyImage
+                      }
+                      style={[
+                        {
+                          width: "100%",
+                          height: initialImageHeightOnScreen,
+                        },
+                      ]}
+                    />
+                  </Animated.View>
+                  <View
+                    style={{
+                      left: boxX,
+                      top: boxY,
+                      width: boardSize,
+                      height: boardSize,
+                      borderColor: "white",
+                      borderWidth: 2,
+                      position: "absolute",
+                      zIndex: 1,
+                    }}
                   />
                 </Animated.View>
-                <View
-                  style={{
-                    left: boxX,
-                    top: boxY,
-                    width: boardSize,
-                    height: boardSize,
-                    borderColor: "white",
-                    borderWidth: 2,
-                    position: "absolute",
-                    zIndex: 1,
-                  }}
-                />
-              </Animated.View>
-            </PinchGestureHandler>
-          </Animated.View>
-        </PanGestureHandler>
-        <View
-          style={{
-            top: height - 80,
-            position: "absolute",
-            alignSelf: "center",
-          }}
-        >
-          <Button color="white" onPress={setCrop} title="Crop" />
-        </View>
-      </SafeAreaView>
+              </PinchGestureHandler>
+            </Animated.View>
+          </PanGestureHandler>
+          <View
+            style={{
+              top: height - 80,
+              position: "absolute",
+              alignSelf: "center",
+            }}
+          >
+            <Button color="white" onPress={setCrop} title="Crop" />
+          </View>
+        </SafeAreaView>
+      </Modal>
     );
   return null;
 }
