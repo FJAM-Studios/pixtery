@@ -6,7 +6,10 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { checkAdminStatus } from "../../FirebaseApp";
 import { setProfile } from "../../store/reducers/profile";
+import { setReceivedPuzzles } from "../../store/reducers/receivedPuzzles";
+import { setSentPuzzles } from "../../store/reducers/sentPuzzles";
 import { RootState, SignInOptions } from "../../types";
+import { restorePuzzleMetadata } from "../../util";
 import Email from "./Email/Email";
 import Phone from "./Phone/Phone";
 import SignInMenu from "./SignInMenu";
@@ -23,6 +26,10 @@ export default function ProfileModal({
   const dispatch = useDispatch();
   const theme = useSelector((state: RootState) => state.theme);
   const profile = useSelector((state: RootState) => state.profile);
+  const receivedPuzzles = useSelector(
+    (state: RootState) => state.receivedPuzzles
+  );
+  const sentPuzzles = useSelector((state: RootState) => state.sentPuzzles);
   const [signInType, setSignInType] = useState<SignInOptions | null>(null);
 
   const onFinish = async () => {
@@ -34,6 +41,14 @@ export default function ProfileModal({
         "@pixteryProfile",
         JSON.stringify({ ...profile, isGalleryAdmin })
       );
+
+      //get and merge pixteries
+      const [
+        mergedReceivedPuzzles,
+        mergedSentPuzzles,
+      ] = await restorePuzzleMetadata(receivedPuzzles, sentPuzzles);
+      dispatch(setReceivedPuzzles(mergedReceivedPuzzles));
+      dispatch(setSentPuzzles(mergedSentPuzzles));
     } catch (e) {
       console.log(e);
       if (e instanceof Error) alert(e.message);

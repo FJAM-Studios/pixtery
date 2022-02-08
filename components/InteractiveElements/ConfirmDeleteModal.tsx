@@ -1,4 +1,3 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
 import { View } from "react-native";
@@ -13,10 +12,8 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 
 import { deleteUserCallable, signOut } from "../../FirebaseApp";
-import { setProfile } from "../../store/reducers/profile";
-import { setReceivedPuzzles } from "../../store/reducers/receivedPuzzles";
-import { setSentPuzzles } from "../../store/reducers/sentPuzzles";
 import { RootState, ScreenNavigation } from "../../types";
+import { clearAllAppData } from "../../util";
 
 export default function SignInModal({
   isVisible,
@@ -31,21 +28,12 @@ export default function SignInModal({
   const [confirmText, setConfirmText] = useState("");
 
   const deleteUser = async () => {
-    // //delete local storage
-    const keys = await AsyncStorage.getAllKeys();
-    await AsyncStorage.multiRemove(keys);
-
+    //clear app data
+    await clearAllAppData(dispatch);
     //delete user from server
     await deleteUserCallable();
-
     //sign out of Firebase account locally
     await signOut();
-
-    //clear app state
-    dispatch(setReceivedPuzzles([]));
-    dispatch(setSentPuzzles([]));
-    dispatch(setProfile(null));
-
     //send you to splash
     navigation.navigate("Splash");
   };
