@@ -35,7 +35,7 @@ export default function Email({
         throw new Error("Passwords do not match");
       if (isRegister) await signUpEmail(email, password);
       else await signInOnFireBase(SignInOptions.EMAIL, email, password);
-      onFinish();
+      await onFinish();
     } catch (e) {
       // @todo nicer errors
       console.log(e);

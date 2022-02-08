@@ -1,9 +1,12 @@
+import { Ionicons } from "@expo/vector-icons";
 import { Header, HeaderBackButton } from "@react-navigation/elements";
 import { ParamListBase } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import React from "react";
+import { Button } from "react-native-paper";
+import { useSelector } from "react-redux";
 
-import { StackScreens } from "../../types";
+import { RootState, StackScreens } from "../../types";
 
 export default function Subheader({
   navigation,
@@ -16,6 +19,7 @@ export default function Subheader({
   enableBack: boolean;
   specificDestination?: keyof StackScreens;
 }): JSX.Element {
+  const theme = useSelector((state: RootState) => state.theme);
   const onPress = () => {
     if (specificDestination) navigation.navigate(specificDestination);
     else navigation.goBack();
@@ -24,10 +28,24 @@ export default function Subheader({
     <Header
       title={title}
       headerLeft={() =>
-        enableBack ? <HeaderBackButton onPress={onPress} /> : null
+        enableBack ? (
+          <HeaderBackButton
+            onPress={onPress}
+            backImage={() => <Ionicons size={20} name="chevron-back" />}
+          />
+        ) : null
       }
-      headerStyle={{ height: 40 }}
-      headerTitleStyle={{ fontSize: 20 }}
+      headerTitle={() => (
+        <Button
+          mode="contained"
+          style={{
+            shadowColor: theme.colors.primary,
+          }}
+        >
+          {title}
+        </Button>
+      )}
+      headerStyle={{ height: 40, backgroundColor: theme.colors.primary }}
     />
   );
 }

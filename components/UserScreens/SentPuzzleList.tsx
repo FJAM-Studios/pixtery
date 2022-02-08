@@ -22,8 +22,6 @@ export default function SentPuzzleList({
   const receivedPuzzles = useSelector(
     (state: RootState) => state.receivedPuzzles
   );
-  const { height } = useSelector((state: RootState) => state.screenHeight);
-
   const sentPuzzles = useSelector((state: RootState) => state.sentPuzzles);
   const [modalVisible, setModalVisible] = React.useState(false);
   const [puzzleToDelete, setPuzzleToDelete] = React.useState<Puzzle | null>(
@@ -129,7 +127,7 @@ export default function SentPuzzleList({
             >
               <Headline
                 style={{
-                  marginTop: height * 0.3,
+                  marginTop: 10,
                 }}
               >
                 You haven&apos;t sent any puzzles!
@@ -137,6 +135,9 @@ export default function SentPuzzleList({
               <Button
                 mode="contained"
                 onPress={() => navigation.navigate("Make")}
+                style={{
+                  marginTop: 10,
+                }}
               >
                 Make a Puzzle
               </Button>
