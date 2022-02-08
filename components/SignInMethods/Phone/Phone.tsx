@@ -62,7 +62,7 @@ export default function Phone({
     setLoadingModalVisible(true);
     try {
       await signInOnFireBase(SignInOptions.PHONE, verificationId, smsCode);
-      onFinish();
+      await onFinish();
     } catch (e) {
       if (e instanceof Error) setErrors(e.message);
       setResetAllowed(true);
