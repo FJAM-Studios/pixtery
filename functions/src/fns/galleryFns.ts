@@ -220,39 +220,40 @@ const getBackupDaily = async () => {
     // try to get tomorrow's Daily
     const tomorrowDaily = await getDailyForDate(year, month, day);
 
-    // if tomorrow's Daily is not set yet
-    if (!tomorrowDaily.exists) {
-      // TODO: update base year to 2022; currently 2020 for testing purposes
-      const BASE_YEAR = 2020;
-      // choose random year between base year (inclusive) and tomorrow's year (exclusive) to get the Daily from
-      // this is to avoid the same Daily from the last year from being pulled forward in perpetuity
-      const randomPastYear = getRandomIntInRange(
-        BASE_YEAR,
-        tomorrow.get("year")
-      );
-      console.log(
-        `Daily was NOT set for ${month}/${day}/${year}. Getting the Daily from ${month}/${day}/${randomPastYear}`
-      );
-      // get the daily for the randomPastYear with tomorrow's month and day
-      const tomorrowDailyFromRandomYear = await getDailyForDate(
-        randomPastYear.toString(),
-        month,
-        day
-      );
-      // if the Daily from the previous random year exists (it should), set tomorrow's Daily with the Daily from randomPastYear with tomorrow's month and day
-      if (tomorrowDailyFromRandomYear.exists)
-        await addToGalleryForDate(
-          year,
-          month,
-          day,
-          tomorrowDailyFromRandomYear.data(),
-          `auto populated from ${month}/${day}/${randomPastYear}`
-        );
-      // could potentially trigger error email to us if there is no back up daily
-      else console.log("No backup Daily found");
-    } else {
+    // if tomorrow's Daily is set already
+    if (tomorrowDaily.exists) {
       console.log(`Daily was already set for ${month}/${day}/${year}`);
+      return;
     }
+
+    // if tomorrow's Daily is not set yet
+    // TODO: update base year to 2022; currently 2020 for testing purposes
+    const BASE_YEAR = 2020;
+    // choose random year between base year (inclusive) and tomorrow's year (exclusive) to get the Daily from
+    // this is to avoid the same Daily from the last year from being pulled forward in perpetuity
+    const randomPastYear = getRandomIntInRange(BASE_YEAR, tomorrow.get("year"));
+    console.log(
+      `Daily was NOT set for ${month}/${day}/${year}. Getting the Daily from ${month}/${day}/${randomPastYear}`
+    );
+    // get the daily for the randomPastYear with tomorrow's month and day
+    const tomorrowDailyFromRandomYear = await getDailyForDate(
+      randomPastYear.toString(),
+      month,
+      day
+    );
+    // if backup Daily doesn't exist; could potentially trigger error email to us if there is no back up daily
+    if (!tomorrowDailyFromRandomYear.exists) {
+      console.log("No backup Daily found");
+      return;
+    }
+    // if the Daily from the previous random year exists (it should), set tomorrow's Daily with the Daily from randomPastYear with tomorrow's month and day
+    await addToGalleryForDate(
+      year,
+      month,
+      day,
+      tomorrowDailyFromRandomYear.data(),
+      `auto populated from ${month}/${day}/${randomPastYear}`
+    );
   } catch (error: unknown) {
     if (error instanceof Error)
       throw new functions.https.HttpsError("unknown", error.message, error);
