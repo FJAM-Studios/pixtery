@@ -29,7 +29,7 @@
     "expo-ads-admob": "~12.0.0",
     "expo-av": "~10.2.0",
     "expo-constants": "~13.0.0",
-    "expo-dev-client": "~0.8.3",
+    "expo-dev-client": "~0.8.4",
     "expo-file-system": "~13.1.0",
     "expo-firebase-recaptcha": "~2.1.0",
     "expo-haptics": "~11.1.0",
