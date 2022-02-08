@@ -94,12 +94,15 @@ export const signUpEmail = async (
       migratePuzzles(prevUser.uid);
     return result.user;
   } catch (error) {
+    console.log(error);
     // throwing error so the Register component has an error message to display to the user.
     if (error instanceof FirebaseError) {
       if (error.code === "auth/wrong-password")
         throw new Error("Incorrect password.");
       if (error.code === "auth/user-not-found")
         throw new Error("User not found.");
+      if (error.code === "auth/email-already-in-use")
+        throw new Error("Account already exists. Sign in or reset password.");
     }
     throw new Error("Could not sign in at this time. Please try again.");
   }
