@@ -4,7 +4,7 @@ import {
   FontAwesome,
 } from "@expo/vector-icons";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-import React from "react";
+
 import { View } from "react-native";
 import {
   SafeAreaView,
