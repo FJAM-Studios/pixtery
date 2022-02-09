@@ -3,6 +3,7 @@ import * as FileSystem from "expo-file-system";
 import * as React from "react";
 import { View } from "react-native";
 import { Headline, ActivityIndicator } from "react-native-paper";
+import Toast from "react-native-root-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { AnyAction } from "redux";
 
@@ -51,7 +52,7 @@ export default function AddPuzzle({
       puzzleData = (await queryPuzzleCallable({ publicKey })).data as Puzzle;
       return puzzleData; // get just nested data from returned JSON
     } catch (error) {
-      console.error(error);
+      console.log(error);
       if (error instanceof Error) throw new Error(error.message); //rethrow the error so it can be caught by outer method
     }
   };
@@ -104,7 +105,14 @@ export default function AddPuzzle({
         }
       } catch (e) {
         console.log(e);
-        goToScreen(navigation, "Make"); //if there is an error in this method or in inner methods, abandon adding the puzzle and go to the home screen
+        Toast.show(
+          "Error retrieving Pixtery! Please try again later or remove this puzzle.",
+          {
+            duration: Toast.durations.LONG,
+            position: Toast.positions.CENTER,
+          }
+        );
+        navigation.navigate("PuzzleListContainer");
       }
     };
     searchForPuzzle();
