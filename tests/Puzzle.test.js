@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { create, act } from "react-test-renderer";
 import ShallowRenderer from "react-test-renderer/shallow";
 import {

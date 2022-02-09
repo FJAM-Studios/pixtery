@@ -1,5 +1,5 @@
 import * as FirebaseRecaptcha from "expo-firebase-recaptcha";
-import React, { useState, useRef } from "react";
+import { useState, useRef } from "react";
 import { View } from "react-native";
 import {
   Text,
