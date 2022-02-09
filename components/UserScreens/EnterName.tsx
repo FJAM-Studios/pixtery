@@ -41,7 +41,7 @@ export default function EnterName({
         JSON.stringify({ ...profile, name, isGalleryAdmin })
       );
       if (url) navigation.navigate("Splash", { url });
-      else navigation.navigate("Home");
+      else navigation.navigate("TabContainer");
     } catch (e) {
       console.log(e);
       if (e instanceof Error) setErrors(e.message);

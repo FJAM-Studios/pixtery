@@ -10,7 +10,7 @@ import { setSentPuzzles } from "../../store/reducers/sentPuzzles";
 import { Puzzle, ScreenNavigation, RootState } from "../../types";
 import { safelyDeletePuzzleImage, deactivatePuzzleOnServer } from "../../util";
 import { SentPuzzleCard } from "../InteractiveElements";
-import { AdSafeAreaView, Header } from "../Layout";
+import { AdSafeAreaView } from "../Layout";
 
 export default function SentPuzzleList({
   navigation,
@@ -22,8 +22,6 @@ export default function SentPuzzleList({
   const receivedPuzzles = useSelector(
     (state: RootState) => state.receivedPuzzles
   );
-  const { height } = useSelector((state: RootState) => state.screenHeight);
-
   const sentPuzzles = useSelector((state: RootState) => state.sentPuzzles);
   const [modalVisible, setModalVisible] = React.useState(false);
   const [puzzleToDelete, setPuzzleToDelete] = React.useState<Puzzle | null>(
@@ -108,12 +106,6 @@ export default function SentPuzzleList({
           </View>
         </View>
       </Modal>
-      <Header
-        notifications={
-          receivedPuzzles.filter((puzzle) => !puzzle.completed).length
-        }
-        navigation={navigation}
-      />
       <ScrollView>
         <>
           {sentPuzzles.length ? (
@@ -135,11 +127,20 @@ export default function SentPuzzleList({
             >
               <Headline
                 style={{
-                  marginTop: height * 0.3,
+                  marginTop: 10,
                 }}
               >
                 You haven&apos;t sent any puzzles!
               </Headline>
+              <Button
+                mode="contained"
+                onPress={() => navigation.navigate("Make")}
+                style={{
+                  marginTop: 10,
+                }}
+              >
+                Make a Puzzle
+              </Button>
             </View>
           )}
         </>

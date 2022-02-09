@@ -75,18 +75,36 @@ export type StackScreens = {
   TitleScreen: undefined;
   Splash: { url: string | undefined } | undefined;
   CreateProfile: { url: string | undefined };
-  Home: undefined;
-  PuzzleList: undefined;
-  SentPuzzleList: undefined;
-  Puzzle: { publicKey: string; sourceList: string };
-  AddPuzzle: { publicKey: string; sourceList: string };
-  Profile: undefined;
-  Register: undefined;
-  ContactUs: undefined;
+  EnterName: {
+    url?: string;
+  };
+
+  TabContainer: undefined;
+
+  MakeContainer: undefined;
+  DailyContainer: undefined;
+  LibraryContainer: undefined;
+  SettingsContainer: undefined;
+  AdminContainer: undefined;
+
+  Make: undefined;
   Tutorial: undefined;
-  Help: undefined;
+
   Gallery: undefined;
   AddToGallery: undefined;
+
+  PuzzleListContainer: undefined;
+  AddPuzzle: { publicKey: string; sourceList: string };
+  Puzzle: { publicKey: string; sourceList: string };
+
+  PuzzleList: undefined;
+  SentPuzzleList: undefined;
+
+  Settings: undefined;
+  Profile: undefined;
+  ManagePuzzles: undefined;
+  ContactUs: undefined;
+
   GalleryQueue: undefined | { forceReload: boolean };
   GalleryReview: {
     puzzle: Puzzle;
@@ -94,9 +112,6 @@ export type StackScreens = {
     publishedDate?: string;
   };
   DailyCalendar: undefined;
-  EnterName: {
-    url?: string;
-  };
 };
 
 export type ScreenNavigation = NativeStackNavigationProp<StackScreens>;
@@ -105,7 +120,6 @@ export type PuzzleRoute = RouteProp<StackScreens, "Puzzle">;
 export type AddPuzzleRoute = RouteProp<StackScreens, "AddPuzzle">;
 export type CreateProfileRoute = RouteProp<StackScreens, "CreateProfile">;
 export type SplashRoute = RouteProp<StackScreens, "Splash">;
-export type RegisterRoute = RouteProp<StackScreens, "Register">;
 export type GalleryQueueRoute = RouteProp<StackScreens, "GalleryQueue">;
 export type GalleryReviewRoute = RouteProp<StackScreens, "GalleryReview">;
 export type EnterNameRoute = RouteProp<StackScreens, "EnterName">;
@@ -119,7 +133,7 @@ export interface ScreenHeight {
 
 export interface RootState {
   adHeight: number;
-  profile: Profile;
+  profile: Profile | null;
   receivedPuzzles: Puzzle[];
   sentPuzzles: Puzzle[];
   screenHeight: ScreenHeight;

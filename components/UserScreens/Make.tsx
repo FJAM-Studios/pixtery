@@ -44,13 +44,13 @@ import {
   checkPermission,
 } from "../../util";
 import { IosCamera, MessageInput } from "../InteractiveElements";
-import { AdSafeAreaView, Header } from "../Layout";
+import { AdSafeAreaView } from "../Layout";
 
 const emptyImage = require("../../assets/blank.jpg");
 
 AdMobInterstitial.setAdUnitID(INTERSTITIAL_ID);
 
-export default function Home({
+export default function Make({
   navigation,
 }: {
   navigation: ScreenNavigation;
@@ -59,9 +59,6 @@ export default function Home({
   const theme = useSelector((state: RootState) => state.theme);
   const { height, boardSize } = useSelector(
     (state: RootState) => state.screenHeight
-  );
-  const receivedPuzzles = useSelector(
-    (state: RootState) => state.receivedPuzzles
   );
   const sentPuzzles = useSelector((state: RootState) => state.sentPuzzles);
   const profile = useSelector((state: RootState) => state.profile);
@@ -291,12 +288,6 @@ export default function Home({
           />
         </Modal>
       </Portal>
-      <Header
-        notifications={
-          receivedPuzzles.filter((puzzle) => !puzzle.completed).length
-        }
-        navigation={navigation}
-      />
       <KeyboardAwareScrollView
         resetScrollToCoords={{ x: 0, y: 0 }}
         keyboardShouldPersistTaps="handled"
