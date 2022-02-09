@@ -1,6 +1,7 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
-import { AsyncStorage, View } from "react-native";
+import { View } from "react-native";
 import Modal from "react-native-modal";
 import {
   Button,

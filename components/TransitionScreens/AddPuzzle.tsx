@@ -100,11 +100,11 @@ export default function AddPuzzle({
           if (newPuzzle) {
             await savePuzzle(newPuzzle);
             goToScreen(navigation, "Puzzle", { publicKey, sourceList });
-          } else goToScreen(navigation, "Home");
+          } else goToScreen(navigation, "Make");
         }
       } catch (e) {
         console.log(e);
-        goToScreen(navigation, "Home"); //if there is an error in this method or in inner methods, abandon adding the puzzle and go to the home screen
+        goToScreen(navigation, "Make"); //if there is an error in this method or in inner methods, abandon adding the puzzle and go to the home screen
       }
     };
     searchForPuzzle();

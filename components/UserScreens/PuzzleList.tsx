@@ -14,7 +14,7 @@ import {
   goToScreen,
 } from "../../util";
 import { ReceivedPuzzleCard } from "../InteractiveElements";
-import { AdSafeAreaView, Header } from "../Layout";
+import { AdSafeAreaView } from "../Layout";
 
 export default function PuzzleList({
   navigation,
@@ -26,7 +26,6 @@ export default function PuzzleList({
   const receivedPuzzles = useSelector(
     (state: RootState) => state.receivedPuzzles
   );
-  const { height } = useSelector((state: RootState) => state.screenHeight);
   const sentPuzzles = useSelector((state: RootState) => state.sentPuzzles);
   const [modalVisible, setModalVisible] = React.useState(false);
   const [puzzleToDelete, setPuzzleToDelete] = React.useState<Puzzle | null>(
@@ -115,12 +114,6 @@ export default function PuzzleList({
           </View>
         </View>
       </Modal>
-      <Header
-        notifications={
-          receivedPuzzles.filter((puzzle) => !puzzle.completed).length
-        }
-        navigation={navigation}
-      />
       <View
         style={{
           flexDirection: "row",
@@ -170,7 +163,7 @@ export default function PuzzleList({
             >
               <Headline
                 style={{
-                  marginTop: height * 0.3,
+                  marginTop: 10,
                 }}
               >
                 You have no puzzles to solve!
