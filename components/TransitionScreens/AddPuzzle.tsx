@@ -106,7 +106,7 @@ export default function AddPuzzle({
       } catch (e) {
         console.log(e);
         Toast.show(
-          "Error retrieving Pixtery! Please try again later or remove this puzzle.",
+          "Error retrieving Pixtery! Check your connection or try again later.",
           {
             duration: Toast.durations.LONG,
             position: Toast.positions.CENTER,

@@ -249,7 +249,6 @@ export default function PuzzleComponent({
     setWinMessage("");
     currentBoard.current = [];
     maxZ.current = 0;
-    // }
   }, [
     boardSize,
     navigation,
