@@ -33,3 +33,4 @@ export const submitFeedbackCallable = httpsCallable(
 export const getDaily = httpsCallable(functions, "getDaily");
 export const migratePuzzles = httpsCallable(functions, "migratePuzzles");
 export const checkGalleryAdmin = httpsCallable(functions, "checkGalleryAdmin");
+export const deleteUserCallable = httpsCallable(functions, "deleteUser");
