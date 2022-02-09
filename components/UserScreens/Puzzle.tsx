@@ -20,7 +20,6 @@ import {
   validateBoard,
 } from "../../puzzleUtils";
 import { setReceivedPuzzles } from "../../store/reducers/receivedPuzzles";
-import { setSentPuzzles } from "../../store/reducers/sentPuzzles";
 import {
   Puzzle,
   Piece,
@@ -138,130 +137,119 @@ export default function PuzzleComponent({
     });
   };
 
-  const removeMissingPuzzle = async (publicKey: string, sourceList: string) => {
-    let puzzleList;
-    let storageItem;
-    let setPuzzles;
-    if (sourceList === "sent") {
-      puzzleList = sentPuzzles;
-      storageItem = "@pixterySentPuzzles";
-      setPuzzles = setSentPuzzles;
-    } else {
-      puzzleList = receivedPuzzles;
-      storageItem = "@pixteryPuzzles";
-      setPuzzles = setReceivedPuzzles;
-    }
-    const newPuzzles = [
-      ...puzzleList.filter((puz) => puz.publicKey !== publicKey),
-    ];
-    await AsyncStorage.setItem(storageItem, JSON.stringify(newPuzzles));
-    await dispatch(setPuzzles(newPuzzles));
-  };
-
   useEffect(() => {
     setReady(false);
     const matchingPuzzles = [...receivedPuzzles, ...sentPuzzles].filter(
       (puz) => puz.publicKey === publicKey
     );
-    if (matchingPuzzles.length && puzzleAreaDimensions.puzzleAreaWidth > 0) {
-      // this enables us to dynamically reference parent container padding below when we calculate ad banner position
-      const parentContainerStyle = StyleSheet.flatten([
-        styles(styleProps).parentContainer,
-      ]);
 
-      const pickedPuzzle = matchingPuzzles[0];
-      const { gridSize, puzzleType, imageURI } = pickedPuzzle;
-      const squareSize = boardSize / gridSize;
-      const numPieces = gridSize * gridSize;
-      const minSandboxY = boardSize * 1.01;
-      // maxSandboxY (upper left max bound of initial piece position)
-      // sometimes depending on screenheight, min is larger than max
-      const maxSandboxY = Math.max(
-        puzzleAreaDimensions.puzzleAreaHeight -
-          adHeight -
-          parentContainerStyle.padding * 2 -
-          squareSize,
-        minSandboxY
-      );
+    // if (matchingPuzzles.length && puzzleAreaDimensions.puzzleAreaWidth > 0) {
+    // this enables us to dynamically reference parent container padding below when we calculate ad banner position
+    const parentContainerStyle = StyleSheet.flatten([
+      styles(styleProps).parentContainer,
+    ]);
 
-      setLowerBound(maxSandboxY);
+    const pickedPuzzle = matchingPuzzles[0];
+    const { gridSize, puzzleType, imageURI } = pickedPuzzle;
+    const squareSize = boardSize / gridSize;
+    const numPieces = gridSize * gridSize;
+    const minSandboxY = boardSize * 1.01;
+    // maxSandboxY (upper left max bound of initial piece position)
+    // sometimes depending on screenheight, min is larger than max
+    const maxSandboxY = Math.max(
+      puzzleAreaDimensions.puzzleAreaHeight -
+        adHeight -
+        parentContainerStyle.padding * 2 -
+        squareSize,
+      minSandboxY
+    );
 
-      setPuzzle(pickedPuzzle);
+    setLowerBound(maxSandboxY);
 
-      const shuffleOrder = shuffle(fillArray(gridSize), disableShuffle);
+    setPuzzle(pickedPuzzle);
 
-      const createPieces = async () => {
-        try {
-          const _pieces: Piece[] = [];
-          const piecePaths =
-            puzzleType === "jigsaw"
-              ? generateJigsawPiecePaths(gridSize, squareSize)
-              : [];
-          // manipulate images in Puzzle component instead to save on renders
-          for (
-            let shuffledIndex = 0;
-            shuffledIndex < numPieces;
-            shuffledIndex++
-          ) {
-            const solvedIndex = shuffleOrder[shuffledIndex];
-            const {
-              pieceDimensions,
-              initialPlacement,
-              viewBox,
-              snapOffset,
-            } = getInitialDimensions(
-              puzzleType,
-              minSandboxY,
-              maxSandboxY,
-              solvedIndex,
-              shuffledIndex,
-              gridSize,
-              squareSize,
-              boardSize
-            );
+    const shuffleOrder = shuffle(fillArray(gridSize), disableShuffle);
 
-            const href = await ImageManipulator.manipulateAsync(
-              FileSystem.documentDirectory + imageURI,
-              [
-                {
-                  resize: {
-                    width: boardSize,
-                    height: boardSize,
-                  },
-                },
-                {
-                  crop: { ...viewBox, ...pieceDimensions },
-                },
-              ],
-              { compress: 1, format: ImageManipulator.SaveFormat.JPEG }
-            );
+    const createPieces = async () => {
+      try {
+        const localURI = FileSystem.documentDirectory + imageURI;
+        const imageInfo = await FileSystem.getInfoAsync(localURI);
 
-            const piece: Piece = {
-              href,
-              pieceDimensions,
-              piecePath: piecePaths.length ? piecePaths[solvedIndex] : "",
-              initialPlacement,
-              initialRotation:
-                Math.floor(Math.random() * 4) * 90 * DEGREE_CONVERSION,
-              solvedIndex,
-              snapOffset,
-            };
-            _pieces.push(piece);
-          }
-          setPieces(_pieces);
-          setReady(true);
-        } catch (e) {
-          console.log(e);
-          setModalVisible(true);
+        if (!imageInfo.exists) {
+          navigation.navigate("AddPuzzle", { publicKey, sourceList });
+          return;
         }
-      };
-      createPieces();
-      setSnapPoints(getSnapPoints(gridSize, squareSize));
-      setWinMessage("");
-      currentBoard.current = [];
-      maxZ.current = 0;
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
+        const _pieces: Piece[] = [];
+        const piecePaths =
+          puzzleType === "jigsaw"
+            ? generateJigsawPiecePaths(gridSize, squareSize)
+            : [];
+
+        // manipulate images in Puzzle component instead to save on renders
+        for (
+          let shuffledIndex = 0;
+          shuffledIndex < numPieces;
+          shuffledIndex++
+        ) {
+          const solvedIndex = shuffleOrder[shuffledIndex];
+          const {
+            pieceDimensions,
+            initialPlacement,
+            viewBox,
+            snapOffset,
+          } = getInitialDimensions(
+            puzzleType,
+            minSandboxY,
+            maxSandboxY,
+            solvedIndex,
+            shuffledIndex,
+            gridSize,
+            squareSize,
+            boardSize
+          );
+
+          const href = await ImageManipulator.manipulateAsync(
+            localURI,
+            [
+              {
+                resize: {
+                  width: boardSize,
+                  height: boardSize,
+                },
+              },
+              {
+                crop: { ...viewBox, ...pieceDimensions },
+              },
+            ],
+            { compress: 1, format: ImageManipulator.SaveFormat.JPEG }
+          );
+
+          const piece: Piece = {
+            href,
+            pieceDimensions,
+            piecePath: piecePaths.length ? piecePaths[solvedIndex] : "",
+            initialPlacement,
+            initialRotation:
+              Math.floor(Math.random() * 4) * 90 * DEGREE_CONVERSION,
+            solvedIndex,
+            snapOffset,
+          };
+          _pieces.push(piece);
+        }
+        setPieces(_pieces);
+        setReady(true);
+      } catch (e) {
+        console.log(e);
+        setModalVisible(true);
+      }
+    };
+    createPieces();
+    setSnapPoints(getSnapPoints(gridSize, squareSize));
+    setWinMessage("");
+    currentBoard.current = [];
+    maxZ.current = 0;
+    // }
   }, [
     boardSize,
     navigation,
@@ -376,7 +364,9 @@ export default function PuzzleComponent({
           isVisible={modalVisible}
           onBackdropPress={() => {
             setModalVisible(false);
-            navigation.navigate("Make");
+            navigation.navigate(
+              sourceList === "sent" ? "SentPuzzleList" : "PuzzleListContainer"
+            );
           }}
           animationIn="fadeIn"
           animationOut="fadeOut"
@@ -405,21 +395,24 @@ export default function PuzzleComponent({
                   setModalVisible(false);
                   navigation.navigate("AddPuzzle", { publicKey, sourceList });
                 }}
-                style={{ margin: 5 }}
+                style={{ margin: 10 }}
               >
-                Redownload Puzzle
+                Try Again
               </Button>
               <Button
-                icon="delete"
+                icon="cancel"
                 mode="contained"
                 onPress={async () => {
-                  await removeMissingPuzzle(publicKey, sourceList);
                   setModalVisible(false);
-                  navigation.navigate("Make");
+                  navigation.navigate(
+                    sourceList === "sent"
+                      ? "SentPuzzleList"
+                      : "PuzzleListContainer"
+                  );
                 }}
-                style={{ margin: 5 }}
+                style={{ marginTop: 5 }}
               >
-                Delete Puzzle
+                Cancel
               </Button>
             </View>
           </View>
