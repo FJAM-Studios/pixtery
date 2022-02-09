@@ -2,7 +2,7 @@ import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone"; // dependent on utc plugin
 import utc from "dayjs/plugin/utc";
 import { AdMobInterstitial } from "expo-ads-admob";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { View, TouchableOpacity } from "react-native";
 import { ActivityIndicator, Button, Text } from "react-native-paper";
 import Toast from "react-native-root-toast";

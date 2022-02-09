@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import React from "react";
+
 import { ScrollView, View, TouchableOpacity } from "react-native";
 import Modal from "react-native-modal";
 import { Headline, Text } from "react-native-paper";

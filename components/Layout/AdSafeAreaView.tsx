@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AdMobBanner } from "expo-ads-admob";
 import * as StoreReview from "expo-store-review";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { StyleProp, ViewStyle, View, LayoutChangeEvent } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 

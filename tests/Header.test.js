@@ -1,4 +1,3 @@
-import React from "react";
 import { create, act } from "react-test-renderer";
 import TestRenderer from "react-test-renderer";
 import ShallowRenderer from "react-test-renderer/shallow";
