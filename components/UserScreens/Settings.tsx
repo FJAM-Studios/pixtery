@@ -1,24 +1,20 @@
 import React from "react";
-import { View, Linking } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { Headline, Text, Button } from "react-native-paper";
+import { Text, Button } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 
 import { VERSION_NUMBER } from "../../constants";
 import { setTutorialFinished } from "../../store/reducers/tutorialFinished";
 import { ScreenNavigation, RootState } from "../../types";
-import { AdSafeAreaView, Header } from "../Layout";
+import { AdSafeAreaView } from "../Layout";
 
-export default function Help({
+export default function Settings({
   navigation,
 }: {
   navigation: ScreenNavigation;
 }): JSX.Element {
   const dispatch = useDispatch();
   const theme = useSelector((state: RootState) => state.theme);
-  const receivedPuzzles = useSelector(
-    (state: RootState) => state.receivedPuzzles
-  );
 
   return (
     <AdSafeAreaView
@@ -29,26 +25,31 @@ export default function Help({
         backgroundColor: theme.colors.background,
       }}
     >
-      <Header
-        notifications={
-          receivedPuzzles.filter((puzzle) => !puzzle.completed).length
-        }
-        navigation={navigation}
-      />
       <KeyboardAwareScrollView
         resetScrollToCoords={{ x: 0, y: 0 }}
         keyboardShouldPersistTaps="handled"
       >
-        <View
-          style={{
-            flexDirection: "column",
-            backgroundColor: theme.colors.background,
-            justifyContent: "center",
-            alignItems: "center",
+        <Button
+          icon="account"
+          mode="contained"
+          onPress={() => {
+            navigation.navigate("Profile");
           }}
+          style={{ margin: 10 }}
         >
-          <Headline>Help</Headline>
-        </View>
+          Manage Profile
+        </Button>
+
+        <Button
+          icon="puzzle"
+          mode="contained"
+          onPress={() => {
+            navigation.navigate("ManagePuzzles");
+          }}
+          style={{ margin: 10 }}
+        >
+          Manage Puzzles
+        </Button>
         <Button
           icon="cursor-pointer"
           mode="contained"
@@ -69,24 +70,6 @@ export default function Help({
           style={{ margin: 10 }}
         >
           Contact Us
-        </Button>
-        <Button
-          mode="contained"
-          onPress={() => {
-            Linking.openURL("https://www.pixtery.io/terms.html");
-          }}
-          style={{ margin: 10 }}
-        >
-          Terms
-        </Button>
-        <Button
-          mode="contained"
-          onPress={() => {
-            Linking.openURL("https://www.pixtery.io/privacy.html");
-          }}
-          style={{ margin: 10 }}
-        >
-          Privacy Policy
         </Button>
         <Text>v{VERSION_NUMBER}</Text>
       </KeyboardAwareScrollView>

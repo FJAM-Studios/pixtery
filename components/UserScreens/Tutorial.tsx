@@ -13,7 +13,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { setTutorialFinished } from "../../store/reducers/tutorialFinished";
 import { ScreenNavigation, RootState } from "../../types";
-import { AdSafeAreaView, Header } from "../Layout";
+import { AdSafeAreaView } from "../Layout";
 
 const emptyImage = require("../../assets/blank.jpg");
 
@@ -26,9 +26,7 @@ export default function Tutorial({
   const { height, boardSize } = useSelector(
     (state: RootState) => state.screenHeight
   );
-  const receivedPuzzles = useSelector(
-    (state: RootState) => state.receivedPuzzles
-  );
+
   const [step, setStep] = useState(0);
   const dispatch = useDispatch();
 
@@ -54,7 +52,7 @@ export default function Tutorial({
     );
     setStep(0);
     dispatch(setTutorialFinished(true));
-    navigation.navigate("Home");
+    navigation.navigate("Make");
   };
   return (
     <AdSafeAreaView
@@ -71,7 +69,7 @@ export default function Tutorial({
         style={{
           position: "absolute",
           width: "120%",
-          height: "100%",
+          height: "120%",
           backgroundColor: "rgba(0,0,0,0.5)",
           alignSelf: "center",
           alignItems: "center",
@@ -79,20 +77,13 @@ export default function Tutorial({
           zIndex: 1,
         }}
       />
-      <Header
-        notifications={
-          receivedPuzzles.filter((puzzle) => !puzzle.completed).length
-        }
-        navigation={navigation}
-        headerStep={step === 5}
-      />
 
       {/* instructions */}
       <View
         style={{
           width: "80%",
           position: "absolute",
-          top: height * 0.14,
+          top: "5%",
           alignSelf: "center",
           zIndex: 3,
         }}
@@ -102,7 +93,7 @@ export default function Tutorial({
             padding: height * 0.03,
             height: height * 0.15,
             borderRadius: theme.roundness,
-            backgroundColor: "rgba(0,0,0,0.5)",
+            backgroundColor: theme.colors.surface,
             justifyContent: "center",
           }}
         >
@@ -118,7 +109,7 @@ export default function Tutorial({
           style={{
             margin: 20,
             borderRadius: theme.roundness,
-            backgroundColor: theme.colors.onSurface,
+            backgroundColor: theme.colors.surface,
           }}
           onPress={() => {
             if (step === 5) finishTutorial();
@@ -130,12 +121,26 @@ export default function Tutorial({
           </Text>
         </Button>
 
-        {step === 0 ? null : (
+        {step === 0 ? (
+          <Button
+            style={{
+              // position: "absolute",
+              // top: height * 0.65,
+              alignSelf: "center",
+              borderRadius: theme.roundness,
+              backgroundColor: theme.colors.surface,
+              zIndex: 3,
+            }}
+            onPress={finishTutorial}
+          >
+            <Text>Skip Tutorial</Text>
+          </Button>
+        ) : (
           <Button
             style={{
               marginHorizontal: 20,
               borderRadius: theme.roundness,
-              backgroundColor: theme.colors.onSurface,
+              backgroundColor: theme.colors.surface,
             }}
             onPress={() => setStep(step - 1)}
           >
@@ -144,22 +149,6 @@ export default function Tutorial({
         )}
       </View>
 
-      {/* skip tutorial button */}
-      {step === 0 ? (
-        <Button
-          style={{
-            position: "absolute",
-            top: height * 0.75,
-            alignSelf: "center",
-            borderRadius: theme.roundness,
-            backgroundColor: theme.colors.onSurface,
-            zIndex: 3,
-          }}
-          onPress={finishTutorial}
-        >
-          <Text>Skip Tutorial</Text>
-        </Button>
-      ) : null}
       <View
         style={{
           alignSelf: "center",

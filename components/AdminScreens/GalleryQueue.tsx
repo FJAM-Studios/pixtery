@@ -19,7 +19,7 @@ import {
   StatusOfDaily,
 } from "../../types";
 import { formatDateFromString } from "../../util";
-import { AdSafeAreaView, Header } from "../Layout";
+import { AdSafeAreaView } from "../Layout";
 
 export default function GalleryQueue({
   navigation,
@@ -29,9 +29,7 @@ export default function GalleryQueue({
   route: GalleryQueueRoute;
 }): JSX.Element {
   const theme = useSelector((state: RootState) => state.theme);
-  const receivedPuzzles = useSelector(
-    (state: RootState) => state.receivedPuzzles
-  );
+
   // these are fixed now, but later if we want to paginate or look at inactive gallery queue listings, we can
   const [limit] = useState(10);
   const [active] = useState(true);
@@ -75,12 +73,6 @@ export default function GalleryQueue({
         backgroundColor: theme.colors.background,
       }}
     >
-      <Header
-        notifications={
-          receivedPuzzles.filter((puzzle) => !puzzle.completed).length
-        }
-        navigation={navigation}
-      />
       <View
         style={{
           flexDirection: "column",
