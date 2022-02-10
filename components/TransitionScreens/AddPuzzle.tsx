@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as FileSystem from "expo-file-system";
-import * as React from "react";
+import { useEffect } from "react";
 import { View } from "react-native";
 import { Headline, ActivityIndicator } from "react-native-paper";
 import Toast from "react-native-root-toast";
@@ -89,7 +89,7 @@ export default function AddPuzzle({
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     const searchForPuzzle = async () => {
       // all logic determining which screen to navigate to happens here in order to place navigation at the end of every branch. Otherwise the function will continue running after navigating away, which can cause the user to get redirected if there is an uncaught navigation further down the line
       try {
