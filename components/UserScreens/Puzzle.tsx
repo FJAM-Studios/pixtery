@@ -143,112 +143,113 @@ export default function PuzzleComponent({
       (puz) => puz.publicKey === publicKey
     );
 
-    // if (matchingPuzzles.length && puzzleAreaDimensions.puzzleAreaWidth > 0) {
-    // this enables us to dynamically reference parent container padding below when we calculate ad banner position
-    const parentContainerStyle = StyleSheet.flatten([
-      styles(styleProps).parentContainer,
-    ]);
+    if (matchingPuzzles.length && puzzleAreaDimensions.puzzleAreaWidth > 0) {
+      // this enables us to dynamically reference parent container padding below when we calculate ad banner position
+      const parentContainerStyle = StyleSheet.flatten([
+        styles(styleProps).parentContainer,
+      ]);
 
-    const pickedPuzzle = matchingPuzzles[0];
-    const { gridSize, puzzleType, imageURI } = pickedPuzzle;
-    const squareSize = boardSize / gridSize;
-    const numPieces = gridSize * gridSize;
-    const minSandboxY = boardSize * 1.01;
-    // maxSandboxY (upper left max bound of initial piece position)
-    // sometimes depending on screenheight, min is larger than max
-    const maxSandboxY = Math.max(
-      puzzleAreaDimensions.puzzleAreaHeight -
-        adHeight -
-        parentContainerStyle.padding * 2 -
-        squareSize,
-      minSandboxY
-    );
+      const pickedPuzzle = matchingPuzzles[0];
+      const { gridSize, puzzleType, imageURI } = pickedPuzzle;
+      const squareSize = boardSize / gridSize;
+      const numPieces = gridSize * gridSize;
+      const minSandboxY = boardSize * 1.01;
+      // maxSandboxY (upper left max bound of initial piece position)
+      // sometimes depending on screenheight, min is larger than max
+      const maxSandboxY = Math.max(
+        puzzleAreaDimensions.puzzleAreaHeight -
+          adHeight -
+          parentContainerStyle.padding * 2 -
+          squareSize,
+        minSandboxY
+      );
 
-    setLowerBound(maxSandboxY);
+      setLowerBound(maxSandboxY);
 
-    setPuzzle(pickedPuzzle);
+      setPuzzle(pickedPuzzle);
 
-    const shuffleOrder = shuffle(fillArray(gridSize), disableShuffle);
+      const shuffleOrder = shuffle(fillArray(gridSize), disableShuffle);
 
-    const createPieces = async () => {
-      try {
-        const localURI = FileSystem.documentDirectory + imageURI;
-        const imageInfo = await FileSystem.getInfoAsync(localURI);
+      const createPieces = async () => {
+        try {
+          const localURI = FileSystem.documentDirectory + imageURI;
+          const imageInfo = await FileSystem.getInfoAsync(localURI);
 
-        if (!imageInfo.exists) {
-          navigation.navigate("AddPuzzle", { publicKey, sourceList });
-          return;
-        }
+          if (!imageInfo.exists) {
+            navigation.navigate("AddPuzzle", { publicKey, sourceList });
+            return;
+          }
 
-        const _pieces: Piece[] = [];
-        const piecePaths =
-          puzzleType === "jigsaw"
-            ? generateJigsawPiecePaths(gridSize, squareSize)
-            : [];
+          const _pieces: Piece[] = [];
+          const piecePaths =
+            puzzleType === "jigsaw"
+              ? generateJigsawPiecePaths(gridSize, squareSize)
+              : [];
 
-        // manipulate images in Puzzle component instead to save on renders
-        for (
-          let shuffledIndex = 0;
-          shuffledIndex < numPieces;
-          shuffledIndex++
-        ) {
-          const solvedIndex = shuffleOrder[shuffledIndex];
-          const {
-            pieceDimensions,
-            initialPlacement,
-            viewBox,
-            snapOffset,
-          } = getInitialDimensions(
-            puzzleType,
-            minSandboxY,
-            maxSandboxY,
-            solvedIndex,
-            shuffledIndex,
-            gridSize,
-            squareSize,
-            boardSize
-          );
+          // manipulate images in Puzzle component instead to save on renders
+          for (
+            let shuffledIndex = 0;
+            shuffledIndex < numPieces;
+            shuffledIndex++
+          ) {
+            const solvedIndex = shuffleOrder[shuffledIndex];
+            const {
+              pieceDimensions,
+              initialPlacement,
+              viewBox,
+              snapOffset,
+            } = getInitialDimensions(
+              puzzleType,
+              minSandboxY,
+              maxSandboxY,
+              solvedIndex,
+              shuffledIndex,
+              gridSize,
+              squareSize,
+              boardSize
+            );
 
-          const href = await ImageManipulator.manipulateAsync(
-            localURI,
-            [
-              {
-                resize: {
-                  width: boardSize,
-                  height: boardSize,
+            const href = await ImageManipulator.manipulateAsync(
+              localURI,
+              [
+                {
+                  resize: {
+                    width: boardSize,
+                    height: boardSize,
+                  },
                 },
-              },
-              {
-                crop: { ...viewBox, ...pieceDimensions },
-              },
-            ],
-            { compress: 1, format: ImageManipulator.SaveFormat.JPEG }
-          );
+                {
+                  crop: { ...viewBox, ...pieceDimensions },
+                },
+              ],
+              { compress: 1, format: ImageManipulator.SaveFormat.JPEG }
+            );
 
-          const piece: Piece = {
-            href,
-            pieceDimensions,
-            piecePath: piecePaths.length ? piecePaths[solvedIndex] : "",
-            initialPlacement,
-            initialRotation:
-              Math.floor(Math.random() * 4) * 90 * DEGREE_CONVERSION,
-            solvedIndex,
-            snapOffset,
-          };
-          _pieces.push(piece);
+            const piece: Piece = {
+              href,
+              pieceDimensions,
+              piecePath: piecePaths.length ? piecePaths[solvedIndex] : "",
+              initialPlacement,
+              initialRotation:
+                Math.floor(Math.random() * 4) * 90 * DEGREE_CONVERSION,
+              solvedIndex,
+              snapOffset,
+            };
+            _pieces.push(piece);
+          }
+          setPieces(_pieces);
+          setReady(true);
+        } catch (e) {
+          console.log(e);
+          setModalVisible(true);
         }
-        setPieces(_pieces);
-        setReady(true);
-      } catch (e) {
-        console.log(e);
-        setModalVisible(true);
-      }
-    };
-    createPieces();
-    setSnapPoints(getSnapPoints(gridSize, squareSize));
-    setWinMessage("");
-    currentBoard.current = [];
-    maxZ.current = 0;
+      };
+      createPieces();
+      setSnapPoints(getSnapPoints(gridSize, squareSize));
+      setWinMessage("");
+      currentBoard.current = [];
+      maxZ.current = 0;
+    }
   }, [
     boardSize,
     navigation,
@@ -335,18 +336,14 @@ export default function PuzzleComponent({
                   height: boardSize,
                 }}
               />
-              <View style={styles(styleProps).winContainer}>
-                <Text style={styles(styleProps).winText}>{winMessage}</Text>
-                <Text style={styles(styleProps).creatorText}>
-                  {winMessage.length
-                    ? `created by: ${puzzle.senderName}`
-                    : null}
-                </Text>
-              </View>
+              <Text style={styles(styleProps).creatorText}>
+                {winMessage.length ? `created by: ${puzzle.senderName}` : null}
+              </Text>
+              <Text style={styles(styleProps).winText}>{winMessage}</Text>
               <Button
                 icon="download-circle"
                 mode="contained"
-                style={{ margin: 15 }}
+                style={{ margin: 5 }}
                 onPress={() => saveToLibrary(puzzle.imageURI)}
               >
                 Save Image
@@ -433,20 +430,20 @@ const styles = (props: { theme: Theme; boardSize: number }) =>
       zIndex: 1,
     },
     winText: {
-      fontSize: 25,
+      fontSize: 18,
       flexWrap: "wrap",
       textAlign: "center",
       // flex: 1,
       color: props.theme.colors.text,
-      marginTop: 20,
+      marginTop: 5,
     },
     creatorText: {
-      fontSize: 15,
+      fontSize: 12,
       flexWrap: "wrap",
       textAlign: "right",
       // flex: 1,
       color: props.theme.colors.text,
-      marginTop: 20,
+      marginTop: 2,
     },
     startText: {
       fontSize: 20,
