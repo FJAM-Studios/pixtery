@@ -1,4 +1,4 @@
-import * as React from "react";
+import { useState, useEffect, useRef } from "react";
 
 import { DEGREE_CONVERSION, TESTING_MODE } from "../constants";
 import {
@@ -21,13 +21,13 @@ export default function Puzzle({
 }: {
   puzzle: PuzzleType;
 }): JSX.Element {
-  const [height, setHeight] = React.useState(0);
-  const [solved, setSolved] = React.useState(false);
-  const [pieces, setPieces] = React.useState<Piece[]>([]);
-  const [snapPoints, setSnapPoints] = React.useState<Point[]>([]);
-  const boardRef = React.useRef<HTMLDivElement | null>(null);
+  const [height, setHeight] = useState(0);
+  const [solved, setSolved] = useState(false);
+  const [pieces, setPieces] = useState<Piece[]>([]);
+  const [snapPoints, setSnapPoints] = useState<Point[]>([]);
+  const boardRef = useRef<HTMLDivElement | null>(null);
   // when a piece is moved, it is given new maxZ through updateZ function below
-  const maxZ = React.useRef(0);
+  const maxZ = useRef(0);
 
   const updateZ = () => {
     maxZ.current += 1;
@@ -35,7 +35,7 @@ export default function Puzzle({
   };
 
   // store current pieces snapped to board
-  const currentBoard = React.useRef<BoardSpace[]>([]);
+  const currentBoard = useRef<BoardSpace[]>([]);
 
   const checkWin = () => {
     console.log(currentBoard.current);
@@ -44,7 +44,7 @@ export default function Puzzle({
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     const boardSize =
       0.95 * Math.min(window.innerWidth, window.innerHeight * 0.5);
     setHeight(boardSize);
