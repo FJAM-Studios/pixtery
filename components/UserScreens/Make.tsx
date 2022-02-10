@@ -293,7 +293,7 @@ export default function Make({
         resetScrollToCoords={{ x: 0, y: 0 }}
         keyboardShouldPersistTaps="handled"
         extraScrollHeight={
-          Platform.OS === "ios" ? 0 : buttonHeight + height * 0.2
+          Platform.OS === "ios" ? 0 : buttonHeight + height * 0.21
         }
         enableOnAndroid
       >
