@@ -227,8 +227,7 @@ const getBackupDaily = async () => {
     }
 
     // if tomorrow's Daily is not set yet
-    // TODO: update base year to 2022; currently 2020 for testing purposes
-    const BASE_YEAR = 2020;
+    const BASE_YEAR = 2022;
     // choose random year between base year (inclusive) and tomorrow's year (exclusive) to get the Daily from
     // this is to avoid the same Daily from the last year from being pulled forward in perpetuity
     const randomPastYear = getRandomIntInRange(BASE_YEAR, tomorrow.get("year"));
@@ -254,6 +253,7 @@ const getBackupDaily = async () => {
       tomorrowDailyFromRandomYear.data(),
       `auto populated from ${month}/${day}/${randomPastYear}`
     );
+    console.log(`Auto-populated Daily from ${month}/${day}/${randomPastYear}`);
   } catch (error: unknown) {
     if (error instanceof Error)
       throw new functions.https.HttpsError("unknown", error.message, error);
