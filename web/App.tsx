@@ -1,4 +1,4 @@
-import * as React from "react";
+import { useState, useEffect } from "react";
 
 import { queryPuzzleCallable } from "../FirebaseApp/CloudFunctions";
 import { getPixteryURL } from "../FirebaseApp/StorageFunctions";
@@ -8,10 +8,10 @@ import Puzzle from "./Puzzle";
 import StoreLinks from "./StoreLinks";
 
 export default function App(): JSX.Element {
-  const [loading, setLoading] = React.useState(true);
-  const [puzzle, setPuzzle] = React.useState<PuzzleType>();
+  const [loading, setLoading] = useState(true);
+  const [puzzle, setPuzzle] = useState<PuzzleType>();
 
-  React.useEffect(() => {
+  useEffect(() => {
     const path = window.location.pathname;
     const publicKey = path.substring(path.lastIndexOf("/") + 1);
     fetchPuzzle(publicKey);

@@ -1,5 +1,4 @@
 import { useNavigation } from "@react-navigation/native";
-
 import { View } from "react-native";
 import Modal from "react-native-modal";
 import { useSelector } from "react-redux";

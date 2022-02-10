@@ -1,4 +1,4 @@
-import * as React from "react";
+import { useState, useRef } from "react";
 
 import { DEFAULT_IMAGE_SIZE, SNAP_MARGIN } from "../constants";
 import { getPointsDistance, snapAngle } from "../puzzleUtils";
@@ -32,21 +32,21 @@ export default function PuzzlePiece({
   } = piece;
   const href = piece.href as string;
 
-  const [rotation, setRotation] = React.useState(initialRotation);
+  const [rotation, setRotation] = useState(initialRotation);
 
   const pivot = {
     x: snapOffset.x / pieceDimensions.width,
     y: snapOffset.y / pieceDimensions.height,
   };
 
-  const pieceRef = React.useRef<HTMLDivElement | null>(null);
-  const position = React.useRef({
+  const pieceRef = useRef<HTMLDivElement | null>(null);
+  const position = useRef({
     _x: 0,
     _y: 0,
     left: initialPlacement.x,
     top: initialPlacement.y,
   });
-  const zIndex = React.useRef(0);
+  const zIndex = useRef(0);
 
   const startDrag = (event: React.PointerEvent) => {
     if (pieceRef.current) {
