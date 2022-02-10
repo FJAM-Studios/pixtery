@@ -1,4 +1,4 @@
-import * as React from "react";
+import { useState } from "react";
 import { View, TextInput } from "react-native";
 import { IconButton, Text } from "react-native-paper";
 import { useSelector } from "react-redux";
@@ -17,7 +17,7 @@ export default function MessageInput({
     useSelector((state: RootState) => state.screenHeight.height) * 0.09;
   const margin =
     useSelector((state: RootState) => state.screenHeight.height) * 0.01;
-  const [messageFocus, setMessageFocus] = React.useState(false);
+  const [messageFocus, setMessageFocus] = useState(false);
   const messageLimit = 70;
   const messageDraft = message.length > 0;
 
