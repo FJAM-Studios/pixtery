@@ -63,23 +63,7 @@ export const addToGallery = functions.https.onCall(
       const puzzleData = res.data();
 
       // set puzzle for that date on firestore
-      await db
-        .collection("gallery")
-        .doc(year)
-        .collection(month)
-        .doc(day)
-        .set(
-          {
-            ...puzzleData,
-            //figured this would be good to remove from the 'live' gallery bc it's sent out to everyone
-            notificationToken: null,
-            addedBy: context.auth.uid,
-            addedOn: new Date(),
-            // currently will overwrite an existing daily at the date
-            // before overwrite, could move existing Daily to a retired folder
-          },
-          { merge: false }
-        );
+      addToGalleryForDate(year, month, day, puzzleData, context.auth.uid);
 
       //make the puzzle inactive in the queue
       await db
@@ -207,7 +191,7 @@ export const getDaily = functions.https.onCall(
 
       if (daily.exists) return daily.data();
       else {
-        // @todo - once a day cloud function that populates from last years puzzle
+        // once a day cloud function will populate from previous years' puzzle
         return null;
       }
     } catch (error: unknown) {
@@ -216,6 +200,96 @@ export const getDaily = functions.https.onCall(
     }
   }
 );
+
+export const populateBlankDaily = functions.pubsub
+  .schedule("55 23 * * *")
+  .timeZone(DAILY_TIMEZONE) // can choose timezone - default is America/Los_Angeles
+  .onRun(() => {
+    console.log("Testing daily at 11:55PM Eastern");
+    getBackupDaily();
+    return null;
+  });
+
+const getBackupDaily = async () => {
+  try {
+    const now = dayjs().tz(DAILY_TIMEZONE);
+    const tomorrow = now.clone().add(1, "day");
+    const [year, month, day] = getESTDate(tomorrow);
+    console.log(`Tomorrow in EST: ${month}/${day}/${year}`);
+
+    // try to get tomorrow's Daily
+    const tomorrowDaily = await getDailyForDate(year, month, day);
+
+    // if tomorrow's Daily is set already
+    if (tomorrowDaily.exists) {
+      console.log(`Daily was already set for ${month}/${day}/${year}`);
+      return;
+    }
+
+    // if tomorrow's Daily is not set yet
+    const BASE_YEAR = 2022;
+    // choose random year between base year (inclusive) and tomorrow's year (exclusive) to get the Daily from
+    // this is to avoid the same Daily from the last year from being pulled forward in perpetuity
+    const randomPastYear = getRandomIntInRange(BASE_YEAR, tomorrow.get("year"));
+    console.log(
+      `Daily was NOT set for ${month}/${day}/${year}. Getting the Daily from ${month}/${day}/${randomPastYear}`
+    );
+    // get the daily for the randomPastYear with tomorrow's month and day
+    const tomorrowDailyFromRandomYear = await getDailyForDate(
+      randomPastYear.toString(),
+      month,
+      day
+    );
+    // if backup Daily doesn't exist; could potentially trigger error email to us if there is no back up daily
+    if (!tomorrowDailyFromRandomYear.exists) {
+      console.log("No backup Daily found");
+      return;
+    }
+    // if the Daily from the previous random year exists (it should), set tomorrow's Daily with the Daily from randomPastYear with tomorrow's month and day
+    await addToGalleryForDate(
+      year,
+      month,
+      day,
+      tomorrowDailyFromRandomYear.data(),
+      `auto populated from ${month}/${day}/${randomPastYear}`
+    );
+    console.log(`Auto-populated Daily from ${month}/${day}/${randomPastYear}`);
+  } catch (error: unknown) {
+    if (error instanceof Error)
+      throw new functions.https.HttpsError("unknown", error.message, error);
+  }
+};
+
+const addToGalleryForDate = async (
+  year: string,
+  month: string,
+  day: string,
+  puzzleData: FirebaseFirestore.DocumentData | undefined,
+  addedBy: string
+) => {
+  await db
+    .collection("gallery")
+    .doc(year)
+    .collection(month)
+    .doc(day)
+    .set(
+      {
+        ...puzzleData,
+        //figured this would be good to remove from the 'live' gallery bc it's sent out to everyone
+        notificationToken: null,
+        addedBy,
+        addedOn: new Date(),
+      },
+      // will overwrite an existing daily at the date
+      { merge: false }
+    );
+};
+
+const getRandomIntInRange = (min: number, max: number): number => {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min) + min); //The maximum is exclusive and the minimum is inclusive
+};
 
 const getDailyForDate = async (year: string, month: string, day: string) => {
   return await db
