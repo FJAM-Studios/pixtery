@@ -41,7 +41,7 @@ export default function Subheader({
             shadowColor: theme.colors.primary,
             width: 200,
             justifyContent: "center",
-            alignSelf: "center"
+            alignSelf: "center",
           }}
         >
           {title}
