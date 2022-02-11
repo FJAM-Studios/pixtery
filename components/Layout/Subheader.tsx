@@ -2,7 +2,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { Header, HeaderBackButton } from "@react-navigation/elements";
 import { ParamListBase } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-
 import { Button } from "react-native-paper";
 import { useSelector } from "react-redux";
 
@@ -40,6 +39,7 @@ export default function Subheader({
           mode="contained"
           style={{
             shadowColor: theme.colors.primary,
+            width: "100%",
           }}
         >
           {title}
