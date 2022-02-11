@@ -1,5 +1,4 @@
 import * as FileSystem from "expo-file-system";
-import * as React from "react";
 import { useState } from "react";
 import {
   ImageBackground,
