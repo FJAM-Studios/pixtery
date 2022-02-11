@@ -2,10 +2,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Audio } from "expo-av";
 import * as FileSystem from "expo-file-system";
 import * as ImageManipulator from "expo-image-manipulator";
-import React, { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Text, View, StyleSheet, Image, LayoutChangeEvent } from "react-native";
 import Modal from "react-native-modal";
-import { ActivityIndicator, Button, Headline } from "react-native-paper";
+import { ActivityIndicator, Button, FAB, Headline } from "react-native-paper";
 import { Theme } from "react-native-paper/lib/typescript/types";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
@@ -20,7 +20,6 @@ import {
   validateBoard,
 } from "../../puzzleUtils";
 import { setReceivedPuzzles } from "../../store/reducers/receivedPuzzles";
-import { setSentPuzzles } from "../../store/reducers/sentPuzzles";
 import {
   Puzzle,
   Piece,
@@ -71,7 +70,7 @@ export default function PuzzleComponent({
     boardSize,
   };
 
-  const [modalVisible, setModalVisible] = React.useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
 
   // z index and current board are not handled through react state so that they don't
   // cause Puzzle/PuzzlePiece re-renders, which would break the positional tracking
@@ -138,31 +137,12 @@ export default function PuzzleComponent({
     });
   };
 
-  const removeMissingPuzzle = async (publicKey: string, sourceList: string) => {
-    let puzzleList;
-    let storageItem;
-    let setPuzzles;
-    if (sourceList === "sent") {
-      puzzleList = sentPuzzles;
-      storageItem = "@pixterySentPuzzles";
-      setPuzzles = setSentPuzzles;
-    } else {
-      puzzleList = receivedPuzzles;
-      storageItem = "@pixteryPuzzles";
-      setPuzzles = setReceivedPuzzles;
-    }
-    const newPuzzles = [
-      ...puzzleList.filter((puz) => puz.publicKey !== publicKey),
-    ];
-    await AsyncStorage.setItem(storageItem, JSON.stringify(newPuzzles));
-    await dispatch(setPuzzles(newPuzzles));
-  };
-
   useEffect(() => {
     setReady(false);
     const matchingPuzzles = [...receivedPuzzles, ...sentPuzzles].filter(
       (puz) => puz.publicKey === publicKey
     );
+
     if (matchingPuzzles.length && puzzleAreaDimensions.puzzleAreaWidth > 0) {
       // this enables us to dynamically reference parent container padding below when we calculate ad banner position
       const parentContainerStyle = StyleSheet.flatten([
@@ -192,11 +172,20 @@ export default function PuzzleComponent({
 
       const createPieces = async () => {
         try {
+          const localURI = FileSystem.documentDirectory + imageURI;
+          const imageInfo = await FileSystem.getInfoAsync(localURI);
+
+          if (!imageInfo.exists) {
+            navigation.navigate("AddPuzzle", { publicKey, sourceList });
+            return;
+          }
+
           const _pieces: Piece[] = [];
           const piecePaths =
             puzzleType === "jigsaw"
               ? generateJigsawPiecePaths(gridSize, squareSize)
               : [];
+
           // manipulate images in Puzzle component instead to save on renders
           for (
             let shuffledIndex = 0;
@@ -221,7 +210,7 @@ export default function PuzzleComponent({
             );
 
             const href = await ImageManipulator.manipulateAsync(
-              FileSystem.documentDirectory + imageURI,
+              localURI,
               [
                 {
                   resize: {
@@ -261,7 +250,6 @@ export default function PuzzleComponent({
       currentBoard.current = [];
       maxZ.current = 0;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     boardSize,
     navigation,
@@ -342,28 +330,37 @@ export default function PuzzleComponent({
           ) : (
             <>
               <Image
-                source={{ uri: FileSystem.documentDirectory + puzzle.imageURI }}
+                source={{
+                  uri: FileSystem.documentDirectory + puzzle.imageURI,
+                }}
                 style={{
                   width: boardSize,
                   height: boardSize,
                 }}
               />
-              <View style={styles(styleProps).winContainer}>
-                <Text style={styles(styleProps).winText}>{winMessage}</Text>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                }}
+              >
+                <FAB
+                  icon="download-circle"
+                  small
+                  onPress={() => saveToLibrary(puzzle.imageURI)}
+                  style={{
+                    bottom: 20,
+                    left: 5,
+                    width: 40,
+                  }}
+                />
                 <Text style={styles(styleProps).creatorText}>
                   {winMessage.length
                     ? `created by: ${puzzle.senderName}`
                     : null}
                 </Text>
               </View>
-              <Button
-                icon="download-circle"
-                mode="contained"
-                style={{ margin: 15 }}
-                onPress={() => saveToLibrary(puzzle.imageURI)}
-              >
-                Save Image
-              </Button>
+              <Text style={styles(styleProps).winText}>{winMessage}</Text>
             </>
           )}
         </View>
@@ -376,7 +373,9 @@ export default function PuzzleComponent({
           isVisible={modalVisible}
           onBackdropPress={() => {
             setModalVisible(false);
-            navigation.navigate("Make");
+            navigation.navigate(
+              sourceList === "sent" ? "SentPuzzleList" : "PuzzleListContainer"
+            );
           }}
           animationIn="fadeIn"
           animationOut="fadeOut"
@@ -405,21 +404,24 @@ export default function PuzzleComponent({
                   setModalVisible(false);
                   navigation.navigate("AddPuzzle", { publicKey, sourceList });
                 }}
-                style={{ margin: 5 }}
+                style={{ margin: 10 }}
               >
-                Redownload Puzzle
+                Try Again
               </Button>
               <Button
-                icon="delete"
+                icon="cancel"
                 mode="contained"
                 onPress={async () => {
-                  await removeMissingPuzzle(publicKey, sourceList);
                   setModalVisible(false);
-                  navigation.navigate("Make");
+                  navigation.navigate(
+                    sourceList === "sent"
+                      ? "SentPuzzleList"
+                      : "PuzzleListContainer"
+                  );
                 }}
-                style={{ margin: 5 }}
+                style={{ marginTop: 5 }}
               >
-                Delete Puzzle
+                Cancel
               </Button>
             </View>
           </View>
@@ -441,20 +443,20 @@ const styles = (props: { theme: Theme; boardSize: number }) =>
       zIndex: 1,
     },
     winText: {
-      fontSize: 25,
+      fontSize: 18,
       flexWrap: "wrap",
       textAlign: "center",
       // flex: 1,
       color: props.theme.colors.text,
-      marginTop: 20,
+      marginTop: -15,
     },
     creatorText: {
-      fontSize: 15,
+      fontSize: 12,
       flexWrap: "wrap",
       textAlign: "right",
       // flex: 1,
       color: props.theme.colors.text,
-      marginTop: 20,
+      marginTop: 2,
     },
     startText: {
       fontSize: 20,

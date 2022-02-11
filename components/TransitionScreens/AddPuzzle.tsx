@@ -1,8 +1,9 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as FileSystem from "expo-file-system";
-import * as React from "react";
+import { useEffect } from "react";
 import { View } from "react-native";
 import { Headline, ActivityIndicator } from "react-native-paper";
+import Toast from "react-native-root-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { AnyAction } from "redux";
 
@@ -51,7 +52,7 @@ export default function AddPuzzle({
       puzzleData = (await queryPuzzleCallable({ publicKey })).data as Puzzle;
       return puzzleData; // get just nested data from returned JSON
     } catch (error) {
-      console.error(error);
+      console.log(error);
       if (error instanceof Error) throw new Error(error.message); //rethrow the error so it can be caught by outer method
     }
   };
@@ -88,7 +89,7 @@ export default function AddPuzzle({
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     const searchForPuzzle = async () => {
       // all logic determining which screen to navigate to happens here in order to place navigation at the end of every branch. Otherwise the function will continue running after navigating away, which can cause the user to get redirected if there is an uncaught navigation further down the line
       try {
@@ -104,7 +105,14 @@ export default function AddPuzzle({
         }
       } catch (e) {
         console.log(e);
-        goToScreen(navigation, "Make"); //if there is an error in this method or in inner methods, abandon adding the puzzle and go to the home screen
+        Toast.show(
+          "Error retrieving Pixtery! Check your connection or try again later.",
+          {
+            duration: Toast.durations.LONG,
+            position: Toast.positions.CENTER,
+          }
+        );
+        navigation.navigate("PuzzleListContainer");
       }
     };
     searchForPuzzle();

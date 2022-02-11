@@ -1,6 +1,10 @@
-import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
+import {
+  MaterialCommunityIcons,
+  Ionicons,
+  FontAwesome,
+} from "@expo/vector-icons";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-import React from "react";
+
 import { View } from "react-native";
 import {
   SafeAreaView,
@@ -33,6 +37,7 @@ export default function TabContainer(): JSX.Element {
         <Tab.Navigator
           initialRouteName="MakeContainer"
           screenOptions={({ route }) => ({
+            tabBarShowLabel: false,
             tabBarAllowFontScaling: true,
             tabBarContentContainerStyle: {
               backgroundColor: theme.colors.primary,
@@ -41,13 +46,30 @@ export default function TabContainer(): JSX.Element {
               color: theme.dark ? "#FFFFFF" : "#000000",
             },
             tabBarIcon: ({ focused }) => {
-              let iconName: React.ComponentProps<
-                typeof MaterialCommunityIcons
-              >["name"] = "alert-circle";
-              if (route.name === "MakeContainer") iconName = "camera-iris";
+              if (route.name === "MakeContainer")
+                return (
+                  <MaterialCommunityIcons
+                    size={24}
+                    name="camera-iris"
+                    color={focused ? theme.colors.text : theme.colors.onSurface}
+                  />
+                );
               if (route.name === "DailyContainer")
-                iconName = "white-balance-sunny";
-              if (route.name === "LibraryContainer") iconName = "book-multiple";
+                return (
+                  <MaterialCommunityIcons
+                    size={24}
+                    name="puzzle"
+                    color={focused ? theme.colors.text : theme.colors.onSurface}
+                  />
+                );
+              if (route.name === "LibraryContainer")
+                return (
+                  <FontAwesome
+                    size={24}
+                    name="inbox"
+                    color={focused ? theme.colors.text : theme.colors.onSurface}
+                  />
+                );
               if (route.name === "SettingsContainer")
                 return (
                   <Ionicons
@@ -56,26 +78,26 @@ export default function TabContainer(): JSX.Element {
                     color={focused ? theme.colors.text : theme.colors.onSurface}
                   />
                 );
-              if (route.name === "AdminContainer") iconName = "lock";
-              return (
-                <MaterialCommunityIcons
-                  size={24}
-                  name={iconName}
-                  color={focused ? theme.colors.text : theme.colors.onSurface}
-                />
-              );
+              if (route.name === "AdminContainer")
+                return (
+                  <MaterialCommunityIcons
+                    size={24}
+                    name="lock"
+                    color={focused ? theme.colors.text : theme.colors.onSurface}
+                  />
+                );
             },
           })}
         >
           <Tab.Screen
-            name="MakeContainer"
-            component={MakeContainer}
-            options={{ title: "Make" }}
-          />
-          <Tab.Screen
             name="DailyContainer"
             component={DailyContainer}
             options={{ tabBarLabel: "Daily" }}
+          />
+          <Tab.Screen
+            name="MakeContainer"
+            component={MakeContainer}
+            options={{ title: "Make" }}
           />
           <Tab.Screen
             name="LibraryContainer"
