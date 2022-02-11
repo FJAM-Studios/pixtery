@@ -5,7 +5,7 @@ import * as FileSystem from "expo-file-system";
 import * as ImageManipulator from "expo-image-manipulator";
 import * as ImagePicker from "expo-image-picker";
 import * as Linking from "expo-linking";
-import * as React from "react";
+import { useState, useEffect } from "react";
 import { Image, View, Platform, Keyboard } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import {
@@ -17,6 +17,7 @@ import {
   ActivityIndicator,
   Modal,
   Portal,
+  Title,
 } from "react-native-paper";
 import Svg, { Path } from "react-native-svg";
 import { useDispatch, useSelector } from "react-redux";
@@ -62,17 +63,17 @@ export default function Make({
   );
   const sentPuzzles = useSelector((state: RootState) => state.sentPuzzles);
   const profile = useSelector((state: RootState) => state.profile);
-  const [imageURI, setImageURI] = React.useState("");
-  const [puzzleType, setPuzzleType] = React.useState("jigsaw");
-  const [gridSize, setGridSize] = React.useState(3);
-  const [message, setMessage] = React.useState("");
-  const [modalVisible, setModalVisible] = React.useState(false);
+  const [imageURI, setImageURI] = useState("");
+  const [puzzleType, setPuzzleType] = useState("jigsaw");
+  const [gridSize, setGridSize] = useState(3);
+  const [message, setMessage] = useState("");
+  const [modalVisible, setModalVisible] = useState(false);
 
-  const [paths, setPaths] = React.useState(
+  const [paths, setPaths] = useState(
     generateJigsawPiecePaths(gridSize, boardSize / (1.6 * gridSize), true)
   );
-  const [buttonHeight, setButtonHeight] = React.useState(0);
-  const [iOSCameraLaunch, setiOSCameraLaunch] = React.useState(false);
+  const [buttonHeight, setButtonHeight] = useState(0);
+  const [iOSCameraLaunch, setiOSCameraLaunch] = useState(false);
 
   const selectImage = async (camera: boolean) => {
     const permission = await checkPermission(camera);
@@ -236,7 +237,7 @@ export default function Make({
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (puzzleType === "squares")
       setPaths(
         generateSquarePiecePaths(gridSize, boardSize / (1.6 * gridSize))
@@ -292,7 +293,7 @@ export default function Make({
         resetScrollToCoords={{ x: 0, y: 0 }}
         keyboardShouldPersistTaps="handled"
         extraScrollHeight={
-          Platform.OS === "ios" ? 0 : buttonHeight + height * 0.2
+          Platform.OS === "ios" ? 0 : buttonHeight + height * 0.21
         }
         enableOnAndroid
       >
@@ -331,7 +332,7 @@ export default function Make({
                 ))}
               </Svg>
             ) : null}
-            {imageURI.length ? null : <Headline>Choose an Image</Headline>}
+            {imageURI.length ? null : <Title>Choose an Image</Title>}
           </Surface>
         </View>
         <Button

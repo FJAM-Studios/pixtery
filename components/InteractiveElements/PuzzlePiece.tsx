@@ -1,6 +1,6 @@
 import * as Haptics from "expo-haptics";
 import * as ImageManipulator from "expo-image-manipulator";
-import React, { useRef } from "react";
+import { useRef } from "react";
 import { Animated } from "react-native";
 import {
   PanGestureHandler,

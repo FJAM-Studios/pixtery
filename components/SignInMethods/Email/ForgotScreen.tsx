@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { View } from "react-native";
 import {
   Text,
@@ -8,6 +8,7 @@ import {
   Headline,
 } from "react-native-paper";
 import { useSelector } from "react-redux";
+
 import { RootState } from "../../../types";
 
 export default function ForgotScreen({
