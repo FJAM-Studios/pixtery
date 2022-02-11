@@ -172,7 +172,9 @@ export default function PuzzleComponent({
 
       const createPieces = async () => {
         try {
-          const localURI = FileSystem.documentDirectory + imageURI;
+          const fileName = imageURI.slice(imageURI.lastIndexOf("/") + 1);
+          const extension = imageURI.slice(-4) === ".jpg" ? "" : ".jpg";
+          const localURI = FileSystem.documentDirectory + fileName + extension;
           const imageInfo = await FileSystem.getInfoAsync(localURI);
 
           if (!imageInfo.exists) {
