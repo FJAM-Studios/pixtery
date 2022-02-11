@@ -51,7 +51,11 @@ export default function MessageInput({
           multiline
           maxLength={messageLimit}
           value={message}
-          onChangeText={(message) => setMessage(message)}
+          onChangeText={(message) => {
+            if (message[message.length - 1] !== "\n") {
+              setMessage(message);
+            }
+          }}
           placeholderTextColor={theme.colors.text}
           onFocus={() => setMessageFocus(true)}
           onBlur={() => setMessageFocus(false)}
