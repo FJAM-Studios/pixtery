@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import React, { useState } from "react";
+import { useState } from "react";
 import { View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Text, TextInput, Button, Headline } from "react-native-paper";
@@ -8,7 +8,10 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { checkAdminStatus } from "../../FirebaseApp";
 import { setProfile } from "../../store/reducers/profile";
+import { setReceivedPuzzles } from "../../store/reducers/receivedPuzzles";
+import { setSentPuzzles } from "../../store/reducers/sentPuzzles";
 import { ScreenNavigation, RootState, EnterNameRoute } from "../../types";
+import { restorePuzzleMetadata } from "../../util";
 import { LoadingModal, Logo, Title } from "../StaticElements";
 
 export default function EnterName({
@@ -22,6 +25,10 @@ export default function EnterName({
 
   const theme = useSelector((state: RootState) => state.theme);
   const profile = useSelector((state: RootState) => state.profile);
+  const receivedPuzzles = useSelector(
+    (state: RootState) => state.receivedPuzzles
+  );
+  const sentPuzzles = useSelector((state: RootState) => state.sentPuzzles);
   const [name, setName] = useState("");
   const [errors, setErrors] = useState("");
   const [loadingModalVisible, setLoadingModalVisible] = useState(false);
@@ -40,6 +47,15 @@ export default function EnterName({
         "@pixteryProfile",
         JSON.stringify({ ...profile, name, isGalleryAdmin })
       );
+
+      //get and merge pixteries
+      const [
+        mergedReceivedPuzzles,
+        mergedSentPuzzles,
+      ] = await restorePuzzleMetadata(receivedPuzzles, sentPuzzles);
+      dispatch(setReceivedPuzzles(mergedReceivedPuzzles));
+      dispatch(setSentPuzzles(mergedSentPuzzles));
+
       if (url) navigation.navigate("Splash", { url });
       else navigation.navigate("TabContainer");
     } catch (e) {

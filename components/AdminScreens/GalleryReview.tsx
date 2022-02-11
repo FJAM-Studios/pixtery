@@ -1,5 +1,5 @@
 import * as FileSystem from "expo-file-system";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { View, Image } from "react-native";
 import {
   ActivityIndicator,
