@@ -39,7 +39,9 @@ export default function Subheader({
           mode="contained"
           style={{
             shadowColor: theme.colors.primary,
-            width: "100%",
+            width: 200,
+            justifyContent: "center",
+            alignSelf: "center"
           }}
         >
           {title}
