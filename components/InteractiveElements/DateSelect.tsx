@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Calendar } from "react-native-calendars";
 import { DateData } from "react-native-calendars/src/types";
 import { ActivityIndicator, Text } from "react-native-paper";

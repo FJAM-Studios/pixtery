@@ -1,4 +1,3 @@
-import React from "react";
 import { View } from "react-native";
 import { Headline, IconButton } from "react-native-paper";
 import Toast from "react-native-root-toast";

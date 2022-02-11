@@ -10,7 +10,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { requestTrackingPermissionsAsync } from "expo-tracking-transparency";
 import * as Updates from "expo-updates";
-import React, { useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
 import { Alert, AppState, LogBox, Dimensions, Platform } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Provider as PaperProvider } from "react-native-paper";
