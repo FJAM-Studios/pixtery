@@ -30,7 +30,7 @@ export default function Subheader({
         enableBack ? (
           <HeaderBackButton
             onPress={onPress}
-            backImage={() => <Ionicons size={20} name="chevron-back" />}
+            backImage={() => <Ionicons size={30} name="chevron-back" />}
           />
         ) : null
       }
