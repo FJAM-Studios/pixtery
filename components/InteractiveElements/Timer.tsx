@@ -1,4 +1,3 @@
-import * as React from "react";
 import { Animated } from "react-native";
 import { CountdownCircleTimer } from "react-native-countdown-circle-timer";
 import { useSelector } from "react-redux";

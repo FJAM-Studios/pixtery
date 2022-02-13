@@ -1,6 +1,5 @@
 // this component is purely presentational to give the stack navigator something to show while it waits for the navigation container to finish initializing
 
-import React from "react";
 import { View } from "react-native";
 import { useSelector } from "react-redux";
 

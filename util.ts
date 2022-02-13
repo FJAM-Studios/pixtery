@@ -12,6 +12,7 @@ import * as MediaLibrary from "expo-media-library";
 import * as SplashScreen from "expo-splash-screen";
 import { Alert, Share } from "react-native";
 import Toast from "react-native-root-toast";
+import { Dispatch } from "redux";
 
 import {
   deactivateAllUserPuzzles,
@@ -20,6 +21,9 @@ import {
   getPixteryURL,
 } from "./FirebaseApp";
 import { DATE_FORMAT } from "./constants";
+import { setProfile } from "./store/reducers/profile";
+import { setReceivedPuzzles } from "./store/reducers/receivedPuzzles";
+import { setSentPuzzles } from "./store/reducers/sentPuzzles";
 import {
   Puzzle,
   ScreenNavigation,
@@ -331,6 +335,23 @@ const mergePuzzles = async (
   }
 };
 
+export const restorePuzzleMetadata = async (
+  receivedState: Puzzle[],
+  sentState: Puzzle[]
+): Promise<Puzzle[][]> => {
+  const [receivedFromServer, sentFromServer] = await fetchAllPuzzleData();
+  const mergedReceivedPuzzles = await mergePuzzles(
+    "@pixteryPuzzles",
+    receivedState,
+    receivedFromServer
+  );
+  const mergedSentPuzzles = await mergePuzzles(
+    "@pixterySentPuzzles",
+    sentState,
+    sentFromServer
+  );
+  return [mergedReceivedPuzzles, mergedSentPuzzles];
+};
 export const restorePuzzles = async (
   receivedState: Puzzle[],
   sentState: Puzzle[]
@@ -339,18 +360,11 @@ export const restorePuzzles = async (
     Toast.show(`Downloading puzzles from server`, {
       duration: Toast.durations.SHORT,
     });
-    const [receivedFromServer, sentFromServer] = await fetchAllPuzzleData();
-    const mergedReceivedPuzzles = await mergePuzzles(
-      "@pixteryPuzzles",
-      receivedState,
-      receivedFromServer
-    );
+    const [
+      mergedReceivedPuzzles,
+      mergedSentPuzzles,
+    ] = await restorePuzzleMetadata(receivedState, sentState);
     let imageErrors = await fetchImages(mergedReceivedPuzzles);
-    const mergedSentPuzzles = await mergePuzzles(
-      "@pixterySentPuzzles",
-      sentState,
-      sentFromServer
-    );
     imageErrors += await fetchImages(mergedSentPuzzles);
     if (imageErrors > 0)
       Toast.show(
@@ -473,6 +487,31 @@ export const isProfile = (profile: unknown): profile is Profile => {
 
 export const formatDateFromString = (date: string): string => {
   return dayjs(date).calendar(null, dateFormatOptions);
+};
+
+export const clearAllAppData = async (dispatch: Dispatch): Promise<void> => {
+  // delete local storage
+  const keys = await AsyncStorage.getAllKeys();
+  await AsyncStorage.multiRemove(keys);
+  // clear app state
+  dispatch(setReceivedPuzzles([]));
+  dispatch(setSentPuzzles([]));
+  dispatch(setProfile(null));
+  // erase local puzzles
+  eraseAllImages();
+};
+
+export const eraseAllImages = async (): Promise<void> => {
+  if (FileSystem.documentDirectory) {
+    const pixteryImages = (
+      await FileSystem.readDirectoryAsync(FileSystem.documentDirectory)
+    ).filter((uri) => uri.slice(-4) === ".jpg");
+
+    pixteryImages.map((imageURI) => {
+      FileSystem.deleteAsync(FileSystem.documentDirectory + imageURI);
+    });
+    clearEIMcache();
+  }
 };
 
 const dateFormatOptions = {
