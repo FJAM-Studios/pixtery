@@ -1,4 +1,3 @@
-import "firebase/functions";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AdMobInterstitial } from "expo-ads-admob";
 import * as FileSystem from "expo-file-system";

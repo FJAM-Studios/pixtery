@@ -1,5 +1,4 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-
 import { useSelector } from "react-redux";
 
 import { RootState, StackScreens } from "../../types";
