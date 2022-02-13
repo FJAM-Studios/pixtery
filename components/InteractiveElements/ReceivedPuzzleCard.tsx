@@ -1,4 +1,3 @@
-import * as React from "react";
 import { View, TouchableOpacity } from "react-native";
 import { Text, Card, IconButton } from "react-native-paper";
 import { useSelector } from "react-redux";

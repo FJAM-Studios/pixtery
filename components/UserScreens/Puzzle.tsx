@@ -5,7 +5,7 @@ import * as ImageManipulator from "expo-image-manipulator";
 import { useEffect, useState, useRef } from "react";
 import { Text, View, StyleSheet, Image, LayoutChangeEvent } from "react-native";
 import Modal from "react-native-modal";
-import { ActivityIndicator, Button, Headline } from "react-native-paper";
+import { ActivityIndicator, Button, FAB, Headline } from "react-native-paper";
 import { Theme } from "react-native-paper/lib/typescript/types";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
@@ -332,24 +332,37 @@ export default function PuzzleComponent({
           ) : (
             <>
               <Image
-                source={{ uri: FileSystem.documentDirectory + puzzle.imageURI }}
+                source={{
+                  uri: FileSystem.documentDirectory + puzzle.imageURI,
+                }}
                 style={{
                   width: boardSize,
                   height: boardSize,
                 }}
               />
-              <Text style={styles(styleProps).creatorText}>
-                {winMessage.length ? `created by: ${puzzle.senderName}` : null}
-              </Text>
-              <Text style={styles(styleProps).winText}>{winMessage}</Text>
-              <Button
-                icon="download-circle"
-                mode="contained"
-                style={{ margin: 5 }}
-                onPress={() => saveToLibrary(puzzle.imageURI)}
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                }}
               >
-                Save Image
-              </Button>
+                <FAB
+                  icon="download-circle"
+                  small
+                  onPress={() => saveToLibrary(puzzle.imageURI)}
+                  style={{
+                    bottom: 20,
+                    left: 5,
+                    width: 40,
+                  }}
+                />
+                <Text style={styles(styleProps).creatorText}>
+                  {winMessage.length
+                    ? `created by: ${puzzle.senderName}`
+                    : null}
+                </Text>
+              </View>
+              <Text style={styles(styleProps).winText}>{winMessage}</Text>
             </>
           )}
         </View>
@@ -437,7 +450,7 @@ const styles = (props: { theme: Theme; boardSize: number }) =>
       textAlign: "center",
       // flex: 1,
       color: props.theme.colors.text,
-      marginTop: 5,
+      marginTop: -15,
     },
     creatorText: {
       fontSize: 12,
