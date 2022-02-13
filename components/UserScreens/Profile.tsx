@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import React, { useState } from "react";
+import { useState } from "react";
 import { View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Text, Button, Switch, IconButton } from "react-native-paper";
@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { auth, signOut } from "../../FirebaseApp";
 import { setProfile } from "../../store/reducers/profile";
 import { ScreenNavigation, RootState } from "../../types";
+import { clearAllAppData } from "../../util";
 import { NameModal, ThemeModal } from "../InteractiveElements";
 import ConfirmDeleteModal from "../InteractiveElements/ConfirmDeleteModal";
 import { AdSafeAreaView } from "../Layout";
@@ -125,8 +126,8 @@ export default function Profile({
             icon="logout"
             mode="contained"
             onPress={async () => {
-              //delete local storage
-              await AsyncStorage.removeItem("@pixteryProfile");
+              //clear app data
+              await clearAllAppData(dispatch);
               //sign out of Firebase account
               await signOut();
               //update app state
