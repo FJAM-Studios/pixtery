@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as React from "react";
+import { useState } from "react";
 import { View, ScrollView } from "react-native";
 import Modal from "react-native-modal";
 import { TextInput, IconButton, Button, Headline } from "react-native-paper";
@@ -27,15 +27,13 @@ export default function PuzzleList({
     (state: RootState) => state.receivedPuzzles
   );
   const sentPuzzles = useSelector((state: RootState) => state.sentPuzzles);
-  const [modalVisible, setModalVisible] = React.useState(false);
-  const [puzzleToDelete, setPuzzleToDelete] = React.useState<Puzzle | null>(
-    null
-  );
+  const [modalVisible, setModalVisible] = useState(false);
+  const [puzzleToDelete, setPuzzleToDelete] = useState<Puzzle | null>(null);
   // the setSortBy/setSortOrder are currently unused, but set up for future sort optionality
-  const [sortBy] = React.useState<keyof Puzzle>("dateReceived");
+  const [sortBy] = useState<keyof Puzzle>("dateReceived");
   // "desc" = descending or "asc" = ascending
-  const [sortOrder] = React.useState<string>("desc");
-  const [puzzleURL, setPuzzleURL] = React.useState<string>("");
+  const [sortOrder] = useState<string>("desc");
+  const [puzzleURL, setPuzzleURL] = useState<string>("");
 
   const showDeleteModal = (puzzle: Puzzle) => {
     setModalVisible(true);

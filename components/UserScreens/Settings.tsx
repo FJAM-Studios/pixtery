@@ -1,4 +1,3 @@
-import React from "react";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Text, Button } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
