@@ -44,6 +44,7 @@ export default function MessageInput({
           borderColor: theme.colors.primary,
           padding: 5,
           marginTop: 2.5,
+          backgroundColor: theme.colors.background,
         }}
       >
         <TextInput
@@ -58,7 +59,6 @@ export default function MessageInput({
           style={{
             color: theme.colors.text,
             justifyContent: "center",
-            backgroundColor: theme.colors.background,
             width: "90%",
           }}
         />
