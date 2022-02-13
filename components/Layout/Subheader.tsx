@@ -2,7 +2,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { Header, HeaderBackButton } from "@react-navigation/elements";
 import { ParamListBase } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import React from "react";
 import { Button } from "react-native-paper";
 import { useSelector } from "react-redux";
 
@@ -31,7 +30,7 @@ export default function Subheader({
         enableBack ? (
           <HeaderBackButton
             onPress={onPress}
-            backImage={() => <Ionicons size={20} name="chevron-back" />}
+            backImage={() => <Ionicons size={30} name="chevron-back" />}
           />
         ) : null
       }
@@ -40,6 +39,9 @@ export default function Subheader({
           mode="contained"
           style={{
             shadowColor: theme.colors.primary,
+            width: 200,
+            justifyContent: "center",
+            alignSelf: "center",
           }}
         >
           {title}

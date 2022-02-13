@@ -1,4 +1,3 @@
-import * as React from "react";
 import Svg, { SvgProps, Defs, Path, G } from "react-native-svg";
 import { useSelector } from "react-redux";
 
