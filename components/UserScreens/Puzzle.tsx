@@ -4,6 +4,7 @@ import * as FileSystem from "expo-file-system";
 import * as ImageManipulator from "expo-image-manipulator";
 import { useEffect, useState, useRef } from "react";
 import { Text, View, StyleSheet, Image, LayoutChangeEvent } from "react-native";
+import HyperLink from "react-native-hyperlink";
 import Modal from "react-native-modal";
 import { ActivityIndicator, Button, FAB, Headline } from "react-native-paper";
 import { Theme } from "react-native-paper/lib/typescript/types";
@@ -362,7 +363,12 @@ export default function PuzzleComponent({
                     : null}
                 </Text>
               </View>
-              <Text style={styles(styleProps).winText}>{winMessage}</Text>
+              <HyperLink
+                linkDefault
+                linkStyle={{ textDecorationLine: "underline" }}
+              >
+                <Text style={styles(styleProps).winText}>{winMessage}</Text>
+              </HyperLink>
             </>
           )}
         </View>
