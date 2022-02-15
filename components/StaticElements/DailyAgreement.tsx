@@ -15,8 +15,7 @@ export default function DailyAgreement(): JSX.Element {
         }}
       >
         Before submitting, please make sure your Pixtery is appropriate for all
-        audiences. We do not condone hateful or offensive content of any kind.
-        Failure to comply may result in disabled accounts or other legal action.
+        audiences.
       </Text>
       <Text
         style={{
@@ -24,7 +23,7 @@ export default function DailyAgreement(): JSX.Element {
           marginTop: 10,
         }}
       >
-        Read the{" "}
+        Read the
         <Text
           style={{
             color: "blue",
