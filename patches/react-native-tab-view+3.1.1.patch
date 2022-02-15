@@ -1,0 +1,20 @@
+diff --git a/node_modules/react-native-tab-view/src/PagerViewAdapter.tsx b/node_modules/react-native-tab-view/src/PagerViewAdapter.tsx
+index b858cb4..aa5acb6 100644
+--- a/node_modules/react-native-tab-view/src/PagerViewAdapter.tsx
++++ b/node_modules/react-native-tab-view/src/PagerViewAdapter.tsx
+@@ -1,5 +1,5 @@
+ import * as React from 'react';
+-import { Animated, Keyboard, StyleSheet } from 'react-native';
++import { Animated, Keyboard, Platform, StyleSheet } from 'react-native';
+ import ViewPager, {
+   PageScrollStateChangedNativeEvent,
+ } from 'react-native-pager-view';
+@@ -63,7 +63,7 @@ export default function PagerViewAdapter<T extends Route>({
+       (route: { key: string }) => route.key === key
+     );
+ 
+-    pagerRef.current?.setPage(index);
++    Platform.OS === "android" ? pagerRef.current?.setPageWithoutAnimation(index) : pagerRef.current?.setPage(index);
+   }, []);
+ 
+   React.useEffect(() => {
