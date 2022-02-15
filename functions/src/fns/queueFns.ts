@@ -95,13 +95,23 @@ export const addToQueue = functions.https.onCall(
           "user not authenticated"
         );
       }
-
-      const { publicKey, message, newPublicKey, notificationToken } = data;
+      const {
+        newPuzzle,
+        newPublicKey,
+        anonymousChecked,
+        notificationToken,
+      } = data;
       // get the puzzle data
-      const res = await db.collection("pixteries").doc(publicKey).get();
+      const res = await db
+        .collection("pixteries")
+        .doc(newPuzzle.publicKey)
+        .get();
       const puzzleData = res.data();
 
       if (puzzleData) {
+        const senderName = anonymousChecked
+          ? "Anonymous"
+          : newPuzzle.senderName;
         // add it to the list of pixteries under the new PK
         // this is so the changed message or anonymous sender will be
         // reflected when you add the daily puzzle
@@ -110,33 +120,27 @@ export const addToQueue = functions.https.onCall(
           .doc(newPublicKey)
           .set(
             {
-              ...puzzleData,
+              ...newPuzzle,
+              senderName,
               publicKey: newPublicKey,
-              message,
-              senderName: data.anonymousChecked
-                ? "Anonymous"
-                : puzzleData.senderName,
             },
             { merge: true }
           );
 
         // add it to the gallery queue
         const dateQueued = new Date().toISOString();
-        const senderName = data.anonymousChecked
-          ? "Anonymous"
-          : puzzleData.senderName;
+
         await db
           .collection("galleryQueue")
           .doc(newPublicKey)
           .set(
             {
-              ...puzzleData,
-              notificationToken,
+              ...newPuzzle,
+              senderName,
               publicKey: newPublicKey,
-              message,
+              notificationToken,
               active: true,
               dateQueued,
-              senderName,
             },
             { merge: true }
           );
@@ -150,7 +154,7 @@ export const addToQueue = functions.https.onCall(
             New Queue Submission - ${dateQueued} \n
             https://www.pixtery.io/p/${newPublicKey} \n
             sender: ${senderName} \n
-            message: ${message}
+            message: ${newPuzzle.message}
             `,
           };
           await sendEmail(mailOptions);
