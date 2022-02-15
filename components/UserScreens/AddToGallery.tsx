@@ -16,7 +16,6 @@ import {
   Headline,
   IconButton,
   Text,
-  TextInput,
 } from "react-native-paper";
 import Toast from "react-native-root-toast";
 import { useSelector } from "react-redux";
@@ -25,6 +24,7 @@ import shortid from "shortid";
 import { addToQueue } from "../../FirebaseApp";
 import { ScreenNavigation, RootState } from "../../types";
 import { formatDateFromString } from "../../util";
+import { MessageInput } from "../InteractiveElements";
 import { AdSafeAreaView } from "../Layout";
 import DailyAgreement from "../StaticElements/DailyAgreement";
 
@@ -112,16 +112,7 @@ export default function AddToGallery({
                 }}
               >
                 <Text>Edit secret message:</Text>
-                <TextInput
-                  multiline
-                  maxLength={70}
-                  mode="outlined"
-                  value={message}
-                  onChangeText={(message) => setMessage(message)}
-                  outlineColor={theme.colors.primary}
-                  placeholderTextColor={theme.colors.primary}
-                  style={{ justifyContent: "center", width: "100%" }}
-                />
+                <MessageInput message={message} setMessage={setMessage} />
               </View>
               <Button
                 mode="contained"
