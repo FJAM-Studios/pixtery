@@ -10,7 +10,7 @@ export default function MessageInput({
   setMessage,
 }: {
   message: string;
-  setMessage: React.Dispatch<React.SetStateAction<string>>;
+  setMessage: (text: string) => void;
 }): JSX.Element {
   const theme = useSelector((state: RootState) => state.theme);
   const height =
