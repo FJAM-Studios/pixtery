@@ -6,7 +6,7 @@
     "slug": "pixtery",
     "privacy": "unlisted",
     "sdkVersion": "44.0.0",
-    "version": "1.2.0",
+    "version": "2.0.0",
     "platforms": ["android", "ios"],
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
@@ -28,7 +28,7 @@
     "assetBundlePatterns": ["assets/*"],
     "ios": {
       "bundleIdentifier": "com.fjamstudios.pixtery",
-      "buildNumber": "1.2.0",
+      "buildNumber": "2.0.0",
       "supportsTablet": true,
       "appStoreUrl": "https://apps.apple.com/us/app/pixtery/id1569991739",
       "config": {
@@ -38,13 +38,13 @@
       "infoPlist": {
         "NSCameraUsageDescription": "This app accesses your device camera so that you can take pictures with your camera to send as puzzles to others.",
         "NSPhotoLibraryUsageDescription": "This app accesses your device photo library so that you can select existing photos on your device to send as puzzles to others.",
-        "NSUserTrackingUsageDescription": "Apple requires us to ask this because we show ads. Pixtery does NOT track your activity. You can safely click no and will still receive the full experience."
+        "NSUserTrackingUsageDescription": "This identifier will be used to deliver personalized ads to you."
       }
     },
     "android": {
       "package": "com.fjamstudios.pixtery",
       "googleServicesFile": "./google-services.json",
-      "versionCode": 5,
+      "versionCode": 6,
       "playStoreUrl": "https://play.google.com/store/apps/details?id=com.fjamstudios.pixtery",
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon.png",
@@ -75,6 +75,14 @@
       "favicon": "./assets/favicon.png",
       "name": "Pixtery",
       "shortName": "Pixtery"
-    }
+    },
+    "plugins": [
+      [
+        "expo-tracking-transparency",
+        {
+          "userTrackingPermission": "This identifier will be used to deliver personalized ads to you."
+        }
+      ]
+    ]
   }
 }
