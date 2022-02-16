@@ -78,7 +78,9 @@ export default function Gallery({
         try {
           //make it so we don't have to watch ads in dev
           if (process.env.NODE_ENV !== "development") {
-            await AdMobInterstitial.requestAdAsync();
+            await AdMobInterstitial.requestAdAsync({
+              servePersonalizedAds: true,
+            });
             await AdMobInterstitial.showAdAsync();
           } else {
             navigation.navigate("AddPuzzle", {
