@@ -62,6 +62,7 @@ export default function AdSafeAreaView(props: {
           bannerSize="smartBannerPortrait"
           adUnitID={BANNER_ID}
           style={{ marginTop: "auto", alignSelf: "center" }}
+          servePersonalizedAds
         />
       </View>
     </View>
