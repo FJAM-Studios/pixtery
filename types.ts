@@ -74,7 +74,7 @@ export interface BoardSpace {
 export type StackScreens = {
   TitleScreen: undefined;
   Splash: { url: string | undefined } | undefined;
-  CreateProfile: { url: string | undefined };
+  CreateProfile: { url: string | undefined | null };
   EnterName: {
     url?: string;
   };

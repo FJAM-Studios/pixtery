@@ -8,11 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { sortPuzzles } from "../../puzzleUtils";
 import { setReceivedPuzzles } from "../../store/reducers/receivedPuzzles";
 import { Puzzle, ScreenNavigation, RootState } from "../../types";
-import {
-  safelyDeletePuzzleImage,
-  deactivatePuzzleOnServer,
-  goToScreen,
-} from "../../util";
+import { safelyDeletePuzzleImage, deactivatePuzzleOnServer } from "../../util";
 import { ReceivedPuzzleCard } from "../InteractiveElements";
 import { AdSafeAreaView } from "../Layout";
 
@@ -57,7 +53,7 @@ export default function PuzzleList({
 
   const downloadPuzzle = () => {
     const publicKey = puzzleURL.slice(puzzleURL.lastIndexOf("/") + 1); //parse the public key from the text, so users can enter either the public key or the whole url.
-    goToScreen(navigation, "AddPuzzle", { publicKey });
+    navigation.navigate("AddPuzzle", { publicKey, sourceList: "received" });
   };
 
   return (
