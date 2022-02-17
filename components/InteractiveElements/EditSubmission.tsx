@@ -1,12 +1,6 @@
 import * as React from "react";
 import { View, Text } from "react-native";
-import {
-  Button,
-  Checkbox,
-  Headline,
-  IconButton,
-  Surface,
-} from "react-native-paper";
+import { Button, Headline, IconButton, Surface } from "react-native-paper";
 import { useSelector } from "react-redux";
 
 import { Puzzle, RootState } from "../../types";
@@ -16,17 +10,14 @@ export default function EditSubmission({
   setNewPuzzle,
   setEditing,
   newPuzzle,
-  anonymousChecked,
-  setAnonymousChecked,
 }: {
   setNewPuzzle: React.Dispatch<React.SetStateAction<Puzzle>>;
   setEditing: React.Dispatch<React.SetStateAction<boolean>>;
   newPuzzle: Puzzle;
-  anonymousChecked: boolean;
-  setAnonymousChecked: React.Dispatch<React.SetStateAction<boolean>>;
 }): JSX.Element {
   const theme = useSelector((state: RootState) => state.theme);
   const { height } = useSelector((state: RootState) => state.screenHeight);
+
   return (
     <View
       style={{
@@ -35,28 +26,15 @@ export default function EditSubmission({
         padding: 10,
       }}
     >
-      <Headline style={{ alignSelf: "center" }}>Edit Puzzle Settings</Headline>
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          margin: 10,
-        }}
-      >
-        <Checkbox.Android // Checkbox is invisible on iOS when unchecked, which is very confusing. Specifying .Android forces iOS to use Android style boxes instead.
-          status={anonymousChecked ? "checked" : "unchecked"}
-          color={theme.colors.surface}
-          onPress={() => {
-            setAnonymousChecked(!anonymousChecked);
-          }}
-        />
-        <Text style={{ color: theme.colors.text }}>Submit Anonymously</Text>
-      </View>
+      <Headline style={{ alignSelf: "center", marginBottom: 10 }}>
+        Edit Puzzle Settings
+      </Headline>
       <View
         style={{
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "space-evenly",
+          marginBottom: 10,
         }}
       >
         <Text>Type:</Text>
@@ -189,7 +167,7 @@ export default function EditSubmission({
           setNewPuzzle(newPuzzle);
         }}
         style={{
-          margin: 10,
+          margin: 20,
         }}
       >
         OK

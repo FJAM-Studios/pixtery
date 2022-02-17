@@ -151,13 +151,17 @@ export default function Splash({
           const { path } = Linking.parse(url);
           const publicKey = path?.substring(path.lastIndexOf("/") + 1);
           if (publicKey && publicKey.length === PUBLIC_KEY_LENGTH) {
-            closeSplashAndNavigate(navigation, "AddPuzzle", {
-              publicKey,
-              sourceList: "received",
-            });
-          } else closeSplashAndNavigate(navigation, "TabContainer");
+            closeSplashAndNavigate(
+              navigation,
+              ["TabContainer", "LibraryContainer", "AddPuzzle"],
+              {
+                publicKey,
+                sourceList: "received",
+              }
+            );
+          } else closeSplashAndNavigate(navigation, ["TabContainer"]);
           // if there's no url bc the app was reloaded by Android OTA update, navigate to Home
-        } else closeSplashAndNavigate(navigation, "TabContainer");
+        } else closeSplashAndNavigate(navigation, ["TabContainer"]);
       } else {
         //otherwise, load profile from local storage if it exists
         const loadedProfile = await loadProfile();
@@ -169,7 +173,7 @@ export default function Splash({
           dispatch(setProfile(loadedProfile));
         } else {
           //or navigate to createprofile if it doesn't exist, passing the url to create profile so it can be forwarded along, and you can go directly to the puzzle after signing in.
-          closeSplashAndNavigate(navigation, "CreateProfile", { url });
+          closeSplashAndNavigate(navigation, ["CreateProfile"], { url });
         }
       }
     };
