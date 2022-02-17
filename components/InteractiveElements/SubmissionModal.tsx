@@ -3,19 +3,13 @@ import * as FileSystem from "expo-file-system";
 import React, { useState } from "react";
 import { ActivityIndicator, Image, Linking, View } from "react-native";
 import Modal from "react-native-modal";
-import {
-  Button,
-  Checkbox,
-  IconButton,
-  Surface,
-  Text,
-} from "react-native-paper";
+import { Button, Checkbox, Surface, Text } from "react-native-paper";
 import Toast from "react-native-root-toast";
 import Svg, { Path } from "react-native-svg";
 import { useSelector } from "react-redux";
 import shortid from "shortid";
 
-import { addToQueue } from "../../FirebaseApp";
+import { addToQueue, getPixteryURL } from "../../FirebaseApp";
 import {
   generateJigsawPiecePaths,
   generateSquarePiecePaths,
@@ -44,14 +38,28 @@ export default function SubmissionModal({
 
   const [newPuzzle, setNewPuzzle] = useState<Puzzle>({ ...puzzle });
   const [anonymousChecked, setAnonymousChecked] = React.useState(false);
-  const [agreeToGuidelines, setAgreeToGuidelines] = useState(false);
   const [loading, setLoading] = useState(false);
   const [editing, setEditing] = useState(false);
   const [paths, setPaths] = useState([""]);
   const { imageURI } = puzzle;
 
   React.useEffect(() => {
-    setNewPuzzle({ ...puzzle });
+    const prepareImage = async () => {
+      setLoading(true);
+      const fileInfo = await FileSystem.getInfoAsync(
+        FileSystem.documentDirectory + imageURI
+      );
+      if (!fileInfo.exists) {
+        const fileName = imageURI.slice(imageURI.lastIndexOf("/") + 1);
+        const extension = imageURI.slice(-4) === ".jpg" ? "" : ".jpg";
+        const localURI = FileSystem.documentDirectory + fileName + extension;
+        const downloadURL = await getPixteryURL("/" + imageURI);
+        await FileSystem.downloadAsync(downloadURL, localURI);
+      }
+      setNewPuzzle({ ...puzzle });
+      setLoading(false);
+    };
+    prepareImage();
   }, [puzzle]);
 
   React.useEffect(() => {
@@ -76,7 +84,6 @@ export default function SubmissionModal({
     setModalVisible(false);
     setEditing(false);
     setNewPuzzle({ ...puzzle });
-    setAgreeToGuidelines(false);
     setAnonymousChecked(false);
   };
 
@@ -94,8 +101,6 @@ export default function SubmissionModal({
           setNewPuzzle={setNewPuzzle}
           newPuzzle={newPuzzle}
           setEditing={setEditing}
-          anonymousChecked={anonymousChecked}
-          setAnonymousChecked={setAnonymousChecked}
         />
       ) : (
         <>
@@ -170,22 +175,32 @@ export default function SubmissionModal({
               </View>
               <View
                 style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  marginHorizontal: 10,
                   padding: 10,
                 }}
               >
-                <Text>{newPuzzle.gridSize}</Text>
-                <IconButton
-                  icon={
-                    newPuzzle.puzzleType === "jigsaw" ? "puzzle" : "view-grid"
-                  }
-                />
                 <Text>{newPuzzle.message || "No message"}</Text>
               </View>
-
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  // padding: 10,
+                }}
+              >
+                <Checkbox.Android
+                  // Checkbox is invisible on iOS when unchecked, which is very confusing.
+                  // Specifying .Android forces iOS to use Android style boxes instead.
+                  status={anonymousChecked ? "checked" : "unchecked"}
+                  color={theme.colors.surface}
+                  onPress={() => {
+                    setAnonymousChecked(!anonymousChecked);
+                  }}
+                />
+                <Text style={{ color: theme.colors.text }}>
+                  Submit Anonymously
+                </Text>
+              </View>
+              {/* 
               <View
                 style={{
                   flexDirection: "row",
@@ -201,28 +216,12 @@ export default function SubmissionModal({
                     setAgreeToGuidelines(!agreeToGuidelines);
                   }}
                 />
-                <Text>
-                  This Pixtery is appropriate for all audiences and conforms to
-                  our{" "}
-                  <Text
-                    style={{
-                      color: "blue",
-                      fontWeight: "bold",
-                      textDecorationLine: "underline",
-                    }}
-                    onPress={() => {
-                      Linking.openURL("https://www.pixtery.io/community.html");
-                    }}
-                  >
-                    Community Guidelines
-                  </Text>
-                </Text>
-              </View>
+
+              </View> */}
 
               <Button
                 mode="contained"
                 icon="check"
-                disabled={!agreeToGuidelines}
                 style={{
                   margin: 10,
                 }}
@@ -260,6 +259,23 @@ export default function SubmissionModal({
               >
                 Submit
               </Button>
+              <Text style={{ margin: 10 }}>
+                Make sure your Pixtery is appropriate for all audiences and
+                meets our{" "}
+                <Text
+                  style={{
+                    color: "blue",
+                    fontWeight: "bold",
+                    textDecorationLine: "underline",
+                  }}
+                  onPress={() => {
+                    Linking.openURL("https://www.pixtery.io/community.html");
+                  }}
+                >
+                  Community Guidelines
+                </Text>
+                . The Pixtery team will review your submission soon!
+              </Text>
               <Button
                 mode="contained"
                 icon="pencil"

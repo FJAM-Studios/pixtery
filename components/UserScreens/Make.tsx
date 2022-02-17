@@ -128,7 +128,7 @@ export default function Make({
   const submitToServer = async (): Promise<void> => {
     if (DISPLAY_PAINFUL_ADS) {
       AdMobInterstitial.removeAllListeners();
-      AdMobInterstitial.requestAdAsync();
+      AdMobInterstitial.requestAdAsync({ servePersonalizedAds: true });
     }
     const fileName: string = uuid.v4() + ".jpg";
     try {

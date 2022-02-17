@@ -15,6 +15,7 @@ import Toast from "react-native-root-toast";
 import { Dispatch } from "redux";
 
 import {
+  checkAdminStatus,
   deactivateAllUserPuzzles,
   deactivateUserPuzzle,
   fetchPuzzles,
@@ -87,23 +88,47 @@ export const goToScreen = (
   }
 ): void => {
   navigation.dispatch(
-    CommonActions.reset({
-      index: 0,
-      routes: [{ name: screen, params: options }],
+    CommonActions.navigate({
+      name: screen,
+      params: options,
     })
   );
 };
 
+const buildScreenPathObject = (
+  screenPath: (keyof StackScreens)[],
+  finalParams: { url?: string | null; publicKey?: string; sourceList?: string },
+  index: number
+): object => {
+  if (index === screenPath.length - 1) {
+    return {
+      screen: screenPath[index],
+      params: finalParams,
+    };
+  } else {
+    return {
+      screen: screenPath[index],
+      params: buildScreenPathObject(screenPath, finalParams, index + 1),
+    };
+  }
+};
+
 export const closeSplashAndNavigate = async (
   navigation: ScreenNavigation | NavigationContainerRef<StackScreens>,
-  screen: string,
+  screenPath: (keyof StackScreens)[],
   options: { url?: string | null; publicKey?: string; sourceList?: string } = {
     url: "",
     publicKey: "",
     sourceList: "",
   }
 ): Promise<void> => {
-  goToScreen(navigation, screen, options);
+  if (screenPath.length === 1) {
+    goToScreen(navigation, screenPath[0], options);
+  } else {
+    const chain = buildScreenPathObject(screenPath, options, 1);
+    navigation.navigate(screenPath[0], chain);
+  }
+
   await SplashScreen.hideAsync();
 };
 
