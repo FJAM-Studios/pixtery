@@ -16,7 +16,7 @@ import {
   ScreenNavigation,
   RootState,
 } from "../../types";
-import { goToScreen, downloadImage } from "../../util";
+import { downloadImage } from "../../util";
 import { Logo, Title } from "../StaticElements";
 
 export default function AddPuzzle({
@@ -95,13 +95,13 @@ export default function AddPuzzle({
       try {
         const { publicKey } = route.params; //no need to check whether publicKey exists, that is done by Splash before navigating here
         const match = await searchForLocalMatch(publicKey);
-        if (match) goToScreen(navigation, "Puzzle", { publicKey, sourceList });
+        if (match) navigation.navigate("Puzzle", { publicKey, sourceList });
         else {
           const newPuzzle: Puzzle | void = await fetchPuzzle(publicKey);
           if (newPuzzle) {
             await savePuzzle(newPuzzle);
-            goToScreen(navigation, "Puzzle", { publicKey, sourceList });
-          } else goToScreen(navigation, "Make");
+            navigation.navigate("Puzzle", { publicKey, sourceList });
+          } else navigation.navigate("Make");
         }
       } catch (e) {
         console.log(e);
@@ -116,7 +116,7 @@ export default function AddPuzzle({
       }
     };
     searchForPuzzle();
-  });
+  }, []);
 
   return (
     <View

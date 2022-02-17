@@ -15,12 +15,7 @@ import { setTheme } from "../../store/reducers/theme";
 import { setTutorialFinished } from "../../store/reducers/tutorialFinished";
 import { allThemes } from "../../themes";
 import { ScreenNavigation, SplashRoute, RootState } from "../../types";
-import {
-  clearEIMcache,
-  closeSplashAndNavigate,
-  isProfile,
-  updateImageURIs,
-} from "../../util";
+import { clearEIMcache, isProfile, updateImageURIs } from "../../util";
 import { Logo, Title } from "../StaticElements";
 
 export default function Splash({
@@ -151,17 +146,20 @@ export default function Splash({
           const { path } = Linking.parse(url);
           const publicKey = path?.substring(path.lastIndexOf("/") + 1);
           if (publicKey && publicKey.length === PUBLIC_KEY_LENGTH) {
-            closeSplashAndNavigate(
-              navigation,
-              ["TabContainer", "LibraryContainer", "AddPuzzle"],
-              {
-                publicKey,
-                sourceList: "received",
-              }
-            );
-          } else closeSplashAndNavigate(navigation, ["TabContainer"]);
+            console.log("NAVIGATING");
+            navigation.navigate("TabContainer", {
+              screen: "LibraryContainer",
+              params: {
+                screen: "AddPuzzle",
+                params: {
+                  publicKey,
+                  sourceList: "received",
+                },
+              },
+            });
+          } else navigation.navigate("TabContainer");
           // if there's no url bc the app was reloaded by Android OTA update, navigate to Home
-        } else closeSplashAndNavigate(navigation, ["TabContainer"]);
+        } else navigation.navigate("TabContainer");
       } else {
         //otherwise, load profile from local storage if it exists
         const loadedProfile = await loadProfile();
@@ -173,7 +171,7 @@ export default function Splash({
           dispatch(setProfile(loadedProfile));
         } else {
           //or navigate to createprofile if it doesn't exist, passing the url to create profile so it can be forwarded along, and you can go directly to the puzzle after signing in.
-          closeSplashAndNavigate(navigation, ["CreateProfile"], { url });
+          navigation.navigate("CreateProfile", { url });
         }
       }
     };
