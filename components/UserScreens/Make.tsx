@@ -37,12 +37,7 @@ import {
 } from "../../puzzleUtils";
 import { setSentPuzzles } from "../../store/reducers/sentPuzzles";
 import { Puzzle, ScreenNavigation, RootState } from "../../types";
-import {
-  createBlob,
-  shareMessage,
-  goToScreen,
-  checkPermission,
-} from "../../util";
+import { createBlob, shareMessage, checkPermission } from "../../util";
 import { IosCamera, MessageInput } from "../InteractiveElements";
 import { AdSafeAreaView } from "../Layout";
 
@@ -147,7 +142,7 @@ export default function Make({
         if (newPuzzle.publicKey) {
           generateLink(newPuzzle.publicKey);
           addToSent(newPuzzle);
-          goToScreen(navigation, "SentPuzzleList");
+          navigation.navigate("SentPuzzleList");
         }
       }
     } catch (error) {
