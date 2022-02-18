@@ -377,6 +377,7 @@ export const deactivateAllPuzzlesOnServer = async (
 };
 
 export const clearEIMcache = async (): Promise<void> => {
+  console.log("Checking EIM cache...");
   try {
     const EIMcacheDir = FileSystem.cacheDirectory + "ImageManipulator";
     const EIMcacheInfo = await FileSystem.getInfoAsync(EIMcacheDir);
