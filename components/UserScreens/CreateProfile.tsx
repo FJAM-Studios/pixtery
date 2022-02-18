@@ -6,12 +6,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useSelector } from "react-redux";
 
 import { anonSignIn } from "../../FirebaseApp";
-import {
-  CreateProfileRoute,
-  ScreenNavigation,
-  RootState,
-  SignInOptions,
-} from "../../types";
+import { RootStackScreenProps, RootState, SignInOptions } from "../../types";
 import SignInMenu from "../SignInMethods/SignInMenu";
 import SignInModal from "../SignInMethods/SignInModal";
 import { LoadingModal, Logo, Title, UserAgreements } from "../StaticElements";
@@ -19,10 +14,7 @@ import { LoadingModal, Logo, Title, UserAgreements } from "../StaticElements";
 export default function CreateProfile({
   navigation,
   route,
-}: {
-  navigation: ScreenNavigation;
-  route: CreateProfileRoute;
-}): JSX.Element {
+}: RootStackScreenProps<"CreateProfile">): JSX.Element {
   const theme = useSelector((state: RootState) => state.theme);
   const [modalVisible, setModalVisible] = useState(false);
   const [loadingModalVisible, setLoadingModalVisible] = useState(false);

@@ -5,7 +5,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Button } from "react-native-paper";
 import { useSelector } from "react-redux";
 
-import { RootState, StackScreens } from "../../types";
+import { RootState, LibraryContainerParamsList } from "../../types";
 
 export default function Subheader({
   navigation,
@@ -16,7 +16,7 @@ export default function Subheader({
   navigation: NativeStackNavigationProp<ParamListBase, string>;
   title: string;
   enableBack: boolean;
-  specificDestination?: keyof StackScreens;
+  specificDestination?: keyof LibraryContainerParamsList;
 }): JSX.Element {
   const theme = useSelector((state: RootState) => state.theme);
   const onPress = () => {

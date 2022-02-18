@@ -10,22 +10,14 @@ import { AnyAction } from "redux";
 import { queryPuzzleCallable } from "../../FirebaseApp";
 import { setReceivedPuzzles } from "../../store/reducers/receivedPuzzles";
 import { setSentPuzzles } from "../../store/reducers/sentPuzzles";
-import {
-  Puzzle,
-  AddPuzzleRoute,
-  ScreenNavigation,
-  RootState,
-} from "../../types";
+import { LibraryContainerProps, Puzzle, RootState } from "../../types";
 import { downloadImage } from "../../util";
 import { Logo, Title } from "../StaticElements";
 
 export default function AddPuzzle({
   navigation,
   route,
-}: {
-  navigation: ScreenNavigation;
-  route: AddPuzzleRoute;
-}): JSX.Element {
+}: LibraryContainerProps<"AddPuzzle">): JSX.Element {
   const dispatch = useDispatch();
   const theme = useSelector((state: RootState) => state.theme);
   const receivedPuzzles = useSelector(
@@ -101,7 +93,10 @@ export default function AddPuzzle({
           if (newPuzzle) {
             await savePuzzle(newPuzzle);
             navigation.navigate("Puzzle", { publicKey, sourceList });
-          } else navigation.navigate("Make");
+          } else
+            navigation.navigate("MakeContainer", {
+              screen: "Make",
+            });
         }
       } catch (e) {
         console.log(e);
@@ -112,9 +107,13 @@ export default function AddPuzzle({
             position: Toast.positions.CENTER,
           }
         );
-        navigation.navigate("PuzzleListContainer");
+        navigation.navigate("LibraryContainer", {
+          screen: "PuzzleListContainer",
+          params: { screen: "PuzzleList" },
+        });
       }
     };
+    console.log("run");
     searchForPuzzle();
   }, []);
 

@@ -10,16 +10,14 @@ import { useSelector } from "react-redux";
 
 import { auth, getDaily } from "../../FirebaseApp";
 import { INTERSTITIAL_ID, DAILY_TIMEZONE } from "../../constants";
-import { RootState, ScreenNavigation } from "../../types";
+import { RootState, DailyContainerProps } from "../../types";
 import { Timer } from "../InteractiveElements";
 import { AdSafeAreaView } from "../Layout";
 AdMobInterstitial.setAdUnitID(INTERSTITIAL_ID);
 
 export default function Gallery({
   navigation,
-}: {
-  navigation: ScreenNavigation;
-}): JSX.Element {
+}: DailyContainerProps<"Gallery">): JSX.Element {
   dayjs.extend(utc);
   dayjs.extend(timezone);
   const theme = useSelector((state: RootState) => state.theme);
@@ -62,16 +60,16 @@ export default function Gallery({
         const { publicKey } = daily;
         AdMobInterstitial.addEventListener("interstitialDidClose", () => {
           AdMobInterstitial.removeAllListeners();
-          navigation.navigate("AddPuzzle", {
-            publicKey,
-            sourceList: "received",
+          navigation.navigate("LibraryContainer", {
+            screen: "AddPuzzle",
+            params: { publicKey, sourceList: "received" },
           });
         });
         AdMobInterstitial.addEventListener("interstitialDidFailToLoad", () => {
           AdMobInterstitial.removeAllListeners();
-          navigation.navigate("AddPuzzle", {
-            publicKey,
-            sourceList: "received",
+          navigation.navigate("LibraryContainer", {
+            screen: "AddPuzzle",
+            params: { publicKey, sourceList: "received" },
           });
         });
 
@@ -83,16 +81,16 @@ export default function Gallery({
             });
             await AdMobInterstitial.showAdAsync();
           } else {
-            navigation.navigate("AddPuzzle", {
-              publicKey,
-              sourceList: "received",
+            navigation.navigate("LibraryContainer", {
+              screen: "AddPuzzle",
+              params: { publicKey, sourceList: "received" },
             });
           }
         } catch (error) {
           // go to the puzzle if there's an ad error
-          navigation.navigate("AddPuzzle", {
-            publicKey,
-            sourceList: "received",
+          navigation.navigate("LibraryContainer", {
+            screen: "AddPuzzle",
+            params: { publicKey, sourceList: "received" },
           });
           console.log(error);
         }

@@ -1,16 +1,16 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-import { StackScreens } from "../../types";
+import { LibraryContainerParamsList } from "../../types";
 import { Subheader } from "../Layout";
 import { AddPuzzle } from "../TransitionScreens";
 import { Puzzle } from "../UserScreens";
 import PuzzleListContainer from "./PuzzleListContainer";
 
-const Stack = createNativeStackNavigator<StackScreens>();
+const Stack = createNativeStackNavigator<LibraryContainerParamsList>();
 
 export default function LibraryContainer(): JSX.Element {
   return (
-    <Stack.Navigator initialRouteName="Gallery">
+    <Stack.Navigator>
       <Stack.Screen
         name="PuzzleListContainer"
         component={PuzzleListContainer}
