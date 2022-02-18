@@ -7,16 +7,14 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { sortPuzzles } from "../../puzzleUtils";
 import { setReceivedPuzzles } from "../../store/reducers/receivedPuzzles";
-import { Puzzle, ScreenNavigation, RootState } from "../../types";
+import { Puzzle, PuzzleListContainerProps, RootState } from "../../types";
 import { safelyDeletePuzzleImage, deactivatePuzzleOnServer } from "../../util";
 import { ReceivedPuzzleCard } from "../InteractiveElements";
 import { AdSafeAreaView } from "../Layout";
 
 export default function PuzzleList({
   navigation,
-}: {
-  navigation: ScreenNavigation;
-}): JSX.Element {
+}: PuzzleListContainerProps<"PuzzleList">): JSX.Element {
   const dispatch = useDispatch();
   const theme = useSelector((state: RootState) => state.theme);
   const receivedPuzzles = useSelector(
@@ -52,8 +50,22 @@ export default function PuzzleList({
   };
 
   const downloadPuzzle = () => {
-    const publicKey = puzzleURL.slice(puzzleURL.lastIndexOf("/") + 1); //parse the public key from the text, so users can enter either the public key or the whole url.
-    navigation.navigate("AddPuzzle", { publicKey, sourceList: "received" });
+    //parse the public key from the text, so users can enter either the public key or the whole url.
+    const publicKey = puzzleURL.slice(puzzleURL.lastIndexOf("/") + 1);
+    navigation.navigate("LibraryContainer", {
+      screen: "AddPuzzle",
+      params: { publicKey, sourceList: "received" },
+    });
+  };
+
+  const navigateToPuzzle = (publicKey: string) => {
+    navigation.navigate("LibraryContainer", {
+      screen: "Puzzle",
+      params: {
+        publicKey,
+        sourceList: "received",
+      },
+    });
   };
 
   return (
@@ -144,7 +156,7 @@ export default function PuzzleList({
               .map((receivedPuzzle, ix) => (
                 <ReceivedPuzzleCard
                   key={ix}
-                  navigation={navigation}
+                  navigateToPuzzle={navigateToPuzzle}
                   puzzle={receivedPuzzle}
                   showDeleteModal={showDeleteModal}
                 />

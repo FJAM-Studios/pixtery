@@ -7,16 +7,14 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { sortPuzzles } from "../../puzzleUtils";
 import { setSentPuzzles } from "../../store/reducers/sentPuzzles";
-import { Puzzle, ScreenNavigation, RootState } from "../../types";
+import { Puzzle, PuzzleListContainerProps, RootState } from "../../types";
 import { safelyDeletePuzzleImage, deactivatePuzzleOnServer } from "../../util";
 import { SentPuzzleCard } from "../InteractiveElements";
 import { AdSafeAreaView } from "../Layout";
 
 export default function SentPuzzleList({
   navigation,
-}: {
-  navigation: ScreenNavigation;
-}): JSX.Element {
+}: PuzzleListContainerProps<"SentPuzzleList">): JSX.Element {
   const dispatch = useDispatch();
   const theme = useSelector((state: RootState) => state.theme);
   const receivedPuzzles = useSelector(
@@ -50,6 +48,16 @@ export default function SentPuzzleList({
     }
     setPuzzleToDelete(null);
     setModalVisible(false);
+  };
+
+  const navigateToPuzzle = (publicKey: string) => {
+    navigation.navigate("LibraryContainer", {
+      screen: "Puzzle",
+      params: {
+        publicKey,
+        sourceList: "received",
+      },
+    });
   };
 
   return (
@@ -114,7 +122,7 @@ export default function SentPuzzleList({
                   key={ix}
                   puzzle={sentPuzzle}
                   showDeleteModal={showDeleteModal}
-                  navigation={navigation}
+                  navigateToPuzzle={navigateToPuzzle}
                 />
               ))
           ) : (
@@ -132,7 +140,9 @@ export default function SentPuzzleList({
               </Headline>
               <Button
                 mode="contained"
-                onPress={() => navigation.navigate("Make")}
+                onPress={() =>
+                  navigation.navigate("MakeContainer", { screen: "Make" })
+                }
                 style={{
                   marginTop: 10,
                 }}

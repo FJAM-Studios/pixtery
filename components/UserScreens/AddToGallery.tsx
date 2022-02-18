@@ -9,16 +9,12 @@ import {
 import { Card, Headline, IconButton, Text } from "react-native-paper";
 import { useSelector } from "react-redux";
 
-import { ScreenNavigation, RootState } from "../../types";
+import { RootState } from "../../types";
 import { formatDateFromString } from "../../util";
 import { SubmissionModal } from "../InteractiveElements";
 import { AdSafeAreaView } from "../Layout";
 
-export default function AddToGallery({
-  navigation,
-}: {
-  navigation: ScreenNavigation;
-}): JSX.Element {
+export default function AddToGallery(): JSX.Element {
   const theme = useSelector((state: RootState) => state.theme);
   const sentPuzzles = useSelector((state: RootState) => state.sentPuzzles);
   const [modalVisible, setModalVisible] = useState(false);

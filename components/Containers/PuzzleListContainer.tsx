@@ -1,10 +1,10 @@
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import { useSelector } from "react-redux";
 
-import { RootState, StackScreens } from "../../types";
+import { RootState, PuzzleListContainerParamsList } from "../../types";
 import { PuzzleList, SentPuzzleList } from "../UserScreens";
 
-const Tab = createMaterialTopTabNavigator<StackScreens>();
+const Tab = createMaterialTopTabNavigator<PuzzleListContainerParamsList>();
 export default function PuzzleListContainer(): JSX.Element {
   const theme = useSelector((state: RootState) => state.theme);
   return (

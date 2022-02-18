@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { auth, signOut } from "../../FirebaseApp";
 import { setProfile } from "../../store/reducers/profile";
-import { ScreenNavigation, RootState } from "../../types";
+import { SettingsContainerProps, RootState } from "../../types";
 import { clearAllAppData } from "../../util";
 import { NameModal, ThemeModal } from "../InteractiveElements";
 import ConfirmDeleteModal from "../InteractiveElements/ConfirmDeleteModal";
@@ -17,9 +17,7 @@ import { LoadingModal } from "../StaticElements";
 
 export default function Profile({
   navigation,
-}: {
-  navigation: ScreenNavigation;
-}): JSX.Element {
+}: SettingsContainerProps<"Profile">): JSX.Element {
   const dispatch = useDispatch();
   const theme = useSelector((state: RootState) => state.theme);
 

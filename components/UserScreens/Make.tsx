@@ -36,7 +36,7 @@ import {
   generateSquarePiecePaths,
 } from "../../puzzleUtils";
 import { setSentPuzzles } from "../../store/reducers/sentPuzzles";
-import { Puzzle, ScreenNavigation, RootState } from "../../types";
+import { Puzzle, RootState, MakeContainerProps } from "../../types";
 import { createBlob, shareMessage, checkPermission } from "../../util";
 import { IosCamera, MessageInput } from "../InteractiveElements";
 import { AdSafeAreaView } from "../Layout";
@@ -47,9 +47,7 @@ AdMobInterstitial.setAdUnitID(INTERSTITIAL_ID);
 
 export default function Make({
   navigation,
-}: {
-  navigation: ScreenNavigation;
-}): JSX.Element {
+}: MakeContainerProps<"Make">): JSX.Element {
   const dispatch = useDispatch();
   const theme = useSelector((state: RootState) => state.theme);
   const { height, boardSize } = useSelector(
@@ -142,7 +140,12 @@ export default function Make({
         if (newPuzzle.publicKey) {
           generateLink(newPuzzle.publicKey);
           addToSent(newPuzzle);
-          navigation.navigate("SentPuzzleList");
+          navigation.navigate("LibraryContainer", {
+            screen: "PuzzleListContainer",
+            params: {
+              screen: "SentPuzzleList",
+            },
+          });
         }
       }
     } catch (error) {

@@ -4,17 +4,17 @@ import { ImageBackground, View, TouchableOpacity } from "react-native";
 import { Card, IconButton } from "react-native-paper";
 import { useSelector } from "react-redux";
 
-import { Puzzle, ScreenNavigation, RootState } from "../../types";
+import { Puzzle, RootState } from "../../types";
 import { saveToLibrary, shareMessage, formatDateFromString } from "../../util";
 
 export default function SentPuzzleCard({
   puzzle,
   showDeleteModal,
-  navigation,
+  navigateToPuzzle,
 }: {
   puzzle: Puzzle;
   showDeleteModal: Function;
-  navigation: ScreenNavigation;
+  navigateToPuzzle: (publicKey: string) => void;
 }): JSX.Element {
   const theme = useSelector((state: RootState) => state.theme);
 
@@ -26,14 +26,7 @@ export default function SentPuzzleCard({
   };
 
   return (
-    <TouchableOpacity
-      onPress={() =>
-        navigation.navigate("Puzzle", {
-          publicKey: puzzle.publicKey,
-          sourceList: "sent",
-        })
-      }
-    >
+    <TouchableOpacity onPress={() => navigateToPuzzle(puzzle.publicKey)}>
       <Card
         style={{
           margin: 1,
