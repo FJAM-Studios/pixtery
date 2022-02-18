@@ -26,9 +26,8 @@ import {
   Piece,
   Point,
   BoardSpace,
-  ScreenNavigation,
-  PuzzleRoute,
   RootState,
+  LibraryContainerProps,
 } from "../../types";
 import { saveToLibrary } from "../../util";
 import { PuzzlePiece } from "../InteractiveElements";
@@ -39,10 +38,7 @@ const disableShuffle = TESTING_MODE;
 export default function PuzzleComponent({
   navigation,
   route,
-}: {
-  navigation: ScreenNavigation;
-  route: PuzzleRoute;
-}): JSX.Element {
+}: LibraryContainerProps<"Puzzle">): JSX.Element {
   const dispatch = useDispatch();
   const { publicKey, sourceList } = route.params;
   const theme = useSelector((state: RootState) => state.theme);
@@ -381,9 +377,12 @@ export default function PuzzleComponent({
           isVisible={modalVisible}
           onBackdropPress={() => {
             setModalVisible(false);
-            navigation.navigate(
-              sourceList === "sent" ? "SentPuzzleList" : "PuzzleListContainer"
-            );
+            navigation.navigate("LibraryContainer", {
+              screen: "PuzzleListContainer",
+              params: {
+                screen: sourceList === "sent" ? "SentPuzzleList" : "PuzzleList",
+              },
+            });
           }}
           animationIn="fadeIn"
           animationOut="fadeOut"
@@ -421,11 +420,13 @@ export default function PuzzleComponent({
                 mode="contained"
                 onPress={async () => {
                   setModalVisible(false);
-                  navigation.navigate(
-                    sourceList === "sent"
-                      ? "SentPuzzleList"
-                      : "PuzzleListContainer"
-                  );
+                  navigation.navigate("LibraryContainer", {
+                    screen: "PuzzleListContainer",
+                    params: {
+                      screen:
+                        sourceList === "sent" ? "SentPuzzleList" : "PuzzleList",
+                    },
+                  });
                 }}
                 style={{ marginTop: 5 }}
               >

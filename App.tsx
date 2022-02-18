@@ -28,11 +28,11 @@ import { MIN_BOTTOM_CLEARANCE } from "./constants";
 import store from "./store";
 import { setNotificationToken } from "./store/reducers/notificationToken";
 import { setDeviceSize } from "./store/reducers/screenHeight";
-import { StackScreens, RootState } from "./types";
+import { RootStackParamList, RootState } from "./types";
 //less than ideal, but idk if we have a choice right now. suppresses the firebase timeout warning
 LogBox.ignoreLogs(["Setting a timer for a long period of time"]);
 
-const Stack = createNativeStackNavigator<StackScreens>();
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -44,7 +44,7 @@ Notifications.setNotificationHandler({
 
 const App = (): JSX.Element => {
   const dispatch = useDispatch();
-  const navigationRef = useRef<NavigationContainerRef<StackScreens> | null>(
+  const navigationRef = useRef<NavigationContainerRef<RootStackParamList> | null>(
     null
   );
   const theme = useSelector((state: RootState) => state.theme);

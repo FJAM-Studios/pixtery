@@ -10,17 +10,14 @@ import { checkAdminStatus } from "../../FirebaseApp";
 import { setProfile } from "../../store/reducers/profile";
 import { setReceivedPuzzles } from "../../store/reducers/receivedPuzzles";
 import { setSentPuzzles } from "../../store/reducers/sentPuzzles";
-import { ScreenNavigation, RootState, EnterNameRoute } from "../../types";
+import { RootStackScreenProps, RootState } from "../../types";
 import { restorePuzzleMetadata } from "../../util";
 import { LoadingModal, Logo, Title } from "../StaticElements";
 
 export default function EnterName({
   navigation,
   route,
-}: {
-  navigation: ScreenNavigation;
-  route: EnterNameRoute;
-}): JSX.Element {
+}: RootStackScreenProps<"EnterName">): JSX.Element {
   const dispatch = useDispatch();
 
   const theme = useSelector((state: RootState) => state.theme);
@@ -57,7 +54,11 @@ export default function EnterName({
       dispatch(setSentPuzzles(mergedSentPuzzles));
 
       if (url) navigation.navigate("Splash", { url });
-      else navigation.navigate("TabContainer");
+      else
+        navigation.navigate("TabContainer", {
+          screen: "MakeContainer",
+          params: { screen: "Make" },
+        });
     } catch (e) {
       console.log(e);
       if (e instanceof Error) setErrors(e.message);

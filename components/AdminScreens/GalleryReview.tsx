@@ -16,11 +16,10 @@ import {
   removeDailyPuzzle,
 } from "../../FirebaseApp";
 import {
+  AdminContainerProps,
   DailyDate,
-  GalleryReviewRoute,
   Puzzle,
   RootState,
-  ScreenNavigation,
   StatusOfDaily,
 } from "../../types";
 import { downloadImage, convertDateStringToObject } from "../../util";
@@ -30,10 +29,7 @@ import { AdSafeAreaView } from "../Layout";
 export default function GalleryReview({
   navigation,
   route,
-}: {
-  navigation: ScreenNavigation;
-  route: GalleryReviewRoute;
-}): JSX.Element {
+}: AdminContainerProps<"GalleryReview">): JSX.Element {
   const { puzzle, statusOfDaily, publishedDate } = route.params;
   const { PUBLISHED } = StatusOfDaily;
   const [loading, setLoading] = useState(true);
@@ -105,7 +101,7 @@ export default function GalleryReview({
   const onMarkedDayPress = (dateString: string, markedDates: DailyDate) => {
     const { puzzle } = markedDates[dateString];
     setModalVisible(false);
-    navigation.push("GalleryReview", {
+    navigation.navigate("GalleryReview", {
       puzzle,
       // when navigating to GalleryReview from the calendar,
       // marked Daily will always be published (i.e. not under review)

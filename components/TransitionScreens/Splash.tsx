@@ -14,17 +14,14 @@ import { setSound } from "../../store/reducers/sound";
 import { setTheme } from "../../store/reducers/theme";
 import { setTutorialFinished } from "../../store/reducers/tutorialFinished";
 import { allThemes } from "../../themes";
-import { ScreenNavigation, SplashRoute, RootState } from "../../types";
+import { RootStackScreenProps, RootState } from "../../types";
 import { clearEIMcache, isProfile, updateImageURIs } from "../../util";
 import { Logo, Title } from "../StaticElements";
 
 export default function Splash({
   navigation,
   route,
-}: {
-  navigation: ScreenNavigation;
-  route: SplashRoute;
-}): JSX.Element {
+}: RootStackScreenProps<"Splash">): JSX.Element {
   const dispatch = useDispatch();
   const theme = useSelector((state: RootState) => state.theme);
   const profile = useSelector((state: RootState) => state.profile);
@@ -146,7 +143,6 @@ export default function Splash({
           const { path } = Linking.parse(url);
           const publicKey = path?.substring(path.lastIndexOf("/") + 1);
           if (publicKey && publicKey.length === PUBLIC_KEY_LENGTH) {
-            console.log("NAVIGATING");
             navigation.navigate("TabContainer", {
               screen: "LibraryContainer",
               params: {
@@ -157,11 +153,20 @@ export default function Splash({
                 },
               },
             });
-          } else navigation.navigate("TabContainer");
+          } else
+            navigation.navigate("TabContainer", {
+              screen: "MakeContainer",
+              params: { screen: "Make" },
+            });
           // if there's no url bc the app was reloaded by Android OTA update, navigate to Home
-        } else navigation.navigate("TabContainer");
+        } else
+          navigation.navigate("TabContainer", {
+            screen: "MakeContainer",
+            params: { screen: "Make" },
+          });
       } else {
         //otherwise, load profile from local storage if it exists
+        console.log("1");
         const loadedProfile = await loadProfile();
         // we should check that the profile loaded from disk is actually an object of the Profile type and not something else
         // in a future PR, we should validate that the loadedProfile is an object in the right shape, and, if not, we direct them to log in again
@@ -171,13 +176,14 @@ export default function Splash({
           dispatch(setProfile(loadedProfile));
         } else {
           //or navigate to createprofile if it doesn't exist, passing the url to create profile so it can be forwarded along, and you can go directly to the puzzle after signing in.
-          navigation.navigate("CreateProfile", { url });
+          navigation.navigate("CreateProfile", { url: url ? url : undefined });
         }
       }
     };
 
     loadAppData();
-  }, [dispatch, navigation, profile, route.params]);
+    console.log("splash run");
+  }, []);
 
   useEffect(() => {
     clearEIMcache();
