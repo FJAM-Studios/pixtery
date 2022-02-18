@@ -11,14 +11,14 @@ import {
 } from "react-native-safe-area-context";
 import { useSelector } from "react-redux";
 
-import { RootState, StackScreens } from "../../types";
+import { RootState, TabContainerParamsList } from "../../types";
 import AdminContainer from "./AdminContainer";
 import DailyContainer from "./DailyContainer";
 import LibraryContainer from "./LibraryContainer";
 import MakeContainer from "./MakeContainer";
 import SettingsContainer from "./SettingsContainer";
 
-const Tab = createMaterialTopTabNavigator<StackScreens>();
+const Tab = createMaterialTopTabNavigator<TabContainerParamsList>();
 
 export default function TabContainer(): JSX.Element {
   const theme = useSelector((state: RootState) => state.theme);

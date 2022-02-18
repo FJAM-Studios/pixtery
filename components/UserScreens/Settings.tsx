@@ -4,14 +4,12 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { VERSION_NUMBER } from "../../constants";
 import { setTutorialFinished } from "../../store/reducers/tutorialFinished";
-import { ScreenNavigation, RootState } from "../../types";
+import { SettingsContainerProps, RootState } from "../../types";
 import { AdSafeAreaView } from "../Layout";
 
 export default function Settings({
   navigation,
-}: {
-  navigation: ScreenNavigation;
-}): JSX.Element {
+}: SettingsContainerProps<"Settings">): JSX.Element {
   const dispatch = useDispatch();
   const theme = useSelector((state: RootState) => state.theme);
 
@@ -54,7 +52,7 @@ export default function Settings({
           mode="contained"
           onPress={async () => {
             dispatch(setTutorialFinished(false));
-            navigation.navigate("Tutorial");
+            navigation.navigate("MakeContainer", { screen: "Tutorial" });
           }}
           style={{ margin: 10 }}
         >

@@ -12,16 +12,14 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 
 import { setTutorialFinished } from "../../store/reducers/tutorialFinished";
-import { ScreenNavigation, RootState } from "../../types";
+import { MakeContainerProps, RootState } from "../../types";
 import { AdSafeAreaView } from "../Layout";
 
 const emptyImage = require("../../assets/blank.jpg");
 
 export default function Tutorial({
   navigation,
-}: {
-  navigation: ScreenNavigation;
-}): JSX.Element {
+}: MakeContainerProps<"Tutorial">): JSX.Element {
   const theme = useSelector((state: RootState) => state.theme);
   const { height, boardSize } = useSelector(
     (state: RootState) => state.screenHeight
