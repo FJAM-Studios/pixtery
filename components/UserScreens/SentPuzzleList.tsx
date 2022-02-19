@@ -55,7 +55,7 @@ export default function SentPuzzleList({
       screen: "Puzzle",
       params: {
         publicKey,
-        sourceList: "received",
+        sourceList: "sent",
       },
     });
   };
