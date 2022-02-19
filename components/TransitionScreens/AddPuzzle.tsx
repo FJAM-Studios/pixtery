@@ -153,8 +153,8 @@ export default function AddPuzzle({
           );
         }
 
-        // go to the destination
-        navigation.navigate(
+        // go to the destination, replace so that you don't nav back to Add Puzzle
+        navigation.replace(
           addPuzzleDestination.screen,
           addPuzzleDestination.params
         );
