@@ -1,8 +1,9 @@
+import { useFocusEffect } from "@react-navigation/native";
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone"; // dependent on utc plugin
 import utc from "dayjs/plugin/utc";
 import { AdMobInterstitial } from "expo-ads-admob";
-import { useState, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { View, TouchableOpacity } from "react-native";
 import { ActivityIndicator, Button, Text } from "react-native-paper";
 import Toast from "react-native-root-toast";
@@ -49,7 +50,8 @@ export default function Gallery({
     return time;
   };
 
-  const [time, setTime] = useState<null | number>(getCountdown());
+  // const [time, setTime] = useState<null | number>(getCountdown());
+  let time = getCountdown();
 
   const loadDaily = async () => {
     setLoading(true);
@@ -104,12 +106,15 @@ export default function Gallery({
     setLoading(false);
   };
 
-  useEffect(() => {
-    const incrementTime = setInterval(() => {
-      setTime(getCountdown());
-    }, 1000);
-    return () => clearInterval(incrementTime);
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      const incrementTime = setInterval(() => {
+        time = getCountdown();
+      }, 1000);
+      return () => clearInterval(incrementTime);
+    }, [])
+  );
+
   return (
     <AdSafeAreaView
       style={{
