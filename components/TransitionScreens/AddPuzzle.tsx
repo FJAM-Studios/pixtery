@@ -94,7 +94,7 @@ export default function AddPuzzle({
   useFocusEffect(
     useCallback(() => {
       const searchForPuzzle = async () => {
-        console.log("searching for puzzle...");
+        console.log(`searching for puzzle ${route.params.publicKey}...`);
 
         // default add puzzle destination is puzzle list screen
         let addPuzzleDestination: NavigatorScreenParams<RootStackParamList> = {
@@ -160,7 +160,7 @@ export default function AddPuzzle({
         );
       };
       searchForPuzzle();
-    }, [])
+    }, [route.params])
   );
 
   return (
