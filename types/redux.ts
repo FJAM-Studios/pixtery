@@ -24,6 +24,6 @@ export interface RootState {
   screenHeight: ScreenHeight;
   theme: PixteryTheme;
   tutorialFinished: boolean;
-  sound: Audio.Sound | null;
+  sounds: { clickSound: Audio.Sound; winSound: Audio.Sound } | null;
   notificationToken: string;
 }
