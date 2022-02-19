@@ -14,7 +14,7 @@ import { PUBLIC_KEY_LENGTH } from "../../constants";
 import { setProfile } from "../../store/reducers/profile";
 import { setReceivedPuzzles } from "../../store/reducers/receivedPuzzles";
 import { setSentPuzzles } from "../../store/reducers/sentPuzzles";
-import { setSound } from "../../store/reducers/sound";
+import { setSounds } from "../../store/reducers/sounds";
 import { setTheme } from "../../store/reducers/theme";
 import { setTutorialFinished } from "../../store/reducers/tutorialFinished";
 import { allThemes } from "../../themes";
@@ -152,10 +152,13 @@ export default function Splash({
         dispatch(setTheme(loadedTheme));
 
         // load audio
-        const { sound } = await Audio.Sound.createAsync(
+        const { sound: clickSound } = await Audio.Sound.createAsync(
           require("../../assets/click.m4a")
         );
-        dispatch(setSound(sound));
+        const { sound: winSound } = await Audio.Sound.createAsync(
+          require("../../assets/camera-click.wav")
+        );
+        dispatch(setSounds({ clickSound, winSound }));
 
         // default splash destination is Make screen
         let splashDestination: NavigatorScreenParams<RootStackParamList> = {

@@ -1,5 +1,4 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Audio } from "expo-av";
 import * as FileSystem from "expo-file-system";
 import * as ImageManipulator from "expo-image-manipulator";
 import { useEffect, useState, useRef } from "react";
@@ -20,6 +19,7 @@ import {
   getInitialDimensions,
   validateBoard,
 } from "../../puzzleUtils";
+import store from "../../store";
 import { setReceivedPuzzles } from "../../store/reducers/receivedPuzzles";
 import {
   Puzzle,
@@ -48,7 +48,6 @@ export default function PuzzleComponent({
   );
   const sentPuzzles = useSelector((state: RootState) => state.sentPuzzles);
   const adHeight = useSelector((state: RootState) => state.adHeight);
-  const profile = useSelector((state: RootState) => state.profile);
   const [lowerBound, setLowerBound] = useState<number>(0);
 
   const [puzzle, setPuzzle] = useState<Puzzle>();
@@ -59,7 +58,6 @@ export default function PuzzleComponent({
     puzzleAreaWidth: 0,
     puzzleAreaHeight: 0,
   });
-  const [sound, setSound] = useState<Audio.Sound>();
   const [opaque, setOpaque] = useState<boolean>(false);
   const [isReady, setReady] = useState<boolean>(false);
   const styleProps = {
@@ -84,26 +82,6 @@ export default function PuzzleComponent({
   // store current pieces snapped to board
   const currentBoard = useRef<BoardSpace[]>([]);
 
-  //set up the camera click sound and clean up on unmount
-  useEffect(() => {
-    const initializeSound = async () => {
-      const { sound } = await Audio.Sound.createAsync(
-        require("../../assets/camera-click.wav")
-      );
-      setSound(sound);
-    };
-
-    initializeSound();
-  }, []);
-
-  useEffect(() => {
-    return sound
-      ? () => {
-          sound.unloadAsync();
-        }
-      : undefined;
-  }, [sound]);
-
   const animateWin = async () => {
     setTimeout(() => {
       setOpaque(true);
@@ -115,7 +93,10 @@ export default function PuzzleComponent({
         setWinMessage(winMessage);
         setOpaque(false);
       }, 100);
-      if (sound && !profile?.noSound) sound.playAsync();
+      const { profile, sounds } = store.getState();
+      if (!profile?.noSound) {
+        sounds?.winSound.playAsync();
+      }
     }, 100);
   };
 
