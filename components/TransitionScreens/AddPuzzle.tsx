@@ -153,8 +153,19 @@ export default function AddPuzzle({
           );
         }
 
-        // go to the destination, replace so that you don't nav back to Add Puzzle
-        navigation.replace(
+        // replace add puzzle with source list component so you can't navigate back to Add Puzzle
+        navigation.replace("TabContainer", {
+          screen: "LibraryContainer",
+          params: {
+            screen: "PuzzleListContainer",
+            params: {
+              screen: sourceList === "sent" ? "SentPuzzleList" : "PuzzleList",
+            },
+          },
+        });
+
+        // then navigate to your destination
+        navigation.navigate(
           addPuzzleDestination.screen,
           addPuzzleDestination.params
         );
