@@ -51,7 +51,7 @@ export default function Tutorial({
     );
     setStep(0);
     dispatch(setTutorialFinished(true));
-    goToScreen(navigation, ["Make"]);
+    goToScreen(navigation, "Make");
   };
   return (
     <AdSafeAreaView
