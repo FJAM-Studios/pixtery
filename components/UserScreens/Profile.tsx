@@ -131,7 +131,7 @@ export default function Profile({
               //update app state
               dispatch(setProfile(null));
               //send you to splash
-              goToScreen(navigation, ["Splash"]);
+              goToScreen(navigation, "Splash");
             }}
             style={{ margin: 10 }}
           >

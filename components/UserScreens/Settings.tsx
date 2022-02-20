@@ -31,7 +31,7 @@ export default function Settings({
           icon="account"
           mode="contained"
           onPress={() => {
-            goToScreen(navigation, ["Profile"]);
+            goToScreen(navigation, "Profile");
           }}
           style={{ margin: 10 }}
         >
@@ -42,7 +42,7 @@ export default function Settings({
           icon="puzzle"
           mode="contained"
           onPress={() => {
-            goToScreen(navigation, ["ManagePuzzles"]);
+            goToScreen(navigation, "ManagePuzzles");
           }}
           style={{ margin: 10 }}
         >
@@ -53,7 +53,7 @@ export default function Settings({
           mode="contained"
           onPress={async () => {
             dispatch(setTutorialFinished(false));
-            goToScreen(navigation, ["MakeContainer", "Tutorial"]);
+            goToScreen(navigation, "Tutorial");
           }}
           style={{ margin: 10 }}
         >
@@ -63,7 +63,7 @@ export default function Settings({
           icon="email"
           mode="contained"
           onPress={() => {
-            goToScreen(navigation, ["ContactUs"]);
+            goToScreen(navigation, "ContactUs");
           }}
           style={{ margin: 10 }}
         >

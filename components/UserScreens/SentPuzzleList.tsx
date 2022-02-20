@@ -55,7 +55,7 @@ export default function SentPuzzleList({
   };
 
   const navigateToPuzzle = (publicKey: string) => {
-    goToScreen(navigation, ["LibraryContainer", "Puzzle"], {
+    goToScreen(navigation, "Puzzle", {
       publicKey,
       sourceList: "sent",
     });
@@ -142,7 +142,7 @@ export default function SentPuzzleList({
               <Button
                 mode="contained"
                 onPress={() => {
-                  goToScreen(navigation, ["MakeContainer", "Make"]);
+                  goToScreen(navigation, "Make");
                 }}
                 style={{
                   marginTop: 10,

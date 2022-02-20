@@ -252,7 +252,7 @@ export default function SubmissionModal({
                       position: Toast.positions.CENTER,
                     });
                   }
-                  goToScreen(navigation, ["Gallery"]);
+                  goToScreen(navigation, "Gallery");
                   setLoading(false);
                   setEditing(false);
                   setModalVisible(false);

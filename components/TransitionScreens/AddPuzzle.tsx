@@ -14,12 +14,7 @@ import { AnyAction } from "redux";
 import { queryPuzzleCallable } from "../../FirebaseApp";
 import { setReceivedPuzzles } from "../../store/reducers/receivedPuzzles";
 import { setSentPuzzles } from "../../store/reducers/sentPuzzles";
-import {
-  LibraryContainerProps,
-  Puzzle,
-  RootStackParamList,
-  RootState,
-} from "../../types";
+import { LibraryContainerProps, Puzzle, RootState } from "../../types";
 import { downloadImage, goToScreen, replaceScreen } from "../../util";
 import { Logo, Title } from "../StaticElements";
 
@@ -98,12 +93,7 @@ export default function AddPuzzle({
 
         // default add puzzle destination is puzzle list screen
         const addPuzzleDestination = {
-          screenPath: [
-            "TabContainer",
-            "LibraryContainer",
-            "PuzzleListContainer",
-            "PuzzleList",
-          ],
+          screen: "PuzzleList",
           params: {},
         };
 
@@ -127,16 +117,13 @@ export default function AddPuzzle({
           }
 
           // set the puzzle if the PK is valid
-          if (validPublicKey)
-            addPuzzleDestination.screenPath = [
-              "TabContainer",
-              "LibraryContainer",
-              "Puzzle",
-            ];
-          addPuzzleDestination.params = {
-            publicKey,
-            sourceList,
-          };
+          if (validPublicKey) {
+            addPuzzleDestination.screen = "Puzzle";
+            addPuzzleDestination.params = {
+              publicKey,
+              sourceList,
+            };
+          }
         } catch (e) {
           console.log(e);
           Toast.show(
@@ -149,17 +136,15 @@ export default function AddPuzzle({
         }
 
         // replace add puzzle with source list component so you can't navigate back to Add Puzzle
-        replaceScreen(navigation, [
-          "TabContainer",
-          "LibraryContainer",
-          "PuzzleListContainer",
-          sourceList === "sent" ? "SentPuzzleList" : "PuzzleList",
-        ]);
+        replaceScreen(
+          navigation,
+          sourceList === "sent" ? "SentPuzzleList" : "PuzzleList"
+        );
 
         // then navigate to your destination
         goToScreen(
           navigation,
-          addPuzzleDestination.screenPath,
+          addPuzzleDestination.screen,
           addPuzzleDestination.params
         );
       };

@@ -27,7 +27,7 @@ export default function DailyCalendar({
 
   const onMarkedDayPress = (dateString: string, markedDates: DailyDate) => {
     const { puzzle } = markedDates[dateString];
-    goToScreen(navigation, ["GalleryReview"], {
+    goToScreen(navigation, "GalleryReview", {
       puzzle,
       statusOfDaily: StatusOfDaily.PUBLISHED,
       publishedDate: dateString,
@@ -66,7 +66,7 @@ export default function DailyCalendar({
             size={20}
             style={{ backgroundColor: theme.colors.primary }}
             onPress={() => {
-              goToScreen(navigation, ["GalleryQueue"]);
+              goToScreen(navigation, "GalleryQueue");
             }}
           />
         </View>

@@ -35,7 +35,7 @@ export default function SignInModal({
     //sign out of Firebase account locally
     await signOut();
     //send you to splash
-    goToScreen(navigation, ["Splash"]);
+    goToScreen(navigation, "Splash");
   };
 
   return (

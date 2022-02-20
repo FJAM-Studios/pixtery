@@ -156,7 +156,7 @@ export default function PuzzleComponent({
           const imageInfo = await FileSystem.getInfoAsync(localURI);
 
           if (!imageInfo.exists) {
-            goToScreen(navigation, ["AddPuzzle"], { publicKey, sourceList });
+            goToScreen(navigation, "AddPuzzle", { publicKey, sourceList });
             return;
           }
 
@@ -358,11 +358,10 @@ export default function PuzzleComponent({
           isVisible={modalVisible}
           onBackdropPress={() => {
             setModalVisible(false);
-            goToScreen(navigation, [
-              "LibraryContainer",
-              "PuzzleListContainer",
-              sourceList === "sent" ? "SentPuzzleList" : "PuzzleList",
-            ]);
+            goToScreen(
+              navigation,
+              sourceList === "sent" ? "SentPuzzleList" : "PuzzleList"
+            );
           }}
           animationIn="fadeIn"
           animationOut="fadeOut"
@@ -389,7 +388,7 @@ export default function PuzzleComponent({
                 mode="contained"
                 onPress={async () => {
                   setModalVisible(false);
-                  goToScreen(navigation, ["AddPuzzle"], {
+                  goToScreen(navigation, "AddPuzzle", {
                     publicKey,
                     sourceList,
                   });
@@ -403,11 +402,10 @@ export default function PuzzleComponent({
                 mode="contained"
                 onPress={async () => {
                   setModalVisible(false);
-                  goToScreen(navigation, [
-                    "LibraryContainer",
-                    "PuzzleListContainer",
-                    sourceList === "sent" ? "SentPuzzleList" : "PuzzleList",
-                  ]);
+                  goToScreen(
+                    navigation,
+                    sourceList === "sent" ? "SentPuzzleList" : "PuzzleList"
+                  );
                 }}
                 style={{ marginTop: 5 }}
               >

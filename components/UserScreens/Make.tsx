@@ -37,7 +37,12 @@ import {
 } from "../../puzzleUtils";
 import { setSentPuzzles } from "../../store/reducers/sentPuzzles";
 import { Puzzle, RootState, MakeContainerProps } from "../../types";
-import { createBlob, shareMessage, checkPermission, goToScreen } from "../../util";
+import {
+  createBlob,
+  shareMessage,
+  checkPermission,
+  goToScreen,
+} from "../../util";
 import { IosCamera, MessageInput } from "../InteractiveElements";
 import { AdSafeAreaView } from "../Layout";
 
@@ -140,11 +145,7 @@ export default function Make({
         if (newPuzzle.publicKey) {
           generateLink(newPuzzle.publicKey);
           addToSent(newPuzzle);
-          goToScreen(navigation, [
-            "LibraryContainer",
-            "PuzzleListContainer",
-            "SentPuzzleList",
-          ]);
+          goToScreen(navigation, "SentPuzzleList");
         }
       }
     } catch (error) {

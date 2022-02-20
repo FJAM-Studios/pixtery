@@ -56,14 +56,14 @@ export default function PuzzleList({
   const downloadPuzzle = () => {
     //parse the public key from the text, so users can enter either the public key or the whole url.
     const publicKey = puzzleURL.slice(puzzleURL.lastIndexOf("/") + 1);
-    goToScreen(navigation, ["LibraryContainer", "AddPuzzle"], {
+    goToScreen(navigation, "AddPuzzle", {
       publicKey,
       sourceList: "received",
     });
   };
 
   const navigateToPuzzle = (publicKey: string) => {
-    goToScreen(navigation, ["LibraryContainer", "Puzzle"], {
+    goToScreen(navigation, "Puzzle", {
       publicKey,
       sourceList: "received",
     });

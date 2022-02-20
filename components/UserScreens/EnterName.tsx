@@ -53,8 +53,8 @@ export default function EnterName({
       dispatch(setReceivedPuzzles(mergedReceivedPuzzles));
       dispatch(setSentPuzzles(mergedSentPuzzles));
 
-      if (url) goToScreen(navigation, ["Splash"], { url });
-      else goToScreen(navigation, ["TabContainer", "MakeContainer", "Make"]);
+      if (url) goToScreen(navigation, "Splash", { url });
+      else goToScreen(navigation, "Make");
     } catch (e) {
       console.log(e);
       if (e instanceof Error) setErrors(e.message);

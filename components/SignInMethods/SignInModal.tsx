@@ -26,7 +26,7 @@ export default function SignInModal({
 
   const onFinish = () => {
     setModalVisible(false);
-    goToScreen(navigation, ["EnterName"], { url });
+    goToScreen(navigation, "EnterName", { url });
   };
 
   return (

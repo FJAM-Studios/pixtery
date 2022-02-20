@@ -163,7 +163,7 @@ export default function Splash({
 
         // default splash destination is Make screen
         const splashDestination = {
-          screenPath: ["TabContainer", "MakeContainer", "Make"],
+          screen: "Make",
           params: {},
         };
 
@@ -180,7 +180,7 @@ export default function Splash({
         // if you do not have a profile, set destination to CreateProfile
         if (!isProfile(loadedProfile)) {
           console.log("profile not found");
-          splashDestination.screenPath = ["CreateProfile"];
+          splashDestination.screen = "CreateProfile";
           splashDestination.params = { url };
         } else {
           // if you DO have a profile, set it in redux store and load puzzles
@@ -194,25 +194,18 @@ export default function Splash({
             const { path } = Linking.parse(url);
             const publicKey = path?.substring(path.lastIndexOf("/") + 1);
             if (publicKey && publicKey.length === PUBLIC_KEY_LENGTH) {
-              splashDestination.screenPath = [
-                "TabContainer",
-                "LibraryContainer",
-                "AddPuzzle",
-              ];
+              splashDestination.screen = "AddPuzzle";
               splashDestination.params = { publicKey, sourceList: "received" };
             }
           }
         }
 
-        console.log(
-          "navigating to splash destination ",
-          JSON.stringify(splashDestination)
-        );
+        console.log("navigating to splash destination ", splashDestination);
 
         // reset the navigation stack so that users can't navigate to Splash with back button
         resetNavigation(
           navigation,
-          splashDestination.screenPath,
+          splashDestination.screen,
           splashDestination.params
         );
       };

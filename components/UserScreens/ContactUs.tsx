@@ -30,7 +30,7 @@ export default function ContactUs({
       setMessage("");
       setEmail("");
       setSubject("");
-      goToScreen(navigation, ["Profile"]);
+      goToScreen(navigation, "Profile");
       alert("Thank you! Your message has been successfully sent.");
     } catch (error) {
       console.error(error);

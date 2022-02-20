@@ -39,7 +39,7 @@ export default function CreateProfile({
     setLoadingModalVisible(true);
     try {
       await anonSignIn();
-      goToScreen(navigation, ["EnterName"], {
+      goToScreen(navigation, "EnterName", {
         url: route.params.url,
       });
     } catch (e) {

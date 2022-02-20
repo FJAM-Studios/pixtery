@@ -21,7 +21,7 @@ export default function Subheader({
 }): JSX.Element {
   const theme = useSelector((state: RootState) => state.theme);
   const onPress = () => {
-    if (specificDestination) goToScreen(navigation, [specificDestination]);
+    if (specificDestination) goToScreen(navigation, specificDestination);
     else navigation.goBack();
   };
   return (

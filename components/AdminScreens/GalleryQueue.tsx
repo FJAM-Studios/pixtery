@@ -89,7 +89,7 @@ export default function GalleryQueue({
             <Button
               icon="calendar"
               mode="contained"
-              onPress={() => goToScreen(navigation, ["DailyCalendar"])}
+              onPress={() => goToScreen(navigation, "DailyCalendar")}
             >
               View Daily Calendar
             </Button>
@@ -112,7 +112,7 @@ export default function GalleryQueue({
           {queue.map((puzzle) => (
             <TouchableOpacity
               onPress={() => {
-                goToScreen(navigation, ["GalleryReview"], {
+                goToScreen(navigation, "GalleryReview", {
                   puzzle,
                   // when navigating from GalleryQueue to GalleryReview, daily will be under review (not published)
                   statusOfDaily: StatusOfDaily.UNDER_REVIEW,
