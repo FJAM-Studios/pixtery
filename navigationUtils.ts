@@ -22,26 +22,6 @@ const screenAncestorMap = {
   Tutorial: "MakeContainer",
 };
 
-// const buildScreenPathObject = (
-//   // screenPath: (keyof StackScreens)[],
-//   screenPath: string[],
-//   // finalParams: { url?: string | null; publicKey?: string; sourceList?: string },
-//   index: number,
-//   finalParams?: object
-// ): object => {
-//   if (index === screenPath.length - 1) {
-//     return {
-//       screen: screenPath[index],
-//       params: finalParams,
-//     };
-//   } else {
-//     return {
-//       screen: screenPath[index],
-//       params: buildScreenPathObject(screenPath, index + 1, finalParams),
-//     };
-//   }
-// };
-
 const buildScreenPathObject = (
   currentScreen: string,
   finalParams = {},
@@ -73,12 +53,8 @@ export const goToScreen = async (
   leafScreen: string,
   params?: object
 ): Promise<void> => {
-  // if (screenPath.length === 1) {
-  //   navigation.navigate(screenPath[0], params);
-  // } else {
   const screenPath = buildScreenPathObject(leafScreen, params);
   navigation.navigate(screenPath.screen, screenPath.params);
-  // }
 };
 
 export const replaceScreen = async (
@@ -96,7 +72,6 @@ export const resetNavigation = async (
   params?: object
 ): Promise<void> => {
   const screenPath = buildScreenPathObject(leafScreen, params);
-  console.log("SCREEN PATH IS", screenPath);
   navigation.reset({
     index: 0,
     routes: [
