@@ -12,6 +12,7 @@ import { useSelector } from "react-redux";
 import { auth, getDaily } from "../../FirebaseApp";
 import { INTERSTITIAL_ID, DAILY_TIMEZONE } from "../../constants";
 import { RootState, DailyContainerProps } from "../../types";
+import { goToScreen } from "../../util";
 import { Timer } from "../InteractiveElements";
 import { AdSafeAreaView } from "../Layout";
 AdMobInterstitial.setAdUnitID(INTERSTITIAL_ID);
@@ -30,7 +31,7 @@ export default function Gallery({
 
   const suggestPixtery = () => {
     if (auth.currentUser && !auth.currentUser?.isAnonymous) {
-      navigation.navigate("AddToGallery");
+      goToScreen(navigation, ["AddToGallery"]);
     } else {
       Toast.show(
         "You must be signed in to submit a Daily Pixtery. Go to the Profile menu to sign in.",
@@ -62,16 +63,16 @@ export default function Gallery({
         const { publicKey } = daily;
         AdMobInterstitial.addEventListener("interstitialDidClose", () => {
           AdMobInterstitial.removeAllListeners();
-          navigation.navigate("LibraryContainer", {
-            screen: "AddPuzzle",
-            params: { publicKey, sourceList: "received" },
+          goToScreen(navigation, ["LibraryContainer", "AddPuzzle"], {
+            publicKey,
+            sourceList: "received",
           });
         });
         AdMobInterstitial.addEventListener("interstitialDidFailToLoad", () => {
           AdMobInterstitial.removeAllListeners();
-          navigation.navigate("LibraryContainer", {
-            screen: "AddPuzzle",
-            params: { publicKey, sourceList: "received" },
+          goToScreen(navigation, ["LibraryContainer", "AddPuzzle"], {
+            publicKey,
+            sourceList: "received",
           });
         });
 
@@ -83,16 +84,16 @@ export default function Gallery({
             });
             await AdMobInterstitial.showAdAsync();
           } else {
-            navigation.navigate("LibraryContainer", {
-              screen: "AddPuzzle",
-              params: { publicKey, sourceList: "received" },
+            goToScreen(navigation, ["LibraryContainer", "AddPuzzle"], {
+              publicKey,
+              sourceList: "received",
             });
           }
         } catch (error) {
           // go to the puzzle if there's an ad error
-          navigation.navigate("LibraryContainer", {
-            screen: "AddPuzzle",
-            params: { publicKey, sourceList: "received" },
+          goToScreen(navigation, ["LibraryContainer", "AddPuzzle"], {
+            publicKey,
+            sourceList: "received",
           });
           console.log(error);
         }

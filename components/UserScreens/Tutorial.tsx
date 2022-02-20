@@ -13,6 +13,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { setTutorialFinished } from "../../store/reducers/tutorialFinished";
 import { MakeContainerProps, RootState } from "../../types";
+import { goToScreen } from "../../util";
 import { AdSafeAreaView } from "../Layout";
 
 const emptyImage = require("../../assets/blank.jpg");
@@ -50,7 +51,7 @@ export default function Tutorial({
     );
     setStep(0);
     dispatch(setTutorialFinished(true));
-    navigation.navigate("Make");
+    goToScreen(navigation, ["Make"]);
   };
   return (
     <AdSafeAreaView

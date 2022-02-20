@@ -18,12 +18,13 @@ import { setSounds } from "../../store/reducers/sounds";
 import { setTheme } from "../../store/reducers/theme";
 import { setTutorialFinished } from "../../store/reducers/tutorialFinished";
 import { allThemes } from "../../themes";
+import { RootStackScreenProps, RootState } from "../../types";
 import {
-  RootStackParamList,
-  RootStackScreenProps,
-  RootState,
-} from "../../types";
-import { clearEIMcache, isProfile, updateImageURIs } from "../../util";
+  clearEIMcache,
+  isProfile,
+  resetNavigation,
+  updateImageURIs,
+} from "../../util";
 import { Logo, Title } from "../StaticElements";
 
 export default function Splash({
@@ -161,9 +162,9 @@ export default function Splash({
         dispatch(setSounds({ clickSound, winSound }));
 
         // default splash destination is Make screen
-        let splashDestination: NavigatorScreenParams<RootStackParamList> = {
-          screen: "TabContainer",
-          params: { screen: "MakeContainer", params: { screen: "Make" } },
+        const splashDestination = {
+          screenPath: ["TabContainer", "MakeContainer", "Make"],
+          params: {},
         };
 
         // first get the url that was either passed in by the url event listener or by the url used to open the app
@@ -179,10 +180,8 @@ export default function Splash({
         // if you do not have a profile, set destination to CreateProfile
         if (!isProfile(loadedProfile)) {
           console.log("profile not found");
-          splashDestination = {
-            screen: "CreateProfile",
-            params: { url },
-          };
+          splashDestination.screenPath = ["CreateProfile"];
+          splashDestination.params = { url };
         } else {
           // if you DO have a profile, set it in redux store and load puzzles
           console.log("profile found");
@@ -195,19 +194,12 @@ export default function Splash({
             const { path } = Linking.parse(url);
             const publicKey = path?.substring(path.lastIndexOf("/") + 1);
             if (publicKey && publicKey.length === PUBLIC_KEY_LENGTH) {
-              splashDestination = {
-                screen: "TabContainer",
-                params: {
-                  screen: "LibraryContainer",
-                  params: {
-                    screen: "AddPuzzle",
-                    params: {
-                      publicKey,
-                      sourceList: "received",
-                    },
-                  },
-                },
-              };
+              splashDestination.screenPath = [
+                "TabContainer",
+                "LibraryContainer",
+                "AddPuzzle",
+              ];
+              splashDestination.params = { publicKey, sourceList: "received" };
             }
           }
         }
@@ -218,15 +210,11 @@ export default function Splash({
         );
 
         // reset the navigation stack so that users can't navigate to Splash with back button
-        navigation.reset({
-          index: 0,
-          routes: [
-            {
-              name: splashDestination.screen,
-              params: splashDestination.params,
-            },
-          ],
-        });
+        resetNavigation(
+          navigation,
+          splashDestination.screenPath,
+          splashDestination.params
+        );
       };
 
       loadAppData();

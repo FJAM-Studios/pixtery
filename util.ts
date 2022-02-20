@@ -20,6 +20,7 @@ import { setProfile } from "./store/reducers/profile";
 import { setReceivedPuzzles } from "./store/reducers/receivedPuzzles";
 import { setSentPuzzles } from "./store/reducers/sentPuzzles";
 import { Puzzle, DateObjString, Profile } from "./types";
+export * from "./navigationUtils";
 
 dayjs.extend(calendar);
 

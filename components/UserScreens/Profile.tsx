@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { auth, signOut } from "../../FirebaseApp";
 import { setProfile } from "../../store/reducers/profile";
 import { SettingsContainerProps, RootState } from "../../types";
-import { clearAllAppData } from "../../util";
+import { clearAllAppData, goToScreen } from "../../util";
 import { NameModal, ThemeModal } from "../InteractiveElements";
 import ConfirmDeleteModal from "../InteractiveElements/ConfirmDeleteModal";
 import { AdSafeAreaView } from "../Layout";
@@ -131,7 +131,7 @@ export default function Profile({
               //update app state
               dispatch(setProfile(null));
               //send you to splash
-              navigation.navigate("Splash");
+              goToScreen(navigation, ["Splash"]);
             }}
             style={{ margin: 10 }}
           >

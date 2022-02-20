@@ -6,6 +6,7 @@ import { Button } from "react-native-paper";
 import { useSelector } from "react-redux";
 
 import { RootState, LibraryContainerParamsList } from "../../types";
+import { goToScreen } from "../../util";
 
 export default function Subheader({
   navigation,
@@ -20,7 +21,7 @@ export default function Subheader({
 }): JSX.Element {
   const theme = useSelector((state: RootState) => state.theme);
   const onPress = () => {
-    if (specificDestination) navigation.navigate(specificDestination);
+    if (specificDestination) goToScreen(navigation, [specificDestination]);
     else navigation.goBack();
   };
   return (

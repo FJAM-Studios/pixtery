@@ -8,7 +8,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { sortPuzzles } from "../../puzzleUtils";
 import { setSentPuzzles } from "../../store/reducers/sentPuzzles";
 import { Puzzle, PuzzleListContainerProps, RootState } from "../../types";
-import { safelyDeletePuzzleImage, deactivatePuzzleOnServer } from "../../util";
+import {
+  safelyDeletePuzzleImage,
+  deactivatePuzzleOnServer,
+  goToScreen,
+} from "../../util";
 import { SentPuzzleCard } from "../InteractiveElements";
 import { AdSafeAreaView } from "../Layout";
 
@@ -51,12 +55,9 @@ export default function SentPuzzleList({
   };
 
   const navigateToPuzzle = (publicKey: string) => {
-    navigation.navigate("LibraryContainer", {
-      screen: "Puzzle",
-      params: {
-        publicKey,
-        sourceList: "sent",
-      },
+    goToScreen(navigation, ["LibraryContainer", "Puzzle"], {
+      publicKey,
+      sourceList: "sent",
     });
   };
 
@@ -140,9 +141,9 @@ export default function SentPuzzleList({
               </Headline>
               <Button
                 mode="contained"
-                onPress={() =>
-                  navigation.navigate("MakeContainer", { screen: "Make" })
-                }
+                onPress={() => {
+                  goToScreen(navigation, ["MakeContainer", "Make"]);
+                }}
                 style={{
                   marginTop: 10,
                 }}

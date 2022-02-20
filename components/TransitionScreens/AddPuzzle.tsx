@@ -20,7 +20,7 @@ import {
   RootStackParamList,
   RootState,
 } from "../../types";
-import { downloadImage } from "../../util";
+import { downloadImage, goToScreen, replaceScreen } from "../../util";
 import { Logo, Title } from "../StaticElements";
 
 export default function AddPuzzle({
@@ -97,15 +97,14 @@ export default function AddPuzzle({
         console.log(`searching for puzzle ${route.params.publicKey}...`);
 
         // default add puzzle destination is puzzle list screen
-        let addPuzzleDestination: NavigatorScreenParams<RootStackParamList> = {
-          screen: "TabContainer",
-          params: {
-            screen: "LibraryContainer",
-            params: {
-              screen: "PuzzleListContainer",
-              params: { screen: "PuzzleList" },
-            },
-          },
+        const addPuzzleDestination = {
+          screenPath: [
+            "TabContainer",
+            "LibraryContainer",
+            "PuzzleListContainer",
+            "PuzzleList",
+          ],
+          params: {},
         };
 
         // try to get the new puzzle and set the navigation destination
@@ -129,19 +128,15 @@ export default function AddPuzzle({
 
           // set the puzzle if the PK is valid
           if (validPublicKey)
-            addPuzzleDestination = {
-              screen: "TabContainer",
-              params: {
-                screen: "LibraryContainer",
-                params: {
-                  screen: "Puzzle",
-                  params: {
-                    publicKey,
-                    sourceList,
-                  },
-                },
-              },
-            };
+            addPuzzleDestination.screenPath = [
+              "TabContainer",
+              "LibraryContainer",
+              "Puzzle",
+            ];
+          addPuzzleDestination.params = {
+            publicKey,
+            sourceList,
+          };
         } catch (e) {
           console.log(e);
           Toast.show(
@@ -154,19 +149,17 @@ export default function AddPuzzle({
         }
 
         // replace add puzzle with source list component so you can't navigate back to Add Puzzle
-        navigation.replace("TabContainer", {
-          screen: "LibraryContainer",
-          params: {
-            screen: "PuzzleListContainer",
-            params: {
-              screen: sourceList === "sent" ? "SentPuzzleList" : "PuzzleList",
-            },
-          },
-        });
+        replaceScreen(navigation, [
+          "TabContainer",
+          "LibraryContainer",
+          "PuzzleListContainer",
+          sourceList === "sent" ? "SentPuzzleList" : "PuzzleList",
+        ]);
 
         // then navigate to your destination
-        navigation.navigate(
-          addPuzzleDestination.screen,
+        goToScreen(
+          navigation,
+          addPuzzleDestination.screenPath,
           addPuzzleDestination.params
         );
       };

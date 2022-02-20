@@ -29,7 +29,7 @@ import {
   RootState,
   LibraryContainerProps,
 } from "../../types";
-import { saveToLibrary } from "../../util";
+import { goToScreen, saveToLibrary } from "../../util";
 import { PuzzlePiece } from "../InteractiveElements";
 import { AdSafeAreaView } from "../Layout";
 
@@ -156,7 +156,7 @@ export default function PuzzleComponent({
           const imageInfo = await FileSystem.getInfoAsync(localURI);
 
           if (!imageInfo.exists) {
-            navigation.navigate("AddPuzzle", { publicKey, sourceList });
+            goToScreen(navigation, ["AddPuzzle"], { publicKey, sourceList });
             return;
           }
 
@@ -358,12 +358,11 @@ export default function PuzzleComponent({
           isVisible={modalVisible}
           onBackdropPress={() => {
             setModalVisible(false);
-            navigation.navigate("LibraryContainer", {
-              screen: "PuzzleListContainer",
-              params: {
-                screen: sourceList === "sent" ? "SentPuzzleList" : "PuzzleList",
-              },
-            });
+            goToScreen(navigation, [
+              "LibraryContainer",
+              "PuzzleListContainer",
+              sourceList === "sent" ? "SentPuzzleList" : "PuzzleList",
+            ]);
           }}
           animationIn="fadeIn"
           animationOut="fadeOut"
@@ -390,7 +389,10 @@ export default function PuzzleComponent({
                 mode="contained"
                 onPress={async () => {
                   setModalVisible(false);
-                  navigation.navigate("AddPuzzle", { publicKey, sourceList });
+                  goToScreen(navigation, ["AddPuzzle"], {
+                    publicKey,
+                    sourceList,
+                  });
                 }}
                 style={{ margin: 10 }}
               >
@@ -401,13 +403,11 @@ export default function PuzzleComponent({
                 mode="contained"
                 onPress={async () => {
                   setModalVisible(false);
-                  navigation.navigate("LibraryContainer", {
-                    screen: "PuzzleListContainer",
-                    params: {
-                      screen:
-                        sourceList === "sent" ? "SentPuzzleList" : "PuzzleList",
-                    },
-                  });
+                  goToScreen(navigation, [
+                    "LibraryContainer",
+                    "PuzzleListContainer",
+                    sourceList === "sent" ? "SentPuzzleList" : "PuzzleList",
+                  ]);
                 }}
                 style={{ marginTop: 5 }}
               >

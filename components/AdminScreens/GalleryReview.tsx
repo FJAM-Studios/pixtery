@@ -22,7 +22,11 @@ import {
   RootState,
   StatusOfDaily,
 } from "../../types";
-import { downloadImage, convertDateStringToObject } from "../../util";
+import {
+  downloadImage,
+  convertDateStringToObject,
+  goToScreen,
+} from "../../util";
 import { DateSelect } from "../InteractiveElements";
 import { AdSafeAreaView } from "../Layout";
 
@@ -93,7 +97,7 @@ export default function GalleryReview({
   const onUnmarkedDayPress = (dailyDate: string) => {
     const addPuzzle = addToCalendar(puzzle, () => {
       setModalVisible(false);
-      navigation.navigate("GalleryQueue", { forceReload: true });
+      goToScreen(navigation, ["GalleryQueue"], { forceReload: true });
     });
     addPuzzle(dailyDate);
   };
@@ -101,7 +105,7 @@ export default function GalleryReview({
   const onMarkedDayPress = (dateString: string, markedDates: DailyDate) => {
     const { puzzle } = markedDates[dateString];
     setModalVisible(false);
-    navigation.navigate("GalleryReview", {
+    goToScreen(navigation, ["GalleryReview"], {
       puzzle,
       // when navigating to GalleryReview from the calendar,
       // marked Daily will always be published (i.e. not under review)
@@ -229,7 +233,7 @@ export default function GalleryReview({
                       await deactivateInQueue({ publicKey });
                     }
                     setModalVisible(false);
-                    navigation.navigate("GalleryQueue", {
+                    goToScreen(navigation, ["GalleryQueue"], {
                       forceReload: true,
                     });
                   }}

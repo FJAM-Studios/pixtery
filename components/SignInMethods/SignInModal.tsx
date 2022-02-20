@@ -4,6 +4,7 @@ import Modal from "react-native-modal";
 import { useSelector } from "react-redux";
 
 import { RootState, RootStackParamList, SignInOptions } from "../../types";
+import { goToScreen } from "../../util";
 import Email from "./Email/Email";
 import Phone from "./Phone/Phone";
 
@@ -25,7 +26,7 @@ export default function SignInModal({
 
   const onFinish = () => {
     setModalVisible(false);
-    navigation.navigate("EnterName", { url });
+    goToScreen(navigation, ["EnterName"], { url });
   };
 
   return (

@@ -9,6 +9,7 @@ import {
   AdminContainerProps,
   StatusOfDaily,
 } from "../../types";
+import { goToScreen } from "../../util";
 import { DateSelect } from "../InteractiveElements";
 import { AdSafeAreaView } from "../Layout";
 
@@ -26,7 +27,7 @@ export default function DailyCalendar({
 
   const onMarkedDayPress = (dateString: string, markedDates: DailyDate) => {
     const { puzzle } = markedDates[dateString];
-    navigation.navigate("GalleryReview", {
+    goToScreen(navigation, ["GalleryReview"], {
       puzzle,
       statusOfDaily: StatusOfDaily.PUBLISHED,
       publishedDate: dateString,
@@ -65,7 +66,7 @@ export default function DailyCalendar({
             size={20}
             style={{ backgroundColor: theme.colors.primary }}
             onPress={() => {
-              navigation.navigate("GalleryQueue");
+              goToScreen(navigation, ["GalleryQueue"]);
             }}
           />
         </View>

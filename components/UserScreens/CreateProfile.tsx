@@ -7,6 +7,7 @@ import { useSelector } from "react-redux";
 
 import { anonSignIn } from "../../FirebaseApp";
 import { RootStackScreenProps, RootState, SignInOptions } from "../../types";
+import { goToScreen } from "../../util";
 import SignInMenu from "../SignInMethods/SignInMenu";
 import SignInModal from "../SignInMethods/SignInModal";
 import { LoadingModal, Logo, Title, UserAgreements } from "../StaticElements";
@@ -38,7 +39,7 @@ export default function CreateProfile({
     setLoadingModalVisible(true);
     try {
       await anonSignIn();
-      navigation.navigate("EnterName", {
+      goToScreen(navigation, ["EnterName"], {
         url: route.params.url,
       });
     } catch (e) {

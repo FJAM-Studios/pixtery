@@ -13,7 +13,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { deleteUserCallable, signOut } from "../../FirebaseApp";
 import { RootStackParamList, RootState } from "../../types";
-import { clearAllAppData } from "../../util";
+import { clearAllAppData, goToScreen } from "../../util";
 
 export default function SignInModal({
   isVisible,
@@ -35,7 +35,7 @@ export default function SignInModal({
     //sign out of Firebase account locally
     await signOut();
     //send you to splash
-    navigation.navigate("Splash");
+    goToScreen(navigation, ["Splash"]);
   };
 
   return (

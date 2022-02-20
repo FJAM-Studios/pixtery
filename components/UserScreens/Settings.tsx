@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { VERSION_NUMBER } from "../../constants";
 import { setTutorialFinished } from "../../store/reducers/tutorialFinished";
 import { SettingsContainerProps, RootState } from "../../types";
+import { goToScreen } from "../../util";
 import { AdSafeAreaView } from "../Layout";
 
 export default function Settings({
@@ -30,7 +31,7 @@ export default function Settings({
           icon="account"
           mode="contained"
           onPress={() => {
-            navigation.navigate("Profile");
+            goToScreen(navigation, ["Profile"]);
           }}
           style={{ margin: 10 }}
         >
@@ -41,7 +42,7 @@ export default function Settings({
           icon="puzzle"
           mode="contained"
           onPress={() => {
-            navigation.navigate("ManagePuzzles");
+            goToScreen(navigation, ["ManagePuzzles"]);
           }}
           style={{ margin: 10 }}
         >
@@ -52,7 +53,7 @@ export default function Settings({
           mode="contained"
           onPress={async () => {
             dispatch(setTutorialFinished(false));
-            navigation.navigate("MakeContainer", { screen: "Tutorial" });
+            goToScreen(navigation, ["MakeContainer", "Tutorial"]);
           }}
           style={{ margin: 10 }}
         >
@@ -62,7 +63,7 @@ export default function Settings({
           icon="email"
           mode="contained"
           onPress={() => {
-            navigation.navigate("ContactUs");
+            goToScreen(navigation, ["ContactUs"]);
           }}
           style={{ margin: 10 }}
         >

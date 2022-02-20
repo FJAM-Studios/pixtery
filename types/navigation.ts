@@ -131,3 +131,13 @@ export type AdminContainerProps<
 >;
 
 //////////////
+
+export type StackScreens =
+  | RootStackParamList
+  | TabContainerParamsList
+  | MakeContainerParamsList
+  | DailyContainerParamsList
+  | LibraryContainerParamsList
+  | PuzzleListContainerParamsList
+  | SettingsContainerParamsList
+  | AdminContainerParamsList;

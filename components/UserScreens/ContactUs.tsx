@@ -6,7 +6,7 @@ import { useSelector } from "react-redux";
 
 import { submitFeedbackCallable } from "../../FirebaseApp";
 import { SettingsContainerProps, RootState } from "../../types";
-import { isEmail } from "../../util";
+import { goToScreen, isEmail } from "../../util";
 import { AdSafeAreaView } from "../Layout";
 
 export default function ContactUs({
@@ -30,7 +30,7 @@ export default function ContactUs({
       setMessage("");
       setEmail("");
       setSubject("");
-      navigation.navigate("Profile");
+      goToScreen(navigation, ["Profile"]);
       alert("Thank you! Your message has been successfully sent.");
     } catch (error) {
       console.error(error);

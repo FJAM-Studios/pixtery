@@ -15,6 +15,7 @@ import {
   generateSquarePiecePaths,
 } from "../../puzzleUtils";
 import { Puzzle, RootStackParamList, RootState } from "../../types";
+import { goToScreen } from "../../util";
 import EditSubmission from "./EditSubmission";
 
 const emptyImage = require("../../assets/blank.jpg");
@@ -200,7 +201,7 @@ export default function SubmissionModal({
                   Submit Anonymously
                 </Text>
               </View>
-              {/* 
+              {/*
               <View
                 style={{
                   flexDirection: "row",
@@ -251,10 +252,7 @@ export default function SubmissionModal({
                       position: Toast.positions.CENTER,
                     });
                   }
-                  navigation.navigate("TabContainer", {
-                    screen: "DailyContainer",
-                    params: { screen: "Gallery" },
-                  });
+                  goToScreen(navigation, ["Gallery"]);
                   setLoading(false);
                   setEditing(false);
                   setModalVisible(false);
