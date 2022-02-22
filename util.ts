@@ -1,21 +1,15 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {
-  CommonActions,
-  NavigationContainerRef,
-} from "@react-navigation/native";
 import dayjs from "dayjs";
 import calendar from "dayjs/plugin/calendar";
 import * as FileSystem from "expo-file-system";
 import * as ImagePicker from "expo-image-picker";
 import * as Linking from "expo-linking";
 import * as MediaLibrary from "expo-media-library";
-import * as SplashScreen from "expo-splash-screen";
 import { Alert, Share } from "react-native";
 import Toast from "react-native-root-toast";
 import { Dispatch } from "redux";
 
 import {
-  checkAdminStatus,
   deactivateAllUserPuzzles,
   deactivateUserPuzzle,
   fetchPuzzles,
@@ -25,13 +19,7 @@ import { DATE_FORMAT } from "./constants";
 import { setProfile } from "./store/reducers/profile";
 import { setReceivedPuzzles } from "./store/reducers/receivedPuzzles";
 import { setSentPuzzles } from "./store/reducers/sentPuzzles";
-import {
-  Puzzle,
-  ScreenNavigation,
-  DateObjString,
-  Profile,
-  StackScreens,
-} from "./types";
+import { Puzzle, DateObjString, Profile } from "./types";
 
 dayjs.extend(calendar);
 
@@ -76,60 +64,6 @@ export const shareMessage = async (pixUrl: string): Promise<void> => {
   } catch (error: unknown) {
     if (error instanceof Error) alert(error.message);
   }
-};
-
-export const goToScreen = (
-  navigation: ScreenNavigation | NavigationContainerRef<StackScreens>,
-  screen: string,
-  options: { url?: string | null; publicKey?: string; sourceList?: string } = {
-    url: "",
-    publicKey: "",
-    sourceList: "",
-  }
-): void => {
-  navigation.dispatch(
-    CommonActions.navigate({
-      name: screen,
-      params: options,
-    })
-  );
-};
-
-const buildScreenPathObject = (
-  screenPath: (keyof StackScreens)[],
-  finalParams: { url?: string | null; publicKey?: string; sourceList?: string },
-  index: number
-): object => {
-  if (index === screenPath.length - 1) {
-    return {
-      screen: screenPath[index],
-      params: finalParams,
-    };
-  } else {
-    return {
-      screen: screenPath[index],
-      params: buildScreenPathObject(screenPath, finalParams, index + 1),
-    };
-  }
-};
-
-export const closeSplashAndNavigate = async (
-  navigation: ScreenNavigation | NavigationContainerRef<StackScreens>,
-  screenPath: (keyof StackScreens)[],
-  options: { url?: string | null; publicKey?: string; sourceList?: string } = {
-    url: "",
-    publicKey: "",
-    sourceList: "",
-  }
-): Promise<void> => {
-  if (screenPath.length === 1) {
-    goToScreen(navigation, screenPath[0], options);
-  } else {
-    const chain = buildScreenPathObject(screenPath, options, 1);
-    navigation.navigate(screenPath[0], chain);
-  }
-
-  await SplashScreen.hideAsync();
 };
 
 export const saveToLibrary = async (imageURI: string): Promise<void> => {
@@ -443,6 +377,7 @@ export const deactivateAllPuzzlesOnServer = async (
 };
 
 export const clearEIMcache = async (): Promise<void> => {
+  console.log("Checking EIM cache...");
   try {
     const EIMcacheDir = FileSystem.cacheDirectory + "ImageManipulator";
     const EIMcacheInfo = await FileSystem.getInfoAsync(EIMcacheDir);

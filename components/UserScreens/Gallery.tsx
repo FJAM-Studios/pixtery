@@ -1,8 +1,9 @@
+import { useFocusEffect } from "@react-navigation/native";
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone"; // dependent on utc plugin
 import utc from "dayjs/plugin/utc";
 import { AdMobInterstitial } from "expo-ads-admob";
-import { useState, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { View, TouchableOpacity } from "react-native";
 import { ActivityIndicator, Button, Text } from "react-native-paper";
 import Toast from "react-native-root-toast";
@@ -10,16 +11,14 @@ import { useSelector } from "react-redux";
 
 import { auth, getDaily } from "../../FirebaseApp";
 import { INTERSTITIAL_ID, DAILY_TIMEZONE } from "../../constants";
-import { RootState, ScreenNavigation } from "../../types";
+import { RootState, DailyContainerProps } from "../../types";
 import { Timer } from "../InteractiveElements";
 import { AdSafeAreaView } from "../Layout";
 AdMobInterstitial.setAdUnitID(INTERSTITIAL_ID);
 
 export default function Gallery({
   navigation,
-}: {
-  navigation: ScreenNavigation;
-}): JSX.Element {
+}: DailyContainerProps<"Gallery">): JSX.Element {
   dayjs.extend(utc);
   dayjs.extend(timezone);
   const theme = useSelector((state: RootState) => state.theme);
@@ -51,7 +50,8 @@ export default function Gallery({
     return time;
   };
 
-  const [time, setTime] = useState<null | number>(getCountdown());
+  // const [time, setTime] = useState<null | number>(getCountdown());
+  let time = getCountdown();
 
   const loadDaily = async () => {
     setLoading(true);
@@ -62,16 +62,16 @@ export default function Gallery({
         const { publicKey } = daily;
         AdMobInterstitial.addEventListener("interstitialDidClose", () => {
           AdMobInterstitial.removeAllListeners();
-          navigation.navigate("AddPuzzle", {
-            publicKey,
-            sourceList: "received",
+          navigation.navigate("LibraryContainer", {
+            screen: "AddPuzzle",
+            params: { publicKey, sourceList: "received" },
           });
         });
         AdMobInterstitial.addEventListener("interstitialDidFailToLoad", () => {
           AdMobInterstitial.removeAllListeners();
-          navigation.navigate("AddPuzzle", {
-            publicKey,
-            sourceList: "received",
+          navigation.navigate("LibraryContainer", {
+            screen: "AddPuzzle",
+            params: { publicKey, sourceList: "received" },
           });
         });
 
@@ -83,16 +83,16 @@ export default function Gallery({
             });
             await AdMobInterstitial.showAdAsync();
           } else {
-            navigation.navigate("AddPuzzle", {
-              publicKey,
-              sourceList: "received",
+            navigation.navigate("LibraryContainer", {
+              screen: "AddPuzzle",
+              params: { publicKey, sourceList: "received" },
             });
           }
         } catch (error) {
           // go to the puzzle if there's an ad error
-          navigation.navigate("AddPuzzle", {
-            publicKey,
-            sourceList: "received",
+          navigation.navigate("LibraryContainer", {
+            screen: "AddPuzzle",
+            params: { publicKey, sourceList: "received" },
           });
           console.log(error);
         }
@@ -106,12 +106,15 @@ export default function Gallery({
     setLoading(false);
   };
 
-  useEffect(() => {
-    const incrementTime = setInterval(() => {
-      setTime(getCountdown());
-    }, 1000);
-    return () => clearInterval(incrementTime);
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      const incrementTime = setInterval(() => {
+        time = getCountdown();
+      }, 1000);
+      return () => clearInterval(incrementTime);
+    }, [])
+  );
+
   return (
     <AdSafeAreaView
       style={{

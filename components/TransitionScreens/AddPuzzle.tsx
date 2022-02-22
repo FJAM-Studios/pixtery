@@ -1,6 +1,10 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
+  NavigatorScreenParams,
+  useFocusEffect,
+} from "@react-navigation/native";
 import * as FileSystem from "expo-file-system";
-import { useEffect } from "react";
+import { useCallback } from "react";
 import { View } from "react-native";
 import { Headline, ActivityIndicator } from "react-native-paper";
 import Toast from "react-native-root-toast";
@@ -11,21 +15,18 @@ import { queryPuzzleCallable } from "../../FirebaseApp";
 import { setReceivedPuzzles } from "../../store/reducers/receivedPuzzles";
 import { setSentPuzzles } from "../../store/reducers/sentPuzzles";
 import {
+  LibraryContainerProps,
   Puzzle,
-  AddPuzzleRoute,
-  ScreenNavigation,
+  RootStackParamList,
   RootState,
 } from "../../types";
-import { goToScreen, downloadImage } from "../../util";
+import { downloadImage } from "../../util";
 import { Logo, Title } from "../StaticElements";
 
 export default function AddPuzzle({
   navigation,
   route,
-}: {
-  navigation: ScreenNavigation;
-  route: AddPuzzleRoute;
-}): JSX.Element {
+}: LibraryContainerProps<"AddPuzzle">): JSX.Element {
   const dispatch = useDispatch();
   const theme = useSelector((state: RootState) => state.theme);
   const receivedPuzzles = useSelector(
@@ -89,34 +90,89 @@ export default function AddPuzzle({
     }
   };
 
-  useEffect(() => {
-    const searchForPuzzle = async () => {
-      // all logic determining which screen to navigate to happens here in order to place navigation at the end of every branch. Otherwise the function will continue running after navigating away, which can cause the user to get redirected if there is an uncaught navigation further down the line
-      try {
-        const { publicKey } = route.params; //no need to check whether publicKey exists, that is done by Splash before navigating here
-        const match = await searchForLocalMatch(publicKey);
-        if (match) goToScreen(navigation, "Puzzle", { publicKey, sourceList });
-        else {
-          const newPuzzle: Puzzle | void = await fetchPuzzle(publicKey);
-          if (newPuzzle) {
-            await savePuzzle(newPuzzle);
-            goToScreen(navigation, "Puzzle", { publicKey, sourceList });
-          } else goToScreen(navigation, "Make");
-        }
-      } catch (e) {
-        console.log(e);
-        Toast.show(
-          "Error retrieving Pixtery! Check your connection or try again later.",
-          {
-            duration: Toast.durations.LONG,
-            position: Toast.positions.CENTER,
+  // useFocusEffect so that the user is never stuck on this page if navigate with back button
+  useFocusEffect(
+    useCallback(() => {
+      const searchForPuzzle = async () => {
+        console.log(`searching for puzzle ${route.params.publicKey}...`);
+
+        // default add puzzle destination is puzzle list screen
+        let addPuzzleDestination: NavigatorScreenParams<RootStackParamList> = {
+          screen: "TabContainer",
+          params: {
+            screen: "LibraryContainer",
+            params: {
+              screen: "PuzzleListContainer",
+              params: { screen: "PuzzleList" },
+            },
+          },
+        };
+
+        // try to get the new puzzle and set the navigation destination
+        try {
+          const { publicKey } = route.params;
+          // assume publicKey is invalid
+          let validPublicKey = false;
+          // first look for locally saved puzzle
+          const match = await searchForLocalMatch(publicKey);
+          // if found locally, then PK is valid
+          if (match) validPublicKey = true;
+          else {
+            // attempt to download
+            const newPuzzle: Puzzle | void = await fetchPuzzle(publicKey);
+            // if successfully found, save locally and mark PK as valid
+            if (newPuzzle) {
+              await savePuzzle(newPuzzle);
+              validPublicKey = true;
+            }
           }
+
+          // set the puzzle if the PK is valid
+          if (validPublicKey)
+            addPuzzleDestination = {
+              screen: "TabContainer",
+              params: {
+                screen: "LibraryContainer",
+                params: {
+                  screen: "Puzzle",
+                  params: {
+                    publicKey,
+                    sourceList,
+                  },
+                },
+              },
+            };
+        } catch (e) {
+          console.log(e);
+          Toast.show(
+            "Error retrieving Pixtery! Check your connection or try again later.",
+            {
+              duration: Toast.durations.LONG,
+              position: Toast.positions.CENTER,
+            }
+          );
+        }
+
+        // replace add puzzle with source list component so you can't navigate back to Add Puzzle
+        navigation.replace("TabContainer", {
+          screen: "LibraryContainer",
+          params: {
+            screen: "PuzzleListContainer",
+            params: {
+              screen: sourceList === "sent" ? "SentPuzzleList" : "PuzzleList",
+            },
+          },
+        });
+
+        // then navigate to your destination
+        navigation.navigate(
+          addPuzzleDestination.screen,
+          addPuzzleDestination.params
         );
-        navigation.navigate("PuzzleListContainer");
-      }
-    };
-    searchForPuzzle();
-  });
+      };
+      searchForPuzzle();
+    }, [route.params])
+  );
 
   return (
     <View

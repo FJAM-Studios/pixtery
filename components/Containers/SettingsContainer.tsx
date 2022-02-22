@@ -1,10 +1,10 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-import { StackScreens } from "../../types";
+import { SettingsContainerParamsList } from "../../types";
 import { Subheader } from "../Layout";
 import { ContactUs, ManagePuzzles, Profile, Settings } from "../UserScreens";
 
-const Stack = createNativeStackNavigator<StackScreens>();
+const Stack = createNativeStackNavigator<SettingsContainerParamsList>();
 
 export default function SettingsContainer(): JSX.Element {
   return (

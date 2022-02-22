@@ -5,15 +5,13 @@ import { Button, TextInput } from "react-native-paper";
 import { useSelector } from "react-redux";
 
 import { submitFeedbackCallable } from "../../FirebaseApp";
-import { ScreenNavigation, RootState } from "../../types";
+import { SettingsContainerProps, RootState } from "../../types";
 import { isEmail } from "../../util";
 import { AdSafeAreaView } from "../Layout";
 
 export default function ContactUs({
   navigation,
-}: {
-  navigation: ScreenNavigation;
-}): JSX.Element {
+}: SettingsContainerProps<"ContactUs">): JSX.Element {
   const theme = useSelector((state: RootState) => state.theme);
   const { height } = useSelector((state: RootState) => state.screenHeight);
 
