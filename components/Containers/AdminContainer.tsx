@@ -1,9 +1,9 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-import { StackScreens } from "../../types";
+import { AdminContainerParamsList } from "../../types";
 import { GalleryQueue, GalleryReview, DailyCalendar } from "../AdminScreens";
 
-const Stack = createNativeStackNavigator<StackScreens>();
+const Stack = createNativeStackNavigator<AdminContainerParamsList>();
 
 export default function AdminContainer(): JSX.Element {
   return (

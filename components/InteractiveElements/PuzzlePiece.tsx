@@ -10,7 +10,6 @@ import {
   TapGestureHandlerStateChangeEvent,
 } from "react-native-gesture-handler";
 import { Svg, Image, Defs, ClipPath, Path, Rect } from "react-native-svg";
-import { useSelector } from "react-redux";
 
 import {
   DEGREE_CONVERSION,
@@ -18,7 +17,8 @@ import {
   USE_NATIVE_DRIVER,
 } from "../../constants";
 import { getPointsDistance, snapAngle } from "../../puzzleUtils";
-import { Point, Piece, BoardSpace, RootState } from "../../types";
+import store from "../../store";
+import { Point, Piece, BoardSpace } from "../../types";
 
 const AnimatedSvg = Animated.createAnimatedComponent(Svg);
 
@@ -65,10 +65,17 @@ export default function PuzzlePiece({
     x: snapOffset.x / pieceDimensions.width,
     y: snapOffset.y / pieceDimensions.height,
   };
-  const profile = useSelector((state: RootState) => state.profile);
-  const sound = useSelector((state: RootState) => state.sound);
 
   let isDragged = false;
+
+  const playSoundAndVibrate = async () => {
+    const { profile, sounds } = store.getState();
+    if (!profile?.noSound) {
+      sounds?.clickSound.replayAsync();
+    }
+    if (!profile?.noVibration)
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+  };
 
   const onGestureEvent = Animated.event(
     [
@@ -162,9 +169,7 @@ export default function PuzzlePiece({
           const rotation = (lastRotate + initialRotation) % (Math.PI * 2);
           currentBoard.push({ pointIndex, solvedIndex, rotation });
           checkWin();
-          if (!profile?.noVibration)
-            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-          if (!profile?.noSound) playSnapSound();
+          playSoundAndVibrate();
           break;
         }
       }
@@ -202,14 +207,8 @@ export default function PuzzlePiece({
         matchingPiece.rotation = rotation;
       }
       checkWin();
-      if (!profile?.noVibration)
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-      if (!profile?.noSound) playSnapSound();
+      playSoundAndVibrate();
     }
-  };
-
-  const playSnapSound = async () => {
-    await sound?.replayAsync();
   };
 
   return (

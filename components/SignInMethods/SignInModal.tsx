@@ -1,9 +1,9 @@
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { View } from "react-native";
 import Modal from "react-native-modal";
 import { useSelector } from "react-redux";
 
-import { RootState, ScreenNavigation, SignInOptions } from "../../types";
+import { RootState, RootStackParamList, SignInOptions } from "../../types";
 import Email from "./Email/Email";
 import Phone from "./Phone/Phone";
 
@@ -20,7 +20,7 @@ export default function SignInModal({
   signInType: SignInOptions | null;
   url?: string;
 }): JSX.Element {
-  const navigation = useNavigation<ScreenNavigation>();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const theme = useSelector((state: RootState) => state.theme);
 
   const onFinish = () => {

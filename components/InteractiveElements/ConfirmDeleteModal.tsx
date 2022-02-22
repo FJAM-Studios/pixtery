@@ -1,4 +1,4 @@
-import { useNavigation } from "@react-navigation/native";
+import { NavigationProp, useNavigation } from "@react-navigation/native";
 import { useState } from "react";
 import { View } from "react-native";
 import Modal from "react-native-modal";
@@ -12,7 +12,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 
 import { deleteUserCallable, signOut } from "../../FirebaseApp";
-import { RootState, ScreenNavigation } from "../../types";
+import { RootStackParamList, RootState } from "../../types";
 import { clearAllAppData } from "../../util";
 
 export default function SignInModal({
@@ -23,7 +23,7 @@ export default function SignInModal({
   setModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
 }): JSX.Element {
   const dispatch = useDispatch();
-  const navigation = useNavigation<ScreenNavigation>();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const theme = useSelector((state: RootState) => state.theme);
   const [confirmText, setConfirmText] = useState("");
 

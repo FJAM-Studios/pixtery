@@ -12,11 +12,10 @@ import { useSelector } from "react-redux";
 
 import { getGalleryQueue } from "../../FirebaseApp";
 import {
-  ScreenNavigation,
   RootState,
   Puzzle,
-  GalleryQueueRoute,
   StatusOfDaily,
+  AdminContainerProps,
 } from "../../types";
 import { formatDateFromString } from "../../util";
 import { AdSafeAreaView } from "../Layout";
@@ -24,10 +23,7 @@ import { AdSafeAreaView } from "../Layout";
 export default function GalleryQueue({
   navigation,
   route,
-}: {
-  navigation: ScreenNavigation;
-  route: GalleryQueueRoute;
-}): JSX.Element {
+}: AdminContainerProps<"GalleryQueue">): JSX.Element {
   const theme = useSelector((state: RootState) => state.theme);
 
   // these are fixed now, but later if we want to paginate or look at inactive gallery queue listings, we can

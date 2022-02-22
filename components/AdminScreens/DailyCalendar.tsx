@@ -6,7 +6,7 @@ import { useSelector } from "react-redux";
 import {
   DailyDate,
   RootState,
-  ScreenNavigation,
+  AdminContainerProps,
   StatusOfDaily,
 } from "../../types";
 import { DateSelect } from "../InteractiveElements";
@@ -14,9 +14,7 @@ import { AdSafeAreaView } from "../Layout";
 
 export default function DailyCalendar({
   navigation,
-}: {
-  navigation: ScreenNavigation;
-}): JSX.Element {
+}: AdminContainerProps<"DailyCalendar">): JSX.Element {
   const theme = useSelector((state: RootState) => state.theme);
 
   const onUnmarkedDayPress = (dailyDate: string) => {
