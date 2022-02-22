@@ -1,4 +1,4 @@
-import { useNavigation } from "@react-navigation/native";
+import { NavigationProp, useNavigation } from "@react-navigation/native";
 import * as FileSystem from "expo-file-system";
 import React, { useState } from "react";
 import { ActivityIndicator, Image, Linking, View } from "react-native";
@@ -14,7 +14,7 @@ import {
   generateJigsawPiecePaths,
   generateSquarePiecePaths,
 } from "../../puzzleUtils";
-import { Puzzle, RootState, ScreenNavigation } from "../../types";
+import { Puzzle, RootStackParamList, RootState } from "../../types";
 import EditSubmission from "./EditSubmission";
 
 const emptyImage = require("../../assets/blank.jpg");
@@ -28,7 +28,7 @@ export default function SubmissionModal({
   puzzle: Puzzle;
 }): JSX.Element {
   const theme = useSelector((state: RootState) => state.theme);
-  const navigation = useNavigation<ScreenNavigation>();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { boardSize, height } = useSelector(
     (state: RootState) => state.screenHeight
   );
@@ -251,7 +251,10 @@ export default function SubmissionModal({
                       position: Toast.positions.CENTER,
                     });
                   }
-                  navigation.navigate("Gallery");
+                  navigation.navigate("TabContainer", {
+                    screen: "DailyContainer",
+                    params: { screen: "Gallery" },
+                  });
                   setLoading(false);
                   setEditing(false);
                   setModalVisible(false);
