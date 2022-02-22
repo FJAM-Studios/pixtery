@@ -1,10 +1,10 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-import { StackScreens } from "../../types";
+import { DailyContainerParamsList } from "../../types";
 import { Subheader } from "../Layout";
 import { AddToGallery, Gallery } from "../UserScreens";
 
-const Stack = createNativeStackNavigator<StackScreens>();
+const Stack = createNativeStackNavigator<DailyContainerParamsList>();
 
 export default function DailyContainer(): JSX.Element {
   return (
