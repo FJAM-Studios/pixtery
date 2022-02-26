@@ -70,7 +70,7 @@ export type DailyContainerProps<
 
 export type LibraryContainerParamsList = {
   PuzzleListContainer: NavigatorScreenParams<PuzzleListContainerParamsList>;
-  AddPuzzle: { publicKey: string; sourceList: string };
+  AddPuzzle: { daily?: Puzzle; publicKey?: string; sourceList: string };
   Puzzle: { publicKey: string; sourceList: string };
 };
 
