@@ -58,7 +58,6 @@ export default function Gallery({
     try {
       // cloud function will tell you today's Daily instead of client
       const daily = (await getDaily()).data as Puzzle;
-      console.log("PUZZZZZLE", daily);
       if (daily && daily.publicKey) {
         AdMobInterstitial.addEventListener("interstitialDidClose", () => {
           AdMobInterstitial.removeAllListeners();
