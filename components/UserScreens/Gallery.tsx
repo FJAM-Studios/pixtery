@@ -59,19 +59,18 @@ export default function Gallery({
       // cloud function will tell you today's Daily instead of client
       const daily = (await getDaily()).data as Puzzle;
       if (daily && daily.publicKey) {
-        const { publicKey } = daily;
         AdMobInterstitial.addEventListener("interstitialDidClose", () => {
           AdMobInterstitial.removeAllListeners();
           navigation.navigate("LibraryContainer", {
             screen: "AddPuzzle",
-            params: { publicKey, sourceList: "received" },
+            params: { daily, sourceList: "received" },
           });
         });
         AdMobInterstitial.addEventListener("interstitialDidFailToLoad", () => {
           AdMobInterstitial.removeAllListeners();
           navigation.navigate("LibraryContainer", {
             screen: "AddPuzzle",
-            params: { publicKey, sourceList: "received" },
+            params: { daily, sourceList: "received" },
           });
         });
 
@@ -85,14 +84,14 @@ export default function Gallery({
           } else {
             navigation.navigate("LibraryContainer", {
               screen: "AddPuzzle",
-              params: { publicKey, sourceList: "received" },
+              params: { daily, sourceList: "received" },
             });
           }
         } catch (error) {
           // go to the puzzle if there's an ad error
           navigation.navigate("LibraryContainer", {
             screen: "AddPuzzle",
-            params: { publicKey, sourceList: "received" },
+            params: { daily, sourceList: "received" },
           });
           console.log(error);
         }
