@@ -189,8 +189,13 @@ export const getDaily = functions.https.onCall(
       const [year, month, day] = getESTDate(now);
       const daily = await getDailyForDate(year, month, day);
 
-      if (daily.exists) return daily.data();
-      else {
+      if (daily.exists) {
+        const puzzle = daily.data();
+        if (puzzle) {
+          puzzle.dateReceived = now.format();
+          return puzzle;
+        }
+      } else {
         // once a day cloud function will populate from previous years' puzzle
         return null;
       }
