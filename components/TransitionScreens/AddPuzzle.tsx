@@ -85,7 +85,6 @@ export default function AddPuzzle({
       dispatch(setPuzzles(allPuzzles));
     } catch (error) {
       console.log(error);
-      alert("Could not save puzzle to your phone");
       if (error instanceof Error) throw new Error(error.message); //rethrow error for outer method
     }
   };
