@@ -229,8 +229,7 @@ export const downloadImage = async (
 
     return 0;
   } catch (error) {
-    console.log(error);
-    // NOTE: I am not throwing an error here because if something goes wrong and an image can't be downloaded, we should still continue with the puzzle data that we do have and rely on the function asking the user to redownload the image when opening the puzzle. Also, assuming it was just an internet issue, hitting restore puzzles when you have better service should redownload the images that you don't have.
+    if (error instanceof Error) throw new Error(error.message);
     return 1;
   }
 };
