@@ -2,12 +2,13 @@ import { useState } from "react";
 import { Keyboard, Text, Linking, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Button, TextInput } from "react-native-paper";
+import Toast from "react-native-root-toast";
 import { useSelector } from "react-redux";
 
 import { submitFeedbackCallable } from "../../FirebaseApp";
 import { SettingsContainerProps, RootState } from "../../types";
-import { isEmail } from "../../util";
 import { AdSafeAreaView } from "../Layout";
+import { LoadingModal } from "../StaticElements";
 
 export default function ContactUs({
   navigation,
@@ -15,28 +16,38 @@ export default function ContactUs({
   const theme = useSelector((state: RootState) => state.theme);
   const { height } = useSelector((state: RootState) => state.screenHeight);
 
+  const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [subject, setSubject] = useState("");
   const [email, setEmail] = useState("");
 
   const submit = async () => {
+    setLoading(true);
     Keyboard.dismiss();
     try {
-      if (isEmail(email)) {
-        alert("Please type in a valid email.");
-        return;
-      }
+      // including an email is optional in the contact form so I don't think we even want to validate this
+
+      // if (isEmail(email)) {
+      //   Toast.show("Please type in a valid email.", {
+      //     duration: Toast.durations.SHORT,
+      //   });
+      //   return;
+      // }
       await submitFeedbackCallable({ subject, email, message });
       setMessage("");
       setEmail("");
       setSubject("");
-      navigation.navigate("Profile");
-      alert("Thank you! Your message has been successfully sent.");
+      navigation.navigate("SettingsContainer", { screen: "Settings" });
+      Toast.show("Thank you! Your message has been successfully sent.", {
+        duration: Toast.durations.SHORT,
+      });
     } catch (error) {
       console.error(error);
-      alert("Your message was not sent. Please try again.");
-      if (error instanceof Error) throw new Error(error.message); //rethrow the error so it can be caught by outer method
+      Toast.show("Your message was not sent. Please try again.", {
+        duration: Toast.durations.SHORT,
+      });
     }
+    setLoading(false);
   };
 
   return (
@@ -81,14 +92,12 @@ export default function ContactUs({
         </View>
         <TextInput
           placeholder="Subject"
-          multiline
           mode="outlined"
           value={subject}
           onChangeText={(subject) => setSubject(subject)}
         />
         <TextInput
           placeholder="Your email (optional)"
-          multiline
           mode="outlined"
           value={email}
           onChangeText={(email) => setEmail(email)}
@@ -110,6 +119,7 @@ export default function ContactUs({
           Submit Feedback
         </Button>
       </KeyboardAwareScrollView>
+      <LoadingModal isVisible={loading} />
     </AdSafeAreaView>
   );
 }
