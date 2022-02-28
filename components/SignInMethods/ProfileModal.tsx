@@ -51,7 +51,7 @@ export default function ProfileModal({
       dispatch(setSentPuzzles(mergedSentPuzzles));
     } catch (e) {
       console.log(e);
-      if (e instanceof Error) alert(e.message);
+      if (e instanceof Error) console.log(e.message);
     }
     setModalVisible(false);
   };
