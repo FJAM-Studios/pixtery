@@ -69,11 +69,12 @@ export default function ContactUs({
       setEmail("");
       setSubject("");
     }
-    // set loading if still mounted, regardless of success
-    if (isMounted.current) setLoading(false);
     // if succeeded, navigate
     if (success)
       navigation.navigate("SettingsContainer", { screen: "Settings" });
+
+    // set loading if still mounted, regardless of success
+    if (isMounted.current) setLoading(false);
   };
 
   return (
