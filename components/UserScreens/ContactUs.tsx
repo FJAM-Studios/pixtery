@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Keyboard, Text, Linking, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Button, TextInput } from "react-native-paper";
@@ -7,6 +7,7 @@ import { useSelector } from "react-redux";
 
 import { submitFeedbackCallable } from "../../FirebaseApp";
 import { SettingsContainerProps, RootState } from "../../types";
+import { isEmail } from "../../util";
 import { AdSafeAreaView } from "../Layout";
 import { LoadingModal } from "../StaticElements";
 
@@ -21,33 +22,58 @@ export default function ContactUs({
   const [subject, setSubject] = useState("");
   const [email, setEmail] = useState("");
 
-  const submit = async () => {
-    setLoading(true);
-    Keyboard.dismiss();
-    try {
-      // including an email is optional in the contact form so I don't think we even want to validate this
+  // trying this approach to avoid unmounted component state update error
+  // https://stackoverflow.com/questions/56442582/react-hooks-cant-perform-a-react-state-update-on-an-unmounted-component
+  const isMounted = useRef(true);
+  useEffect(() => {
+    console.log("...ContactUs component mounted...");
+    return () => {
+      console.log("...UNmounted ContactUs component...");
+      isMounted.current = false;
+    };
+  }, []);
 
-      // if (isEmail(email)) {
-      //   Toast.show("Please type in a valid email.", {
-      //     duration: Toast.durations.SHORT,
-      //   });
-      //   return;
-      // }
+  const submit = async () => {
+    Keyboard.dismiss();
+
+    setLoading(true);
+    // default message is an error
+    let toastMessage = "Your message was not sent. Please try again.";
+    let success = false;
+
+    try {
+      if (email.length && !isEmail(email)) {
+        // different error if not valid email
+        toastMessage = "Please type in a valid email.";
+        throw new Error("invalid email");
+      }
+
+      // try to send email
       await submitFeedbackCallable({ subject, email, message });
+      toastMessage = "Thank you! Your message has been successfully sent.";
+      success = true;
+    } catch (error) {
+      console.log(error);
+    }
+
+    // show message
+    Toast.show(toastMessage, {
+      duration: Toast.durations.SHORT,
+      position: Toast.positions.CENTER,
+    });
+
+    // trying this approach to avoid unmounted component state update error
+    // if the message was sent and the component is still mounted, set input form state
+    if (success && isMounted.current) {
       setMessage("");
       setEmail("");
       setSubject("");
-      navigation.navigate("SettingsContainer", { screen: "Settings" });
-      Toast.show("Thank you! Your message has been successfully sent.", {
-        duration: Toast.durations.SHORT,
-      });
-    } catch (error) {
-      console.error(error);
-      Toast.show("Your message was not sent. Please try again.", {
-        duration: Toast.durations.SHORT,
-      });
     }
-    setLoading(false);
+    // set loading if still mounted, regardless of success
+    if (isMounted.current) setLoading(false);
+    // if succeeded, navigate
+    if (success)
+      navigation.navigate("SettingsContainer", { screen: "Settings" });
   };
 
   return (
