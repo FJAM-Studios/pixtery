@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useState } from "react";
-import { View } from "react-native";
+import { View, Keyboard } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Text, TextInput, Button, Headline } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -34,9 +34,11 @@ export default function EnterName({
 
   const confirmName = async () => {
     setLoadingModalVisible(true);
+    Keyboard.dismiss();
     try {
       if (name.trim().length < 1)
         throw new Error("A display name is required.");
+
       const isGalleryAdmin = await checkAdminStatus();
       dispatch(setProfile({ ...profile, name, isGalleryAdmin }));
       //save to local storage
