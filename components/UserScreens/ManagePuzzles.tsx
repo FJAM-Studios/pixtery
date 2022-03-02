@@ -9,7 +9,6 @@ import { setSentPuzzles } from "../../store/reducers/sentPuzzles";
 import { RootState } from "../../types";
 import {
   safelyDeletePuzzleImage,
-  restorePuzzles,
   deactivateAllPuzzlesOnServer,
 } from "../../util";
 import { AdSafeAreaView } from "../Layout";
@@ -83,7 +82,8 @@ export default function ManagePuzzles(): JSX.Element {
         >
           Delete Sent Puzzles
         </Button>
-        <Button
+        {/* Button for restoring all puzzles with images disabled as it was replaced with log in / log out function */}
+        {/* <Button
           icon="cloud-download"
           mode="contained"
           disabled={restoring}
@@ -105,7 +105,7 @@ export default function ManagePuzzles(): JSX.Element {
           style={{ margin: 10 }}
         >
           Restore Puzzles
-        </Button>
+        </Button> */}
       </KeyboardAwareScrollView>
     </AdSafeAreaView>
   );
