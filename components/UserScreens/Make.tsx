@@ -18,6 +18,7 @@ import {
   Portal,
   Title,
 } from "react-native-paper";
+import Toast from "react-native-root-toast";
 import Svg, { Path } from "react-native-svg";
 import { useDispatch, useSelector } from "react-redux";
 import shortid from "shortid";
@@ -150,7 +151,12 @@ export default function Make({
       }
     } catch (error) {
       console.log(error);
-      alert("Could not upload puzzle. Check connection and try again later.");
+      Toast.show(
+        "Could not upload puzzle. Check connection and try again later.",
+        {
+          duration: Toast.durations.SHORT,
+        }
+      );
       setModalVisible(false);
     }
     // need to add else for error handling if uploadPuzzSettings throws error
