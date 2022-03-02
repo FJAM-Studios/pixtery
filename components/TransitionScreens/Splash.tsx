@@ -48,7 +48,7 @@ export default function Splash({
           return tutorialFinished;
         } catch (e) {
           console.log(e);
-          alert("Could not load profile.");
+          console.log("Could not load tutorial state.");
           return null;
         }
       };
@@ -63,7 +63,7 @@ export default function Splash({
           else return allThemes[0];
         } catch (e) {
           console.log(e);
-          alert("Could not load profile.");
+          console.log("Could not load theme.");
           return allThemes[0];
         }
       };
@@ -93,7 +93,7 @@ export default function Splash({
           return loadedProfile;
         } catch (e) {
           console.log(e);
-          alert("Could not load profile.");
+          console.log("Could not load profile.");
           return null;
         }
       };
@@ -135,7 +135,7 @@ export default function Splash({
           dispatch(setSentPuzzles(loadedSentPuzzles));
         } catch (e) {
           console.log(e);
-          alert("Could not load saved puzzles.");
+          console.log("Could not load saved puzzles.");
         }
       };
 

@@ -75,7 +75,6 @@ export default function AddPuzzle({
 
   const savePuzzle = async (newPuzzle: Puzzle) => {
     try {
-      await downloadImage(newPuzzle);
       // save puzzle data to localStorage
       const allPuzzles = [
         newPuzzle,
@@ -83,9 +82,9 @@ export default function AddPuzzle({
       ];
       await AsyncStorage.setItem(storageItem, JSON.stringify(allPuzzles));
       dispatch(setPuzzles(allPuzzles));
+      await downloadImage(newPuzzle);
     } catch (error) {
       console.log(error);
-      alert("Could not save puzzle to your phone");
       if (error instanceof Error) throw new Error(error.message); //rethrow error for outer method
     }
   };

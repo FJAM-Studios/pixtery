@@ -62,7 +62,7 @@ export const shareMessage = async (pixUrl: string): Promise<void> => {
     };
     await Share.share(content, options);
   } catch (error: unknown) {
-    if (error instanceof Error) alert(error.message);
+    if (error instanceof Error) console.log(error.message);
   }
 };
 
@@ -84,7 +84,10 @@ export const saveToLibrary = async (imageURI: string): Promise<void> => {
           duration: Toast.durations.LONG,
         });
       }
-    } else alert("Cannot save image. Please take a screenshot instead.");
+    } else
+      Toast.show("Cannot save image. Please take a screenshot instead.", {
+        duration: Toast.durations.SHORT,
+      });
   }
 };
 
@@ -229,8 +232,7 @@ export const downloadImage = async (
 
     return 0;
   } catch (error) {
-    console.log(error);
-    // NOTE: I am not throwing an error here because if something goes wrong and an image can't be downloaded, we should still continue with the puzzle data that we do have and rely on the function asking the user to redownload the image when opening the puzzle. Also, assuming it was just an internet issue, hitting restore puzzles when you have better service should redownload the images that you don't have.
+    if (error instanceof Error) throw new Error(error.message);
     return 1;
   }
 };
@@ -434,7 +436,21 @@ export function secondsToTime(duration: number): string {
   return _hours + ":" + _minutes + ":" + _seconds;
 }
 export const isEmail = (email: string): boolean => {
-  return email.length > 0 && (!email.includes(".") || !email.includes("@"));
+  // return email.length > 0 && (!email.includes(".") || !email.includes("@"));
+
+  // I think the above logic isn't right for general use. It might've been written for the optional email
+  // in Contact Us, but that's confusing because the function is called isEmail and it's used elsewhere.
+  // Here's a simple validator that I found on SO:
+  // https://stackoverflow.com/questions/46155/whats-the-best-way-to-validate-an-email-address-in-javascript
+
+  if (
+    email.match(
+      // eslint-disable-next-line no-useless-escape
+      /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+    )
+  )
+    return true;
+  return false;
 };
 
 export const isProfile = (profile: unknown): profile is Profile => {
