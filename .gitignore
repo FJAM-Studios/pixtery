@@ -18,6 +18,7 @@ node_modules
 ip.ts
 serviceAccount.ts
 keystorecredentials.txt
+google-services.json
 public/bundle*
 
 # macOS
