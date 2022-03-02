@@ -95,7 +95,7 @@ const App = (): JSX.Element => {
       try {
         await requestTrackingPermissionsAsync();
       } catch (error) {
-        alert(`trackingErr${error}`);
+        console.log("request tracking permission error: ", error);
       }
     }
     requestTrackingPermissions();
@@ -111,7 +111,7 @@ const App = (): JSX.Element => {
           finalStatus = status;
         }
         if (finalStatus !== "granted") {
-          alert("Failed to get push token for push notification!");
+          console.log("Failed to get push token for push notification!");
           return;
         }
         const token = (
@@ -121,7 +121,7 @@ const App = (): JSX.Element => {
         ).data;
         dispatch(setNotificationToken(token));
       } else {
-        alert("Must use physical device for Push Notifications");
+        console.log("Must use physical device for Push Notifications");
       }
 
       if (Platform.OS === "android") {
