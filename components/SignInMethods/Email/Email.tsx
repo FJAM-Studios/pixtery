@@ -29,7 +29,7 @@ export default function Email({
   ) => {
     setLoadingModalVisible(true);
     try {
-      if (isEmail(email)) throw new Error("Valid email required");
+      if (!isEmail(email)) throw new Error("Valid email required");
       if (password.length < 6) throw new Error("Password too short");
       if (isRegister && confirmPassword !== password)
         throw new Error("Passwords do not match");
@@ -51,7 +51,7 @@ export default function Email({
   ) => {
     setLoadingModalVisible(true);
     try {
-      if (isEmail(email)) throw new Error("Valid email required");
+      if (!isEmail(email)) throw new Error("Valid email required");
       await sendResetEmail(email);
       setErrors("");
       setMessage("A link to reset your password has been sent.");
