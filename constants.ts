@@ -1,5 +1,7 @@
 import { Platform } from "react-native";
 
+import admobIDs from "./admobIDs";
+
 const TESTING_MODE = false;
 
 const SNAP_MARGIN = 0.25;
@@ -11,16 +13,14 @@ const DEFAULT_IMAGE_SIZE = {
   height: 1080,
 };
 
-const TEST_BANNER_ID = "ca-app-pub-3940256099942544/6300978111";
-const ANDROID_BANNER_ID = "ca-app-pub-5028593996211038/4454679708";
-const IOS_BANNER_ID = "ca-app-pub-5028593996211038/6122984590";
+const {
+  IOS_BANNER_ID,
+  ANDROID_BANNER_ID,
+  IOS_INTERSTITIAL_ID,
+  ANDROID_INTERSTITIAL_ID,
+} = admobIDs;
 
 const BANNER_ID = Platform.OS === "ios" ? IOS_BANNER_ID : ANDROID_BANNER_ID;
-
-const TEST_INTERSTITIAL_ID = "ca-app-pub-3940256099942544/1033173712";
-const IOS_INTERSTITIAL_ID = "ca-app-pub-5028593996211038/9856183189";
-const ANDROID_INTERSTITIAL_ID = "ca-app-pub-5028593996211038/3290774832";
-
 const INTERSTITIAL_ID =
   Platform.OS === "ios" ? IOS_INTERSTITIAL_ID : ANDROID_INTERSTITIAL_ID;
 
