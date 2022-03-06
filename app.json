@@ -32,7 +32,7 @@
       "supportsTablet": true,
       "appStoreUrl": "https://apps.apple.com/us/app/pixtery/id1569991739",
       "config": {
-        "googleMobileAdsAppId": "***REMOVED***"
+        "googleMobileAdsAppId": ""
       },
       "associatedDomains": ["applinks:pixtery.io"],
       "infoPlist": {
@@ -51,7 +51,7 @@
         "backgroundColor": "#C490D1"
       },
       "config": {
-        "googleMobileAdsAppId": "***REMOVED***"
+        "googleMobileAdsAppId": ""
       },
       "permissions": [
         "CAMERA",
