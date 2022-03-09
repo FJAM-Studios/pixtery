@@ -19,6 +19,8 @@ ip.ts
 serviceAccount.ts
 keystorecredentials.txt
 google-services.json
+admobIDs.js
+firebaseConfig.ts
 public/bundle*
 
 # macOS
