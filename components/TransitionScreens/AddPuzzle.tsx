@@ -172,7 +172,7 @@ export default function AddPuzzle({
         );
       };
       searchForPuzzle();
-    }, [route.params])
+    }, [])
   );
 
   return (
