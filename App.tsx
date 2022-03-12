@@ -2,41 +2,51 @@ import {
   NavigationContainer,
   NavigationContainerRef,
 } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import Constants from "expo-constants";
 import * as Linking from "expo-linking";
-import * as SplashScreen from "expo-splash-screen";
+import * as Notifications from "expo-notifications";
+import { StatusBar } from "expo-status-bar";
 import { requestTrackingPermissionsAsync } from "expo-tracking-transparency";
 import * as Updates from "expo-updates";
-import React, { useRef, useEffect } from "react";
-import { Alert, AppState, View, LogBox, Dimensions } from "react-native";
+import { useRef, useEffect } from "react";
+import { Alert, AppState, LogBox, Dimensions, Platform } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Provider as PaperProvider } from "react-native-paper";
+import { RootSiblingParent } from "react-native-root-siblings";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { useDispatch, useSelector } from "react-redux";
+import {
+  Provider as StoreProvider,
+  useDispatch,
+  useSelector,
+} from "react-redux";
 
-import AddPuzzle from "./components/AddPuzzle";
-import CreateProfile from "./components/CreateProfile";
-import HomeScreen from "./components/Home";
-import Profile from "./components/Profile";
-import Puzzle from "./components/Puzzle";
-import PuzzleList from "./components/PuzzleList";
-import SentPuzzleList from "./components/SentPuzzleList";
-import Splash from "./components/Splash";
-import TitleScreen from "./components/TitleScreen";
+import { TabContainer } from "./components/Containers";
+import { Splash, TitleScreen } from "./components/TransitionScreens";
+import { CreateProfile, EnterName } from "./components/UserScreens";
 import { MIN_BOTTOM_CLEARANCE } from "./constants";
+import store from "./store";
+import { setNotificationToken } from "./store/reducers/notificationToken";
 import { setDeviceSize } from "./store/reducers/screenHeight";
-import { StackScreens, RootState } from "./types";
-import { goToScreen } from "./util";
-
+import { RootStackParamList, RootState } from "./types";
 //less than ideal, but idk if we have a choice right now. suppresses the firebase timeout warning
 LogBox.ignoreLogs(["Setting a timer for a long period of time"]);
 
-const Stack = createStackNavigator<StackScreens>();
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
-SplashScreen.preventAutoHideAsync().catch();
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
 
 const App = (): JSX.Element => {
   const dispatch = useDispatch();
-  const navigationRef = useRef<NavigationContainerRef | null>(null);
+  const navigationRef = useRef<NavigationContainerRef<RootStackParamList> | null>(
+    null
+  );
   const theme = useSelector((state: RootState) => state.theme);
 
   const promptRestart = () => {
@@ -64,28 +74,68 @@ const App = (): JSX.Element => {
   };
 
   useEffect(() => {
-    // when update is downloaded, request reload
-    Updates.addListener((event) => {
-      if (event.type === Updates.UpdateEventType.UPDATE_AVAILABLE) {
-        promptRestart();
-      }
-    });
+    //don't check for updates in dev mode
+    if (process.env.NODE_ENV !== "development") {
+      // when update is downloaded, request reload
+      Updates.addListener((event) => {
+        if (event.type === Updates.UpdateEventType.UPDATE_AVAILABLE) {
+          promptRestart();
+        }
+      });
 
-    //check for updates when app is foregrounded
-    AppState.addEventListener("change", () => {
-      if (AppState.currentState === "active") {
-        getUpdate();
-      }
-    });
+      //check for updates when app is foregrounded
+      AppState.addEventListener("change", () => {
+        if (AppState.currentState === "active") {
+          getUpdate();
+        }
+      });
+    }
 
     async function requestTrackingPermissions() {
       try {
         await requestTrackingPermissionsAsync();
       } catch (error) {
-        alert(`trackingErr${error}`);
+        console.log("request tracking permission error: ", error);
       }
     }
     requestTrackingPermissions();
+
+    const registerForPushNotificationsAsync = async () => {
+      if (Constants.isDevice) {
+        const {
+          status: existingStatus,
+        } = await Notifications.getPermissionsAsync();
+        let finalStatus = existingStatus;
+        if (existingStatus !== "granted") {
+          const { status } = await Notifications.requestPermissionsAsync();
+          finalStatus = status;
+        }
+        if (finalStatus !== "granted") {
+          console.log("Failed to get push token for push notification!");
+          return;
+        }
+        const token = (
+          await Notifications.getExpoPushTokenAsync({
+            experienceId: "@fjam-studios/pixtery",
+          })
+        ).data;
+        dispatch(setNotificationToken(token));
+      } else {
+        console.log("Must use physical device for Push Notifications");
+      }
+
+      if (Platform.OS === "android") {
+        Notifications.setNotificationChannelAsync("default", {
+          name: "default",
+          importance: Notifications.AndroidImportance.MAX,
+          vibrationPattern: [0, 250, 250, 250],
+          lightColor: "#FF231F7C",
+        });
+      }
+    };
+
+    registerForPushNotificationsAsync();
+
     const { width, height } = Dimensions.get("screen");
 
     const boardSize =
@@ -94,61 +144,61 @@ const App = (): JSX.Element => {
         Math.min(height, width),
         MIN_BOTTOM_CLEARANCE * Math.max(height, width)
       );
-    dispatch(setDeviceSize(height, boardSize));
+    dispatch(setDeviceSize(width, height, boardSize));
 
     // on url change go to the splash screen, which will stop the user if they aren't logged in
     Linking.addEventListener("url", (ev) => {
       const url = ev.url;
-      if (url && navigationRef.current)
-        goToScreen(navigationRef.current, "Splash", { url });
+      if (url) navigationRef.current?.navigate("Splash", { url });
     });
   }, []);
 
-  // to control trigger order and prevent users from skipping the login screen, puzzle querying has been moved to AddPuzzle, which is called from Splash, which is navigated to only after the navigation container loads using the onReady prop
+  // to control trigger order and prevent users from skipping the login screen, puzzle querying has been moved to AddPuzzle,
+  // which is called from Splash, which is navigated to only after the navigation container loads using the onReady prop
   const gotoSplash = () => {
     // this timeout is if we want to force users to see the starting screen before moving on.
-    if (navigationRef.current) {
-      goToScreen(navigationRef.current, "Splash");
-    }
+    navigationRef.current?.navigate("Splash");
   };
 
   return (
     <PaperProvider theme={theme}>
       <SafeAreaProvider>
         <NavigationContainer ref={navigationRef} onReady={gotoSplash}>
-          <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
-            <Stack.Navigator initialRouteName="TitleScreen" headerMode="none">
-              <Stack.Screen name="TitleScreen" component={TitleScreen} />
-              <Stack.Screen name="Splash">
-                {(props) => <Splash {...props} />}
-              </Stack.Screen>
-              <Stack.Screen name="CreateProfile">
-                {(props) => <CreateProfile {...props} />}
-              </Stack.Screen>
-              <Stack.Screen name="Home">
-                {(props) => <HomeScreen {...props} />}
-              </Stack.Screen>
-              <Stack.Screen name="PuzzleList">
-                {(props) => <PuzzleList {...props} />}
-              </Stack.Screen>
-              <Stack.Screen name="SentPuzzleList">
-                {(props) => <SentPuzzleList {...props} />}
-              </Stack.Screen>
-              <Stack.Screen name="Puzzle">
-                {(props) => <Puzzle {...props} />}
-              </Stack.Screen>
-              <Stack.Screen name="AddPuzzle">
-                {(props) => <AddPuzzle {...props} />}
-              </Stack.Screen>
-              <Stack.Screen name="Profile">
-                {(props) => <Profile {...props} />}
-              </Stack.Screen>
-            </Stack.Navigator>
-          </View>
+          <Stack.Navigator
+            initialRouteName="TitleScreen"
+            screenOptions={{ headerShown: false }}
+          >
+            {/* Initialization Screens */}
+            <Stack.Screen name="TitleScreen" component={TitleScreen} />
+            <Stack.Screen name="Splash" component={Splash} />
+
+            {/* Login Screens */}
+            <Stack.Screen name="CreateProfile" component={CreateProfile} />
+            <Stack.Screen name="EnterName" component={EnterName} />
+
+            {/* Tab Container */}
+            <Stack.Screen name="TabContainer" component={TabContainer} />
+          </Stack.Navigator>
         </NavigationContainer>
       </SafeAreaProvider>
+      <StatusBar
+        style={theme.dark ? "light" : "dark"}
+        backgroundColor={theme.colors.primary}
+      />
     </PaperProvider>
   );
 };
 
-export default App;
+const AppWrapper = (): JSX.Element => {
+  return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <StoreProvider store={store}>
+        <RootSiblingParent>
+          <App />
+        </RootSiblingParent>
+      </StoreProvider>
+    </GestureHandlerRootView>
+  );
+};
+
+export default AppWrapper;

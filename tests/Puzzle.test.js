@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { create, act } from "react-test-renderer";
 import ShallowRenderer from "react-test-renderer/shallow";
 import {
@@ -11,7 +11,7 @@ import {
   cleanup,
 } from "@testing-library/react-native";
 import { theme } from "../App.tsx";
-import Puzzle from "../components/Puzzle";
+import Puzzle from "../components/UserScreens/Puzzle";
 import {
   Button,
   IconButton,
@@ -22,7 +22,7 @@ import {
 } from "react-native-paper";
 import { generateJigsawPiecePaths } from "../util";
 import { Provider as PaperProvider, DefaultTheme } from "react-native-paper";
-import Header from "../components/Header";
+import Header from "../components/Layout/Header";
 
 // other test ideas:
 // test for logging in twice?

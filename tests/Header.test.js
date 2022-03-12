@@ -1,4 +1,3 @@
-import React from "react";
 import { create, act } from "react-test-renderer";
 import TestRenderer from "react-test-renderer";
 import ShallowRenderer from "react-test-renderer/shallow";
@@ -7,8 +6,8 @@ import {
   fireEvent,
   getByLabelText,
 } from "@testing-library/react-native";
-import Header from "../components/Header";
-import Home from "../components/Header";
+import Header from "../components/Layout/Header";
+import Home from "../components/Layout/Header";
 import { theme } from "../App.tsx";
 import { TouchableWithoutFeedback } from "react-native";
 

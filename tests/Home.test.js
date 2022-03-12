@@ -1,4 +1,3 @@
-import React from "react";
 import { create, act } from "react-test-renderer";
 import ShallowRenderer from "react-test-renderer/shallow";
 import {
@@ -7,7 +6,7 @@ import {
   getByLabelText,
 } from "@testing-library/react-native";
 import { theme } from "../App.tsx";
-import Home from "../components/Home";
+import Home from "../components/UserScreens/Home";
 import {
   Button,
   IconButton,

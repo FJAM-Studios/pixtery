@@ -1,18 +1,27 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {
-  CommonActions,
-  NavigationContainerRef,
-} from "@react-navigation/native";
+import dayjs from "dayjs";
+import calendar from "dayjs/plugin/calendar";
 import * as FileSystem from "expo-file-system";
 import * as ImagePicker from "expo-image-picker";
 import * as Linking from "expo-linking";
 import * as MediaLibrary from "expo-media-library";
-import * as SplashScreen from "expo-splash-screen";
 import { Alert, Share } from "react-native";
 import Toast from "react-native-root-toast";
+import { Dispatch } from "redux";
 
-import { storage, functions } from "./FirebaseApp";
-import { Puzzle, ScreenNavigation } from "./types";
+import {
+  deactivateAllUserPuzzles,
+  deactivateUserPuzzle,
+  fetchPuzzles,
+  getPixteryURL,
+} from "./FirebaseApp";
+import { DATE_FORMAT } from "./constants";
+import { setProfile } from "./store/reducers/profile";
+import { setReceivedPuzzles } from "./store/reducers/receivedPuzzles";
+import { setSentPuzzles } from "./store/reducers/sentPuzzles";
+import { Puzzle, DateObjString, Profile } from "./types";
+
+dayjs.extend(calendar);
 
 //convert URI into a blob to transmit to server
 export const createBlob = (localUri: string): Promise<Blob> => {
@@ -52,39 +61,9 @@ export const shareMessage = async (pixUrl: string): Promise<void> => {
       subject: "Someone sent you a Pixtery to solve!",
     };
     await Share.share(content, options);
-  } catch (error) {
-    alert(error.message);
+  } catch (error: unknown) {
+    if (error instanceof Error) console.log(error.message);
   }
-};
-
-export const goToScreen = (
-  navigation: ScreenNavigation | NavigationContainerRef,
-  screen: string,
-  options: { url?: string | null; publicKey?: string; sourceList?: string } = {
-    url: "",
-    publicKey: "",
-    sourceList: "",
-  }
-): void => {
-  navigation.dispatch(
-    CommonActions.reset({
-      index: 0,
-      routes: [{ name: screen, params: options }],
-    })
-  );
-};
-
-export const closeSplashAndNavigate = async (
-  navigation: ScreenNavigation | NavigationContainerRef,
-  screen: string,
-  options: { url?: string | null; publicKey?: string; sourceList?: string } = {
-    url: "",
-    publicKey: "",
-    sourceList: "",
-  }
-): Promise<void> => {
-  goToScreen(navigation, screen, options);
-  await SplashScreen.hideAsync();
 };
 
 export const saveToLibrary = async (imageURI: string): Promise<void> => {
@@ -105,7 +84,10 @@ export const saveToLibrary = async (imageURI: string): Promise<void> => {
           duration: Toast.durations.LONG,
         });
       }
-    } else alert("Cannot save image. Please take a screenshot instead.");
+    } else
+      Toast.show("Cannot save image. Please take a screenshot instead.", {
+        duration: Toast.durations.SHORT,
+      });
   }
 };
 
@@ -223,17 +205,23 @@ export const checkPermission = async (camera: boolean): Promise<string> => {
   }
 };
 
-export const downloadImage = async (newPuzzle: Puzzle): Promise<number> => {
+export const downloadImage = async (
+  newPuzzle: Puzzle,
+  temporaryStorage = false
+): Promise<number> => {
   try {
     const { imageURI } = newPuzzle;
     // for now, giving image a filename based on URL from server, can change later if needed
     const fileName = imageURI.slice(imageURI.lastIndexOf("/") + 1);
-    const downloadURL = await storage.ref("/" + imageURI).getDownloadURL();
+    const downloadURL = await getPixteryURL("/" + imageURI);
     //put jpg in upload instead of here
     //but user could still download old pixtery (with no uploaded extension), so addl logic needed
     const extension = imageURI.slice(-4) === ".jpg" ? "" : ".jpg";
     newPuzzle.imageURI = fileName + extension;
-    const localURI = FileSystem.documentDirectory + fileName + extension;
+    const downloadFolder = temporaryStorage
+      ? FileSystem.cacheDirectory + "ImageManipulator"
+      : FileSystem.documentDirectory;
+    const localURI = downloadFolder + fileName + extension;
     // if you already have this image, don't download it
     const fileInfo = await FileSystem.getInfoAsync(localURI);
     if (!fileInfo.exists) {
@@ -244,8 +232,7 @@ export const downloadImage = async (newPuzzle: Puzzle): Promise<number> => {
 
     return 0;
   } catch (error) {
-    console.log(error);
-    // NOTE: I am not throwing an error here because if something goes wrong and an image can't be downloaded, we should still continue with the puzzle data that we do have and rely on the function asking the user to redownload the image when opening the puzzle. Also, assuming it was just an internet issue, hitting restore puzzles when you have better service should redownload the images that you don't have.
+    if (error instanceof Error) throw new Error(error.message);
     return 1;
   }
 };
@@ -278,9 +265,8 @@ const fetchAllPuzzleData = async (): Promise<Puzzle[][]> => {
 };
 
 const fetchCollection = async (listType: string): Promise<Puzzle[]> => {
-  const fetchPuzzles = functions.httpsCallable("fetchPuzzles");
   const puzzles = await fetchPuzzles(listType);
-  return puzzles.data;
+  return puzzles.data as Puzzle[];
 };
 
 const mergePuzzles = async (
@@ -310,6 +296,23 @@ const mergePuzzles = async (
   }
 };
 
+export const restorePuzzleMetadata = async (
+  receivedState: Puzzle[],
+  sentState: Puzzle[]
+): Promise<Puzzle[][]> => {
+  const [receivedFromServer, sentFromServer] = await fetchAllPuzzleData();
+  const mergedReceivedPuzzles = await mergePuzzles(
+    "@pixteryPuzzles",
+    receivedState,
+    receivedFromServer
+  );
+  const mergedSentPuzzles = await mergePuzzles(
+    "@pixterySentPuzzles",
+    sentState,
+    sentFromServer
+  );
+  return [mergedReceivedPuzzles, mergedSentPuzzles];
+};
 export const restorePuzzles = async (
   receivedState: Puzzle[],
   sentState: Puzzle[]
@@ -318,18 +321,11 @@ export const restorePuzzles = async (
     Toast.show(`Downloading puzzles from server`, {
       duration: Toast.durations.SHORT,
     });
-    const [receivedFromServer, sentFromServer] = await fetchAllPuzzleData();
-    const mergedReceivedPuzzles = await mergePuzzles(
-      "@pixteryPuzzles",
-      receivedState,
-      receivedFromServer
-    );
+    const [
+      mergedReceivedPuzzles,
+      mergedSentPuzzles,
+    ] = await restorePuzzleMetadata(receivedState, sentState);
     let imageErrors = await fetchImages(mergedReceivedPuzzles);
-    const mergedSentPuzzles = await mergePuzzles(
-      "@pixterySentPuzzles",
-      sentState,
-      sentFromServer
-    );
     imageErrors += await fetchImages(mergedSentPuzzles);
     if (imageErrors > 0)
       Toast.show(
@@ -366,9 +362,6 @@ export const deactivatePuzzleOnServer = async (
   list: string
 ): Promise<void> => {
   try {
-    const deactivateUserPuzzle = functions.httpsCallable(
-      "deactivateUserPuzzle"
-    );
     await deactivateUserPuzzle({ publicKey, list });
   } catch (error) {
     console.log(error);
@@ -379,11 +372,129 @@ export const deactivateAllPuzzlesOnServer = async (
   list: string
 ): Promise<void> => {
   try {
-    const deactivateAllUserPuzzles = functions.httpsCallable(
-      "deactivateAllUserPuzzles"
-    );
     await deactivateAllUserPuzzles(list);
   } catch (error) {
     console.log(error);
   }
+};
+
+export const clearEIMcache = async (): Promise<void> => {
+  console.log("Checking EIM cache...");
+  try {
+    const EIMcacheDir = FileSystem.cacheDirectory + "ImageManipulator";
+    const EIMcacheInfo = await FileSystem.getInfoAsync(EIMcacheDir);
+    if (EIMcacheInfo.exists && EIMcacheInfo.isDirectory) {
+      console.log("removing old EIM cache...");
+      await FileSystem.deleteAsync(EIMcacheDir);
+    } else {
+      console.log("No EIM cache found");
+    }
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+// converts single digit integers to double digit strings (e.g. 9 -> "09")
+export const convertIntToDoubleDigitString = (number: number): string => {
+  // return the two numbers from end of string (i.e. "09" or "10")
+  return `0${number}`.slice(-2);
+};
+
+export const convertDateStringToObject = (
+  dateString: string
+): DateObjString => {
+  // dateString passed in is "YYYY-MM-DD"
+  const dateArray = dateString.split("-");
+  return {
+    year: dateArray[0],
+    month: dateArray[1],
+    day: dateArray[2],
+  };
+};
+
+export function msToTime(duration: number): string {
+  const seconds = Math.floor((duration / 1000) % 60),
+    minutes = Math.floor((duration / (1000 * 60)) % 60),
+    hours = Math.floor((duration / (1000 * 60 * 60)) % 24);
+
+  const _hours = hours < 10 ? "0" + hours : hours;
+  const _minutes = minutes < 10 ? "0" + minutes : minutes;
+  const _seconds = seconds < 10 ? "0" + seconds : seconds;
+
+  return _hours + ":" + _minutes + ":" + _seconds;
+}
+
+export function secondsToTime(duration: number): string {
+  const hours = Math.floor(duration / 3600);
+  const minutes = Math.floor((duration % 3600) / 60);
+  const seconds = duration % 60;
+
+  const _hours = hours < 10 ? "0" + hours : hours;
+  const _minutes = minutes < 10 ? "0" + minutes : minutes;
+  const _seconds = seconds < 10 ? "0" + seconds : seconds;
+
+  return _hours + ":" + _minutes + ":" + _seconds;
+}
+export const isEmail = (email: string): boolean => {
+  // return email.length > 0 && (!email.includes(".") || !email.includes("@"));
+
+  // I think the above logic isn't right for general use. It might've been written for the optional email
+  // in Contact Us, but that's confusing because the function is called isEmail and it's used elsewhere.
+  // Here's a simple validator that I found on SO:
+  // https://stackoverflow.com/questions/46155/whats-the-best-way-to-validate-an-email-address-in-javascript
+
+  if (
+    email.match(
+      // eslint-disable-next-line no-useless-escape
+      /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+    )
+  )
+    return true;
+  return false;
+};
+
+export const isProfile = (profile: unknown): profile is Profile => {
+  return (
+    profile !== undefined &&
+    profile !== null &&
+    (profile as Profile).name !== undefined
+  );
+};
+
+export const formatDateFromString = (date: string): string => {
+  return dayjs(date).calendar(null, dateFormatOptions);
+};
+
+export const clearAllAppData = async (dispatch: Dispatch): Promise<void> => {
+  // delete local storage
+  const keys = await AsyncStorage.getAllKeys();
+  await AsyncStorage.multiRemove(keys);
+  // clear app state
+  dispatch(setReceivedPuzzles([]));
+  dispatch(setSentPuzzles([]));
+  dispatch(setProfile(null));
+  // erase local puzzles
+  eraseAllImages();
+};
+
+export const eraseAllImages = async (): Promise<void> => {
+  if (FileSystem.documentDirectory) {
+    const pixteryImages = (
+      await FileSystem.readDirectoryAsync(FileSystem.documentDirectory)
+    ).filter((uri) => uri.slice(-4) === ".jpg");
+
+    pixteryImages.map((imageURI) => {
+      FileSystem.deleteAsync(FileSystem.documentDirectory + imageURI);
+    });
+    clearEIMcache();
+  }
+};
+
+const dateFormatOptions = {
+  sameDay: "[Today at] h:mm A", // The same day ( Today at 2:30 AM )
+  nextDay: "[Tomorrow at] h:mm A", // The next day ( Tomorrow at 2:30 AM )
+  nextWeek: "dddd [at] h:mm A", // The next week ( Sunday at 2:30 AM )
+  lastDay: "[Yesterday at] h:mm A", // The day before ( Yesterday at 2:30 AM )
+  lastWeek: "[Last] dddd [at] h:mm A", // Last week ( Last Monday at 2:30 AM )
+  sameElse: DATE_FORMAT, // Everything else ( Jan 23 2022 )
 };

@@ -1,28 +1,29 @@
-import * as React from "react";
+import { useState, useEffect } from "react";
 
-import { storage, functions } from "../FirebaseApp";
+import { queryPuzzleCallable } from "../FirebaseApp/CloudFunctions";
+import { getPixteryURL } from "../FirebaseApp/StorageFunctions";
 import { PUBLIC_KEY_LENGTH } from "../constants";
 import { Puzzle as PuzzleType } from "../types";
 import Puzzle from "./Puzzle";
 import StoreLinks from "./StoreLinks";
 
 export default function App(): JSX.Element {
-  const [loading, setLoading] = React.useState(true);
-  const [puzzle, setPuzzle] = React.useState<PuzzleType>();
+  const [loading, setLoading] = useState(true);
+  const [puzzle, setPuzzle] = useState<PuzzleType>();
 
-  React.useEffect(() => {
+  useEffect(() => {
     const path = window.location.pathname;
     const publicKey = path.substring(path.lastIndexOf("/") + 1);
     fetchPuzzle(publicKey);
   }, []);
 
   const fetchPuzzle = async (publicKey: string): Promise<PuzzleType | void> => {
-    const queryPuzzleCallable = functions.httpsCallable("queryPuzzle");
     if (publicKey.length === PUBLIC_KEY_LENGTH) {
       try {
-        const puzzleData = (await queryPuzzleCallable({ publicKey })).data;
+        const puzzleData = (await queryPuzzleCallable({ publicKey }))
+          .data as Puzzle;
         const imageURI = puzzleData.imageURI;
-        const downloadURL = await storage.ref("/" + imageURI).getDownloadURL();
+        const downloadURL = await getPixteryURL("/" + imageURI);
         puzzleData.imageURI = downloadURL;
         setPuzzle(puzzleData);
       } catch (error) {
@@ -53,11 +54,16 @@ export default function App(): JSX.Element {
       <StoreLinks />
       <div id="web-footer">
         <div id="web-footer-contents">
-          <a href="https://pixtery.io/privacy.html">Privacy policy</a>
+          <a href="https://pixtery.io/privacy.html">Privacy Policy</a>
+          <span className="dot">&nbsp;&#x2022;&nbsp;</span>
+          <a href="https://pixtery.io/community.html">Community Guidelines</a>
+          <span className="dot">&nbsp;&#x2022;&nbsp;</span>
+          <a href="https://pixtery.io/terms.html">Terms</a>
           <span className="dot">&nbsp;&#x2022;&nbsp;</span>
           <a href="mailto:contact@pixtery.io">contact@pixtery.io</a>
-          <span className="dot">&nbsp;&#x2022;&nbsp;</span>
-          <span className="studio">© 2021 FJAM Studios</span>
+          <div>
+            <span className="studio">© 2021 FJAM Studios</span>
+          </div>
         </div>
       </div>
     </div>

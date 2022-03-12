@@ -10,7 +10,8 @@ npm-debug.*
 web-build/
 .vscode
 *.bat
-functions/*
+functions/*.json
+serviceAccount.ts
 package-lock.json
 tests/
 patches
