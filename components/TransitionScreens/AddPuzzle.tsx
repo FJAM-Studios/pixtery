@@ -75,7 +75,6 @@ export default function AddPuzzle({
 
   const savePuzzle = async (newPuzzle: Puzzle) => {
     try {
-      await downloadImage(newPuzzle);
       // save puzzle data to localStorage
       const allPuzzles = [
         newPuzzle,
@@ -83,9 +82,9 @@ export default function AddPuzzle({
       ];
       await AsyncStorage.setItem(storageItem, JSON.stringify(allPuzzles));
       dispatch(setPuzzles(allPuzzles));
+      await downloadImage(newPuzzle);
     } catch (error) {
       console.log(error);
-      alert("Could not save puzzle to your phone");
       if (error instanceof Error) throw new Error(error.message); //rethrow error for outer method
     }
   };
@@ -110,7 +109,8 @@ export default function AddPuzzle({
 
         // try to get the new puzzle and set the navigation destination
         try {
-          const { publicKey } = route.params;
+          let { publicKey, daily } = route.params;
+          publicKey = (publicKey || daily?.publicKey) as string;
           // assume publicKey is invalid
           let validPublicKey = false;
           // first look for locally saved puzzle
@@ -118,8 +118,9 @@ export default function AddPuzzle({
           // if found locally, then PK is valid
           if (match) validPublicKey = true;
           else {
-            // attempt to download
-            const newPuzzle: Puzzle | void = await fetchPuzzle(publicKey);
+            // save puzzl if we already have it from the daily or attempt to download
+            const newPuzzle =
+              daily || ((await fetchPuzzle(publicKey)) as Puzzle);
             // if successfully found, save locally and mark PK as valid
             if (newPuzzle) {
               await savePuzzle(newPuzzle);
@@ -171,7 +172,7 @@ export default function AddPuzzle({
         );
       };
       searchForPuzzle();
-    }, [route.params])
+    }, [])
   );
 
   return (

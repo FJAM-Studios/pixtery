@@ -15,7 +15,6 @@ export default function ReceivedPuzzleCard({
   navigateToPuzzle: (publicKey: string) => void;
 }): JSX.Element {
   const theme = useSelector((state: RootState) => state.theme);
-
   return (
     <TouchableOpacity onPress={() => navigateToPuzzle(puzzle.publicKey)}>
       <Card

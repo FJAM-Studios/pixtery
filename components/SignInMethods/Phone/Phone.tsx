@@ -10,11 +10,8 @@ import {
 } from "react-native-paper";
 import { useSelector } from "react-redux";
 
-import {
-  phoneProvider,
-  firebaseConfig,
-  signInOnFireBase,
-} from "../../../FirebaseApp";
+import { phoneProvider, signInOnFireBase } from "../../../FirebaseApp";
+import firebaseConfig from "../../../firebaseConfig";
 import { RootState, SignInOptions } from "../../../types";
 
 const phoneFormat = require("phone");

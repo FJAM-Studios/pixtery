@@ -11,6 +11,7 @@ web-build/
 .vscode
 *.bat
 functions/*.json
+serviceAccount.ts
 package-lock.json
 tests/
 patches
