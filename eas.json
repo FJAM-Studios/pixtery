@@ -24,6 +24,9 @@
         "buildType": "app-bundle"
       }
     },
+    "testflight": {
+      "releaseChannel": "internal-testing"
+    },
     "production": {}
   },
   "submit": {
