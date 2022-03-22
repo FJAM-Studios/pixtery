@@ -42,7 +42,7 @@ const PUBLIC_KEY_LENGTH = 9;
 
 const MIN_BOTTOM_CLEARANCE = 0.7;
 
-const VERSION_NUMBER = "2.0.51";
+const VERSION_NUMBER = "2.0.52";
 
 const ARGUABLY_CLEVER_PHRASES = [
   "Please wait!",
