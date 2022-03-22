@@ -3,7 +3,7 @@ import {
   NavigationContainerRef,
 } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import Constants from "expo-constants";
+import * as Device from "expo-device";
 import * as Linking from "expo-linking";
 import * as Notifications from "expo-notifications";
 import { StatusBar } from "expo-status-bar";
@@ -66,7 +66,8 @@ const App = (): JSX.Element => {
       const isUpdate = await Updates.checkForUpdateAsync();
       if (isUpdate.isAvailable) {
         await Updates.fetchUpdateAsync();
-        promptRestart();
+        // commenting out the restart prompt but leaving the fetchUpdate so users get new version silently
+        // promptRestart();
       }
     } catch (error) {
       console.log(error);
@@ -101,7 +102,7 @@ const App = (): JSX.Element => {
     requestTrackingPermissions();
 
     const registerForPushNotificationsAsync = async () => {
-      if (Constants.isDevice) {
+      if (Device.isDevice) {
         const {
           status: existingStatus,
         } = await Notifications.getPermissionsAsync();
