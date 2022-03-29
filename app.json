@@ -6,7 +6,7 @@
     "slug": "pixtery",
     "privacy": "unlisted",
     "sdkVersion": "44.0.0",
-    "version": "2.0.5",
+    "version": "2.0.52",
     "platforms": ["android", "ios"],
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
@@ -28,7 +28,7 @@
     "assetBundlePatterns": ["assets/*"],
     "ios": {
       "bundleIdentifier": "com.fjamstudios.pixtery",
-      "buildNumber": "2.0.5",
+      "buildNumber": "2.0.52",
       "supportsTablet": true,
       "appStoreUrl": "https://apps.apple.com/us/app/pixtery/id1569991739",
       "config": {
@@ -44,7 +44,7 @@
     "android": {
       "package": "com.fjamstudios.pixtery",
       "googleServicesFile": "./google-services.json",
-      "versionCode": 11,
+      "versionCode": 14,
       "playStoreUrl": "https://play.google.com/store/apps/details?id=com.fjamstudios.pixtery",
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon.png",

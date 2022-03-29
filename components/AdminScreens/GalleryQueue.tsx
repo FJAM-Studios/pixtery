@@ -1,3 +1,4 @@
+import * as Updates from "expo-updates";
 import { useState, useEffect } from "react";
 import { View, ScrollView, TouchableOpacity } from "react-native";
 import {
@@ -79,6 +80,8 @@ export default function GalleryQueue({
         }}
       >
         <Headline>Submission Queue</Headline>
+        <Text>Release Channel: {Updates.releaseChannel}</Text>
+        <Text>ID: {Updates.updateId}</Text>
         <Text style={{ color: "red", backgroundColor: "white" }}>
           {message}
         </Text>
