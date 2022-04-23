@@ -20,6 +20,7 @@ import {
   useDispatch,
   useSelector,
 } from "react-redux";
+import * as Sentry from "sentry-expo";
 
 import { TabContainer } from "./components/Containers";
 import { Splash, TitleScreen } from "./components/TransitionScreens";
@@ -42,12 +43,27 @@ Notifications.setNotificationHandler({
   }),
 });
 
+Sentry.init({
+  dsn:
+    "https://c8e5645714bf4f05b4c7a397d5d99bb3@o1207021.ingest.sentry.io/6340472",
+  enableInExpoDevelopment: true,
+  debug: true, // If `true`, Sentry will try to print out useful debugging information if something goes wrong with sending the event. Set it to `false` in production
+});
+
+// Access any @sentry/react-native exports via:
+Sentry.Native;
+
+// Access any @sentry/browser exports via:
+Sentry.Browser;
+
 const App = (): JSX.Element => {
   const dispatch = useDispatch();
   const navigationRef = useRef<NavigationContainerRef<RootStackParamList> | null>(
     null
   );
   const theme = useSelector((state: RootState) => state.theme);
+  // start here - run in dev and see if i can see this on dashboard
+  // throw new Error("My first Sentry error!");
 
   // const promptRestart = () => {
   //   Alert.alert("A new update is ready. Please restart the app.", "", [
