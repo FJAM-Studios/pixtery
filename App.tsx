@@ -57,8 +57,6 @@ const App = (): JSX.Element => {
   );
   const theme = useSelector((state: RootState) => state.theme);
 
-  // start here - run in dev and see if i can see this on dashboard
-  // throw new Error("My first Sentry error!");
 
   // const promptRestart = () => {
   //   Alert.alert("A new update is ready. Please restart the app.", "", [
