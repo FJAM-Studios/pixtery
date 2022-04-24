@@ -8,6 +8,7 @@ import { View, TouchableOpacity } from "react-native";
 import { ActivityIndicator, Button, Text } from "react-native-paper";
 import Toast from "react-native-root-toast";
 import { useSelector } from "react-redux";
+import * as Sentry from "sentry-expo";
 
 import { auth, getDaily } from "../../FirebaseApp";
 import { INTERSTITIAL_ID, DAILY_TIMEZONE } from "../../constants";
@@ -100,6 +101,7 @@ export default function Gallery({
       }
     } catch (e) {
       setError("Sorry! Something went wrong.");
+      Sentry.Native.captureException(e);
       console.log(e);
     }
     setLoading(false);
