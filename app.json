@@ -84,18 +84,6 @@
         },
         "sentry-expo"
       ]
-    ],
-    "hooks": {
-      "postPublish": [
-        {
-          "file": "sentry-expo/upload-sourcemaps",
-          "config": {
-            "organization": "fjam",
-            "project": "pixtery",
-            "authToken": ""
-          }
-        }
-      ]
-    }
+    ]
   }
 }
