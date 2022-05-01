@@ -20,11 +20,13 @@ import {
   useDispatch,
   useSelector,
 } from "react-redux";
+import * as Sentry from "sentry-expo";
 
 import { TabContainer } from "./components/Containers";
 import { Splash, TitleScreen } from "./components/TransitionScreens";
 import { CreateProfile, EnterName } from "./components/UserScreens";
 import { MIN_BOTTOM_CLEARANCE } from "./constants";
+import { DSN } from "./sentry";
 import store from "./store";
 import { setNotificationToken } from "./store/reducers/notificationToken";
 import { setDeviceSize } from "./store/reducers/screenHeight";
@@ -40,6 +42,12 @@ Notifications.setNotificationHandler({
     shouldPlaySound: false,
     shouldSetBadge: false,
   }),
+});
+
+Sentry.init({
+  dsn: DSN,
+  enableInExpoDevelopment: true,
+  debug: true, // If `true`, Sentry will try to print out useful debugging information if something goes wrong with sending the event. Set it to `false` in production
 });
 
 const App = (): JSX.Element => {

@@ -82,7 +82,19 @@
         {
           "userTrackingPermission": "This identifier will be used to deliver personalized ads to you."
         }
+      ], ["sentry-expo"]
+    ],
+    "hooks": {
+      "postPublish": [
+        {
+          "file": "sentry-expo/upload-sourcemaps",
+          "config": {
+            "organization": "fjam",
+            "project": "pixtery",
+            "authToken": ""
+          }
+        }
       ]
-    ]
+    }
   }
 }
