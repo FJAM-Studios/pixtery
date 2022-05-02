@@ -1,10 +1,11 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFocusEffect } from "@react-navigation/native";
 import { AdMobInterstitial } from "expo-ads-admob";
 import * as FileSystem from "expo-file-system";
 import * as ImageManipulator from "expo-image-manipulator";
 import * as ImagePicker from "expo-image-picker";
 import * as Linking from "expo-linking";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Image, View, Platform, Keyboard } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import {
@@ -48,6 +49,7 @@ AdMobInterstitial.setAdUnitID(INTERSTITIAL_ID);
 
 export default function Make({
   navigation,
+  route,
 }: MakeContainerProps<"Make">): JSX.Element {
   const dispatch = useDispatch();
   const theme = useSelector((state: RootState) => state.theme);
@@ -61,12 +63,24 @@ export default function Make({
   const [gridSize, setGridSize] = useState(3);
   const [message, setMessage] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
+  const [directToDaily, setDirectToDaily] = useState(
+    !!route.params?.directToDaily
+  );
 
   const [paths, setPaths] = useState(
     generateJigsawPiecePaths(gridSize, boardSize / (1.6 * gridSize), true)
   );
   const [buttonHeight, setButtonHeight] = useState(0);
   const [iOSCameraLaunch, setiOSCameraLaunch] = useState(false);
+
+  // on navigating away from Make screen, reset to non-Daily version
+  useFocusEffect(
+    useCallback(() => {
+      return () => {
+        setDirectToDaily(false);
+      };
+    }, [navigation])
+  );
 
   const selectImage = async (camera: boolean) => {
     const permission = await checkPermission(camera);
@@ -139,14 +153,24 @@ export default function Make({
       setModalVisible(false);
       if (newPuzzle) {
         if (newPuzzle.publicKey) {
-          generateLink(newPuzzle.publicKey);
           addToSent(newPuzzle);
-          navigation.navigate("LibraryContainer", {
-            screen: "PuzzleListContainer",
-            params: {
-              screen: "SentPuzzleList",
-            },
-          });
+          // no need to generate link sharing if submitting direct to daily
+          if (directToDaily) {
+            navigation.navigate("DailyContainer", {
+              screen: "AddToGallery",
+              params: {
+                puzzle: newPuzzle,
+              },
+            });
+          } else {
+            generateLink(newPuzzle.publicKey);
+            navigation.navigate("LibraryContainer", {
+              screen: "PuzzleListContainer",
+              params: {
+                screen: "SentPuzzleList",
+              },
+            });
+          }
         }
       }
     } catch (error) {
@@ -480,7 +504,7 @@ export default function Make({
           disabled={imageURI.length === 0}
           onLayout={(ev) => setButtonHeight(ev.nativeEvent.layout.height)}
         >
-          Send
+          {directToDaily ? "Submit Daily" : "Send"}
         </Button>
       </KeyboardAwareScrollView>
     </AdSafeAreaView>

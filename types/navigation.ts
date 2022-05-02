@@ -41,7 +41,7 @@ export type TabContainerProps<
 ///////////
 
 export type MakeContainerParamsList = {
-  Make: undefined;
+  Make: undefined | { directToDaily: boolean };
   Tutorial: undefined;
 };
 
@@ -56,7 +56,7 @@ export type MakeContainerProps<
 
 export type DailyContainerParamsList = {
   Gallery: undefined;
-  AddToGallery: undefined;
+  AddToGallery: { puzzle: Puzzle } | undefined;
 };
 
 export type DailyContainerProps<
