@@ -2,7 +2,14 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useState } from "react";
 import { View, Keyboard } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { Text, TextInput, Button, Headline } from "react-native-paper";
+import {
+  Text,
+  TextInput,
+  Button,
+  Headline,
+  IconButton,
+  Switch,
+} from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -12,6 +19,7 @@ import { setReceivedPuzzles } from "../../store/reducers/receivedPuzzles";
 import { setSentPuzzles } from "../../store/reducers/sentPuzzles";
 import { RootStackScreenProps, RootState } from "../../types";
 import { restorePuzzleMetadata } from "../../util";
+import { ThemeModal } from "../InteractiveElements";
 import { LoadingModal, Logo, Title } from "../StaticElements";
 
 export default function EnterName({
@@ -30,6 +38,12 @@ export default function EnterName({
   const [errors, setErrors] = useState("");
   const [loadingModalVisible, setLoadingModalVisible] = useState(false);
 
+  const [noSound, setNoSound] = useState((profile && profile.noSound) || false);
+  const [noVibration, setNoVibration] = useState(
+    (profile && profile.noVibration) || false
+  );
+  const [themeModalVisible, setThemeModalVisible] = useState(false);
+
   const { url } = route.params;
 
   const confirmName = async () => {
@@ -40,11 +54,19 @@ export default function EnterName({
         throw new Error("A display name is required.");
 
       const isGalleryAdmin = await checkAdminStatus();
-      dispatch(setProfile({ ...profile, name, isGalleryAdmin }));
+      dispatch(
+        setProfile({ ...profile, name, isGalleryAdmin, noSound, noVibration })
+      );
       //save to local storage
       await AsyncStorage.setItem(
         "@pixteryProfile",
-        JSON.stringify({ ...profile, name, isGalleryAdmin })
+        JSON.stringify({
+          ...profile,
+          name,
+          isGalleryAdmin,
+          noSound,
+          noVibration,
+        })
       );
 
       //get and merge pixteries
@@ -112,7 +134,59 @@ export default function EnterName({
         <Text style={{ textAlign: "center" }}>
           Enter a display name so your friends know who sent them a Pixtery
         </Text>
+        <View
+          style={{
+            justifyContent: "space-around",
+            alignItems: "center",
+            flexDirection: "row",
+            marginVertical: 10,
+          }}
+        >
+          <View
+            style={{
+              justifyContent: "flex-start",
+              alignItems: "center",
+              flexDirection: "row",
+            }}
+          >
+            <IconButton icon="volume-high" />
+            <Text>Off</Text>
+            <Switch
+              value={!noSound}
+              onValueChange={() => setNoSound(!noSound)}
+            />
+            <Text>On</Text>
+          </View>
+          <View
+            style={{
+              justifyContent: "flex-start",
+              alignItems: "center",
+              flexDirection: "row",
+            }}
+          >
+            <IconButton icon="vibrate" />
+            <Text>Off</Text>
+            <Switch
+              value={!noVibration}
+              onValueChange={() => setNoVibration(!noVibration)}
+            />
+            <Text>On</Text>
+          </View>
+        </View>
+        <Button
+          icon="palette"
+          mode="contained"
+          onPress={() => setThemeModalVisible(true)}
+          style={{ margin: 10 }}
+        >
+          Change Theme
+        </Button>
       </KeyboardAwareScrollView>
+      <ThemeModal
+        isVisible={themeModalVisible}
+        setModalVisible={setThemeModalVisible}
+        setLoadingModalVisible={setLoadingModalVisible}
+      />
       <LoadingModal isVisible={loadingModalVisible} />
     </SafeAreaView>
   );
