@@ -6,6 +6,7 @@ import {
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import { StatusOfDaily } from "./misc";
+import { Puzzle } from "./pixtery";
 
 export type RootStackParamList = {
   TitleScreen: undefined;
