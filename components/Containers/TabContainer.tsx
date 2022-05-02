@@ -4,6 +4,7 @@ import {
   FontAwesome,
 } from "@expo/vector-icons";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
+import dayjs from "dayjs";
 import { View } from "react-native";
 import {
   SafeAreaView,
@@ -24,7 +25,11 @@ const Tab = createMaterialTopTabNavigator<TabContainerParamsList>();
 export default function TabContainer(): JSX.Element {
   const theme = useSelector((state: RootState) => state.theme);
   const profile = useSelector((state: RootState) => state.profile);
+  const dailyStatus = useSelector((state: RootState) => state.dailyStatus);
   const insets = useSafeAreaInsets();
+  const todayString = dayjs().startOf("day").toString();
+  const wiggleActive = todayString !== dailyStatus;
+
   return (
     <>
       <View
@@ -56,7 +61,11 @@ export default function TabContainer(): JSX.Element {
                 );
               if (route.name === "DailyContainer")
                 return (
-                  <WiggleIcon focused={focused} theme={theme} active={true} />
+                  <WiggleIcon
+                    focused={focused}
+                    theme={theme}
+                    active={wiggleActive}
+                  />
                 );
               if (route.name === "LibraryContainer")
                 return (

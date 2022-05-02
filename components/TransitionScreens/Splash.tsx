@@ -11,6 +11,7 @@ import { ActivityIndicator } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 
 import { PUBLIC_KEY_LENGTH } from "../../constants";
+import { setDailyStatus } from "../../store/reducers/dailyStatus";
 import { setProfile } from "../../store/reducers/profile";
 import { setReceivedPuzzles } from "../../store/reducers/receivedPuzzles";
 import { setSentPuzzles } from "../../store/reducers/sentPuzzles";
@@ -65,6 +66,20 @@ export default function Splash({
           console.log(e);
           console.log("Could not load theme.");
           return allThemes[0];
+        }
+      };
+
+      const loadDailyStatus = async () => {
+        console.log("loading daily status...");
+        try {
+          const jsonValue = await AsyncStorage.getItem("@dailyStatus");
+          const dailyStatus = jsonValue || "none";
+          console.log("dailyStatus: ", dailyStatus);
+          return dailyStatus;
+        } catch (e) {
+          console.log(e);
+          console.log("Could not load daily status.");
+          return "none";
         }
       };
 
@@ -159,6 +174,10 @@ export default function Splash({
           require("../../assets/camera-click.wav")
         );
         dispatch(setSounds({ clickSound, winSound }));
+
+        // load daily status
+        const dailyStatus = await loadDailyStatus();
+        dispatch(setDailyStatus(dailyStatus));
 
         // default splash destination is Make screen
         let splashDestination: NavigatorScreenParams<RootStackParamList> = {
