@@ -12,6 +12,7 @@ import {
 import { useSelector } from "react-redux";
 
 import { RootState, TabContainerParamsList } from "../../types";
+import WiggleIcon from "../InteractiveElements/WiggleIcon";
 import AdminContainer from "./AdminContainer";
 import DailyContainer from "./DailyContainer";
 import LibraryContainer from "./LibraryContainer";
@@ -55,11 +56,7 @@ export default function TabContainer(): JSX.Element {
                 );
               if (route.name === "DailyContainer")
                 return (
-                  <MaterialCommunityIcons
-                    size={24}
-                    name="puzzle"
-                    color={focused ? theme.colors.text : theme.colors.onSurface}
-                  />
+                  <WiggleIcon focused={focused} theme={theme} active={true} />
                 );
               if (route.name === "LibraryContainer")
                 return (
