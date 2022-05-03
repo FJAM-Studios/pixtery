@@ -25,7 +25,7 @@ const {
 
 let BANNER_ID = TEST_BANNER_ID;
 let INTERSTITIAL_ID = TEST_INTERSTITIAL_ID;
-if (Device.isDevice) {
+if (Device.isDevice && process.env.NODE_ENV !== "development") {
   BANNER_ID = Platform.OS === "ios" ? IOS_BANNER_ID : ANDROID_BANNER_ID;
   INTERSTITIAL_ID =
     Platform.OS === "ios" ? IOS_INTERSTITIAL_ID : ANDROID_INTERSTITIAL_ID;

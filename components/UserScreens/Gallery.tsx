@@ -55,46 +55,15 @@ export default function Gallery({
 
   const loadDaily = async () => {
     setLoading(true);
+    // AdMobInterstitial.removeAllListeners();
     try {
       // cloud function will tell you today's Daily instead of client
       const daily = (await getDaily()).data as Puzzle;
       if (daily && daily.publicKey) {
-        AdMobInterstitial.addEventListener("interstitialDidClose", () => {
-          AdMobInterstitial.removeAllListeners();
-          navigation.navigate("LibraryContainer", {
-            screen: "AddPuzzle",
-            params: { daily, sourceList: "received" },
-          });
+        navigation.navigate("LibraryContainer", {
+          screen: "AddPuzzle",
+          params: { daily, sourceList: "received" },
         });
-        AdMobInterstitial.addEventListener("interstitialDidFailToLoad", () => {
-          AdMobInterstitial.removeAllListeners();
-          navigation.navigate("LibraryContainer", {
-            screen: "AddPuzzle",
-            params: { daily, sourceList: "received" },
-          });
-        });
-
-        try {
-          //make it so we don't have to watch ads in dev
-          if (process.env.NODE_ENV !== "development") {
-            await AdMobInterstitial.requestAdAsync({
-              servePersonalizedAds: true,
-            });
-            await AdMobInterstitial.showAdAsync();
-          } else {
-            navigation.navigate("LibraryContainer", {
-              screen: "AddPuzzle",
-              params: { daily, sourceList: "received" },
-            });
-          }
-        } catch (error) {
-          // go to the puzzle if there's an ad error
-          navigation.navigate("LibraryContainer", {
-            screen: "AddPuzzle",
-            params: { daily, sourceList: "received" },
-          });
-          console.log(error);
-        }
       } else {
         setError("Sorry! No Daily Pixtery today.");
       }
@@ -102,6 +71,18 @@ export default function Gallery({
       setError("Sorry! Something went wrong.");
       console.log(e);
     }
+    setLoading(false);
+  };
+
+  const showAd = async () => {
+    setLoading(true);
+    try {
+      await AdMobInterstitial.requestAdAsync({ servePersonalizedAds: true });
+      await AdMobInterstitial.showAdAsync();
+    } catch (error) {
+      console.log(error);
+    }
+    loadDaily();
     setLoading(false);
   };
 
@@ -148,7 +129,7 @@ export default function Gallery({
               </Text>
               {time ? (
                 <TouchableOpacity
-                  onPress={loadDaily}
+                  onPress={showAd}
                   style={{
                     backgroundColor: theme.colors.primary,
                     padding: 15,
