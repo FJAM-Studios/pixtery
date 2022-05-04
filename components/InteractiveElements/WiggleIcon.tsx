@@ -29,7 +29,7 @@ export default function DailyAgreement({
     Animated.parallel([
       Animated.sequence([
         Animated.timing(fade.current, {
-          toValue: 0.5,
+          toValue: 0.25,
           duration: 400,
           easing: Easing.linear,
           useNativeDriver: true,
