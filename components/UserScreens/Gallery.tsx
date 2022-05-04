@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone"; // dependent on utc plugin
@@ -7,10 +8,11 @@ import { useState, useCallback } from "react";
 import { View, TouchableOpacity } from "react-native";
 import { ActivityIndicator, Button, Text } from "react-native-paper";
 import Toast from "react-native-root-toast";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import { auth, getDaily } from "../../FirebaseApp";
 import { INTERSTITIAL_ID, DAILY_TIMEZONE } from "../../constants";
+import { setDailyStatus } from "../../store/reducers/dailyStatus";
 import { RootState, DailyContainerProps } from "../../types";
 import { Timer } from "../InteractiveElements";
 import { AdSafeAreaView } from "../Layout";
@@ -21,6 +23,7 @@ export default function Gallery({
 }: DailyContainerProps<"Gallery">): JSX.Element {
   dayjs.extend(utc);
   dayjs.extend(timezone);
+  const dispatch = useDispatch();
   const theme = useSelector((state: RootState) => state.theme);
   const { width, height } = useSelector(
     (state: RootState) => state.screenHeight
@@ -52,6 +55,7 @@ export default function Gallery({
 
   // const [time, setTime] = useState<null | number>(getCountdown());
   let time = getCountdown();
+  const todayString = dayjs().startOf("day").toString();
 
   const loadDaily = async () => {
     setLoading(true);
@@ -103,6 +107,8 @@ export default function Gallery({
       console.log(e);
     }
     setLoading(false);
+    AsyncStorage.setItem("@dailyStatus", todayString);
+    dispatch(setDailyStatus(todayString));
   };
 
   useFocusEffect(
