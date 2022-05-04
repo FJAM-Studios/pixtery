@@ -10,7 +10,6 @@ import { setProfile } from "../../store/reducers/profile";
 import { SettingsContainerProps, RootState } from "../../types";
 import { clearAllAppData } from "../../util";
 import { NameModal, ThemeModal } from "../InteractiveElements";
-import ConfirmDeleteModal from "../InteractiveElements/ConfirmDeleteModal";
 import { AdSafeAreaView } from "../Layout";
 import { ProfileModal } from "../SignInMethods";
 import { LoadingModal } from "../StaticElements";
@@ -29,7 +28,6 @@ export default function Profile({
   const [accountModalVisible, setAccountModalVisible] = useState(false);
   const [nameModalVisible, setNameModalVisible] = useState(false);
   const [themeModalVisible, setThemeModalVisible] = useState(false);
-  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [loadingModalVisible, setLoadingModalVisible] = useState(false);
 
   const toggleSound = async () => {
@@ -149,15 +147,16 @@ export default function Profile({
             Sign In / Register Account
           </Button>
         )}
+
         <Button
-          icon="cloud-download"
+          icon="dots-horizontal-circle"
           mode="contained"
           onPress={() => {
-            setDeleteModalVisible(true);
+            navigation.navigate("MoreSettings");
           }}
           style={{ margin: 10 }}
         >
-          Delete Account
+          More Settings
         </Button>
       </KeyboardAwareScrollView>
       <NameModal
@@ -175,10 +174,7 @@ export default function Profile({
         setModalVisible={setAccountModalVisible}
         setLoadingModalVisible={setLoadingModalVisible}
       />
-      <ConfirmDeleteModal
-        isVisible={deleteModalVisible}
-        setModalVisible={setDeleteModalVisible}
-      />
+
       <LoadingModal isVisible={loadingModalVisible} />
     </AdSafeAreaView>
   );

@@ -99,7 +99,7 @@ export type PuzzleListContainerProps<
 ///////////
 
 export type SettingsContainerParamsList = {
-  Settings: undefined;
+  MoreSettings: undefined;
   Profile: undefined;
   ManagePuzzles: undefined;
   ContactUs: undefined;
