@@ -4,6 +4,7 @@ import {
   FontAwesome,
 } from "@expo/vector-icons";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
+import dayjs from "dayjs";
 import { View } from "react-native";
 import {
   SafeAreaView,
@@ -12,6 +13,7 @@ import {
 import { useSelector } from "react-redux";
 
 import { RootState, TabContainerParamsList } from "../../types";
+import WiggleIcon from "../InteractiveElements/WiggleIcon";
 import AdminContainer from "./AdminContainer";
 import DailyContainer from "./DailyContainer";
 import LibraryContainer from "./LibraryContainer";
@@ -23,7 +25,11 @@ const Tab = createMaterialTopTabNavigator<TabContainerParamsList>();
 export default function TabContainer(): JSX.Element {
   const theme = useSelector((state: RootState) => state.theme);
   const profile = useSelector((state: RootState) => state.profile);
+  const dailyStatus = useSelector((state: RootState) => state.dailyStatus);
   const insets = useSafeAreaInsets();
+  const todayString = dayjs().startOf("day").toString();
+  const wiggleActive = todayString !== dailyStatus;
+
   return (
     <>
       <View
@@ -55,10 +61,10 @@ export default function TabContainer(): JSX.Element {
                 );
               if (route.name === "DailyContainer")
                 return (
-                  <MaterialCommunityIcons
-                    size={24}
-                    name="puzzle"
-                    color={focused ? theme.colors.text : theme.colors.onSurface}
+                  <WiggleIcon
+                    focused={focused}
+                    theme={theme}
+                    active={wiggleActive}
                   />
                 );
               if (route.name === "LibraryContainer")

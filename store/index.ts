@@ -2,6 +2,7 @@ import { combineReducers, createStore, applyMiddleware } from "redux";
 import thunk from "redux-thunk";
 
 import adHeight from "./reducers/adHeight";
+import dailyStatus from "./reducers/dailyStatus";
 import notificationToken from "./reducers/notificationToken";
 import profile from "./reducers/profile";
 import receivedPuzzles from "./reducers/receivedPuzzles";
@@ -21,6 +22,7 @@ const reducer = combineReducers({
   theme,
   tutorialFinished,
   sounds,
+  dailyStatus,
 });
 
 export default createStore(reducer, applyMiddleware(thunk));

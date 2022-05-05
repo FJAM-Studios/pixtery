@@ -26,4 +26,5 @@ export interface RootState {
   tutorialFinished: boolean;
   sounds: { clickSound: Audio.Sound; winSound: Audio.Sound } | null;
   notificationToken: string;
+  dailyStatus: string;
 }
