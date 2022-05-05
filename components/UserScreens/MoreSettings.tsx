@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Text, Button } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
@@ -5,13 +6,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { VERSION_NUMBER } from "../../constants";
 import { setTutorialFinished } from "../../store/reducers/tutorialFinished";
 import { SettingsContainerProps, RootState } from "../../types";
+import ConfirmDeleteModal from "../InteractiveElements/ConfirmDeleteModal";
 import { AdSafeAreaView } from "../Layout";
 
-export default function Settings({
+export default function MoreSettings({
   navigation,
-}: SettingsContainerProps<"Settings">): JSX.Element {
+}: SettingsContainerProps<"MoreSettings">): JSX.Element {
   const dispatch = useDispatch();
   const theme = useSelector((state: RootState) => state.theme);
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
 
   return (
     <AdSafeAreaView
@@ -26,17 +29,6 @@ export default function Settings({
         resetScrollToCoords={{ x: 0, y: 0 }}
         keyboardShouldPersistTaps="handled"
       >
-        <Button
-          icon="account"
-          mode="contained"
-          onPress={() => {
-            navigation.navigate("Profile");
-          }}
-          style={{ margin: 10 }}
-        >
-          Manage Profile
-        </Button>
-
         <Button
           icon="puzzle"
           mode="contained"
@@ -68,8 +60,22 @@ export default function Settings({
         >
           Contact Us
         </Button>
+        <Button
+          icon="cloud-download"
+          mode="contained"
+          onPress={() => {
+            setDeleteModalVisible(true);
+          }}
+          style={{ margin: 10 }}
+        >
+          Delete Account
+        </Button>
         <Text>v{VERSION_NUMBER}</Text>
       </KeyboardAwareScrollView>
+      <ConfirmDeleteModal
+        isVisible={deleteModalVisible}
+        setModalVisible={setDeleteModalVisible}
+      />
     </AdSafeAreaView>
   );
 }

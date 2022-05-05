@@ -82,7 +82,7 @@
         {
           "userTrackingPermission": "This identifier will be used to deliver personalized ads to you."
         }
-      ], ["sentry-expo"]
+      ], "sentry-expo"
     ],
     "hooks": {
       "postPublish": [
