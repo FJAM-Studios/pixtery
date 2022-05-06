@@ -1,5 +1,5 @@
 import * as FileSystem from "expo-file-system";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   ImageBackground,
   View,
@@ -20,15 +20,17 @@ export default function AddToGallery({
 }: DailyContainerProps<"AddToGallery">): JSX.Element {
   const theme = useSelector((state: RootState) => state.theme);
   const sentPuzzles = useSelector((state: RootState) => state.sentPuzzles);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [selectedPuzzle, setSelectedPuzzle] = useState<Puzzle>();
 
-  useEffect(() => {
-    if (route.params?.puzzle) {
-      setModalVisible(true);
-      setSelectedPuzzle(route.params.puzzle);
-    }
-  }, [route.params?.puzzle]);
+  let modalState = false;
+  let loadedPuzzle = null;
+  if (route.params?.puzzle) {
+    modalState = true;
+    loadedPuzzle = route.params.puzzle;
+  }
+  const [modalVisible, setModalVisible] = useState(modalState);
+  const [selectedPuzzle, setSelectedPuzzle] = useState<Puzzle | null>(
+    loadedPuzzle
+  );
 
   return (
     <AdSafeAreaView

@@ -30,7 +30,6 @@ import {
   DEFAULT_IMAGE_SIZE,
   COMPRESSION,
   INTERSTITIAL_ID,
-  DISPLAY_PAINFUL_ADS,
   ARGUABLY_CLEVER_PHRASES,
 } from "../../constants";
 import {
@@ -134,10 +133,8 @@ export default function Make({
   };
 
   const submitToServer = async (): Promise<void> => {
-    if (DISPLAY_PAINFUL_ADS) {
-      AdMobInterstitial.removeAllListeners();
-      AdMobInterstitial.requestAdAsync({ servePersonalizedAds: true });
-    }
+    Keyboard.dismiss();
+    setModalVisible(true);
     const fileName: string = uuid.v4() + ".jpg";
     try {
       const localURI = await uploadImage(fileName);
@@ -150,16 +147,18 @@ export default function Make({
           to: permanentURI,
         });
       }
-      setModalVisible(false);
       if (newPuzzle) {
         if (newPuzzle.publicKey) {
-          addToSent(newPuzzle);
+          await addToSent(newPuzzle);
           // no need to generate link sharing if submitting direct to daily
           if (directToDaily) {
-            navigation.navigate("DailyContainer", {
-              screen: "AddToGallery",
+            navigation.push("TabContainer", {
+              screen: "DailyContainer",
               params: {
-                puzzle: newPuzzle,
+                screen: "AddToGallery",
+                params: {
+                  puzzle: newPuzzle,
+                },
               },
             });
           } else {
@@ -181,9 +180,8 @@ export default function Make({
           duration: Toast.durations.SHORT,
         }
       );
-      setModalVisible(false);
     }
-    // need to add else for error handling if uploadPuzzSettings throws error
+    setModalVisible(false);
   };
 
   const addToSent = async (puzzle: Puzzle) => {
@@ -239,29 +237,6 @@ export default function Make({
       scheme: "https",
     });
     shareMessage(deepLink);
-  };
-
-  const displayPainfulAd = async () => {
-    Keyboard.dismiss();
-    if (DISPLAY_PAINFUL_ADS) {
-      //I tried adding the event listeners in the useEffect but that caused the filename passed to the image manipulator to be blank so instead they're created here and then cleaned up in the submitToServer so it doesn't trigger repeatedly when making more than one puzzle
-      AdMobInterstitial.addEventListener("interstitialDidClose", () => {
-        submitToServer();
-      });
-      AdMobInterstitial.addEventListener("interstitialDidFailToLoad", () => {
-        submitToServer();
-      });
-      try {
-        await AdMobInterstitial.showAdAsync();
-        setModalVisible(true);
-      } catch (error) {
-        console.log(error);
-        submitToServer();
-      }
-    } else {
-      setModalVisible(true);
-      submitToServer();
-    }
   };
 
   useEffect(() => {
@@ -499,7 +474,7 @@ export default function Make({
         <Button
           icon="send"
           mode="contained"
-          onPress={displayPainfulAd}
+          onPress={submitToServer}
           style={{ margin: height * 0.01 }}
           disabled={imageURI.length === 0}
           onLayout={(ev) => setButtonHeight(ev.nativeEvent.layout.height)}
