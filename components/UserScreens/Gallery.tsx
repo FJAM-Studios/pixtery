@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone"; // dependent on utc plugin
@@ -7,10 +8,11 @@ import { useState, useCallback } from "react";
 import { View, TouchableOpacity } from "react-native";
 import { ActivityIndicator, Button, Text } from "react-native-paper";
 import Toast from "react-native-root-toast";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import { auth, getDaily } from "../../FirebaseApp";
 import { INTERSTITIAL_ID, DAILY_TIMEZONE } from "../../constants";
+import { setDailyStatus } from "../../store/reducers/dailyStatus";
 import { RootState, DailyContainerProps } from "../../types";
 import { Timer } from "../InteractiveElements";
 import { AdSafeAreaView } from "../Layout";
@@ -21,6 +23,7 @@ export default function Gallery({
 }: DailyContainerProps<"Gallery">): JSX.Element {
   dayjs.extend(utc);
   dayjs.extend(timezone);
+  const dispatch = useDispatch();
   const theme = useSelector((state: RootState) => state.theme);
   const { width, height } = useSelector(
     (state: RootState) => state.screenHeight
@@ -52,49 +55,19 @@ export default function Gallery({
 
   // const [time, setTime] = useState<null | number>(getCountdown());
   let time = getCountdown();
+  const todayString = dayjs().startOf("day").toString();
 
   const loadDaily = async () => {
     setLoading(true);
+    // AdMobInterstitial.removeAllListeners();
     try {
       // cloud function will tell you today's Daily instead of client
       const daily = (await getDaily()).data as Puzzle;
       if (daily && daily.publicKey) {
-        AdMobInterstitial.addEventListener("interstitialDidClose", () => {
-          AdMobInterstitial.removeAllListeners();
-          navigation.navigate("LibraryContainer", {
-            screen: "AddPuzzle",
-            params: { daily, sourceList: "received" },
-          });
+        navigation.navigate("LibraryContainer", {
+          screen: "AddPuzzle",
+          params: { daily, sourceList: "received" },
         });
-        AdMobInterstitial.addEventListener("interstitialDidFailToLoad", () => {
-          AdMobInterstitial.removeAllListeners();
-          navigation.navigate("LibraryContainer", {
-            screen: "AddPuzzle",
-            params: { daily, sourceList: "received" },
-          });
-        });
-
-        try {
-          //make it so we don't have to watch ads in dev
-          if (process.env.NODE_ENV !== "development") {
-            await AdMobInterstitial.requestAdAsync({
-              servePersonalizedAds: true,
-            });
-            await AdMobInterstitial.showAdAsync();
-          } else {
-            navigation.navigate("LibraryContainer", {
-              screen: "AddPuzzle",
-              params: { daily, sourceList: "received" },
-            });
-          }
-        } catch (error) {
-          // go to the puzzle if there's an ad error
-          navigation.navigate("LibraryContainer", {
-            screen: "AddPuzzle",
-            params: { daily, sourceList: "received" },
-          });
-          console.log(error);
-        }
       } else {
         setError("Sorry! No Daily Pixtery today.");
       }
@@ -102,6 +75,20 @@ export default function Gallery({
       setError("Sorry! Something went wrong.");
       console.log(e);
     }
+    setLoading(false);
+    AsyncStorage.setItem("@dailyStatus", todayString);
+    dispatch(setDailyStatus(todayString));
+  };
+
+  const showAd = async () => {
+    setLoading(true);
+    try {
+      await AdMobInterstitial.requestAdAsync({ servePersonalizedAds: true });
+      await AdMobInterstitial.showAdAsync();
+    } catch (error) {
+      console.log(error);
+    }
+    loadDaily();
     setLoading(false);
   };
 
@@ -148,7 +135,7 @@ export default function Gallery({
               </Text>
               {time ? (
                 <TouchableOpacity
-                  onPress={loadDaily}
+                  onPress={showAd}
                   style={{
                     backgroundColor: theme.colors.primary,
                     padding: 15,
