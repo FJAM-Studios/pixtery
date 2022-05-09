@@ -119,7 +119,7 @@ export default function Gallery({
           flexGrow: 1,
         }}
       >
-        <View style={{ flex: 1, alignContent: "center" }}>
+        <View style={{ flex: 3, alignContent: "center" }}>
           {loading ? (
             <ActivityIndicator size="large" />
           ) : (
@@ -133,35 +133,35 @@ export default function Gallery({
                   "Today's Pixtery expires in:"
                 )}
               </Text>
-              {time ? (
-                <TouchableOpacity
-                  onPress={showAd}
-                  style={{
-                    backgroundColor: theme.colors.primary,
-                    padding: 15,
-                    borderRadius: theme.roundness,
-                  }}
-                >
-                  <Timer time={time} />
-                  <Text
-                    style={{ fontSize: 20, marginTop: 15, textAlign: "center" }}
-                  >
-                    Touch To Solve!
-                  </Text>
-                </TouchableOpacity>
-              ) : null}
+              {time ? <Timer time={time} /> : null}
             </View>
           )}
         </View>
         <View
           style={{
-            position: "absolute",
-            bottom: 10,
+            // position: "absolute",
+            // bottom: 10,
+            flex: 2,
             alignItems: "center",
+            justifyContent: "flex-start",
           }}
         >
           <Button
-            icon="brush"
+            icon="ticket"
+            mode="contained"
+            onPress={showAd}
+            style={{
+              margin: 10,
+              width: width * 0.8,
+              paddingTop: height * 0.01,
+              paddingBottom: height * 0.01,
+            }}
+          >
+            Solve today&apos;s Daily Pixtery!
+          </Button>
+          <Text> or </Text>
+          <Button
+            icon="send"
             mode="contained"
             onPress={suggestPixtery}
             style={{
