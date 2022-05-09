@@ -159,7 +159,7 @@ export default function Gallery({
           >
             Solve today&apos;s Daily Pixtery!
           </Button>
-          <Text> or </Text>
+          <Text style={{ fontSize: 17 }}> or </Text>
           <Button
             icon="send"
             mode="contained"
