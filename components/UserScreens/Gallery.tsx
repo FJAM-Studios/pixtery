@@ -139,8 +139,6 @@ export default function Gallery({
         </View>
         <View
           style={{
-            // position: "absolute",
-            // bottom: 10,
             flex: 2,
             alignItems: "center",
             justifyContent: "flex-start",
@@ -171,7 +169,7 @@ export default function Gallery({
               paddingBottom: height * 0.01,
             }}
           >
-            Submit a Daily Pixtery!
+            Submit Your Own Pixtery!
           </Button>
         </View>
       </View>
