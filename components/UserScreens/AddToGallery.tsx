@@ -6,19 +6,31 @@ import {
   ScrollView,
   TouchableOpacity,
 } from "react-native";
-import { Card, Headline, IconButton, Text } from "react-native-paper";
+import { Button, Card, Headline, IconButton, Text } from "react-native-paper";
 import { useSelector } from "react-redux";
 
-import { RootState } from "../../types";
+import { DailyContainerProps, RootState } from "../../types";
 import { formatDateFromString } from "../../util";
 import { SubmissionModal } from "../InteractiveElements";
 import { AdSafeAreaView } from "../Layout";
 
-export default function AddToGallery(): JSX.Element {
+export default function AddToGallery({
+  navigation,
+  route,
+}: DailyContainerProps<"AddToGallery">): JSX.Element {
   const theme = useSelector((state: RootState) => state.theme);
   const sentPuzzles = useSelector((state: RootState) => state.sentPuzzles);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [selectedPuzzle, setSelectedPuzzle] = useState<Puzzle>();
+
+  let modalState = false;
+  let loadedPuzzle = null;
+  if (route.params?.puzzle) {
+    modalState = true;
+    loadedPuzzle = route.params.puzzle;
+  }
+  const [modalVisible, setModalVisible] = useState(modalState);
+  const [selectedPuzzle, setSelectedPuzzle] = useState<Puzzle | null>(
+    loadedPuzzle
+  );
 
   return (
     <AdSafeAreaView
@@ -30,13 +42,26 @@ export default function AddToGallery(): JSX.Element {
         justifyContent: "flex-start",
       }}
     >
+      <Button
+        icon="camera-iris"
+        mode="contained"
+        onPress={() => {
+          navigation.push("TabContainer", {
+            screen: "MakeContainer",
+            params: { screen: "Make", params: { directToDaily: true } },
+          });
+        }}
+        style={{ margin: 5 }}
+      >
+        Create a New Pixtery!
+      </Button>
       <ScrollView>
-        <Text style={{ alignSelf: "center", textAlign: "center" }}>
-          You can edit the secret message after selecting
-        </Text>
-        <>
-          {sentPuzzles.length ? (
-            sentPuzzles.map((sentPuzzle, ix) => (
+        {sentPuzzles.length ? (
+          <>
+            <Text style={{ alignSelf: "center", textAlign: "center" }}>
+              You can edit the secret message after selecting
+            </Text>
+            {sentPuzzles.map((sentPuzzle, ix) => (
               <TouchableOpacity
                 onPress={() => {
                   setModalVisible(true);
@@ -87,18 +112,19 @@ export default function AddToGallery(): JSX.Element {
                   />
                 </Card>
               </TouchableOpacity>
-            ))
-          ) : (
-            <View
-              style={{
-                alignItems: "center",
-              }}
-            >
-              <Headline>You haven&apos;t sent any puzzles!</Headline>
-            </View>
-          )}
-        </>
+            ))}
+          </>
+        ) : (
+          <View
+            style={{
+              alignItems: "center",
+            }}
+          >
+            <Headline>You haven&apos;t sent any puzzles!</Headline>
+          </View>
+        )}
       </ScrollView>
+
       {selectedPuzzle ? (
         <SubmissionModal
           modalVisible={modalVisible}

@@ -31,9 +31,6 @@ if (Device.isDevice && process.env.NODE_ENV !== "development") {
     Platform.OS === "ios" ? IOS_INTERSTITIAL_ID : ANDROID_INTERSTITIAL_ID;
 }
 
-// so we don't have to deal w fullscreen ads before sending a test pixtery
-const DISPLAY_PAINFUL_ADS = false;
-
 const DEGREE_CONVERSION = Math.PI / 180;
 
 const USE_NATIVE_DRIVER = true;
@@ -65,7 +62,6 @@ export {
   DEFAULT_IMAGE_SIZE,
   BANNER_ID,
   INTERSTITIAL_ID,
-  DISPLAY_PAINFUL_ADS,
   DEGREE_CONVERSION,
   USE_NATIVE_DRIVER,
   PUBLIC_KEY_LENGTH,

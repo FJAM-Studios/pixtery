@@ -1,10 +1,11 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFocusEffect } from "@react-navigation/native";
 import { AdMobInterstitial } from "expo-ads-admob";
 import * as FileSystem from "expo-file-system";
 import * as ImageManipulator from "expo-image-manipulator";
 import * as ImagePicker from "expo-image-picker";
 import * as Linking from "expo-linking";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Image, View, Platform, Keyboard } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import {
@@ -29,7 +30,6 @@ import {
   DEFAULT_IMAGE_SIZE,
   COMPRESSION,
   INTERSTITIAL_ID,
-  DISPLAY_PAINFUL_ADS,
   ARGUABLY_CLEVER_PHRASES,
 } from "../../constants";
 import {
@@ -48,6 +48,7 @@ AdMobInterstitial.setAdUnitID(INTERSTITIAL_ID);
 
 export default function Make({
   navigation,
+  route,
 }: MakeContainerProps<"Make">): JSX.Element {
   const dispatch = useDispatch();
   const theme = useSelector((state: RootState) => state.theme);
@@ -61,12 +62,24 @@ export default function Make({
   const [gridSize, setGridSize] = useState(3);
   const [message, setMessage] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
+  const [directToDaily, setDirectToDaily] = useState(
+    !!route.params?.directToDaily
+  );
 
   const [paths, setPaths] = useState(
     generateJigsawPiecePaths(gridSize, boardSize / (1.6 * gridSize), true)
   );
   const [buttonHeight, setButtonHeight] = useState(0);
   const [iOSCameraLaunch, setiOSCameraLaunch] = useState(false);
+
+  // on navigating away from Make screen, reset to non-Daily version
+  useFocusEffect(
+    useCallback(() => {
+      return () => {
+        setDirectToDaily(false);
+      };
+    }, [navigation])
+  );
 
   const selectImage = async (camera: boolean) => {
     const permission = await checkPermission(camera);
@@ -120,10 +133,8 @@ export default function Make({
   };
 
   const submitToServer = async (): Promise<void> => {
-    if (DISPLAY_PAINFUL_ADS) {
-      AdMobInterstitial.removeAllListeners();
-      AdMobInterstitial.requestAdAsync({ servePersonalizedAds: true });
-    }
+    Keyboard.dismiss();
+    setModalVisible(true);
     const fileName: string = uuid.v4() + ".jpg";
     try {
       const localURI = await uploadImage(fileName);
@@ -136,17 +147,29 @@ export default function Make({
           to: permanentURI,
         });
       }
-      setModalVisible(false);
       if (newPuzzle) {
         if (newPuzzle.publicKey) {
-          generateLink(newPuzzle.publicKey);
-          addToSent(newPuzzle);
-          navigation.navigate("LibraryContainer", {
-            screen: "PuzzleListContainer",
-            params: {
-              screen: "SentPuzzleList",
-            },
-          });
+          await addToSent(newPuzzle);
+          // no need to generate link sharing if submitting direct to daily
+          if (directToDaily) {
+            navigation.push("TabContainer", {
+              screen: "DailyContainer",
+              params: {
+                screen: "AddToGallery",
+                params: {
+                  puzzle: newPuzzle,
+                },
+              },
+            });
+          } else {
+            generateLink(newPuzzle.publicKey);
+            navigation.navigate("LibraryContainer", {
+              screen: "PuzzleListContainer",
+              params: {
+                screen: "SentPuzzleList",
+              },
+            });
+          }
         }
       }
     } catch (error) {
@@ -157,9 +180,8 @@ export default function Make({
           duration: Toast.durations.SHORT,
         }
       );
-      setModalVisible(false);
     }
-    // need to add else for error handling if uploadPuzzSettings throws error
+    setModalVisible(false);
   };
 
   const addToSent = async (puzzle: Puzzle) => {
@@ -215,29 +237,6 @@ export default function Make({
       scheme: "https",
     });
     shareMessage(deepLink);
-  };
-
-  const displayPainfulAd = async () => {
-    Keyboard.dismiss();
-    if (DISPLAY_PAINFUL_ADS) {
-      //I tried adding the event listeners in the useEffect but that caused the filename passed to the image manipulator to be blank so instead they're created here and then cleaned up in the submitToServer so it doesn't trigger repeatedly when making more than one puzzle
-      AdMobInterstitial.addEventListener("interstitialDidClose", () => {
-        submitToServer();
-      });
-      AdMobInterstitial.addEventListener("interstitialDidFailToLoad", () => {
-        submitToServer();
-      });
-      try {
-        await AdMobInterstitial.showAdAsync();
-        setModalVisible(true);
-      } catch (error) {
-        console.log(error);
-        submitToServer();
-      }
-    } else {
-      setModalVisible(true);
-      submitToServer();
-    }
   };
 
   useEffect(() => {
@@ -475,12 +474,12 @@ export default function Make({
         <Button
           icon="send"
           mode="contained"
-          onPress={displayPainfulAd}
+          onPress={submitToServer}
           style={{ margin: height * 0.01 }}
           disabled={imageURI.length === 0}
           onLayout={(ev) => setButtonHeight(ev.nativeEvent.layout.height)}
         >
-          Send
+          {directToDaily ? "Submit Daily" : "Send"}
         </Button>
       </KeyboardAwareScrollView>
     </AdSafeAreaView>
