@@ -7,6 +7,7 @@ import { secondsToTime } from "../../util";
 
 export default function Timer({ time }: { time: number }): JSX.Element {
   const { width } = useSelector((state: RootState) => state.screenHeight);
+  const theme = useSelector((state: RootState) => state.theme);
 
   return (
     <CountdownCircleTimer
@@ -21,7 +22,7 @@ export default function Timer({ time }: { time: number }): JSX.Element {
       size={width * 0.6}
     >
       {({ remainingTime }) => (
-        <Animated.Text style={{ color: "#FFFFFF", fontSize: 40 }}>
+        <Animated.Text style={{ color: theme.colors.text, fontSize: 40 }}>
           {secondsToTime(remainingTime)}
         </Animated.Text>
       )}

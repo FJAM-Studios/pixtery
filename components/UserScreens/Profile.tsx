@@ -156,7 +156,7 @@ export default function Profile({
           }}
           style={{ margin: 10 }}
         >
-          More Settings
+          More
         </Button>
       </KeyboardAwareScrollView>
       <NameModal

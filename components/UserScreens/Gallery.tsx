@@ -5,7 +5,7 @@ import timezone from "dayjs/plugin/timezone"; // dependent on utc plugin
 import utc from "dayjs/plugin/utc";
 import { AdMobInterstitial } from "expo-ads-admob";
 import { useState, useCallback } from "react";
-import { View, TouchableOpacity } from "react-native";
+import { View } from "react-native";
 import { ActivityIndicator, Button, Text } from "react-native-paper";
 import Toast from "react-native-root-toast";
 import { useDispatch, useSelector } from "react-redux";
@@ -59,46 +59,15 @@ export default function Gallery({
 
   const loadDaily = async () => {
     setLoading(true);
+    // AdMobInterstitial.removeAllListeners();
     try {
       // cloud function will tell you today's Daily instead of client
       const daily = (await getDaily()).data as Puzzle;
       if (daily && daily.publicKey) {
-        AdMobInterstitial.addEventListener("interstitialDidClose", () => {
-          AdMobInterstitial.removeAllListeners();
-          navigation.navigate("LibraryContainer", {
-            screen: "AddPuzzle",
-            params: { daily, sourceList: "received" },
-          });
+        navigation.navigate("LibraryContainer", {
+          screen: "AddPuzzle",
+          params: { daily, sourceList: "received" },
         });
-        AdMobInterstitial.addEventListener("interstitialDidFailToLoad", () => {
-          AdMobInterstitial.removeAllListeners();
-          navigation.navigate("LibraryContainer", {
-            screen: "AddPuzzle",
-            params: { daily, sourceList: "received" },
-          });
-        });
-
-        try {
-          //make it so we don't have to watch ads in dev
-          if (process.env.NODE_ENV !== "development") {
-            await AdMobInterstitial.requestAdAsync({
-              servePersonalizedAds: true,
-            });
-            await AdMobInterstitial.showAdAsync();
-          } else {
-            navigation.navigate("LibraryContainer", {
-              screen: "AddPuzzle",
-              params: { daily, sourceList: "received" },
-            });
-          }
-        } catch (error) {
-          // go to the puzzle if there's an ad error
-          navigation.navigate("LibraryContainer", {
-            screen: "AddPuzzle",
-            params: { daily, sourceList: "received" },
-          });
-          console.log(error);
-        }
       } else {
         setError("Sorry! No Daily Pixtery today.");
       }
@@ -109,6 +78,18 @@ export default function Gallery({
     setLoading(false);
     AsyncStorage.setItem("@dailyStatus", todayString);
     dispatch(setDailyStatus(todayString));
+  };
+
+  const showAd = async () => {
+    setLoading(true);
+    try {
+      await AdMobInterstitial.requestAdAsync({ servePersonalizedAds: true });
+      await AdMobInterstitial.showAdAsync();
+    } catch (error) {
+      console.log(error);
+    }
+    loadDaily();
+    setLoading(false);
   };
 
   useFocusEffect(
@@ -138,7 +119,7 @@ export default function Gallery({
           flexGrow: 1,
         }}
       >
-        <View style={{ flex: 1, alignContent: "center" }}>
+        <View style={{ flex: 3, alignContent: "center" }}>
           {loading ? (
             <ActivityIndicator size="large" />
           ) : (
@@ -152,35 +133,33 @@ export default function Gallery({
                   "Today's Pixtery expires in:"
                 )}
               </Text>
-              {time ? (
-                <TouchableOpacity
-                  onPress={loadDaily}
-                  style={{
-                    backgroundColor: theme.colors.primary,
-                    padding: 15,
-                    borderRadius: theme.roundness,
-                  }}
-                >
-                  <Timer time={time} />
-                  <Text
-                    style={{ fontSize: 20, marginTop: 15, textAlign: "center" }}
-                  >
-                    Touch To Solve!
-                  </Text>
-                </TouchableOpacity>
-              ) : null}
+              {time ? <Timer time={time} /> : null}
             </View>
           )}
         </View>
         <View
           style={{
-            position: "absolute",
-            bottom: 10,
+            flex: 2,
             alignItems: "center",
+            justifyContent: "flex-start",
           }}
         >
           <Button
-            icon="brush"
+            icon="ticket"
+            mode="contained"
+            onPress={showAd}
+            style={{
+              margin: 10,
+              width: width * 0.8,
+              paddingTop: height * 0.01,
+              paddingBottom: height * 0.01,
+            }}
+          >
+            Solve today&apos;s Daily Pixtery!
+          </Button>
+          <Text style={{ fontSize: 17 }}> or </Text>
+          <Button
+            icon="send"
             mode="contained"
             onPress={suggestPixtery}
             style={{
@@ -190,7 +169,7 @@ export default function Gallery({
               paddingBottom: height * 0.01,
             }}
           >
-            Submit a Daily Pixtery!
+            Submit Your Own Pixtery!
           </Button>
         </View>
       </View>

@@ -427,6 +427,10 @@ const styles = (props: { theme: Theme; boardSize: number }) =>
     messageContainer: {
       flexDirection: "column",
       zIndex: -1,
+      backgroundColor: props.theme.colors.surface,
+      width: "80%",
+      alignSelf: "center",
+      borderRadius: props.theme.roundness,
     },
     winContainer: {
       flexDirection: "column",
