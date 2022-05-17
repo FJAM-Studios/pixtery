@@ -137,7 +137,6 @@ export default function PuzzleComponent({
       // maxSandboxY (upper left max bound of initial piece position)
       // sometimes depending on screenheight, min is larger than max
       const maxSandboxY = Math.max(topOfAd - squareSize, minSandboxY);
-      console.log('adheight', adHeight, puzzleAreaDimensions.puzzleAreaHeight)
 
       setLowerBound(topOfAd);
       setPuzzle(pickedPuzzle);
