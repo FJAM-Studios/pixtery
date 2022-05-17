@@ -22,6 +22,7 @@ google-services.json
 admobIDs.js
 firebaseConfig.ts
 public/bundle*
+sentry.js
 
 # macOS
 .DS_Store

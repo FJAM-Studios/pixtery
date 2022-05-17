@@ -131,19 +131,15 @@ export default function PuzzleComponent({
       const { gridSize, puzzleType, imageURI } = pickedPuzzle;
       const squareSize = boardSize / gridSize;
       const numPieces = gridSize * gridSize;
-      const minSandboxY = boardSize * 1.01;
+      const topOfAd = puzzleAreaDimensions.puzzleAreaHeight - adHeight;
+      // minSandboxY (i.e. top of initial puzzle scatter area) is min of the bottom of board and top of ad banner minus the squaresize. Depending on the screen dimensions (i.e. iPad), sometimes the area below the board is smaller than the puzzle pieces.
+      const minSandboxY = Math.min(boardSize * 1.01, topOfAd - squareSize);
       // maxSandboxY (upper left max bound of initial piece position)
       // sometimes depending on screenheight, min is larger than max
-      const maxSandboxY = Math.max(
-        puzzleAreaDimensions.puzzleAreaHeight -
-          adHeight -
-          parentContainerStyle.padding * 2 -
-          squareSize,
-        minSandboxY
-      );
+      const maxSandboxY = Math.max(topOfAd - squareSize, minSandboxY);
+      console.log('adheight', adHeight, puzzleAreaDimensions.puzzleAreaHeight)
 
-      setLowerBound(maxSandboxY);
-
+      setLowerBound(topOfAd);
       setPuzzle(pickedPuzzle);
 
       const shuffleOrder = shuffle(fillArray(gridSize), disableShuffle);
