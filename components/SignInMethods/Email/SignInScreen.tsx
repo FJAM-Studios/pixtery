@@ -56,7 +56,7 @@ export default function SignInScreen({
       <Button
         icon="camera-iris"
         mode="contained"
-        onPress={() => onPress(email, password, null, setErrors, false)}
+        onPress={() => onPress(email.trim(), password, null, setErrors, false)}
         style={{ margin: 10 }}
         disabled={email.length === 0 || password.length === 0}
       >
