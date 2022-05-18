@@ -22,6 +22,7 @@ import {
 import Toast from "react-native-root-toast";
 import Svg, { Path } from "react-native-svg";
 import { useDispatch, useSelector } from "react-redux";
+import * as Sentry from "sentry-expo";
 import shortid from "shortid";
 import uuid from "uuid";
 
@@ -223,10 +224,13 @@ export default function Make({
       dateReceived: new Date().toISOString(),
     };
     try {
+      // uncomment below Error line to test Sentry
+      // throw new Error("upload puzzle forced error for sentry");
       await uploadPuzzleSettingsCallable({ newPuzzle });
       return newPuzzle;
     } catch (error) {
       console.error(error);
+      Sentry.Native.captureException(error);
       if (error instanceof Error) throw new Error(error.message);
     }
   };
