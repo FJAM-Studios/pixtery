@@ -25,11 +25,14 @@
     "@react-navigation/material-top-tabs": "^6.0.6",
     "@react-navigation/native": "^6.0.6",
     "@react-navigation/native-stack": "^6.2.5",
+    "@sentry/react-native": "^3.4.1",
     "expo": "^44.0.0",
     "expo-ads-admob": "~12.0.0",
+    "expo-application": "~4.0.2",
     "expo-av": "~10.2.0",
-    "expo-constants": "~13.0.0",
+    "expo-constants": "~13.0.2",
     "expo-dev-client": "~0.8.4",
+    "expo-device": "~4.1.1",
     "expo-file-system": "~13.1.4",
     "expo-firebase-recaptcha": "~2.1.0",
     "expo-haptics": "~11.1.0",
@@ -68,10 +71,10 @@
     "react-redux": "^7.2.6",
     "redux": "^4.1.2",
     "redux-thunk": "^2.4.1",
+    "sentry-expo": "^4.0.0",
     "shortid": "^2.2.16",
     "tslib": "^2.3.1",
-    "uuid": "^3.4.0",
-    "expo-device": "~4.1.0"
+    "uuid": "^3.4.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
