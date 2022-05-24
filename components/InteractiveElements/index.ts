@@ -1,12 +1,12 @@
 import DateSelect from "./DateSelect";
 import EditSubmission from "./EditSubmission";
 import IosCamera from "./IosCamera";
-import MessageInput from "./MessageInput";
 import NameModal from "./NameModal";
 import PuzzlePiece from "./PuzzlePiece";
 import ReceivedPuzzleCard from "./ReceivedPuzzleCard";
 import SentPuzzleCard from "./SentPuzzleCard";
 import SubmissionModal from "./SubmissionModal";
+import { MessageInput } from "./TextInputs";
 import ThemeModal from "./ThemeModal";
 import Timer from "./Timer";
 

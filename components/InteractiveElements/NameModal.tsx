@@ -2,12 +2,13 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useState } from "react";
 import { View } from "react-native";
 import Modal from "react-native-modal";
-import { Button, TextInput } from "react-native-paper";
+import { Button } from "react-native-paper";
 import Toast from "react-native-root-toast";
 import { useDispatch, useSelector } from "react-redux";
 
 import { setProfile } from "../../store/reducers/profile";
 import { RootState } from "../../types";
+import { NameInput } from "./TextInputs";
 
 export default function NameModal({
   isVisible,
@@ -61,7 +62,7 @@ export default function NameModal({
           padding: 20,
         }}
       >
-        <TextInput value={name} onChangeText={(name) => setName(name)} />
+        <NameInput name={name} setName={setName} />
         <Button
           disabled={name.length === 0}
           icon="account"
