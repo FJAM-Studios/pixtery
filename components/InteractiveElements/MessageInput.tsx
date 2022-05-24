@@ -26,14 +26,17 @@ export default function MessageInput({
   const overTheLimit = messageGraphemes > messageLimit;
 
   useEffect(() => {
-    const graphemes = splitter.splitGraphemes(message);
     const graphemeCount = splitter.countGraphemes(message);
     setMessageGraphemes(graphemeCount);
+  }, [message]);
+
+  useEffect(() => {
     if (overTheLimit) {
+      const graphemes = splitter.splitGraphemes(message);
       const slicedGraphemes = graphemes.slice(0, messageLimit).join("");
       setMessage(slicedGraphemes);
     }
-  });
+  }, [overTheLimit]);
 
   return (
     <View
