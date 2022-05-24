@@ -48,14 +48,20 @@ export default function EnterName({
 
       const isGalleryAdmin = await checkAdminStatus();
       dispatch(
-        setProfile({ ...profile, name, isGalleryAdmin, noSound, noVibration })
+        setProfile({
+          ...profile,
+          name: name.trim(),
+          isGalleryAdmin,
+          noSound,
+          noVibration,
+        })
       );
       //save to local storage
       await AsyncStorage.setItem(
         "@pixteryProfile",
         JSON.stringify({
           ...profile,
-          name,
+          name: name.trim(),
           isGalleryAdmin,
           noSound,
           noVibration,

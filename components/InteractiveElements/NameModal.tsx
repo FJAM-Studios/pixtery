@@ -29,10 +29,10 @@ export default function NameModal({
     try {
       await AsyncStorage.setItem(
         "@pixteryProfile",
-        JSON.stringify({ ...profile, name })
+        JSON.stringify({ ...profile, name: name.trim() })
       );
       //update app state
-      dispatch(setProfile({ ...profile, name }));
+      dispatch(setProfile({ ...profile, name: name.trim() }));
     } catch (e) {
       console.log(e);
       Toast.show("There was an error saving your profile.", {
