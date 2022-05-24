@@ -6,7 +6,7 @@ import PuzzlePiece from "./PuzzlePiece";
 import ReceivedPuzzleCard from "./ReceivedPuzzleCard";
 import SentPuzzleCard from "./SentPuzzleCard";
 import SubmissionModal from "./SubmissionModal";
-import { MessageInput } from "./TextInputs";
+import { MessageInput, NameInput } from "./TextInputs";
 import ThemeModal from "./ThemeModal";
 import Timer from "./Timer";
 
@@ -15,6 +15,7 @@ export {
   EditSubmission,
   IosCamera,
   MessageInput,
+  NameInput,
   NameModal,
   PuzzlePiece,
   ReceivedPuzzleCard,

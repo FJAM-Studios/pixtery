@@ -2,14 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useState } from "react";
 import { View, Keyboard } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import {
-  Text,
-  TextInput,
-  Button,
-  Headline,
-  IconButton,
-  Switch,
-} from "react-native-paper";
+import { Text, Button, Headline, IconButton, Switch } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -19,7 +12,7 @@ import { setReceivedPuzzles } from "../../store/reducers/receivedPuzzles";
 import { setSentPuzzles } from "../../store/reducers/sentPuzzles";
 import { RootStackScreenProps, RootState } from "../../types";
 import { restorePuzzleMetadata } from "../../util";
-import { ThemeModal } from "../InteractiveElements";
+import { ThemeModal, NameInput } from "../InteractiveElements";
 import { LoadingModal, Logo, Title } from "../StaticElements";
 
 export default function EnterName({
@@ -116,8 +109,7 @@ export default function EnterName({
         enableOnAndroid
       >
         <Headline style={{ textAlign: "center" }}>Enter Your Name</Headline>
-        <Text style={{ marginTop: 10 }}>Display Name (Required)</Text>
-        <TextInput value={name} onChangeText={(name) => setName(name)} />
+        <NameInput name={name} setName={setName} />
         {errors.length ? (
           <Text style={{ color: theme.colors.accent, fontStyle: "italic" }}>
             {errors}
