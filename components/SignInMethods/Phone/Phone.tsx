@@ -105,10 +105,10 @@ export default function Phone({
             editable={!!verificationId}
             keyboardType="numeric"
             placeholder="123456"
+            placeholderTextColor={theme.colors.placeholder}
             onChangeText={(verificationCode: string) =>
               setSmsCode(verificationCode)
             }
-            placeholderTextColor={theme.colors.text}
           />
           <Button
             icon="check-decagram"

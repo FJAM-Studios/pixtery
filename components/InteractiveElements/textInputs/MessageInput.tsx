@@ -11,7 +11,6 @@ export default function MessageInput({
     <CustomTextInput
       text={message}
       setText={setMessage}
-      textLimit={70}
       placeHolderText="Message (optional, reveals when solved)"
     />
   );

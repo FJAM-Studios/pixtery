@@ -11,8 +11,8 @@ export default function NameInput({
     <CustomTextInput
       text={name}
       setText={setName}
-      textLimit={15}
-      placeHolderText="Display Name"
+      initalizeWithCounter={false}
+      placeHolderText="Pixtery Display Name"
     />
   );
 }

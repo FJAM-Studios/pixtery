@@ -9,12 +9,14 @@ import { RootState } from "../../../types";
 export default function CustomTextInput({
   text,
   setText,
-  textLimit,
+  textLimit = 70,
+  initalizeWithCounter = true,
   placeHolderText,
 }: {
   text: string;
   setText: (text: string) => void;
-  textLimit: number;
+  textLimit?: number;
+  initalizeWithCounter?: boolean;
   placeHolderText: string;
 }): JSX.Element {
   const theme = useSelector((state: RootState) => state.theme);
@@ -24,14 +26,23 @@ export default function CustomTextInput({
     useSelector((state: RootState) => state.screenHeight.height) * 0.01;
   const [textFocus, setTextFocus] = useState(false);
   const [textGraphemes, setTextGraphemes] = useState(0);
+  const [showCounter, setShowCounter] = useState(initalizeWithCounter);
   const splitter = new GraphemeSplitter();
   const textDraft = textGraphemes > 0;
+  const isCounterDisplayed = textFocus && showCounter;
+  const atOrOverTheLimit = textGraphemes >= textLimit;
   const overTheLimit = textGraphemes > textLimit;
 
   useEffect(() => {
     const graphemeCount = splitter.countGraphemes(text);
     setTextGraphemes(graphemeCount);
   }, [text]);
+
+  useEffect(() => {
+    if (atOrOverTheLimit) {
+      setShowCounter(true);
+    }
+  }, [atOrOverTheLimit]);
 
   useEffect(() => {
     if (overTheLimit) {
@@ -59,8 +70,8 @@ export default function CustomTextInput({
           borderWidth: textFocus ? 2.5 : 1,
           borderTopLeftRadius: theme.roundness,
           borderTopRightRadius: theme.roundness,
-          borderBottomLeftRadius: textFocus ? 0 : theme.roundness,
-          borderBottomRightRadius: textFocus ? 0 : theme.roundness,
+          borderBottomLeftRadius: isCounterDisplayed ? 0 : theme.roundness,
+          borderBottomRightRadius: isCounterDisplayed ? 0 : theme.roundness,
           borderColor: theme.colors.primary,
           padding: 5,
           marginTop: 2.5,
@@ -98,7 +109,7 @@ export default function CustomTextInput({
           }}
         />
       </View>
-      {textFocus ? (
+      {isCounterDisplayed ? (
         <Text
           style={{
             textAlign: "right",
