@@ -11,7 +11,7 @@ import { StatusBar } from "expo-status-bar";
 import { requestTrackingPermissionsAsync } from "expo-tracking-transparency";
 import * as Updates from "expo-updates";
 import { useRef, useEffect } from "react";
-import { LogBox, Dimensions, Platform } from "react-native";
+import { LogBox, Dimensions, Platform, PlatformIOSStatic } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Provider as PaperProvider } from "react-native-paper";
 import { RootSiblingParent } from "react-native-root-siblings";
@@ -66,7 +66,18 @@ const lockScreenOrientationToPortrait = async (
     await ScreenOrientation.lockAsync(orientationLock);
 };
 
-lockScreenOrientationToPortrait(ScreenOrientation.OrientationLock.PORTRAIT_UP);
+const isIpad = (): boolean => {
+  // analogous approach not available for android tablet
+  if (Platform.OS === "ios") {
+    const platformIOS = Platform as PlatformIOSStatic;
+    return platformIOS.isPad;
+  } else return false;
+};
+
+if (isIpad())
+  lockScreenOrientationToPortrait(
+    ScreenOrientation.OrientationLock.PORTRAIT_UP
+  );
 
 const App = (): JSX.Element => {
   const dispatch = useDispatch();
