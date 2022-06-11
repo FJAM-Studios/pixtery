@@ -39,7 +39,8 @@
         "NSCameraUsageDescription": "This app accesses your device camera so that you can take pictures with your camera to send as puzzles to others.",
         "NSPhotoLibraryUsageDescription": "This app accesses your device photo library so that you can select existing photos on your device to send as puzzles to others.",
         "NSUserTrackingUsageDescription": "This identifier will be used to deliver personalized ads to you."
-      }
+      },
+      "requireFullScreen": true
     },
     "android": {
       "package": "com.fjamstudios.pixtery",

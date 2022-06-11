@@ -74,7 +74,8 @@
     "sentry-expo": "^4.0.0",
     "shortid": "^2.2.16",
     "tslib": "^2.3.1",
-    "uuid": "^3.4.0"
+    "uuid": "^3.4.0",
+    "expo-screen-orientation": "~4.1.2"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

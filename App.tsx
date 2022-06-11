@@ -6,6 +6,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as Device from "expo-device";
 import * as Linking from "expo-linking";
 import * as Notifications from "expo-notifications";
+import * as ScreenOrientation from "expo-screen-orientation";
 import { StatusBar } from "expo-status-bar";
 import { requestTrackingPermissionsAsync } from "expo-tracking-transparency";
 import * as Updates from "expo-updates";
@@ -49,6 +50,23 @@ Sentry.init({
   enableInExpoDevelopment: true,
   debug: true, // If `true`, Sentry will try to print out useful debugging information if something goes wrong with sending the event. Set it to `false` in production
 });
+
+const logScreenOrientation = async () => {
+  const getOrientationAsync = await ScreenOrientation.getOrientationAsync();
+  console.log("getOrientationAsync", getOrientationAsync);
+  const getOrientationLockAsync = await ScreenOrientation.getOrientationLockAsync();
+  console.log("getOrientationLockAsync", getOrientationLockAsync);
+};
+logScreenOrientation();
+
+const lockScreenOrientationToPortrait = async (
+  orientationLock: ScreenOrientation.OrientationLock
+): Promise<void> => {
+  if (await ScreenOrientation.supportsOrientationLockAsync(orientationLock))
+    await ScreenOrientation.lockAsync(orientationLock);
+};
+
+lockScreenOrientationToPortrait(ScreenOrientation.OrientationLock.PORTRAIT_UP);
 
 const App = (): JSX.Element => {
   const dispatch = useDispatch();
