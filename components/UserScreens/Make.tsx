@@ -72,6 +72,8 @@ export default function Make({
   );
   const [buttonHeight, setButtonHeight] = useState(0);
   const [iOSCameraLaunch, setiOSCameraLaunch] = useState(false);
+  const iosVersionIsBelow13: boolean =
+    Platform.OS === "ios" && parseFloat(Platform.constants.osVersion) < 13;
 
   // on navigating away from Make screen, reset to non-Daily version
   useFocusEffect(
@@ -84,6 +86,10 @@ export default function Make({
 
   const selectImage = async (camera: boolean) => {
     const permission = await checkPermission(camera);
+    // for ImagePicker.launchImageLibraryAsync ImagePicker.UIImagePickerPresentationStyle.Automatic is not supported for iOS versions below 13. Need to set to FullScreen for these older versions. 
+    const presentationStyle = iosVersionIsBelow13
+      ? ImagePicker.UIImagePickerPresentationStyle.FullScreen
+      : ImagePicker.UIImagePickerPresentationStyle.Automatic;
     if (permission === "granted") {
       const result = camera
         ? await ImagePicker.launchCameraAsync({
@@ -97,6 +103,7 @@ export default function Make({
             allowsEditing: true,
             aspect: [4, 4],
             quality: 1,
+            presentationStyle,
           });
       if (!result.cancelled) {
         // if the resulting image is not a square because user did not zoom to fill image select box
@@ -341,18 +348,21 @@ export default function Make({
             {imageURI.length ? null : <Title>Choose an Image</Title>}
           </Surface>
         </View>
-        <Button
-          icon="camera"
-          mode="contained"
-          onPress={
-            Platform.OS === "android"
-              ? () => selectImage(true)
-              : () => setiOSCameraLaunch(true)
-          }
-          style={{ margin: height * 0.01 }}
-        >
-          Camera
-        </Button>
+        {/* in SDK44, iOS versions below 13 are not supported for ImagePicker.launchCameraAsync on the presentationStyle field. Therefore we hide the camera button for the older versions. */}
+        {iosVersionIsBelow13 ? null : (
+          <Button
+            icon="camera"
+            mode="contained"
+            onPress={
+              Platform.OS === "android"
+                ? () => selectImage(true)
+                : () => setiOSCameraLaunch(true)
+            }
+            style={{ margin: height * 0.01 }}
+          >
+            Camera
+          </Button>
+        )}
         <Button
           icon="folder"
           mode="contained"
