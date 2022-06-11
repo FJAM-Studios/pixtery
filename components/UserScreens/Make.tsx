@@ -86,7 +86,7 @@ export default function Make({
 
   const selectImage = async (camera: boolean) => {
     const permission = await checkPermission(camera);
-    // for ImagePicker.launchImageLibraryAsync ImagePicker.UIImagePickerPresentationStyle.Automatic is not supported for iOS versions below 13. Need to set to FullScreen for these older versions. 
+    // for ImagePicker.launchImageLibraryAsync ImagePicker.UIImagePickerPresentationStyle.Automatic is not supported for iOS versions below 13. Need to set to FullScreen for these older versions.
     const presentationStyle = iosVersionIsBelow13
       ? ImagePicker.UIImagePickerPresentationStyle.FullScreen
       : ImagePicker.UIImagePickerPresentationStyle.Automatic;
