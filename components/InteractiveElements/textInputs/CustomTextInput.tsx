@@ -27,7 +27,7 @@ export default function CustomTextInput({
   const [textFocus, setTextFocus] = useState(false);
   const [textGraphemes, setTextGraphemes] = useState(0);
   const [showCounter, setShowCounter] = useState(initalizeWithCounter);
-  const splitter = new GraphemeSplitter();
+  const [splitter] = useState(new GraphemeSplitter());
   const textDraft = textGraphemes > 0;
   const isCounterDisplayed = textFocus && showCounter;
   const atOrOverTheLimit = textGraphemes >= textLimit;
