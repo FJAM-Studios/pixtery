@@ -20,7 +20,7 @@ export default function MessageInput({
     useSelector((state: RootState) => state.screenHeight.height) * 0.01;
   const [messageFocus, setMessageFocus] = useState(false);
   const [messageGraphemes, setMessageGraphemes] = useState(0);
-  const splitter = new GraphemeSplitter();
+  const [splitter] = useState(new GraphemeSplitter());
   const messageLimit = 70;
   const messageDraft = messageGraphemes > 0;
   const overTheLimit = messageGraphemes > messageLimit;
