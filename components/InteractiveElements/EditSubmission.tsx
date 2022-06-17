@@ -4,7 +4,7 @@ import { Button, Headline, IconButton, Surface } from "react-native-paper";
 import { useSelector } from "react-redux";
 
 import { Puzzle, RootState } from "../../types";
-import MessageInput from "./MessageInput";
+import { MessageInput } from "./TextInputs";
 
 export default function EditSubmission({
   setNewPuzzle,
