@@ -1,4 +1,5 @@
-import { useState } from "react";
+import GraphemeSplitter from "grapheme-splitter";
+import { useEffect, useState } from "react";
 import { View, TextInput } from "react-native";
 import { IconButton, Text } from "react-native-paper";
 import { useSelector } from "react-redux";
@@ -18,8 +19,24 @@ export default function MessageInput({
   const margin =
     useSelector((state: RootState) => state.screenHeight.height) * 0.01;
   const [messageFocus, setMessageFocus] = useState(false);
+  const [messageGraphemes, setMessageGraphemes] = useState(0);
+  const [splitter] = useState(new GraphemeSplitter());
   const messageLimit = 70;
-  const messageDraft = message.length > 0;
+  const messageDraft = messageGraphemes > 0;
+  const overTheLimit = messageGraphemes > messageLimit;
+
+  useEffect(() => {
+    const graphemeCount = splitter.countGraphemes(message);
+    setMessageGraphemes(graphemeCount);
+  }, [message]);
+
+  useEffect(() => {
+    if (overTheLimit) {
+      const graphemes = splitter.splitGraphemes(message);
+      const slicedGraphemes = graphemes.slice(0, messageLimit).join("");
+      setMessage(slicedGraphemes);
+    }
+  }, [overTheLimit]);
 
   return (
     <View
@@ -50,14 +67,16 @@ export default function MessageInput({
         <TextInput
           placeholder="Message (optional, reveals when solved)"
           multiline
-          maxLength={messageLimit}
+          maxLength={
+            messageGraphemes >= messageLimit ? message.length : messageLimit * 4
+          }
           value={message}
           onChangeText={(message) => {
             if (message[message.length - 1] !== "\n") {
               setMessage(message);
             }
           }}
-          placeholderTextColor={theme.colors.text}
+          placeholderTextColor={theme.colors.placeholder}
           onFocus={() => setMessageFocus(true)}
           onBlur={() => setMessageFocus(false)}
           style={{
@@ -83,6 +102,7 @@ export default function MessageInput({
           style={{
             textAlign: "right",
             alignItems: "center",
+            color: overTheLimit ? theme.colors.error : theme.colors.text,
             backgroundColor: theme.colors.primary,
             borderBottomLeftRadius: theme.roundness,
             borderBottomRightRadius: theme.roundness,
@@ -90,7 +110,7 @@ export default function MessageInput({
             paddingBottom: 2.5,
           }}
         >
-          {message.length}/{messageLimit} characters
+          {messageGraphemes}/{messageLimit} characters
         </Text>
       ) : null}
     </View>
