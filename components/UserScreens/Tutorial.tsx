@@ -89,7 +89,8 @@ export default function Tutorial({
         <Surface
           style={{
             padding: height * 0.03,
-            height: height * 0.15,
+            // lazy fix for the partial hidden text in tutorial
+            // height: height * 0.15,
             borderRadius: theme.roundness,
             backgroundColor: theme.colors.surface,
             justifyContent: "center",
