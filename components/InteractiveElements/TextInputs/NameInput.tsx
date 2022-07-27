@@ -1,3 +1,4 @@
+import { NAME_CHARACTER_LIMIT } from "../../../constants";
 import CustomTextInput from "./CustomTextInput";
 
 export default function NameInput({
@@ -11,7 +12,8 @@ export default function NameInput({
     <CustomTextInput
       text={name}
       setText={setName}
-      initalizeWithCounter={false}
+      textLimit={NAME_CHARACTER_LIMIT}
+      initializeWithCounter={false}
       placeHolderText="Pixtery Display Name"
     />
   );

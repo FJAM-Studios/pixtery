@@ -1,3 +1,4 @@
+import { MESSAGE_CHARACTER_LIMIT } from "../../../constants";
 import CustomTextInput from "./CustomTextInput";
 
 export default function MessageInput({
@@ -11,6 +12,8 @@ export default function MessageInput({
     <CustomTextInput
       text={message}
       setText={setMessage}
+      textLimit={MESSAGE_CHARACTER_LIMIT}
+      initializeWithCounter
       placeHolderText="Message (optional, reveals when solved)"
     />
   );

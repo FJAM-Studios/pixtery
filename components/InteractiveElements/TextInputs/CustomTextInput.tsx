@@ -9,14 +9,14 @@ import { RootState } from "../../../types";
 export default function CustomTextInput({
   text,
   setText,
-  textLimit = 70,
-  initalizeWithCounter = true,
+  textLimit,
+  initializeWithCounter,
   placeHolderText,
 }: {
   text: string;
   setText: (text: string) => void;
-  textLimit?: number;
-  initalizeWithCounter?: boolean;
+  textLimit: number;
+  initializeWithCounter: boolean;
   placeHolderText: string;
 }): JSX.Element {
   const theme = useSelector((state: RootState) => state.theme);
@@ -26,7 +26,7 @@ export default function CustomTextInput({
     useSelector((state: RootState) => state.screenHeight.height) * 0.01;
   const [textFocus, setTextFocus] = useState(false);
   const [textGraphemes, setTextGraphemes] = useState(0);
-  const [showCounter, setShowCounter] = useState(initalizeWithCounter);
+  const [showCounter, setShowCounter] = useState(initializeWithCounter);
   const [splitter] = useState(new GraphemeSplitter());
   const textDraft = textGraphemes > 0;
   const isCounterDisplayed = textFocus && showCounter;
