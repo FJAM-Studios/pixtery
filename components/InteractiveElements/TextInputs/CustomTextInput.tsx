@@ -4,37 +4,51 @@ import { View, TextInput } from "react-native";
 import { IconButton, Text } from "react-native-paper";
 import { useSelector } from "react-redux";
 
-import { RootState } from "../../types";
+import { RootState } from "../../../types";
 
-export default function MessageInput({
-  message,
-  setMessage,
+export default function CustomTextInput({
+  text,
+  setText,
+  textLimit,
+  initializeWithCounter,
+  placeHolderText,
 }: {
-  message: string;
-  setMessage: (text: string) => void;
+  text: string;
+  setText: (text: string) => void;
+  textLimit: number;
+  initializeWithCounter: boolean;
+  placeHolderText: string;
 }): JSX.Element {
   const theme = useSelector((state: RootState) => state.theme);
   const height =
     useSelector((state: RootState) => state.screenHeight.height) * 0.09;
   const margin =
     useSelector((state: RootState) => state.screenHeight.height) * 0.01;
-  const [messageFocus, setMessageFocus] = useState(false);
-  const [messageGraphemes, setMessageGraphemes] = useState(0);
+  const [textFocus, setTextFocus] = useState(false);
+  const [textGraphemes, setTextGraphemes] = useState(0);
+  const [showCounter, setShowCounter] = useState(initializeWithCounter);
   const [splitter] = useState(new GraphemeSplitter());
-  const messageLimit = 70;
-  const messageDraft = messageGraphemes > 0;
-  const overTheLimit = messageGraphemes > messageLimit;
+  const textDraft = textGraphemes > 0;
+  const isCounterDisplayed = textFocus && showCounter;
+  const atOrOverTheLimit = textGraphemes >= textLimit;
+  const overTheLimit = textGraphemes > textLimit;
 
   useEffect(() => {
-    const graphemeCount = splitter.countGraphemes(message);
-    setMessageGraphemes(graphemeCount);
-  }, [message]);
+    const graphemeCount = splitter.countGraphemes(text);
+    setTextGraphemes(graphemeCount);
+  }, [text]);
+
+  useEffect(() => {
+    if (atOrOverTheLimit) {
+      setShowCounter(true);
+    }
+  }, [atOrOverTheLimit]);
 
   useEffect(() => {
     if (overTheLimit) {
-      const graphemes = splitter.splitGraphemes(message);
-      const slicedGraphemes = graphemes.slice(0, messageLimit).join("");
-      setMessage(slicedGraphemes);
+      const graphemes = splitter.splitGraphemes(text);
+      const slicedGraphemes = graphemes.slice(0, textLimit).join("");
+      setText(slicedGraphemes);
     }
   }, [overTheLimit]);
 
@@ -53,11 +67,11 @@ export default function MessageInput({
           flexDirection: "row",
           justifyContent: "space-between",
           alignItems: "center",
-          borderWidth: messageFocus ? 2.5 : 1,
+          borderWidth: textFocus ? 2.5 : 1,
           borderTopLeftRadius: theme.roundness,
           borderTopRightRadius: theme.roundness,
-          borderBottomLeftRadius: messageFocus ? 0 : theme.roundness,
-          borderBottomRightRadius: messageFocus ? 0 : theme.roundness,
+          borderBottomLeftRadius: isCounterDisplayed ? 0 : theme.roundness,
+          borderBottomRightRadius: isCounterDisplayed ? 0 : theme.roundness,
           borderColor: theme.colors.primary,
           padding: 5,
           marginTop: 2.5,
@@ -65,20 +79,18 @@ export default function MessageInput({
         }}
       >
         <TextInput
-          placeholder="Message (optional, reveals when solved)"
+          placeholder={placeHolderText}
           multiline
-          maxLength={
-            messageGraphemes >= messageLimit ? message.length : messageLimit * 4
-          }
-          value={message}
-          onChangeText={(message) => {
-            if (message[message.length - 1] !== "\n") {
-              setMessage(message);
+          maxLength={textGraphemes >= textLimit ? text.length : textLimit * 14}
+          value={text}
+          onChangeText={(text) => {
+            if (text[text.length - 1] !== "\n") {
+              setText(text);
             }
           }}
           placeholderTextColor={theme.colors.placeholder}
-          onFocus={() => setMessageFocus(true)}
-          onBlur={() => setMessageFocus(false)}
+          onFocus={() => setTextFocus(true)}
+          onBlur={() => setTextFocus(false)}
           style={{
             color: theme.colors.text,
             justifyContent: "center",
@@ -90,14 +102,14 @@ export default function MessageInput({
           style={{
             margin: 0,
           }}
-          color={messageDraft ? theme.colors.primary : theme.colors.disabled}
-          disabled={!messageDraft}
+          color={textDraft ? theme.colors.primary : theme.colors.disabled}
+          disabled={!textDraft}
           onPress={() => {
-            setMessage("");
+            setText("");
           }}
         />
       </View>
-      {messageFocus ? (
+      {isCounterDisplayed ? (
         <Text
           style={{
             textAlign: "right",
@@ -110,7 +122,7 @@ export default function MessageInput({
             paddingBottom: 2.5,
           }}
         >
-          {messageGraphemes}/{messageLimit} characters
+          {textGraphemes}/{textLimit} characters
         </Text>
       ) : null}
     </View>

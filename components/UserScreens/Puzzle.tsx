@@ -317,6 +317,7 @@ export default function PuzzleComponent({
                 style={{
                   flexDirection: "row",
                   justifyContent: "space-between",
+                  width: boardSize,
                 }}
               >
                 <FAB
@@ -327,20 +328,27 @@ export default function PuzzleComponent({
                     bottom: 20,
                     left: 5,
                     width: 40,
+                    alignSelf: "flex-start",
                   }}
                 />
-                <Text style={styles(styleProps).creatorText}>
-                  {winMessage.length
-                    ? `created by: ${puzzle.senderName}`
-                    : null}
-                </Text>
+                <View
+                  style={{
+                    width: boardSize - 40,
+                  }}
+                >
+                  <Text style={styles(styleProps).creatorText}>
+                    created by: {puzzle.senderName}
+                  </Text>
+                </View>
               </View>
-              <HyperLink
-                linkDefault
-                linkStyle={{ textDecorationLine: "underline" }}
-              >
-                <Text style={styles(styleProps).winText}>{winMessage}</Text>
-              </HyperLink>
+              <View>
+                <HyperLink
+                  linkDefault
+                  linkStyle={{ textDecorationLine: "underline" }}
+                >
+                  <Text style={styles(styleProps).winText}>{winMessage}</Text>
+                </HyperLink>
+              </View>
             </>
           )}
         </View>
@@ -437,12 +445,12 @@ const styles = (props: { theme: Theme; boardSize: number }) =>
       textAlign: "center",
       // flex: 1,
       color: props.theme.colors.text,
-      marginTop: -15,
     },
     creatorText: {
       fontSize: 12,
       flexWrap: "wrap",
       textAlign: "right",
+      marginLeft: 5,
       // flex: 1,
       color: props.theme.colors.text,
       marginTop: 2,
