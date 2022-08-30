@@ -14,7 +14,7 @@
     "build-watch": "webpack -w",
     "build": "webpack",
     "emulate-host": "firebase emulators:start --only hosting",
-    "web-dev": "npm run build && npm run emulate-host",
+    "web-dev": "concurrently \"npm run build-watch\" \"npm run emulate-host\"",
     "func-dev": "concurrently \"cd functions && npm run build:watch\" \"cd functions && firebase emulators:start --only functions\" \"npm run func-env\"",
     "func-env": "cross-env FUNC=true npm start",
     "postinstall": "patch-package"

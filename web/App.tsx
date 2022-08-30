@@ -17,6 +17,7 @@ const getDaily = httpsCallable(functions, "getDaily");
 
 export default function App(): JSX.Element {
   const [loading, setLoading] = useState(true);
+  const [startSolved, setStartSolved] = useState(false);
   const [puzzle, setPuzzle] = useState<PuzzleType>();
 
   useEffect(() => {
@@ -36,14 +37,25 @@ export default function App(): JSX.Element {
       } catch (error) {
         console.error(error);
       }
-    } else if (publicKey.length === PUBLIC_KEY_LENGTH) {
+    } else if (
+      publicKey.length === PUBLIC_KEY_LENGTH ||
+      PUBLIC_KEY_LENGTH + 7
+    ) {
       try {
-        const puzzleData = (await queryPuzzleCallable({ publicKey }))
-          .data as Puzzle;
+        const puzzleData = (
+          await queryPuzzleCallable({
+            publicKey: publicKey.slice(0, PUBLIC_KEY_LENGTH),
+          })
+        ).data as Puzzle;
         const imageURI = puzzleData.imageURI;
         const downloadURL = await getPixteryURL("/" + imageURI);
         puzzleData.imageURI = downloadURL;
         setPuzzle(puzzleData);
+        if (
+          publicKey.slice(PUBLIC_KEY_LENGTH, PUBLIC_KEY_LENGTH + 7) ===
+          "_SOLVED"
+        )
+          setStartSolved(true);
       } catch (error) {
         console.error(error);
       }
@@ -61,7 +73,7 @@ export default function App(): JSX.Element {
   if (puzzle) {
     return (
       <div id="app">
-        <Puzzle puzzle={puzzle} />
+        <Puzzle puzzle={puzzle} startSolved={startSolved} />
       </div>
     );
   }
