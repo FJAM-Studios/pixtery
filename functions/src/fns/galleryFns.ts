@@ -175,14 +175,6 @@ export const getDaily = functions.https.onCall(
     context
   ): Promise<void | null | FirebaseFirestore.DocumentData> => {
     try {
-      // throw error if user is not authenticated
-      if (!context.auth) {
-        throw new functions.https.HttpsError(
-          "permission-denied",
-          "user not authenticated"
-        );
-      }
-
       //get today's date in EST and create vars
       const now = dayjs().tz(DAILY_TIMEZONE);
 

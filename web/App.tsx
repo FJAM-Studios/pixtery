@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-import { queryPuzzleCallable } from "../FirebaseApp/CloudFunctions";
+import { queryPuzzleCallable, getDaily } from "../FirebaseApp/CloudFunctions";
 import { getPixteryURL } from "../FirebaseApp/StorageFunctions";
 import { PUBLIC_KEY_LENGTH } from "../constants";
 import { Puzzle as PuzzleType } from "../types";
@@ -18,7 +18,17 @@ export default function App(): JSX.Element {
   }, []);
 
   const fetchPuzzle = async (publicKey: string): Promise<PuzzleType | void> => {
-    if (publicKey.length === PUBLIC_KEY_LENGTH) {
+    if (publicKey === "daily") {
+      try {
+        const puzzleData = (await getDaily()).data as Puzzle;
+        const imageURI = puzzleData.imageURI;
+        const downloadURL = await getPixteryURL("/" + imageURI);
+        puzzleData.imageURI = downloadURL;
+        setPuzzle(puzzleData);
+      } catch (error) {
+        console.error(error);
+      }
+    } else if (publicKey.length === PUBLIC_KEY_LENGTH) {
       try {
         const puzzleData = (await queryPuzzleCallable({ publicKey }))
           .data as Puzzle;
@@ -51,6 +61,11 @@ export default function App(): JSX.Element {
     <div id="app">
       <img src="/logo.svg" className="logo" alt="Pixtery!" />
       <img src="/pixtery.svg" className="title" alt="Pixtery!" />
+      <b>
+        <a style={{ fontFamily: "Shrikhand" }} href="/p/daily">
+          Play the Daily Pixtery!
+        </a>
+      </b>
       <StoreLinks />
       <div id="web-footer">
         <div id="web-footer-contents">
