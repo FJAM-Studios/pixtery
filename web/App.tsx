@@ -1,11 +1,19 @@
+import { getFunctions, httpsCallable } from "firebase/functions";
 import { useState, useEffect } from "react";
 
-import { queryPuzzleCallable, getDaily } from "../FirebaseApp/CloudFunctions";
+// removing to avoid problems with Expo-Constants and webpack
+// import { queryPuzzleCallable, getDaily } from "../FirebaseApp/CloudFunctions";
+import { app } from "../FirebaseApp/InitializeFirebase";
 import { getPixteryURL } from "../FirebaseApp/StorageFunctions";
 import { PUBLIC_KEY_LENGTH } from "../constants";
 import { Puzzle as PuzzleType } from "../types";
 import Puzzle from "./Puzzle";
 import StoreLinks from "./StoreLinks";
+
+// replacing imports for webpack
+const functions = getFunctions(app);
+const queryPuzzleCallable = httpsCallable(functions, "queryPuzzle");
+const getDaily = httpsCallable(functions, "getDaily");
 
 export default function App(): JSX.Element {
   const [loading, setLoading] = useState(true);

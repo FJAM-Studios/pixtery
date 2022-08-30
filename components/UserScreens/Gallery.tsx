@@ -4,6 +4,7 @@ import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone"; // dependent on utc plugin
 import utc from "dayjs/plugin/utc";
 import { AdMobInterstitial } from "expo-ads-admob";
+import * as Device from "expo-device";
 import { useState, useCallback } from "react";
 import { View } from "react-native";
 import { ActivityIndicator, Button, Text } from "react-native-paper";
@@ -12,12 +13,18 @@ import { useDispatch, useSelector } from "react-redux";
 import * as Sentry from "sentry-expo";
 
 import { auth, getDaily } from "../../FirebaseApp";
-import { INTERSTITIAL_ID, DAILY_TIMEZONE } from "../../constants";
+import {
+  INTERSTITIAL_ID,
+  DAILY_TIMEZONE,
+  TEST_INTERSTITIAL_ID,
+} from "../../constants";
 import { setDailyStatus } from "../../store/reducers/dailyStatus";
 import { RootState, DailyContainerProps } from "../../types";
 import { Timer } from "../InteractiveElements";
 import { AdSafeAreaView } from "../Layout";
-AdMobInterstitial.setAdUnitID(INTERSTITIAL_ID);
+AdMobInterstitial.setAdUnitID(
+  Device.isDevice ? INTERSTITIAL_ID : TEST_INTERSTITIAL_ID
+);
 
 export default function Gallery({
   navigation,

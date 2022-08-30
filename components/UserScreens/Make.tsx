@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
 import { AdMobInterstitial } from "expo-ads-admob";
+import * as Device from "expo-device";
 import * as FileSystem from "expo-file-system";
 import * as ImageManipulator from "expo-image-manipulator";
 import * as ImagePicker from "expo-image-picker";
@@ -31,6 +32,7 @@ import {
   DEFAULT_IMAGE_SIZE,
   COMPRESSION,
   INTERSTITIAL_ID,
+  TEST_INTERSTITIAL_ID,
   ARGUABLY_CLEVER_PHRASES,
 } from "../../constants";
 import {
@@ -45,7 +47,9 @@ import { AdSafeAreaView } from "../Layout";
 
 const emptyImage = require("../../assets/blank.jpg");
 
-AdMobInterstitial.setAdUnitID(INTERSTITIAL_ID);
+AdMobInterstitial.setAdUnitID(
+  Device.isDevice ? INTERSTITIAL_ID : TEST_INTERSTITIAL_ID
+);
 
 export default function Make({
   navigation,

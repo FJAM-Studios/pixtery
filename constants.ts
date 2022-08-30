@@ -1,4 +1,3 @@
-import * as Device from "expo-device";
 import { Platform } from "react-native";
 
 import admobIDs from "./admobIDs";
@@ -25,7 +24,8 @@ const {
 
 let BANNER_ID = TEST_BANNER_ID;
 let INTERSTITIAL_ID = TEST_INTERSTITIAL_ID;
-if (Device.isDevice && process.env.NODE_ENV !== "development") {
+// move device check to React Native components to avoid webpack errors for web build
+if (process.env.NODE_ENV !== "development") {
   BANNER_ID = Platform.OS === "ios" ? IOS_BANNER_ID : ANDROID_BANNER_ID;
   INTERSTITIAL_ID =
     Platform.OS === "ios" ? IOS_INTERSTITIAL_ID : ANDROID_INTERSTITIAL_ID;
@@ -64,6 +64,8 @@ export {
   SNAP_MARGIN,
   COMPRESSION,
   DEFAULT_IMAGE_SIZE,
+  TEST_BANNER_ID,
+  TEST_INTERSTITIAL_ID,
   BANNER_ID,
   INTERSTITIAL_ID,
   DEGREE_CONVERSION,
