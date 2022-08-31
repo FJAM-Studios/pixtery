@@ -27,38 +27,26 @@ export default function App(): JSX.Element {
   }, []);
 
   const fetchPuzzle = async (publicKey: string): Promise<PuzzleType | void> => {
-    if (publicKey === "daily") {
-      try {
-        const puzzleData = (await getDaily()).data as Puzzle;
-        const imageURI = puzzleData.imageURI;
-        const downloadURL = await getPixteryURL("/" + imageURI);
-        puzzleData.imageURI = downloadURL;
-        setPuzzle(puzzleData);
-      } catch (error) {
-        console.error(error);
-      }
-    } else if (
-      publicKey.length === PUBLIC_KEY_LENGTH ||
-      PUBLIC_KEY_LENGTH + 7
-    ) {
-      try {
-        const puzzleData = (
-          await queryPuzzleCallable({
-            publicKey: publicKey.slice(0, PUBLIC_KEY_LENGTH),
-          })
-        ).data as Puzzle;
-        const imageURI = puzzleData.imageURI;
-        const downloadURL = await getPixteryURL("/" + imageURI);
-        puzzleData.imageURI = downloadURL;
-        setPuzzle(puzzleData);
-        if (
-          publicKey.slice(PUBLIC_KEY_LENGTH, PUBLIC_KEY_LENGTH + 7) ===
-          "_SOLVED"
-        )
-          setStartSolved(true);
-      } catch (error) {
-        console.error(error);
-      }
+    const populatePuzzleData = async (puzzleData: Puzzle) => {
+      const imageURI = puzzleData.imageURI;
+      const downloadURL = await getPixteryURL("/" + imageURI);
+      puzzleData.imageURI = downloadURL;
+      setPuzzle(puzzleData);
+      if (
+        publicKey.slice(PUBLIC_KEY_LENGTH, PUBLIC_KEY_LENGTH + 7) === "_SOLVED"
+      )
+        setStartSolved(true);
+    };
+
+    try {
+      const subKey = publicKey.slice(0, PUBLIC_KEY_LENGTH);
+      const puzzleData =
+        subKey === "the_daily"
+          ? ((await getDaily()).data as Puzzle)
+          : ((await queryPuzzleCallable({ publicKey: subKey })).data as Puzzle);
+      await populatePuzzleData(puzzleData);
+    } catch (error) {
+      console.error(error);
     }
     setLoading(false);
   };
@@ -82,7 +70,7 @@ export default function App(): JSX.Element {
       <img src="/logo.svg" className="logo" alt="Pixtery!" />
       <img src="/pixtery.svg" className="title" alt="Pixtery!" />
       <b>
-        <a style={{ fontFamily: "Shrikhand" }} href="/p/daily">
+        <a style={{ fontFamily: "Shrikhand" }} href="/p/the_daily">
           Play the Daily Pixtery!
         </a>
       </b>
