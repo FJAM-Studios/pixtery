@@ -18,11 +18,13 @@ const disableShuffle = TESTING_MODE;
 
 export default function Puzzle({
   puzzle,
+  startSolved,
 }: {
   puzzle: PuzzleType;
+  startSolved: boolean;
 }): JSX.Element {
   const [height, setHeight] = useState(0);
-  const [solved, setSolved] = useState(false);
+  const [solved, setSolved] = useState(startSolved);
   const [pieces, setPieces] = useState<Piece[]>([]);
   const [snapPoints, setSnapPoints] = useState<Point[]>([]);
   const boardRef = useRef<HTMLDivElement | null>(null);
@@ -38,7 +40,6 @@ export default function Puzzle({
   const currentBoard = useRef<BoardSpace[]>([]);
 
   const checkWin = () => {
-    console.log(currentBoard.current);
     if (validateBoard(currentBoard.current, puzzle.gridSize)) {
       setSolved(true);
     }
@@ -117,6 +118,9 @@ export default function Puzzle({
               backgroundSize: `${height}px ${height}px`,
             }}
           />
+          {puzzle.senderName && puzzle.senderName.length ? (
+            <h4 id="web-sender-name">created by:{puzzle.senderName}</h4>
+          ) : null}
           <div
             id="callToAction"
             style={{ marginLeft: "auto", marginRight: "auto", width: height }}
@@ -126,6 +130,7 @@ export default function Puzzle({
                 ? puzzle.message
                 : "Congrats! You solved the puzzle!"}
             </h2>
+
             <h3 id="callToAction-text">
               Download the Pixtery app to send your own puzzle!
             </h3>

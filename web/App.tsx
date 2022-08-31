@@ -1,14 +1,23 @@
+import { getFunctions, httpsCallable } from "firebase/functions";
 import { useState, useEffect } from "react";
 
-import { queryPuzzleCallable } from "../FirebaseApp/CloudFunctions";
+// removing to avoid problems with Expo-Constants and webpack
+// import { queryPuzzleCallable, getDaily } from "../FirebaseApp/CloudFunctions";
+import { app } from "../FirebaseApp/InitializeFirebase";
 import { getPixteryURL } from "../FirebaseApp/StorageFunctions";
 import { PUBLIC_KEY_LENGTH } from "../constants";
 import { Puzzle as PuzzleType } from "../types";
 import Puzzle from "./Puzzle";
 import StoreLinks from "./StoreLinks";
 
+// replacing imports for webpack
+const functions = getFunctions(app);
+const queryPuzzleCallable = httpsCallable(functions, "queryPuzzle");
+const getDaily = httpsCallable(functions, "getDaily");
+
 export default function App(): JSX.Element {
   const [loading, setLoading] = useState(true);
+  const [startSolved, setStartSolved] = useState(false);
   const [puzzle, setPuzzle] = useState<PuzzleType>();
 
   useEffect(() => {
@@ -18,17 +27,26 @@ export default function App(): JSX.Element {
   }, []);
 
   const fetchPuzzle = async (publicKey: string): Promise<PuzzleType | void> => {
-    if (publicKey.length === PUBLIC_KEY_LENGTH) {
-      try {
-        const puzzleData = (await queryPuzzleCallable({ publicKey }))
-          .data as Puzzle;
-        const imageURI = puzzleData.imageURI;
-        const downloadURL = await getPixteryURL("/" + imageURI);
-        puzzleData.imageURI = downloadURL;
-        setPuzzle(puzzleData);
-      } catch (error) {
-        console.error(error);
-      }
+    const populatePuzzleData = async (puzzleData: Puzzle) => {
+      const imageURI = puzzleData.imageURI;
+      const downloadURL = await getPixteryURL("/" + imageURI);
+      puzzleData.imageURI = downloadURL;
+      setPuzzle(puzzleData);
+      if (
+        publicKey.slice(PUBLIC_KEY_LENGTH, PUBLIC_KEY_LENGTH + 7) === "_SOLVED"
+      )
+        setStartSolved(true);
+    };
+
+    try {
+      const subKey = publicKey.slice(0, PUBLIC_KEY_LENGTH);
+      const puzzleData =
+        subKey === "the_daily"
+          ? ((await getDaily()).data as Puzzle)
+          : ((await queryPuzzleCallable({ publicKey: subKey })).data as Puzzle);
+      await populatePuzzleData(puzzleData);
+    } catch (error) {
+      console.error(error);
     }
     setLoading(false);
   };
@@ -43,7 +61,7 @@ export default function App(): JSX.Element {
   if (puzzle) {
     return (
       <div id="app">
-        <Puzzle puzzle={puzzle} />
+        <Puzzle puzzle={puzzle} startSolved={startSolved} />
       </div>
     );
   }
@@ -51,6 +69,11 @@ export default function App(): JSX.Element {
     <div id="app">
       <img src="/logo.svg" className="logo" alt="Pixtery!" />
       <img src="/pixtery.svg" className="title" alt="Pixtery!" />
+      <b>
+        <a style={{ fontFamily: "Shrikhand" }} href="/p/the_daily">
+          Play the Daily Pixtery!
+        </a>
+      </b>
       <StoreLinks />
       <div id="web-footer">
         <div id="web-footer-contents">
