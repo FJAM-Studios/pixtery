@@ -40,7 +40,6 @@ export default function Puzzle({
   const currentBoard = useRef<BoardSpace[]>([]);
 
   const checkWin = () => {
-    console.log(currentBoard.current);
     if (validateBoard(currentBoard.current, puzzle.gridSize)) {
       setSolved(true);
     }
