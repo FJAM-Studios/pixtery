@@ -14,18 +14,22 @@ const DEFAULT_IMAGE_SIZE = {
 };
 
 const {
+  TEST_BANNER_ID,
   IOS_BANNER_ID,
   ANDROID_BANNER_ID,
+  TEST_INTERSTITIAL_ID,
   IOS_INTERSTITIAL_ID,
   ANDROID_INTERSTITIAL_ID,
 } = admobIDs;
 
-const BANNER_ID = Platform.OS === "ios" ? IOS_BANNER_ID : ANDROID_BANNER_ID;
-const INTERSTITIAL_ID =
-  Platform.OS === "ios" ? IOS_INTERSTITIAL_ID : ANDROID_INTERSTITIAL_ID;
-
-// so we don't have to deal w fullscreen ads before sending a test pixtery
-const DISPLAY_PAINFUL_ADS = false;
+let BANNER_ID = TEST_BANNER_ID;
+let INTERSTITIAL_ID = TEST_INTERSTITIAL_ID;
+// move device check to React Native components to avoid webpack errors for web build
+if (process.env.NODE_ENV !== "development") {
+  BANNER_ID = Platform.OS === "ios" ? IOS_BANNER_ID : ANDROID_BANNER_ID;
+  INTERSTITIAL_ID =
+    Platform.OS === "ios" ? IOS_INTERSTITIAL_ID : ANDROID_INTERSTITIAL_ID;
+}
 
 const DEGREE_CONVERSION = Math.PI / 180;
 
@@ -35,7 +39,7 @@ const PUBLIC_KEY_LENGTH = 9;
 
 const MIN_BOTTOM_CLEARANCE = 0.7;
 
-const VERSION_NUMBER = "2.0.5";
+const VERSION_NUMBER = "2.1";
 
 const ARGUABLY_CLEVER_PHRASES = [
   "Please wait!",
@@ -51,14 +55,19 @@ const DAILY_TIMEZONE = "America/New_York";
 
 const DATE_FORMAT = "MMM D YYYY";
 
+const MESSAGE_CHARACTER_LIMIT = 70;
+
+const NAME_CHARACTER_LIMIT = 70;
+
 export {
   TESTING_MODE,
   SNAP_MARGIN,
   COMPRESSION,
   DEFAULT_IMAGE_SIZE,
+  TEST_BANNER_ID,
+  TEST_INTERSTITIAL_ID,
   BANNER_ID,
   INTERSTITIAL_ID,
-  DISPLAY_PAINFUL_ADS,
   DEGREE_CONVERSION,
   USE_NATIVE_DRIVER,
   PUBLIC_KEY_LENGTH,
@@ -68,4 +77,6 @@ export {
   DAY_IN_MILLISECONDS,
   DAILY_TIMEZONE,
   DATE_FORMAT,
+  MESSAGE_CHARACTER_LIMIT,
+  NAME_CHARACTER_LIMIT,
 };

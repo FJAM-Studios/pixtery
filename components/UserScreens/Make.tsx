@@ -1,10 +1,12 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFocusEffect } from "@react-navigation/native";
 import { AdMobInterstitial } from "expo-ads-admob";
+import * as Device from "expo-device";
 import * as FileSystem from "expo-file-system";
 import * as ImageManipulator from "expo-image-manipulator";
 import * as ImagePicker from "expo-image-picker";
 import * as Linking from "expo-linking";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Image, View, Platform, Keyboard } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import {
@@ -21,6 +23,7 @@ import {
 import Toast from "react-native-root-toast";
 import Svg, { Path } from "react-native-svg";
 import { useDispatch, useSelector } from "react-redux";
+import * as Sentry from "sentry-expo";
 import shortid from "shortid";
 import uuid from "uuid";
 
@@ -29,7 +32,7 @@ import {
   DEFAULT_IMAGE_SIZE,
   COMPRESSION,
   INTERSTITIAL_ID,
-  DISPLAY_PAINFUL_ADS,
+  TEST_INTERSTITIAL_ID,
   ARGUABLY_CLEVER_PHRASES,
 } from "../../constants";
 import {
@@ -44,10 +47,13 @@ import { AdSafeAreaView } from "../Layout";
 
 const emptyImage = require("../../assets/blank.jpg");
 
-AdMobInterstitial.setAdUnitID(INTERSTITIAL_ID);
+AdMobInterstitial.setAdUnitID(
+  Device.isDevice ? INTERSTITIAL_ID : TEST_INTERSTITIAL_ID
+);
 
 export default function Make({
   navigation,
+  route,
 }: MakeContainerProps<"Make">): JSX.Element {
   const dispatch = useDispatch();
   const theme = useSelector((state: RootState) => state.theme);
@@ -61,15 +67,33 @@ export default function Make({
   const [gridSize, setGridSize] = useState(3);
   const [message, setMessage] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
+  const [directToDaily, setDirectToDaily] = useState(
+    !!route.params?.directToDaily
+  );
 
   const [paths, setPaths] = useState(
     generateJigsawPiecePaths(gridSize, boardSize / (1.6 * gridSize), true)
   );
   const [buttonHeight, setButtonHeight] = useState(0);
   const [iOSCameraLaunch, setiOSCameraLaunch] = useState(false);
+  const iosVersionIsBelow13: boolean =
+    Platform.OS === "ios" && parseFloat(Platform.constants.osVersion) < 13;
+
+  // on navigating away from Make screen, reset to non-Daily version
+  useFocusEffect(
+    useCallback(() => {
+      return () => {
+        setDirectToDaily(false);
+      };
+    }, [navigation])
+  );
 
   const selectImage = async (camera: boolean) => {
     const permission = await checkPermission(camera);
+    // for ImagePicker.launchImageLibraryAsync ImagePicker.UIImagePickerPresentationStyle.Automatic is not supported for iOS versions below 13. Need to set to FullScreen for these older versions.
+    const presentationStyle = iosVersionIsBelow13
+      ? ImagePicker.UIImagePickerPresentationStyle.FullScreen
+      : ImagePicker.UIImagePickerPresentationStyle.Automatic;
     if (permission === "granted") {
       const result = camera
         ? await ImagePicker.launchCameraAsync({
@@ -83,6 +107,7 @@ export default function Make({
             allowsEditing: true,
             aspect: [4, 4],
             quality: 1,
+            presentationStyle,
           });
       if (!result.cancelled) {
         // if the resulting image is not a square because user did not zoom to fill image select box
@@ -120,10 +145,8 @@ export default function Make({
   };
 
   const submitToServer = async (): Promise<void> => {
-    if (DISPLAY_PAINFUL_ADS) {
-      AdMobInterstitial.removeAllListeners();
-      AdMobInterstitial.requestAdAsync({ servePersonalizedAds: true });
-    }
+    Keyboard.dismiss();
+    setModalVisible(true);
     const fileName: string = uuid.v4() + ".jpg";
     try {
       const localURI = await uploadImage(fileName);
@@ -136,17 +159,29 @@ export default function Make({
           to: permanentURI,
         });
       }
-      setModalVisible(false);
       if (newPuzzle) {
         if (newPuzzle.publicKey) {
-          generateLink(newPuzzle.publicKey);
-          addToSent(newPuzzle);
-          navigation.navigate("LibraryContainer", {
-            screen: "PuzzleListContainer",
-            params: {
-              screen: "SentPuzzleList",
-            },
-          });
+          await addToSent(newPuzzle);
+          // no need to generate link sharing if submitting direct to daily
+          if (directToDaily) {
+            navigation.push("TabContainer", {
+              screen: "DailyContainer",
+              params: {
+                screen: "AddToGallery",
+                params: {
+                  puzzle: newPuzzle,
+                },
+              },
+            });
+          } else {
+            generateLink(newPuzzle.publicKey);
+            navigation.navigate("LibraryContainer", {
+              screen: "PuzzleListContainer",
+              params: {
+                screen: "SentPuzzleList",
+              },
+            });
+          }
         }
       }
     } catch (error) {
@@ -157,9 +192,8 @@ export default function Make({
           duration: Toast.durations.SHORT,
         }
       );
-      setModalVisible(false);
     }
-    // need to add else for error handling if uploadPuzzSettings throws error
+    setModalVisible(false);
   };
 
   const addToSent = async (puzzle: Puzzle) => {
@@ -201,10 +235,13 @@ export default function Make({
       dateReceived: new Date().toISOString(),
     };
     try {
+      // uncomment below Error line to test Sentry
+      // throw new Error("upload puzzle forced error for sentry");
       await uploadPuzzleSettingsCallable({ newPuzzle });
       return newPuzzle;
     } catch (error) {
       console.error(error);
+      Sentry.Native.captureException(error);
       if (error instanceof Error) throw new Error(error.message);
     }
   };
@@ -215,29 +252,6 @@ export default function Make({
       scheme: "https",
     });
     shareMessage(deepLink);
-  };
-
-  const displayPainfulAd = async () => {
-    Keyboard.dismiss();
-    if (DISPLAY_PAINFUL_ADS) {
-      //I tried adding the event listeners in the useEffect but that caused the filename passed to the image manipulator to be blank so instead they're created here and then cleaned up in the submitToServer so it doesn't trigger repeatedly when making more than one puzzle
-      AdMobInterstitial.addEventListener("interstitialDidClose", () => {
-        submitToServer();
-      });
-      AdMobInterstitial.addEventListener("interstitialDidFailToLoad", () => {
-        submitToServer();
-      });
-      try {
-        await AdMobInterstitial.showAdAsync();
-        setModalVisible(true);
-      } catch (error) {
-        console.log(error);
-        submitToServer();
-      }
-    } else {
-      setModalVisible(true);
-      submitToServer();
-    }
   };
 
   useEffect(() => {
@@ -338,18 +352,21 @@ export default function Make({
             {imageURI.length ? null : <Title>Choose an Image</Title>}
           </Surface>
         </View>
-        <Button
-          icon="camera"
-          mode="contained"
-          onPress={
-            Platform.OS === "android"
-              ? () => selectImage(true)
-              : () => setiOSCameraLaunch(true)
-          }
-          style={{ margin: height * 0.01 }}
-        >
-          Camera
-        </Button>
+        {/* in SDK44, iOS versions below 13 are not supported for ImagePicker.launchCameraAsync on the presentationStyle field. Therefore we hide the camera button for the older versions. */}
+        {iosVersionIsBelow13 ? null : (
+          <Button
+            icon="camera"
+            mode="contained"
+            onPress={
+              Platform.OS === "android"
+                ? () => selectImage(true)
+                : () => setiOSCameraLaunch(true)
+            }
+            style={{ margin: height * 0.01 }}
+          >
+            Camera
+          </Button>
+        )}
         <Button
           icon="folder"
           mode="contained"
@@ -475,12 +492,12 @@ export default function Make({
         <Button
           icon="send"
           mode="contained"
-          onPress={displayPainfulAd}
+          onPress={submitToServer}
           style={{ margin: height * 0.01 }}
           disabled={imageURI.length === 0}
           onLayout={(ev) => setButtonHeight(ev.nativeEvent.layout.height)}
         >
-          Send
+          {directToDaily ? "Submit Daily" : "Send"}
         </Button>
       </KeyboardAwareScrollView>
     </AdSafeAreaView>

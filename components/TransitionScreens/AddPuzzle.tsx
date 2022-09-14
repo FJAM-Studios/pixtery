@@ -10,6 +10,7 @@ import { Headline, ActivityIndicator } from "react-native-paper";
 import Toast from "react-native-root-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { AnyAction } from "redux";
+import * as Sentry from "sentry-expo";
 
 import { queryPuzzleCallable } from "../../FirebaseApp";
 import { setReceivedPuzzles } from "../../store/reducers/receivedPuzzles";
@@ -54,6 +55,7 @@ export default function AddPuzzle({
       return puzzleData; // get just nested data from returned JSON
     } catch (error) {
       console.log(error);
+      Sentry.Native.captureException(error);
       if (error instanceof Error) throw new Error(error.message); //rethrow the error so it can be caught by outer method
     }
   };

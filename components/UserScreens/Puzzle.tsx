@@ -131,19 +131,14 @@ export default function PuzzleComponent({
       const { gridSize, puzzleType, imageURI } = pickedPuzzle;
       const squareSize = boardSize / gridSize;
       const numPieces = gridSize * gridSize;
-      const minSandboxY = boardSize * 1.01;
+      const topOfAd = puzzleAreaDimensions.puzzleAreaHeight - adHeight;
+      // minSandboxY (i.e. top of initial puzzle scatter area) is min of the bottom of board and top of ad banner minus the squaresize. Depending on the screen dimensions (i.e. iPad), sometimes the area below the board is smaller than the puzzle pieces.
+      const minSandboxY = Math.min(boardSize * 1.01, topOfAd - squareSize);
       // maxSandboxY (upper left max bound of initial piece position)
       // sometimes depending on screenheight, min is larger than max
-      const maxSandboxY = Math.max(
-        puzzleAreaDimensions.puzzleAreaHeight -
-          adHeight -
-          parentContainerStyle.padding * 2 -
-          squareSize,
-        minSandboxY
-      );
+      const maxSandboxY = Math.max(topOfAd - squareSize, minSandboxY);
 
-      setLowerBound(maxSandboxY);
-
+      setLowerBound(topOfAd);
       setPuzzle(pickedPuzzle);
 
       const shuffleOrder = shuffle(fillArray(gridSize), disableShuffle);
@@ -322,6 +317,7 @@ export default function PuzzleComponent({
                 style={{
                   flexDirection: "row",
                   justifyContent: "space-between",
+                  width: boardSize,
                 }}
               >
                 <FAB
@@ -332,20 +328,27 @@ export default function PuzzleComponent({
                     bottom: 20,
                     left: 5,
                     width: 40,
+                    alignSelf: "flex-start",
                   }}
                 />
-                <Text style={styles(styleProps).creatorText}>
-                  {winMessage.length
-                    ? `created by: ${puzzle.senderName}`
-                    : null}
-                </Text>
+                <View
+                  style={{
+                    width: boardSize - 40,
+                  }}
+                >
+                  <Text style={styles(styleProps).creatorText}>
+                    created by: {puzzle.senderName}
+                  </Text>
+                </View>
               </View>
-              <HyperLink
-                linkDefault
-                linkStyle={{ textDecorationLine: "underline" }}
-              >
-                <Text style={styles(styleProps).winText}>{winMessage}</Text>
-              </HyperLink>
+              <View>
+                <HyperLink
+                  linkDefault
+                  linkStyle={{ textDecorationLine: "underline" }}
+                >
+                  <Text style={styles(styleProps).winText}>{winMessage}</Text>
+                </HyperLink>
+              </View>
             </>
           )}
         </View>
@@ -427,6 +430,10 @@ const styles = (props: { theme: Theme; boardSize: number }) =>
     messageContainer: {
       flexDirection: "column",
       zIndex: -1,
+      backgroundColor: props.theme.colors.surface,
+      width: "80%",
+      alignSelf: "center",
+      borderRadius: props.theme.roundness,
     },
     winContainer: {
       flexDirection: "column",
@@ -438,12 +445,12 @@ const styles = (props: { theme: Theme; boardSize: number }) =>
       textAlign: "center",
       // flex: 1,
       color: props.theme.colors.text,
-      marginTop: -15,
     },
     creatorText: {
       fontSize: 12,
       flexWrap: "wrap",
       textAlign: "right",
+      marginLeft: 5,
       // flex: 1,
       color: props.theme.colors.text,
       marginTop: 2,

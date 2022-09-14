@@ -68,7 +68,7 @@ export default function RegisterScreen({
         icon="account"
         mode="contained"
         onPress={() =>
-          onPress(email, password, confirmPassword, setErrors, true)
+          onPress(email.trim(), password, confirmPassword, setErrors, true)
         }
         style={{ margin: 10 }}
         disabled={email.length === 0 || password.length === 0}

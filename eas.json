@@ -12,15 +12,20 @@
     },
     "preview:apk": {
       "distribution": "internal",
+      "releaseChannel": "internal-testing",
       "android": {
         "buildType": "apk"
       }
     },
     "preview:aab": {
       "distribution": "internal",
+      "releaseChannel": "internal-testing",
       "android": {
         "buildType": "app-bundle"
       }
+    },
+    "testflight": {
+      "releaseChannel": "internal-testing"
     },
     "production": {}
   },

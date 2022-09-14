@@ -122,7 +122,7 @@ export default function PuzzlePiece({
         lastOffset.x
       );
       lastOffset.y = Math.min(
-        lowerBound - pieceDimensions.height * 0.5 - initialPlacement.y,
+        lowerBound - pieceDimensions.height - initialPlacement.y,
         lastOffset.y
       );
       // snap piece here using lastOffset, adjust for centered snapping points

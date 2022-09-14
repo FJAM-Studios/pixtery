@@ -3,14 +3,14 @@ import {
   NavigationContainerRef,
 } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import Constants from "expo-constants";
+import * as Device from "expo-device";
 import * as Linking from "expo-linking";
 import * as Notifications from "expo-notifications";
 import { StatusBar } from "expo-status-bar";
 import { requestTrackingPermissionsAsync } from "expo-tracking-transparency";
 import * as Updates from "expo-updates";
 import { useRef, useEffect } from "react";
-import { Alert, AppState, LogBox, Dimensions, Platform } from "react-native";
+import { LogBox, Dimensions, Platform } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Provider as PaperProvider } from "react-native-paper";
 import { RootSiblingParent } from "react-native-root-siblings";
@@ -20,11 +20,13 @@ import {
   useDispatch,
   useSelector,
 } from "react-redux";
+import * as Sentry from "sentry-expo";
 
 import { TabContainer } from "./components/Containers";
 import { Splash, TitleScreen } from "./components/TransitionScreens";
 import { CreateProfile, EnterName } from "./components/UserScreens";
 import { MIN_BOTTOM_CLEARANCE } from "./constants";
+import { DSN } from "./sentry";
 import store from "./store";
 import { setNotificationToken } from "./store/reducers/notificationToken";
 import { setDeviceSize } from "./store/reducers/screenHeight";
@@ -42,6 +44,12 @@ Notifications.setNotificationHandler({
   }),
 });
 
+Sentry.init({
+  dsn: DSN,
+  enableInExpoDevelopment: true,
+  debug: true, // If `true`, Sentry will try to print out useful debugging information if something goes wrong with sending the event. Set it to `false` in production
+});
+
 const App = (): JSX.Element => {
   const dispatch = useDispatch();
   const navigationRef = useRef<NavigationContainerRef<RootStackParamList> | null>(
@@ -49,24 +57,30 @@ const App = (): JSX.Element => {
   );
   const theme = useSelector((state: RootState) => state.theme);
 
-  const promptRestart = () => {
-    Alert.alert("A new update is ready. Please restart the app.", "", [
-      {
-        text: "Close",
-        style: "cancel",
-      },
-      {
-        text: "Restart",
-        onPress: () => Updates.reloadAsync(),
-      },
-    ]);
-  };
+  // const promptRestart = () => {
+  //   Alert.alert("A new update is ready. Please restart the app.", "", [
+  //     {
+  //       text: "Close",
+  //       style: "cancel",
+  //     },
+  //     {
+  //       text: "Restart",
+  //       onPress: () => Updates.reloadAsync(),
+  //     },
+  //   ]);
+  // };
   const getUpdate = async () => {
     try {
+      console.log("checking for updates...");
       const isUpdate = await Updates.checkForUpdateAsync();
       if (isUpdate.isAvailable) {
+        console.log("update is available, downloading...");
         await Updates.fetchUpdateAsync();
-        promptRestart();
+        console.log("app will be updated next restart.");
+        // commenting out the restart prompt but leaving the fetchUpdate so users get new version silently
+        // promptRestart();
+      } else {
+        console.log("No update available.");
       }
     } catch (error) {
       console.log(error);
@@ -76,19 +90,22 @@ const App = (): JSX.Element => {
   useEffect(() => {
     //don't check for updates in dev mode
     if (process.env.NODE_ENV !== "development") {
-      // when update is downloaded, request reload
-      Updates.addListener((event) => {
-        if (event.type === Updates.UpdateEventType.UPDATE_AVAILABLE) {
-          promptRestart();
-        }
-      });
+      // commenting out listener; just have app check for update on initial open
 
-      //check for updates when app is foregrounded
-      AppState.addEventListener("change", () => {
-        if (AppState.currentState === "active") {
-          getUpdate();
-        }
-      });
+      getUpdate();
+      // // when update is downloaded, request reload
+      // Updates.addListener((event) => {
+      //   if (event.type === Updates.UpdateEventType.UPDATE_AVAILABLE) {
+      //     promptRestart();
+      //   }
+      // });
+
+      // //check for updates when app is foregrounded
+      // AppState.addEventListener("change", () => {
+      //   if (AppState.currentState === "active") {
+      //     getUpdate();
+      //   }
+      // });
     }
 
     async function requestTrackingPermissions() {
@@ -101,7 +118,7 @@ const App = (): JSX.Element => {
     requestTrackingPermissions();
 
     const registerForPushNotificationsAsync = async () => {
-      if (Constants.isDevice) {
+      if (Device.isDevice) {
         const {
           status: existingStatus,
         } = await Notifications.getPermissionsAsync();

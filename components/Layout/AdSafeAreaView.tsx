@@ -1,11 +1,16 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AdMobBanner } from "expo-ads-admob";
+import * as Device from "expo-device";
 import * as StoreReview from "expo-store-review";
 import { useEffect } from "react";
 import { StyleProp, ViewStyle, View, LayoutChangeEvent } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 
-import { BANNER_ID, DAY_IN_MILLISECONDS } from "../../constants";
+import {
+  TEST_BANNER_ID,
+  BANNER_ID,
+  DAY_IN_MILLISECONDS,
+} from "../../constants";
 import { setAdHeight } from "../../store/reducers/adHeight";
 import { RootState } from "../../types";
 
@@ -60,7 +65,7 @@ export default function AdSafeAreaView(props: {
       <View onLayout={(ev) => measureAdArea(ev)}>
         <AdMobBanner
           bannerSize="smartBannerPortrait"
-          adUnitID={BANNER_ID}
+          adUnitID={Device.isDevice ? BANNER_ID : TEST_BANNER_ID}
           style={{ marginTop: "auto", alignSelf: "center" }}
           servePersonalizedAds
         />
